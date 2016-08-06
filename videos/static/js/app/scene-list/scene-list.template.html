@@ -1,0 +1,75 @@
+<pagination page-type="'Scene'"></pagination>
+
+
+    <table>
+    <tr ng-repeat="scene in $ctrl.scenes">
+        <td>
+            <a href="/#!/scene/{{ scene.id }}">
+                <img ng-src="{{ scene.thumbnail }}" class="thumb-wide"
+                     alt="{{ scene.name }}"
+                />
+            </a>
+        </td>
+        <td>
+            <h4>{{$index + 1}}) <a href="/#!/scene/{{ scene.id }}">  {{ scene.name }}</a></h4>
+
+                        <span>Websites:
+                                <button class="btn btn-success btn-xs"
+                                        popover-trigger="outsideClick"
+                                        uib-popover-template="'static/partials/popover-templates/popover-website.template.html'"
+                                        popover-append-to-body="true"
+                                        type="button" class="btn btn-success">
+                                    <span
+
+                                            class="glyphicon glyphicon-plus"></span>
+                                </button>
+                            <br>
+
+                            <span ng-repeat="site in scene.websites"> <a
+                                    href="/#!/website/{{ site.id }}">  {{ site.name }}</a> <span
+                                    class="glyphicon glyphicon-remove"
+                                    ng-click="$ctrl.removeItem(scene,site,'websites')"></span> {{$last ? '' : ', '}} </span>
+
+                            </span>
+
+                <br>
+                        <span>Tags:
+                            <button class="btn btn-success btn-xs"
+                                    popover-trigger="outsideClick"
+                                    uib-popover-template="'static/partials/popover-templates/popover-tag.template.html'"
+                                    popover-append-to-body="true"
+                                    type="button" class="btn btn-success"
+                            >
+                                    <span
+
+                                            class="glyphicon glyphicon-plus"></span>
+                                </button>
+                            <br>
+                            <span ng-repeat="tag in scene.scene_tags"> <a
+                                    href="/#!/scene-tag/{{ tag.id }}">  {{ tag.name }}</a> <span
+                                    class="glyphicon glyphicon-remove"
+                                    ng-click="$ctrl.removeItem(scene,tag,'scene_tags')"></span> {{$last ? '' : ', '}} </span>
+                            </span>
+                <br>
+                        <span>Performers:
+                             <button class="btn btn-success btn-xs"
+                                     popover-trigger="outsideClick"
+                                     uib-popover-template="'static/partials/popover-templates/popover-actor.template.html'"
+                                     popover-append-to-body="true"
+                                     type="button">
+                                    <span
+
+                                            class="glyphicon glyphicon-plus"></span>
+                                </button>
+                            <br>
+                            <span ng-repeat="actor in scene.actors">  <a
+                                    href="/#!/actor/{{ actor.id }}">  {{ actor.name }}</a> <span
+                                    class="glyphicon glyphicon-remove"
+                                    ng-click="$ctrl.removeItem(scene,actor,'actors')"></span> {{$last ? '' : ', '}} </span>
+                            </span>
+
+
+        </td>
+    </tr>
+</table>
+

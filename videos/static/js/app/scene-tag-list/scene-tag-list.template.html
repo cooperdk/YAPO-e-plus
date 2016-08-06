@@ -1,0 +1,34 @@
+<!--
+    <div class="row">
+        <div class="col-md-2">
+
+
+            Search: <input ng-model="search.name"/>
+
+            <p>
+                Sort by:
+                <select ng-model="$ctrl.orderProp">
+                    <option value="name">Alphabetical</option>
+                    <option value="ethnicity">Ethnicity</option>
+                    <option value="gender">Gender</option>
+                    <option value="height">Height</option>
+                    <option value="$ctrl.tags.scenes.length">Rating</option>
+                    {#                    <option value="age">Newest</option>#}
+                    <option value="-name">Alphabetical Des</option>
+                </select>
+            </p>
+
+        </div>
+-->
+<pagination page-type="'SceneTag'"></pagination>
+
+<ul class="tags">
+    <li ng-repeat="tag in $ctrl.tags">
+        <a href="/#!/scene-tag/{{ tag.id }}">{{ tag.name }}</a>
+        <span ng-click="$ctrl.deleteSceneTag(tag)" class="glyphicon glyphicon-remove"></span>
+
+    </li>
+</ul>
+
+
+

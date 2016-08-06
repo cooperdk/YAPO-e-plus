@@ -1,0 +1,1 @@
+On windows ffmpeg.exe and ffprobe.exe go in this folder.

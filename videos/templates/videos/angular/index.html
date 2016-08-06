@@ -1,0 +1,28 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html ng-app="yapoApp" lang="en">
+
+
+<head>
+    {% include 'videos/angular/index-head.html' %}
+</head>
+
+
+<body>
+
+<nav-bar></nav-bar>
+
+<br>
+<br>
+<div>
+
+    {% verbatim %}
+    <div ng-view class="view-frame"></div>
+    {% endverbatim %}
+
+</div>
+
+</body>
+
+</html>
+

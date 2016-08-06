@@ -1,0 +1,31 @@
+<div class="container-fluid" xmlns:C="http://www.w3.org/1999/xhtml">
+    <label>Path to folder to add: </label>
+<input class="form-control" id="inputdefault" type="text"
+                                             ng-model="$ctrl.pathToFolderToAdd">
+<button type="button" ng-click="$ctrl.addFolderClicked()" class="btn btn-default btn-sm"
+ uib-popover-html="'Add selected path and all supported videos in it to the Yapo database.(For now the path needs to be added manually Ex: C:\\myVideos\\)'"
+        popover-trigger="mouseenter" popover-placement="right-top"
+>
+    <span class="glyphicon glyphicon-plus"></span> Add Folder
+</button>
+<input type="checkbox" ng-model="createSampleVideo"
+uib-popover-html="'If checked will try to create a mp4 sample video for each scene in the *Add folder* path.<strong>Each</strong> sample video takes about 10Mb
+of storage on average and it takes about 30 seconds to create. The sample length is between 30 and 90 seconds depending on the duration of the original scene.
+The samples are stored in media/scenes/(sceneId)/sample'"
+        popover-trigger="mouseenter" popover-placement="right-top"
+> <label>Create sample video ?  </label>
+<br>
+<br>
+<br>
+<br>
+
+<label>Actors names seperated by commas: </label><textarea class="form-control" rows="5" id="comment"
+                                                           ng-model="$ctrl.actorsToAdd"></textarea>
+<button type="button" ng-click="$ctrl.addActorsClicked()" class="btn btn-default btn-sm"
+uib-popover-html="'Adds actors to the database. Actors should be seperated by commas EX: Adriana Nicole,Stoya,James Deen'"
+        popover-trigger="mouseenter" popover-placement="right-top"
+>
+    <span class="glyphicon glyphicon-plus"></span> Add Actors
+</button>
+
+</div>

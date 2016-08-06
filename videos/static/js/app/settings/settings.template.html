@@ -1,0 +1,30 @@
+<div class="container-fluid">
+
+    <label>Path to VLC player:</label><input class="form-control" id="inputdefault" type="text"
+                                         ng-model="$ctrl.pathToVLC">
+<button type="button" ng-click="$ctrl.updateVlcPath()" class="btn btn-default btn-sm"
+        uib-popover-html="'Sets Yapos VLC path to the path in the text input.'"
+        popover-trigger="mouseenter" popover-placement="right-top"
+>
+    <span class="glyphicon glyphicon-cog"></span> Set VLC Path
+</button>
+
+<br>
+<button type="button" ng-click="$ctrl.scrapAllActors()" class="btn btn-default btn-sm"
+        uib-popover-html="'Scrapes <strong>all</strong> previously unscraped actors with TMdB and Freeones scrapers.'"
+        popover-trigger="mouseenter"  popover-placement="right-top"
+>
+    <span class="glyphicon glyphicon-user"
+
+    ></span> Scrape All Actors
+</button>
+
+<button type="button" ng-click="$ctrl.tagAllScenes()" class="btn btn-default btn-sm"
+        uib-popover-html="'Checks all scenes in the database against all known Tags,Websites and Actors, and tags them with the correct information.'"
+        popover-trigger="mouseenter"  popover-placement="right-top"
+>
+    <span class="glyphicon glyphicon-user"
+
+    ></span> Tag All Scenes
+</button>
+</div>

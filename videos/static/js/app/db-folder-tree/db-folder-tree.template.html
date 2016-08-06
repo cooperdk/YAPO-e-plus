@@ -1,0 +1,41 @@
+<div class="container-fluid">
+
+
+    <div class="row">
+        <div class="col-md-4" id="left">
+            <div class="well"><h3>
+                <span ng-repeat="n in $ctrl.nav"
+                      ng-click="$ctrl.navClick(n)"
+                      class="on-hover-red-cursor-pointer"> {{ n.last_folder_name_only }} > </span>
+            </h3></div>
+
+            <ul class="dbFolders">
+                <li ng-model="$ctrl.dbFolders"
+                    ng-repeat="folder in $ctrl.dbFolders"
+                    class="thumbnail">
+                    <span ng-click="$ctrl.appendFolders(folder)"><a
+                            href="">{{$index + 1}}) {{ folder.last_folder_name_only }} </a>  </span>
+
+
+                    <!--
+                    <ul>
+                        <scene-list pk="folder.scenes"></scene-list>
+                    </ul>
+                    -->
+
+                </li>
+            </ul>
+
+        </div>
+        <div class="col-md-8">
+
+            <div class="scene-list">
+
+                <scene-list tree-folder="$ctrl.routParam"></scene-list>
+            </div>
+
+        </div>
+
+
+    </div>
+</div>

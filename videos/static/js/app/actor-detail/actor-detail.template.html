@@ -1,0 +1,263 @@
+<uib-alert ng-repeat="alert in $ctrl.alerts" class="enter" type="{{ alert.type }}" close="$ctrl.closeAlert($index)"
+           dismiss-on-timeout="{{ alert.timeout }}">{{ alert.msg }}</uib-alert>
+<h1 align="center">{{$ctrl.actor.name}}</h1>
+<h2 align="center">
+    <uib-rating ng-model="$ctrl.actor.rating" max="10" read-only="isReadonly" on-hover="hoveringOver(value)"
+                on-leave="overStar = null" titles="['one','two','three']"
+                aria-labelledby="default-rating" ng-change="$ctrl.updateActor($ctrl.actor)"></uib-rating>
+</h2>
+<ul>
+    <li><span>Favorite
+        <label class="switch">
+  <input type="checkbox" ng-model="$ctrl.actor.is_fav" ng-change="$ctrl.updateActor($ctrl.actor)">
+  <div class="slider round"></div></span>
+        </label>
+
+    </li>
+    <li>Runner up
+        <label class="switch">
+            <input type="checkbox" ng-model="$ctrl.actor.is_runner_up" ng-change="$ctrl.updateActor($ctrl.actor)">
+            <div class="slider round"></div>
+        </label>
+
+    </li>
+</ul>
+
+<!--
+<div class="col-md-8">
+            <div class="scene-list">
+                <h3>Scenes:</h3>
+                <scene-list pk="$ctrl.actor.scenes"></scene-list>
+            </div>
+        </div>
+-->
+
+
+<div class="row">
+    <div class="col-md-8 ">
+
+        <h3>Scenes:</h3>
+        <div id="big-scroll-item" class="scene-list">
+            <scene-list pk="$ctrl.actor.scenes"></scene-list>
+        </div>
+
+    </div>
+    <div class="col-lg-4">
+
+            <table class="actor-detail">
+            <tr>
+                <td colspan="2">
+
+
+                    <div class="alcenter">
+                        <button type="button" ng-click="$ctrl.scrapeActor('TMDB')" class="btn btn-default btn-sm">
+                            <span class="glyphicon glyphicon-plus"></span> Scrape TMdb
+                        </button>
+                        <button type="button" ng-click="$ctrl.scrapeActor('freeOnes')"
+                                class="btn btn-default btn-sm">
+                            <span class="glyphicon glyphicon-plus"></span> Scrape Freeones
+                        </button>
+                    </div>
+
+                    <detail-profile-image ng-if="$ctrl.updateImage" actor="$ctrl.actor"></detail-profile-image>
+
+
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <div class="actor-bio">
+                        <a href="#" editable-textarea="$ctrl.actor.description" e-rows="5" e-cols="100"
+                           onaftersave="$ctrl.updateActor($ctrl.actor)">
+                            {{ $ctrl.actor.description || 'no description' }}
+                        </a>
+                    </div>
+                </td>
+
+
+            </tr>
+
+            <tr>
+                <td>
+                    Date of Birth:
+                </td>
+                <td class="alright">
+                    <a href="#" editable-bsdate="$ctrl.actor.date_of_birth" e-is-open="opened.$data"
+                       e-ng-click="open($event,'$data')"
+                       e-datepicker-popup="dd-MMMM-yyyy">
+                        {{ ($ctrl.actor.date_of_birth | date:"dd/MM/yyyy") || 'NA' }}
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Ethnicity:
+                </td>
+                <td class="alright">
+                    <a href="#" editable-text="$ctrl.actor.ethnicity"
+                       onaftersave="$ctrl.updateActor($ctrl.actor)">
+                        {{ $ctrl.actor.ethnicity || 'NA' }}
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Aliases:
+                    <input type="text" name="name" ng-model="aliasToInsert"/>
+                    <button type="button" ng-click="$ctrl.aliasInput(aliasToInsert)"
+                            class="btn btn-default btn-sm">
+                        <span class="glyphicon glyphicon-plus"></span> Add
+                    </button>
+                </td>
+                <td>
+
+                    <actor-alias-list pk="$ctrl.actor.actor_aliases"></actor-alias-list>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Tags:
+                    <async-typeahead object="$ctrl.actor.actor_tags"
+                                     object-type='actor_tags'
+                                     sending-object="$ctrl.actor"
+                                     sending-object-type='Actor'
+                                     selected-object="$ctrl.selectedActorTag = $event.selected"
+                    ></async-typeahead>
+                </td>
+                <td class="alright">
+                    <actor-tag-list pk="$ctrl.actor.actor_tags" actor="$ctrl.actor"></actor-tag-list>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Height:
+
+                </td>
+                <td class="alright">
+                    <span>
+                    <a href="#!" editable-text="$ctrl.actor.height" onaftersave="$ctrl.updateActor($ctrl.actor)"
+                       e-label="Weight:">{{ $ctrl.actor.height || 'NA' }} cm</a>
+                     </span>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td>
+                    Weight:
+
+                </td>
+                <td class="alright">
+                    <span>
+                    <a href="#!" editable-text="$ctrl.actor.weight" onaftersave="$ctrl.updateActor($ctrl.actor)"
+                       e-label="Weight:">{{ $ctrl.actor.weight || 'NA' }} Kg</a>
+                     </span>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    Measurements:
+
+                </td>
+                <td class="alright">
+                    <span>
+                    <a href="#" editable-text="$ctrl.actor.measurements" onaftersave="$ctrl.updateActor($ctrl.actor)">
+                        {{ $ctrl.actor.measurements || 'NA' }}
+                        </a>
+                     </span>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    Gender:
+
+                </td>
+                <td class="alright">
+                    <span>
+                        <a href="#" editable-text="$ctrl.actor.gender" onaftersave="$ctrl.updateActor($ctrl.actor)">
+                        {{ $ctrl.actor.gender || 'NA' }}
+                        </a>
+
+                    </span>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    Country Of Birth:
+
+                </td>
+                <td class="alright">
+                    <span>
+                       <a href="#" editable-text="$ctrl.actor.country_of_origin"
+                          onaftersave="$ctrl.updateActor($ctrl.actor)">
+                           {{ $ctrl.actor.country_of_origin || 'NA' }}
+                       </a>
+
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    {{ $ctrl.actor.name }} on the web:
+                </td>
+                <td>
+                    <ul>
+
+                        <li ng-if="$ctrl.isNotEmpty('official_pages')"><a
+                                href="{{ $ctrl.actor.official_pages }}"
+                                target="_blank"> {{ actor.name }} official page</a></li>
+
+
+                        <li ng-if="$ctrl.isNotEmpty('tmdb_id')"><a
+                                href="https://www.themoviedb.org/person/{{ $ctrl.actor.tmdb_id }}"
+                                target="_blank"> {{ actor.name }} at
+                            TMDB.com</a></li>
+
+                        <li ng-if="$ctrl.isNotEmpty('imdb_id')"><a
+                                href="http://www.imdb.com/name/{{ $ctrl.actor.imdb_id }}"
+                                target="_blank"> {{ actor.name }} at
+                            IMDB.com</a>
+                        </li>
+
+                        <li><a href="http://www.pornhub.com/pornstar/{{ $ctrl.actorNameDelimiter('-') }}"
+                               target="_blank">{{ actor.name }} at Pornhub</a></li>
+
+                        <li><a href="http://www.empornium.me/torrents.php?taglist={{  $ctrl.actorNameDelimiter('.') }}"
+                               target="_blank">{{ actor.name }} at Empornium</a></li>
+                        <li><a href="https://kat.cr/usearch/{{  $ctrl.actorNameDelimiter(' ') }} category:xxx"
+                               target="_blank">{{ actor.name }} at Kickasstorrents </a></li>
+
+                        <li><a href="http://www.xvideos.com/?k={{ $ctrl.actorNameDelimiter('.') }}"
+                               target="_blank">{{ actor.name }} at Xvidoes </a></li>
+
+                        <li><a href="https://duckduckgo.com/?q=
+                            {{  $ctrl.actorNameDelimiter('+') }}&iax=1&ia=images&iaf=size%3Al"
+                               target="_blank">{{ actor.name }} at DuckDuckGo image search </a></li>
+
+
+                    </ul>
+
+                </td>
+            </tr>
+        </table>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+

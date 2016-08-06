@@ -1,0 +1,235 @@
+body {
+    padding-top: 20px;
+}
+
+.actor-detail {
+
+    clear: both;
+    border-spacing: 0.2em;
+    float: right;
+    width: 40%;
+    margin: 2em;
+    background: whitesmoke;
+
+}
+
+
+
+.actor-detail li {
+    text-align: right;
+    list-style-position: outside;
+    list-style: none;
+
+}
+
+.actor-detail table,tr, th, td {
+    /*border: 1px solid black;*/
+    border-collapse: collapse;
+}
+
+.actor-detail th, td {
+    padding: 15px;
+}
+
+.alright {
+    text-align: right;
+}
+
+.alcenter{
+
+    text-align: center;
+}
+
+.actor-dsc {
+    margin: 50px;
+    float: left;
+}
+
+.actors {
+    list-style: none;
+}
+
+.actors li {
+    clear: both;
+    height: 150px;
+    padding-top: 15px;
+}
+
+.scenes {
+    list-style: none;
+}
+
+.scenes li {
+    clear: both;
+    height: 250px;
+    padding-top: 15px;
+}
+
+/* View: Phone detail */
+.sample-video {
+    /*background-color: white;*/
+    /*border: 1px solid black;*/
+    float: right;
+    /*height: 400px;*/
+    /*margin-bottom: 2em;*/
+    margin-right: 3em;
+    /*padding: 2em;*/
+    /*width: 720px;*/
+}
+
+.actor-thumb {
+    /*background-color: white;*/
+    border: 1px solid black;
+
+    /*height: 400px;*/
+    /*margin-bottom: 2em;*/
+    /*margin-right: 3em;*/
+    /*padding: 2em;*/
+    margin-top: 0.5em;
+    /*width: 400px;*/
+}
+
+.dbFolders {
+    border: 1px solid black;
+    padding: 1em;
+    background-color: #b2dba1;
+}
+
+.scene-list {
+    /*height: 1900px;*/
+    /*border: 1px solid black;*/
+    padding: 1em;
+    margin-left: 3em;
+    max-height: 60em;
+    width: 85%;
+    float: inherit;
+
+    /*background-color: aquamarine;*/
+}
+
+.scene-info {
+
+}
+
+.actor-bio {
+    /*border: 0.1em solid black;*/
+    /*background: whitesmoke;*/
+    /*margin: 2em;*/
+    /*width: 35.5em;*/
+    text-align: justify;
+    /*overflow: scroll;*/
+    /*float: right;*/
+    /*padding: 1.1em;*/
+
+    /*height: 20em;*/
+}
+
+/*.actor-thumbs {*/
+/*list-style: none;*/
+/*margin: 0;*/
+/*}*/
+
+.thumb {
+    float: left;
+    height: 100px;
+    margin: -0.5em 1em 1.5em 0;
+    padding-bottom: 1em;
+    width: 100px;
+}
+
+.thumb-wide {
+    float: left;
+    /*height: 240px;*/
+    /*padding-right: 1em;*/
+    height: 180px;
+    width: 320px;
+
+    border: 0.2em solid black;
+}
+
+.on-hover-red-cursor-pointer:hover {
+    color: red;
+    cursor: pointer;
+}
+
+.glyphicon-remove:hover {
+    color: red;
+    cursor: pointer;
+}
+
+.glyphicon-plus:hover {
+    color: green;
+    cursor: hand;
+}
+
+#right {
+    overflow-y: scroll;
+}
+
+#big-scroll-item {
+    height: 55em;
+    overflow-y: scroll;
+}
+
+/*toggle button*/
+/* The switch - the box around the slider */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 30px;
+    height: 17px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+    display: none;
+}
+
+/* The slider */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 12px;
+    width: 12px;
+    left: 2px;
+    bottom: 2.5px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(13px);
+    -ms-transform: translateX(13px);
+    transform: translateX(13px);
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 17px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+

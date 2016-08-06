@@ -1,0 +1,18 @@
+<div class="phone">
+    <img ng-src="/static/images/website/{{$ctrl.website.name}}/profile/profile.jpg" width="{{ $ctrl.imageWidth }}px"/>
+    <h5 ng-click="$ctrl.zoomUp(2)">Zoom x2</h5>
+    <h5 ng-click="$ctrl.zoomDown(2)">UnZoom x2</h5>
+</div>
+
+<br>
+
+<h1>{{$ctrl.website.name}}</h1>
+<h3>This website is used {{$ctrl.website.scenes.length}} times </h3>
+<p>{{$ctrl.website.description}}</p>
+
+
+<scene-list></scene-list>
+
+
+
+

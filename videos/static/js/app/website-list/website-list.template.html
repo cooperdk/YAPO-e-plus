@@ -1,0 +1,11 @@
+<pagination page-type="'Website'"></pagination>
+
+<ul class="websites">
+    <li ng-repeat="site in $ctrl.websites">
+        <a href="/#!/website/{{ site.id }}">[{{$index + 1}}] {{ site.name }} </a><span
+            ng-click="$ctrl.removeWebsiteFromScene(site)"
+            class="glyphicon glyphicon-remove"></span>
+
+    </li>
+</ul>
+

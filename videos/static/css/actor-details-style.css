@@ -1,0 +1,44 @@
+.image-and-text {
+    text-align: justify;
+    width: 256px;
+    position: absolute;
+    right: 20px;
+    margin: 20px;
+
+}
+
+.image-and-text img {
+    display: block;
+    border: 25px gray;
+    margin-right: 10px;
+
+}
+
+.headline {
+    text-align: center;
+}
+
+#wrapper {
+    width: 1080px;
+    margin: 0 auto;
+}
+
+#leftcolumn, #rightcolumn {
+    border: 1px solid white;
+    float: left;
+    min-height: 450px;
+    color: black;
+}
+
+#leftcolumn {
+    width: 600px;
+
+    /* # background-color: #111; */
+}
+
+#rightcolumn {
+
+    width: 300px;
+
+    /* # background-color: #777; */
+}

@@ -1,0 +1,224 @@
+{% load staticfiles %}
+<meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
+<title ng-bind="'Yapo: ' + title"></title>
+
+
+<!--
+
+{#    <script src="{% static 'bower_components/jquery/dist/jquery.min.map' %}"></script>#}
+
+<link href="{% static 'css/bootstrap.min.css' %} " rel="stylesheet">
+<script src="{% static 'bower_components/jquery/dist/jquery.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+<script src="{% static 'lib/angular.js' %}"></script>
+
+<script src="{% static 'lib/angular-resource.js' %}"></script>
+<script src="{% static 'lib/angular-route.js' %}"></script>
+
+<script src="{% static 'lib/angular-animate.js' %}"></script>
+<script src="{% static 'lib/angular-route.js' %}"></script>
+
+did not install (maybe uneeded)
+<script src="{% static 'lib/angular-ui.router.js' %}"></script>
+<script src="{% static 'lib/angular-sanitize.js' %}"></script>
+
+<script src="{% static 'bower_components/angular-django-rest-resource/angular-django-rest-resource.js' %}"></script>
+
+
+{# video #}
+<script src="{% static 'bower_components/video.js/dist/video.js' %}"></script>
+<script src="{% static 'bower_components/vjs-video/dist/vjs-video.js' %}"></script>
+<link rel="stylesheet" href="{% static 'bower_components/video.js/dist/video-js.css' %}"/>
+
+<script src="{% static 'js/ui-bootstrap-tpls-1.3.3.js' %}"></script>
+
+{# infinite scroll https://sroze.github.io/ngInfiniteScroll/documentation.html#}
+<script src="{% static 'bower_components/ngInfiniteScroll/build/ng-infinite-scroll.js' %}"></script>
+<script src="{% static 'js/app/core/infinite-scroll/infinite-scroll.config.js' %}"></script>
+
+
+{#angularStrap from:  http://mgcrea.github.io/angular-strap/#}
+<script src="{% static 'bower_components/angular-strap/dist/angular-strap.min.js' %}"></script>
+<script src="{% static 'bower_components/angular-strap/dist/angular-strap.tpl.min.js' %}"></script>
+
+{#angular-motion from: https://github.com/mgcrea/angular-motion#}
+
+<link rel="stylesheet" href="{% static 'bower_components/angular-motion/dist/angular-motion.min.css' %}">
+
+
+{#lazyScroll from http://shabeebk.com/blog/lazy-scroll-infinite-scrolling-angularjs-plugin#}
+
+<script src="{% static 'bower_components/lazy-scroll/lazy-scroll.js' %}"></script>
+
+{#-- angular-ui-tree-#}
+<script type="text/javascript"
+        src="{% static 'bower_components/angular-ui-tree/dist/angular-ui-tree.js' %}"></script>
+        <link rel="stylesheet" href="{% static 'bower_components/angular-ui-tree/dist/angular-ui-tree.min.css' %}">
+
+-- infinite scroll config--
+<script src="{% static 'js/app/core/infinite-scroll/infinite-scroll.config.js' %}"></script>
+
+Probobly will need this
+<script src="{% static 'bower_components/angular-img-cropper/dist/angular-img-cropper.min.js' %}"></script>
+-->
+
+
+{#Dependencies:#}
+
+<script src="{% static 'bower/bower_components/jquery/dist/jquery.min.js' %}"></script>
+
+
+
+<script src="{% static 'bower/bower_components/bootstrap/dist/js/bootstrap.min.js' %}"></script>
+<link href="{% static 'bower/bower_components/bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
+
+
+{#<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>#}
+<script src="{% static 'bower/bower_components/angular/angular.js' %}"></script>
+<script src="{% static 'bower/bower_components/angular-animate/angular-animate.min.js' %}"></script>
+
+<!-- angularUI https://github.com/angular-ui/-->
+
+{#For some reason closing popover with a click only works with version 1.3.3 of ui-bootstrap. Sadly the version on bower is 2.0#}
+{#<script src="{% static 'bower/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js' %}"></script>#}
+{#<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/1.3.3/ui-bootstrap-tpls.min.js"></script>#}
+<script src="{% static 'js/dep-not-in-bower/ui-bootstrap-tpls-1.3.3.js' %}"></script>
+
+
+{#<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0rc1/angular-route.min.js"></script>#}
+<script src="{% static 'bower/bower_components/angular-route/angular-route.min.js' %}"></script>
+<script src="{% static 'bower/bower_components/angular-resource/angular-resource.min.js' %}"></script>
+
+
+<!--  https://github.com/AllanBishop/angular-img-cropper -->
+<script src="{% static 'bower/bower_components/angular-img-cropper/dist/angular-img-cropper.min.js' %}"></script>
+
+
+<script src="{% static 'bower/bower_components/angular-xeditable/dist/js/xeditable.js' %}"></script>
+<link href="{% static 'bower/bower_components/angular-xeditable/dist/css/xeditable.css' %} " rel="stylesheet">
+
+<!-- ngStorage https://github.com/gsklee/ngStorage-->
+
+<script src="{% static 'bower/bower_components/ngstorage/ngStorage.js' %}"></script>
+
+
+
+{#<script src="{% static 'bower/bower_components/angular-bootstrap/ui-bootstrap.min.js' %}"></script>#}
+
+
+
+
+
+{#My app#}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="{% static 'js/app/core/actor/actor.module.js' %}"></script>
+<script src="{% static 'js/app/core/actor/actor.service.js' %}"></script>
+
+<script src="{% static 'js/app/core/scene/scene.module.js' %}"></script>
+<script src="{% static 'js/app/core/scene/scene.service.js' %}"></script>
+
+<script src="{% static 'js/app/core/actor-alias/actor-alias.module.js' %}"></script>
+<script src="{% static 'js/app/core/actor-alias/actor-alias.service.js' %}"></script>
+
+
+<script src="{% static 'js/app/core/actor-tag/actor-tag.module.js' %}"></script>
+<script src="{% static 'js/app/core/actor-tag/acotr-tag.service.js' %}"></script>
+
+<script src="{% static 'js/app/core/scene-tag/scene-tag.module.js' %}"></script>
+<script src="{% static 'js/app/core/scene-tag/scene-tag.service.js' %}"></script>
+
+<script src="{% static 'js/app/core/website/website.module.js' %}"></script>
+<script src="{% static 'js/app/core/website/website.service.js' %}"></script>
+
+<script src="{% static 'js/app/core/db-folder/db-folder.module.js' %}"></script>
+<script src="{% static 'js/app/core/db-folder/db-folder.service.js' %}"></script>
+
+<script src="{% static 'js/app/actor-alias-list/actor-alias-list.module.js' %}"></script>
+<script src="{% static 'js/app/actor-alias-list/actor-alias-list.component.js' %}"></script>
+
+<script src="{% static 'js/app/website-list/website-list.module.js' %}"></script>
+<script src="{% static 'js/app/website-list/website-list.component.js' %}"></script>
+
+<script src="{% static 'js/app/website-detail/website-detail.module.js' %}"></script>
+<script src="{% static 'js/app/website-detail/website-detail.component.js' %}"></script>
+
+<script src="{% static 'js/app/scene-tag-list/scene-tag-list.module.js' %}"></script>
+<script src="{% static 'js/app/scene-tag-list/scene-tag-list.component.js' %}"></script>
+
+<script src="{% static 'js/app/scene-tag-detail/scene-tag-detail.module.js' %}"></script>
+<script src="{% static 'js/app/scene-tag-detail/scene-tag-detail.component.js' %}"></script>
+
+<script src="{% static 'js/app/actor-tag-list/actor-tag-list.module.js' %}"></script>
+<script src="{% static 'js/app/actor-tag-list/actor-tag-list.component.js' %}"></script>
+
+<script src="{% static 'js/app/actor-tag-detail/actor-tag-detail.module.js' %}"></script>
+<script src="{% static 'js/app/actor-tag-detail/actor-tag-detail.component.js' %}"></script>
+
+<script src="{% static 'js/app/scene-list/scene-list.module.js' %}"></script>
+<script src="{% static 'js/app/scene-list/scene-list.component.js' %}"></script>
+
+<script src="{% static 'js/app/scene-detail/scene-detail.module.js' %}"></script>
+<script src="{% static 'js/app/scene-detail/scene-detail.component.js' %}"></script>
+
+<script src="{% static 'js/app/db-folder-tree/db-folder-tree.module.js' %}"></script>
+<script src="{% static 'js/app/db-folder-tree/db-folder-tree.component.js' %}"></script>
+
+<script src="{% static 'js/app/detail-profile-image/detail-profile-image.module.js' %}"></script>
+<script src="{% static 'js/app/detail-profile-image/detail-profile-image.component.js' %}"></script>
+
+<script src="{% static 'js/app/pagination/pagination.module.js' %}"></script>
+<script src="{% static 'js/app/pagination/pagination.component.js' %}"></script>
+
+<script src="{% static 'js/app/async-typeahead/async-typeahead.module.js' %}"></script>
+<script src="{% static 'js/app/async-typeahead/async-typeahead.component.js' %}"></script>
+
+<script src="{% static 'js/app/section-list-wrapper/section-list-wrapper.module.js' %}"></script>
+<script src="{% static 'js/app/section-list-wrapper/section-list-wrapper.component.js' %}"></script>
+
+<script src="{% static 'js/app/nav-bar/nav-bar.module.js' %}"></script>
+<script src="{% static 'js/app/nav-bar/nav-bar.component.js' %}"></script>
+
+
+<script src="{% static 'js/app/add-items/add-items.module.js' %}"></script>
+<script src="{% static 'js/app/add-items/add-items.component.js' %}"></script>
+
+<script src="{% static 'js/app/settings/settings.module.js' %}"></script>
+<script src="{% static 'js/app/settings/settings.component.js' %}"></script>
+
+<script src="{% static 'js/app/actor-list/actor-list.module.js' %}"></script>
+<script src="{% static 'js/app/actor-list/actor-list.component.js' %}"></script>
+<script src="{% static 'js/app/actor-detail/actor-detail.module.js' %}"></script>
+<script src="{% static 'js/app/actor-detail/actor-detail.component.js' %}"></script>
+<script src="{% static 'js/app/core/core.module.js' %}"></script>
+<script src="{% static 'js/app/core/checkmark/checkmark.filter.js' %}"></script>
+
+<script src="{% static 'js/app/app.upload.js' %}"></script>
+<script src="{% static 'js/app/app.module.js' %}"></script>
+<script src="{% static 'js/app/app.config.js' %}"></script>
+<script src="{% static 'js/app/app.controller.js' %}"></script>
+<script src="{% static 'js/app/app.services.js' %}"></script>
+
+{#<script src="{% static 'js/app/app.constant.js' %}"></script>#}
+
+
+
+<link rel="stylesheet" type="text/css" href="{% static 'css/angular/styles.css' %}">
+
+
+
+

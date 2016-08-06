@@ -1,0 +1,137 @@
+<h1 align="center">{{$ctrl.scene.name}}</h1>
+<a href="/#!/folder/{{ $ctrl.scene.folders_in_tree[0] }}"><h5 align="center">{{$ctrl.scene.path_to_dir}}</h5></a>
+<h2 align="center">
+    <uib-rating ng-model="$ctrl.scene.rating" max="10" read-only="isReadonly" on-hover="hoveringOver(value)"
+                on-leave="overStar = null" titles="['one','two','three']"
+                aria-labelledby="default-rating" ng-change="$ctrl.updateScene($ctrl.scene)"></uib-rating>
+    <br>
+    <button type="button" ng-click="$ctrl.playScene()" class="btn btn-default btn-sm">
+        <span class="glyphicon glyphicon-play-circle"></span> Play Scene
+    </button>
+    <button type="button" ng-click="$ctrl.openFolder()" class="btn btn-default btn-sm">
+        <span class="glyphicon glyphicon-folder-open"></span> Open Folder
+    </button>
+    <button type="button" ng-click="$ctrl.generateSampleVideo($ctrl.scene)" class="btn btn-default btn-sm"
+            uib-popover-html="'Will try to create a mp4 sample video for this scene. Sample size is about 10MB and its duration is between 30 and 90 seconds
+            ,depending on the source duration. It takes about 30 seconds to generate a sample video, and it is stored in media/scenes/(sceneid)/sample.
+            For now, the server is locked while generating the sample. This is by design, and will be changed later.'"
+            popover-trigger="mouseenter" popover-placement="right"
+    >
+        <span class="glyphicon glyphicon-facetime-video"></span> Generate Sample Video
+    </button>
+
+
+</h2>
+
+<ul>
+    <li><span>Favorite
+        <!-- Rounded switch -->
+        <label class="switch">
+  <input type="checkbox" ng-model="$ctrl.scene.is_fav" ng-change="$ctrl.updateScene($ctrl.scene)">
+  <div class="slider round"></div></span>
+        </label>
+
+    </li>
+    <li>Runner up
+        <label class="switch">
+            <input type="checkbox" ng-model="$ctrl.scene.is_runner_up" ng-change="$ctrl.updateScene($ctrl.scene)">
+            <div class="slider round"></div>
+        </label>
+
+    </li>
+</ul>
+
+
+<p>{{$ctrl.scene.description}}</p>
+
+<div class="row">
+    <div class="col-md-8">
+        <ul>
+            <li>Tags:
+
+                <async-typeahead object="$ctrl.scene.scene_tags"
+                                 object-type='scene_tags'
+                                 sending-object="$ctrl.scene"
+                                 sending-object-type='Scene'
+                                 selected-object="$ctrl.selectedSceneTag = $event.selected"
+                ></async-typeahead>
+
+                <scene-tag-list pk="$ctrl.scene.scene_tags" scene="$ctrl.scene"></scene-tag-list>
+
+
+            </li>
+
+            <li>Actors:
+
+                <async-typeahead object="$ctrl.scene.actors"
+                                 object-type='actors'
+                                 sending-object="$ctrl.scene"
+                                 sending-object-type='Scene'
+                                 selected-object="$ctrl.selectedActor = $event.selected"
+                ></async-typeahead>
+
+
+                <actor-list class="pre-scrollable" mainPage="false" scene="$ctrl.scene"></actor-list>
+            </li>
+
+            <li>Websites:
+
+                <async-typeahead object="$ctrl.scene.websites"
+                                 object-type='websites'
+                                 sending-object="$ctrl.scene"
+                                 sending-object-type='Scene'
+                                 selected-object="$ctrl.selectedWebsite = $event.selected"
+                ></async-typeahead>
+
+
+                <website-list class="pre-scrollable" pk="$ctrl.scene.websites" scene="$ctrl.scene"></website-list>
+            </li>
+
+        </ul>
+
+        <h1>{{ rate }}</h1>
+
+
+    </div>
+    <div class="col-md-4">
+        <div>
+            <div class="sample-video">
+                <a href="#!/scene/{{ $ctrl.next }}">Next</a>
+                <a href="#!/scene/{{ $ctrl.prev }}">Prev</a>
+
+
+                <video ng-if="$ctrl.updatedSample" poster="{{ $ctrl.scene.thumbnail }}" ng-src="{{ $ctrl.samplePath }}"
+                       width="540" controls></video>
+
+
+            </div>
+
+            <ul align="left">
+                File info:
+                <li>
+                    Video bitrate: {{ $ctrl.scene.bit_rate / 1000 }} Kb\s
+                </li>
+                <li>
+                    Video size: {{ $ctrl.scene.size / 1000000 }} MB
+                </li>
+                <li>
+                    Video resolution: {{ $ctrl.scene.width}}x{{ $ctrl.scene.height}}
+                </li>
+                <li>
+                    Video codec name: {{ $ctrl.scene.codec_name }}
+                </li>
+                <li>
+                    Video framerate: {{ $ctrl.scene.framerate }}
+                </li>
+                <li>
+                    Video druation: {{ $ctrl.scene.duration / 60 }} Minutes
+                </li>
+            </ul>
+
+        </div>
+    </div>
+</div>
+
+
+
+

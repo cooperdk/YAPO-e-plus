@@ -1,0 +1,30 @@
+{
+  "name": "yapo",
+  "homepage": "https://github.com/curtwagner1984/YAPO",
+  "authors": [
+    "Curt Wagner <curtwagner1984@gmail.com>"
+  ],
+  "description": "Yet Another Porn Organizer",
+  "main": "app.config.js",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^3.1.0",
+    "bootstrap": "^3.3.7",
+    "angular": "^1.5.8",
+    "angular-resource": "^1.5.8",
+    "angular-route": "^1.5.8",
+    "angular-animate": "^1.5.8",
+    "angular-xeditable": "^0.2.0",
+    "ngstorage": "^0.3.11",
+    "angular-bootstrap": "^2.0.1",
+    "angular-img-cropper": "^1.1.0"
+  }
+}
