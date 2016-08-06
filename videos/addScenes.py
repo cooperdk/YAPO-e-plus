@@ -70,13 +70,13 @@ def create_scene(scene_path, make_sample_video):
 
                 print("Screenshot taken...".format(
                     scene_in_db.name))
+            scene_in_db.save()
 
     else:
         current_scene.save()
 
         print("Trying to use ffprobe on scene: {}".format(current_scene.name))
         if ffmpeg_process.ffprobe_get_data_without_save(current_scene):
-
             print(
                 "FFpbrobe successfully gathered information on scene {} ... Taking a screenshot wiht ffmpeg...".format(
                     current_scene.name))
