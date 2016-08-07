@@ -11,68 +11,9 @@ angular.module('dbFolderTree').component('dbFolderTree', {
             $rootScope.title = "Folders";
             self.currentDir;
             self.pageType = 'DbFolder';
+            self.nav = [];
 
             self.routParam = $routeParams.parentId;
-
-
-            if ($routeParams.parentId != undefined) {
-                self.dbFolders = DbFolder.query({
-                    id: $routeParams.parentId, offset: '0',
-                    limit: '100'
-                });
-
-                var x = self.dbFolders.$promise.then(function (res) {
-
-
-                    var y = res[0];
-
-
-                    for (var z in y[0].path_id) {
-                        console.log("Name is: " + y[0].path_id[z].name);
-                        console.log("id is: " + y[0].path_id[z].id);
-                        var temp = {'last_folder_name_only': y[0].path_id[z].name, 'id': y[0].path_id[z].id};
-                        self.nav.push(temp)
-                    }
-
-
-                })
-            }
-            //     // alert("Route Params are:" + $routeParams.parentId);
-            //
-            //     scopeWatchService.folderOpened($routeParams.parentId);
-            //
-            //
-            // } else {
-            if (angular.isUndefined(this.parent)) {
-                // alert("Parent is undefined")
-                // self.dbFolders = DbFolder.query({level: '0'});
-                self.dbFolders = DbFolder.query({level: '0'}).$promise.then(function (res) {
-                    self.dbFolders = helperService.resourceToArray(res[0]);
-
-
-                    // self.actorsToadd = res[0];
-
-                    var paginationInfo = {
-                        pageType: self.pageType,
-                        pageInfo: res[1]
-                    };
-
-                    scopeWatchService.paginationInit(paginationInfo);
-
-
-                });
-
-
-                //self.actors = Actor.query({pk: self.pk.toString()});
-                // this.orderProp = 'level';
-                self.nav = []
-            } else {
-                console.log("db-folder-tree: folder tree parent is " + $routeParams.parentId);
-                self.dbFolders = self.dbFolders.concat(DbFolder.query({
-                    parent: $routeParams.parentId
-                }));
-            }
-            // }
 
             self.appendFolders = function (clickedFolder) {
                 // alert(clickedFolder)
@@ -89,10 +30,10 @@ angular.module('dbFolderTree').component('dbFolderTree', {
                     self.dbFoldersToAppend = helperService.resourceToArray(result[0]);
 
                     // alert(self.dbFoldersToAppend)
-                    if (redirectedFromNav == false) {
-                        self.nav.push(clickedFolder)
-                    }
-                    redirectedFromNav = false;
+                    // if (redirectedFromNav == false) {
+                    //     self.nav.push(clickedFolder)
+                    // }
+                    // redirectedFromNav = false;
 
                     // self.dbFolders = self.dbFolders.concat(self.dbFoldersToAppend)
 
@@ -106,6 +47,64 @@ angular.module('dbFolderTree').component('dbFolderTree', {
 
 
             };
+
+
+            if ($routeParams.parentId != undefined) {
+                var temp = DbFolder.query({
+                    id: $routeParams.parentId, offset: '0',
+                    limit: '100'
+                });
+
+                var currentFolder = undefined;
+                var x = temp.$promise.then(function (res) {
+
+                    // res is a 2d array. In the [0] is another array of the result folders,
+                    // while [1] is header info from the request.
+                    var currentFolder = res[0][0];
+
+
+                    for (var z in currentFolder.path_id) {
+                        console.log("Name is: " + currentFolder.path_id[z].name);
+                        console.log("id is: " + currentFolder.path_id[z].id);
+                        var temp = {
+                            'last_folder_name_only': currentFolder.path_id[z].name,
+                            'id': currentFolder.path_id[z].id
+                        };
+                        self.nav.push(temp)
+                    }
+
+                    self.appendFolders(currentFolder);
+
+
+                })
+
+
+            } else {
+
+                self.dbFolders = DbFolder.query({level: '0'}).$promise.then(function (res) {
+                    self.dbFolders = helperService.resourceToArray(res[0]);
+
+
+                    var paginationInfo = {
+                        pageType: self.pageType,
+                        pageInfo: res[1]
+                    };
+
+                    scopeWatchService.paginationInit(paginationInfo);
+
+
+                });
+            }
+
+
+            //
+            //     self.nav = []
+            // } else {
+            //     console.log("db-folder-tree: folder tree parent is " + $routeParams.parentId);
+            //     self.dbFolders = self.dbFolders.concat(DbFolder.query({
+            //         parent: $routeParams.parentId
+            //     }));
+            // }
 
 
             self.navClick = function (clickedFolder) {
@@ -149,7 +148,6 @@ angular.module('dbFolderTree').component('dbFolderTree', {
                     return true;
                 }
             };
-
 
 
         }

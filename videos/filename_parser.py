@@ -9,11 +9,6 @@ from videos.models import Actor, Scene, ActorAlias, SceneTag, Website
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 
-actors = Actor.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
-actors_alias = ActorAlias.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
-scene_tags = SceneTag.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
-websites = Website.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
-
 
 def parse_all_scenes():
     for scene in Scene.objects.all():
@@ -21,6 +16,10 @@ def parse_all_scenes():
 
 
 def parse_scene_all_metadata(scene):
+    actors = Actor.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
+    actors_alias = ActorAlias.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
+    scene_tags = SceneTag.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
+    websites = Website.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
 
     print("Parsing scene's: {} path for actors,tags,and websites ...".format(scene.name))
 
@@ -30,16 +29,16 @@ def parse_scene_all_metadata(scene):
     # are not consistan through the files)
     scene_path = re.sub(r'"(.*)(\w+ \d{1,2}, \d{4})"', r'\1', scene_path)
 
-    scene_path = parse_website_in_scenes(scene, scene_path)
+    scene_path = parse_website_in_scenes(scene, scene_path, websites)
 
-    scene_path = parse_actors_in_scene(scene, scene_path)
+    scene_path = parse_actors_in_scene(scene, scene_path, actors, actors_alias)
 
-    scene_path = parse_scene_tags_in_scene(scene, scene_path)
+    scene_path = parse_scene_tags_in_scene(scene, scene_path, scene_tags)
 
     print("Finished parsing scene's {} path...".format(scene.name))
 
 
-def parse_actors_in_scene(scene_to_parse, scene_path):
+def parse_actors_in_scene(scene_to_parse, scene_path, actors, actors_alias):
     # MyModel.objects.extra(select={'length':'Length(name)'}).order_by('length')
 
     for actor in actors:
@@ -80,6 +79,7 @@ def parse_actors_in_scene(scene_to_parse, scene_path):
 def add_actor_to_scene(actor_to_add, scene_to_add_to):
     # if not Scene.objects.filter(pk=scene_to_add_to.pk, actors__pk=actor_to_add.pk):
     if not scene_to_add_to.actors.filter(pk=actor_to_add.pk):
+
         print("Adding " + actor_to_add.name + " to scene" + scene_to_add_to.name + "\n")
         scene_to_add_to.actors.add(actor_to_add)
         scene_to_add_to.save()
@@ -103,21 +103,22 @@ def get_regex_search_term(name, delimiter):
     return regex_search_term
 
 
-def parse_scene_tags_in_scene(scene, scene_path):
+def parse_scene_tags_in_scene(scene, scene_path, scene_tags):
     for scene_tag in scene_tags:
         regex_search_term = get_regex_search_term(scene_tag.name, '.')
 
         if re.search(regex_search_term, scene_path, re.IGNORECASE) is not None:
             scene_path = re.sub(regex_search_term, '', scene_path, flags=re.IGNORECASE)
             if not scene.scene_tags.filter(name=scene_tag.name):
-                print("Adding " + scene_tag.name + " to scene" + scene.name + "\n")
+                print("Adding {} to scene {}".format(scene_tag.name, scene.name))
+                # print("Adding " + scene_tag.name + " to scene" + scene.name + "\n")
                 scene.scene_tags.add(scene_tag)
             else:
-                print(scene_tag.name + " is already in" + scene.name + "\n")
+                print("{} is already in {}".format(scene_tag.name, scene.name))
     return scene_path
 
 
-def parse_website_in_scenes(scene, scene_path):
+def parse_website_in_scenes(scene, scene_path, websites):
     for website in websites:
         regex_search_term = get_regex_search_term(website.name, '.')
 

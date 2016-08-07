@@ -34,6 +34,8 @@ from operator import attrgetter
 from random import shuffle
 import videos.const as const
 
+import threading
+
 
 # Aux Functions
 def search_in_get_queryset(original_queryset, request):
@@ -190,12 +192,16 @@ def settings(request):
 
         if 'scrapAllActor' in request.query_params:
             if request.query_params['scrapAllActor'] == "True":
-                _thread.start_new_thread(scrape_all_actors, True, ())
+                threading.Thread(target=scrape_all_actors,
+                                 args=(False,)
+                                 ).start()
+
             return Response(status=200)
 
         if 'tagAllScenes' in request.query_params:
             if request.query_params['tagAllScenes'] == "True":
-                _thread.start_new_thread(tag_all_scenes, (), )
+                threading.Thread(target=tag_all_scenes, ).start()
+                # _thread.start_new_thread(tag_all_scenes, (), )
             return Response(status=200)
 
 
@@ -217,19 +223,19 @@ class AddItems(views.APIView):
     def get(self, request, format=None):
 
         if request.query_params['folderToAddPath'] != "":
-            folder_to_add_path = request.query_params['folderToAddPath']
+            folders_to_add_path = request.query_params['folderToAddPath']
 
-            if os.path.isdir(folder_to_add_path):
-                # if the second argument is true - tries to make a sample video when inserting scene to db.
-                if request.query_params['createSampleVideo'] == 'true':
-                    _thread.start_new_thread(videos.addScenes.get_files, (folder_to_add_path, True))
+            for folder_to_add_path in folders_to_add_path.split(','):
+                if os.path.isdir(folder_to_add_path):
+                    # if the second argument is true - tries to make a sample video when inserting scene to db.
+                    if request.query_params['createSampleVideo'] == 'true':
+                        videos.addScenes.get_files(folder_to_add_path, True)
+                    else:
+                        videos.addScenes.get_files(folder_to_add_path, False)
                 else:
-                    _thread.start_new_thread(videos.addScenes.get_files, (folder_to_add_path, False))
-
-                return Response(status=200)
-            else:
-                content = {'Path does not exist!': "Can't find path!"}
-                return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    content = {'Path does not exist!': "Can't find path!"}
+                    return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(status=200)
 
         if request.query_params['actorsToAdd'] != "":
             actors_to_add = request.query_params['actorsToAdd']
@@ -241,9 +247,11 @@ class AddItems(views.APIView):
                 try:
                     if not ActorAlias.objects.filter(name=actor_to_insert.name):
                         actor_to_insert.save()
+                        print("Added {} To db".format(actor_to_insert.name))
                 except django.db.IntegrityError as e:
-                    content = {'something whent wrong': e}
-                    return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    # content = {'something whent wrong': e}
+                    print("{} while trying to add {}".format(e, actor_to_insert.name))
+                    # return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             return Response(status=200)
 

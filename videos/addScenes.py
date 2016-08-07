@@ -72,6 +72,8 @@ def create_scene(scene_path, make_sample_video):
                     scene_in_db.name))
             scene_in_db.save()
 
+
+
     else:
         current_scene.save()
 

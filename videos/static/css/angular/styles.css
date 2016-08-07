@@ -147,10 +147,30 @@ body {
     border: 0.2em solid black;
 }
 
+
 .on-hover-red-cursor-pointer:hover {
     color: red;
     cursor: pointer;
 }
+
+.on-hover-red-cursor-pointer a {
+    /*text-decoration: none;*/
+    color: black;
+}
+
+.on-hover-red-cursor-pointer a:link {
+    text-decoration: none;
+
+}
+
+.on-hover-red-cursor-pointer a:hover {
+    color: red;
+
+}
+
+
+
+
 
 .glyphicon-remove:hover {
     color: red;
