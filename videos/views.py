@@ -35,7 +35,7 @@ from random import shuffle
 import videos.const as const
 
 import threading
-
+import pathlib
 
 # Aux Functions
 def search_in_get_queryset(original_queryset, request):
@@ -341,7 +341,8 @@ class AssetAdd(views.APIView):
                     actor.save()
 
                     if not os.path.exists(current_tumb):
-                        os.makedirs(current_tumb)
+
+                        os.makedirs(os.path.dirname(current_tumb))
                     shutil.move(save_dest, current_tumb)
 
             return Response(status=200)
