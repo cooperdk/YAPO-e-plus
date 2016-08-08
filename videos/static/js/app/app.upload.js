@@ -24,7 +24,7 @@ myApp.service('fileUpload', ['$http', function ($http) {
         fd.append('file', file);
         fd.append('type', uploadingObject);
         fd.append('id', uploadingObjectID);
-        $http.post('http://127.0.0.1:8000/upload/', fd, {
+        $http.post('/upload/', fd, {
             transformRequest: angular.identity,
             headers: {'Content-Type': undefined}
         })
