@@ -240,15 +240,19 @@
 
                         <li><a href="http://www.empornium.me/torrents.php?taglist={{  $ctrl.actorNameDelimiter('.') }}"
                                target="_blank">{{ actor.name }} at Empornium</a></li>
-                        <li><a href="https://kat.cr/usearch/{{  $ctrl.actorNameDelimiter(' ') }} category:xxx"
-                               target="_blank">{{ actor.name }} at Kickasstorrents </a></li>
 
                         <li><a href="http://www.xvideos.com/?k={{ $ctrl.actorNameDelimiter('.') }}"
                                target="_blank">{{ actor.name }} at Xvidoes </a></li>
 
                         <li><a href="https://duckduckgo.com/?q=
-                            {{  $ctrl.actorNameDelimiter('+') }}&iax=1&ia=images&iaf=size%3Al"
+                            {{$ctrl.actorNameDelimiter('&#43;')}}&iax=1&ia=images&iaf=size%3Al"
                                target="_blank">{{ actor.name }} at DuckDuckGo image search </a></li>
+
+
+                        <li><a
+                                href="https://www.google.com/search?as_st=y&tbm=isch&as_q={{  $ctrl.actorNameDelimiter('&#43;') }}&as_epq=&as_oq=&as_eq=&cr=&as_sitesearch=&safe=images&tbs=isz:l,iar:t
+                            "
+                               target="_blank">{{ actor.name }} at Google image search </a></li>
 
 
                     </ul>

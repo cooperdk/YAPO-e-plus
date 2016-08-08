@@ -262,6 +262,8 @@ angular.module('actorDetail').component('actorDetail', {
                 if (gotPromise) {
                     var newName = self.actor.name.replace(/ /g, delimiter);
                     // console.log("Name with delimeter " + delimiter + " is " + newName);
+                    newName = newName + delimiter + "pornstar";
+                    console.log("Name with delimiter is:" +  newName);
                     return newName;
                 }
 
