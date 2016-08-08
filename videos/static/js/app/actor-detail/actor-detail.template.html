@@ -21,6 +21,19 @@
         </label>
 
     </li>
+    <li>Allow one word name when auto-tagging:
+        <label class="switch" uib-popover-html="'By default actors with one word name (Ex: &quot;Stoya&quot; )
+            are ignored when autotagging scenes. If checked this will allow this actor to be autotaged even though
+            their consists name is one word only. <i>Use only on actors whos name are unique enough as to not cause incorrect tagging.</i>'"
+                 popover-trigger="mouseenter" popover-placement="right-top">
+            <input type="checkbox" ng-model="$ctrl.actor.is_exempt_from_one_word_search"
+                   ng-change="$ctrl.updateActor($ctrl.actor)">
+            <div class="slider round"
+
+            ></div>
+        </label>
+
+    </li>
 </ul>
 
 <!--
@@ -44,7 +57,7 @@
     </div>
     <div class="col-lg-4">
 
-            <table class="actor-detail">
+        <table class="actor-detail">
             <tr>
                 <td colspan="2">
 

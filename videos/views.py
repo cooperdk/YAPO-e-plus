@@ -212,6 +212,16 @@ def ffmpeg(request):
             if request.query_params['generateSampleVideo']:
                 scene_id = request.query_params['sceneId']
                 scene = Scene.objects.get(pk=scene_id)
+                if scene.duration is None:
+                    success_probe = ffmpeg_process.ffprobe_get_data_without_save(scene)
+                    if success_probe:
+                        success = ffmpeg_process.ffmpeg_create_sammple_video(scene)
+
+                        if success:
+                            return Response(status=200)
+                        else:
+                            return Response(status=500)
+
                 success = ffmpeg_process.ffmpeg_create_sammple_video(scene)
                 if success:
                     return Response(status=200)
