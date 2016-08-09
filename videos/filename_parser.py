@@ -10,18 +10,13 @@ from videos.models import Actor, Scene, ActorAlias, SceneTag, Website
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 
 
-def parse_all_scenes():
-    for scene in Scene.objects.all():
-        parse_scene_all_metadata(scene)
+# def parse_all_scenes():
+#     for scene in Scene.objects.all():
+#         parse_scene_all_metadata(scene)
 
 
-def parse_scene_all_metadata(scene):
-    actors = Actor.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
-    actors_alias = ActorAlias.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
-    scene_tags = SceneTag.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
-    websites = Website.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
-
-    print("Parsing scene's: {} path for actors,tags,and websites ...".format(scene.name))
+def parse_scene_all_metadata(scene, actors, actors_alias, scene_tags, websites):
+    print("Parsing scene's: {} path: {} for actors,tags,and websites ...".format(scene.name, scene.path_to_file))
 
     scene_path = scene.path_to_file.lower()
 
@@ -43,6 +38,7 @@ def parse_actors_in_scene(scene_to_parse, scene_path, actors, actors_alias):
 
     for actor in actors:
         # If actor name is only one word or exempt from being searched even though it is one word.
+        # print("Checking actor {}".format(actor.name))
         if actor.name.count(' ') > 0 or actor.is_exempt_from_one_word_search:
 
             regex_search_term = get_regex_search_term(actor.name, ' ')
@@ -57,7 +53,7 @@ def parse_actors_in_scene(scene_to_parse, scene_path, actors, actors_alias):
                 # print (actor.name + " is one word name")
 
     for alias in actors_alias:
-
+        # print("Checking alias {}".format(alias.name))
         actor_in_alias = alias.actors.first()
         if actor_in_alias:
             if alias.name.count(' ') > 0 or actor_in_alias.is_exempt_from_one_word_search:
@@ -73,6 +69,7 @@ def parse_actors_in_scene(scene_to_parse, scene_path, actors, actors_alias):
                     add_actor_to_scene(actor_in_alias, scene_to_parse)
                     # else:
                     # print(alias.name + " is one word alias")
+
     return scene_path
 
 

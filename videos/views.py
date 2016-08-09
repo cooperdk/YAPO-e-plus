@@ -37,6 +37,7 @@ import videos.const as const
 import threading
 import pathlib
 
+
 # Aux Functions
 def search_in_get_queryset(original_queryset, request):
     qs_list = list()
@@ -113,9 +114,18 @@ def scrape_all_actors(force):
 
 def tag_all_scenes():
     scenes = Scene.objects.all()
+    scene_count = scenes.count()
+    counter = 1
+
+    actors = list(Actor.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
+    actors_alias = list(ActorAlias.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
+    scene_tags = SceneTag.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
+    websites = Website.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
 
     for scene in scenes:
-        filename_parser.parse_scene_all_metadata(scene)
+        print("Scene {} out of {}".format(counter, scene_count))
+        filename_parser.parse_scene_all_metadata(scene, actors, actors_alias, scene_tags, websites)
+        counter += 1
 
 
 # views
@@ -341,7 +351,6 @@ class AssetAdd(views.APIView):
                     actor.save()
 
                     if not os.path.exists(current_tumb):
-
                         os.makedirs(os.path.dirname(current_tumb))
                     shutil.move(save_dest, current_tumb)
 

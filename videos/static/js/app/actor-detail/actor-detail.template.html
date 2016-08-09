@@ -95,11 +95,20 @@
                     Date of Birth:
                 </td>
                 <td class="alright">
-                    <a href="#" editable-bsdate="$ctrl.actor.date_of_birth" e-is-open="opened.$data"
+                    <div>
+                        <a href="#" editable-bsdate="$ctrl.actor.date_of_birth" e-is-open="opened.$data"
                        e-ng-click="open($event,'$data')"
                        e-datepicker-popup="dd-MMMM-yyyy">
                         {{ ($ctrl.actor.date_of_birth | date:"dd/MM/yyyy") || 'NA' }}
                     </a>
+                        <br>
+                        <span ng-if="$ctrl.actor != undefined && $ctrl.actor.date_of_birth != undefined">
+                            ({{ $ctrl.howOld($ctrl.actor.date_of_birth)}} Years Old )
+                        </span>
+
+                    </div>
+
+
                 </td>
             </tr>
             <tr>

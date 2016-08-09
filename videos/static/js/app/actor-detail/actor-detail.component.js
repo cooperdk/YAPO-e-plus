@@ -307,6 +307,23 @@ angular.module('actorDetail').component('actorDetail', {
                 });
 
 
+            };
+
+            self.howOld = function (datetime) {
+                var actorDob = new Date (datetime);
+                var actorDobYear = actorDob.getFullYear();
+                
+                var dt = new Date();
+                var nowYear = dt.getFullYear();
+
+                // Display the month, day, and year. getMonth() returns a 0-based number.
+                
+                console.log("Actor Age:" +  nowYear - actorDobYear);
+                
+                return (nowYear - actorDobYear)
+                
+
+
             }
 
         }
