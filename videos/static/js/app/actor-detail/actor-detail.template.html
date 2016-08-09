@@ -1,6 +1,11 @@
 <uib-alert ng-repeat="alert in $ctrl.alerts" class="enter" type="{{ alert.type }}" close="$ctrl.closeAlert($index)"
            dismiss-on-timeout="{{ alert.timeout }}">{{ alert.msg }}</uib-alert>
-<h1 align="center">{{$ctrl.actor.name}}</h1>
+<h1 align="center">
+     <a href="#" editable-text="$ctrl.actor.name"
+                          onaftersave="$ctrl.updateActor($ctrl.actor)" style="cursor:text">
+                           {{ $ctrl.actor.name || 'NA' }}
+                       </a>
+   </h1>
 <h2 align="center">
     <uib-rating ng-model="$ctrl.actor.rating" max="10" read-only="isReadonly" on-hover="hoveringOver(value)"
                 on-leave="overStar = null" titles="['one','two','three']"
