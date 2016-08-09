@@ -81,7 +81,7 @@ def parse_actors_in_scene(scene_to_parse, scene_path, actors, actors_alias):
                     scene_path = re.sub(regex_search_term, '', scene_path, flags=re.IGNORECASE)
                     # print ("Trimmed scene path is: " + scene_path + "\n")
 
-                    print(alias.name + "is alias for" + actor_in_alias.name)
+                    print(alias.name + " is alias for " + actor_in_alias.name)
                     add_actor_to_scene(actor_in_alias, scene_to_parse)
                     # else:
                     # print(alias.name + " is one word alias")

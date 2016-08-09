@@ -6,7 +6,7 @@ from videos import filename_parser
 
 django.setup()
 
-from videos.models import Scene, Folder, Actor
+from videos.models import *
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 
@@ -101,7 +101,14 @@ def create_scene(scene_path, make_sample_video):
 
         current_scene.save()
 
-        filename_parser.parse_scene_all_metadata(current_scene)
+        actors = list(Actor.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
+        actors_alias = list(ActorAlias.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
+        scene_tags = SceneTag.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
+        websites = Website.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
+
+        filtered_alias = list()
+
+        filename_parser.parse_scene_all_metadata(current_scene, actors, actors_alias, scene_tags, websites)
 
 
 def find_duplicates():
