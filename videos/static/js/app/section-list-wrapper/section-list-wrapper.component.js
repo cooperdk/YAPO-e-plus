@@ -4,12 +4,12 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
         templateUrl: 'static/js/app/section-list-wrapper/section-wrapper.template.html',
         bindings: {
             sectionType: '='
+
         },
         controller: ['$scope', '$rootScope', '$rootScope', 'scopeWatchService',
             function ActorListWrapperController($scope, Actor, $rootScope, scopeWatchService) {
 
                 var self = this;
-                $rootScope.title = "Actors";
 
                 var searchTerm = "";
 
@@ -103,14 +103,19 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
 
                 if (self.sectionType == 'ActorList') {
                     self.orderFields = actorOrderFields;
+                    $rootScope.title = "Actors";
                 } else if (self.sectionType == 'SceneList') {
                     self.orderFields = sceneOrderFields;
+                    $rootScope.title = "Scenes"
                 } else if (self.sectionType == 'WebsiteList') {
                     self.orderFields = websiteOrderFields;
+                    $rootScope.title = "Websites"
                 } else if (self.sectionType == 'ActorTagList') {
                     self.orderFields = actorTagOrderFields;
+                    $rootScope.title = "Actor Tags"
                 } else if (self.sectionType == 'SceneTagList') {
                     self.orderFields = sceneTagOrderFields;
+                    $rootScope.title = "Scene Tags"
                 }
 
 

@@ -10,9 +10,25 @@ from videos.models import Actor, Scene, ActorAlias, SceneTag, Website
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 
 
-# def parse_all_scenes():
-#     for scene in Scene.objects.all():
-#         parse_scene_all_metadata(scene)
+def parse_all_scenes():
+    actors = list(Actor.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
+    actors_alias = list(ActorAlias.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
+    scene_tags = SceneTag.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
+    websites = Website.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
+
+    filtered_alias = list()
+    scenes = Scene.objects.all()
+    scene_count = scenes.count()
+    counter = 1
+
+    for alias in actors_alias:
+        if ' ' in alias.name or alias.is_exempt_from_one_word_search:
+            filtered_alias.append(alias)
+
+    for scene in scenes:
+        print("Scene {} out of {}".format(counter, scene_count))
+        parse_scene_all_metadata(scene, actors, filtered_alias, scene_tags, websites)
+        counter += 1
 
 
 def parse_scene_all_metadata(scene, actors, actors_alias, scene_tags, websites):
@@ -38,7 +54,7 @@ def parse_actors_in_scene(scene_to_parse, scene_path, actors, actors_alias):
 
     for actor in actors:
         # If actor name is only one word or exempt from being searched even though it is one word.
-        # print("Checking actor {}".format(actor.name))
+        print("     Checking actor {}".format(actor.name))
         if actor.name.count(' ') > 0 or actor.is_exempt_from_one_word_search:
 
             regex_search_term = get_regex_search_term(actor.name, ' ')
@@ -53,7 +69,7 @@ def parse_actors_in_scene(scene_to_parse, scene_path, actors, actors_alias):
                 # print (actor.name + " is one word name")
 
     for alias in actors_alias:
-        # print("Checking alias {}".format(alias.name))
+        print("             Checking alias {}".format(alias.name))
         actor_in_alias = alias.actors.first()
         if actor_in_alias:
             if alias.name.count(' ') > 0 or actor_in_alias.is_exempt_from_one_word_search:
@@ -147,9 +163,7 @@ def clean_taling_spaces():
 
 
 def main():
-    all_scenes = Scene.objects.all()
-    for scene in all_scenes:
-        parse_scene_all_metadata(scene)
+    parse_all_scenes()
 
 
 if __name__ == "__main__":

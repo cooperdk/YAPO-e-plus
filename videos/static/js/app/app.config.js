@@ -1,10 +1,11 @@
-app.config(['$sceProvider', '$locationProvider', '$routeProvider', '$httpProvider', '$resourceProvider',
+app.config(['$sceProvider', '$locationProvider', '$routeProvider', '$httpProvider', '$resourceProvider', 
     function config($sceProvider, $locationProvider, $routeProvider, $httpProvider, $resourceProvider) {
 
         // disable SCE completely (https://docs.angularjs.org/api/ng/service/$sce)
         $sceProvider.enabled(false);
 
         $locationProvider.hashPrefix('!');
+
 
         $routeProvider.when('/actor', {
             template: '<section-list-wrapper section-type="\'ActorList\'"></section-list-wrapper>'

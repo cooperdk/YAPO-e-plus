@@ -122,9 +122,15 @@ def tag_all_scenes():
     scene_tags = SceneTag.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
     websites = Website.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
 
+    filtered_alias = list()
+
+    for alias in actors_alias:
+        if ' ' in alias.name or alias.is_exempt_from_one_word_search:
+            filtered_alias.append(alias)
+
     for scene in scenes:
         print("Scene {} out of {}".format(counter, scene_count))
-        filename_parser.parse_scene_all_metadata(scene, actors, actors_alias, scene_tags, websites)
+        filename_parser.parse_scene_all_metadata(scene, actors, filtered_alias, scene_tags, websites)
         counter += 1
 
 

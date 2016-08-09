@@ -81,7 +81,7 @@ angular.module('actorAliasList').component('actorAliasList', {
                 var resId = [];
                 var resObjects = [];
 
-                for (i = 0 ; i < self.aliases.length; i++) {
+                for (var i = 0 ; i < self.aliases.length; i++) {
                     if (self.aliases[i].id != aliasToDelete.id) {
 
                             resId.push(self.aliases[i].id);
@@ -95,7 +95,22 @@ angular.module('actorAliasList').component('actorAliasList', {
                 self.aliases = resObjects;
 
 
-            }
+            };
+            self.isOneWord = function (alias) {
+                
+                return !(alias.name.indexOf(' ') > -1)
+                
+            };
+            
+            self.updateActorAlias = function (object) {
+
+                //
+                // var id = object.id + '/';
+                // alert(id);
+
+                ActorAlias.update({actorAliasId: object.id}, object);
+                // return alert(object.id + ' ' + object.name + ' input: ' + input);
+            };
         }
     ]
 });
