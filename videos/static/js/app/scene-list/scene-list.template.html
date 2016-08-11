@@ -1,7 +1,7 @@
 <pagination page-type="'Scene'"></pagination>
 
 
-    <table>
+<table>
     <tr ng-repeat="scene in $ctrl.scenes">
         <td>
             <a href="/#!/scene/{{ scene.id }}">
@@ -10,8 +10,27 @@
                 />
             </a>
         </td>
-        <td>
-            <h4>{{$index + 1}}) <a href="/#!/scene/{{ scene.id }}">  {{ scene.name }}</a></h4>
+        <td><h4>
+            <span>
+                {{$index + 1}}) <a href="/#!/scene/{{ scene.id }}">  {{ scene.name }}</a>
+
+                <label class="switch"
+                       uib-popover-html="'Toggle Runner Up.'"
+                       popover-trigger="mouseenter" popover-placement="right">
+                <input type="checkbox" ng-model="scene.is_runner_up" ng-change="$ctrl.sceneRunnerUpToggle(scene)">
+                <div class="slider round"></div>
+                </label>
+
+                <span class="glyphicon glyphicon-play-circle on-hover-red-cursor-pointer" uib-popover-html="'Play scene.'"
+                       popover-trigger="mouseenter" popover-placement="right" ng-click="$ctrl.playScene(scene)"
+
+
+                ></span>
+
+            </span>
+            </h4>
+
+
 
                         <span>Websites:
                                 <button class="btn btn-success btn-xs"
@@ -32,7 +51,7 @@
 
                             </span>
 
-                <br>
+            <br>
                         <span>Tags:
                             <button class="btn btn-success btn-xs"
                                     popover-trigger="outsideClick"
@@ -50,7 +69,7 @@
                                     class="glyphicon glyphicon-remove"
                                     ng-click="$ctrl.removeItem(scene,tag,'scene_tags')"></span> {{$last ? '' : ', '}} </span>
                             </span>
-                <br>
+            <br>
                         <span>Performers:
                              <button class="btn btn-success btn-xs"
                                      popover-trigger="outsideClick"

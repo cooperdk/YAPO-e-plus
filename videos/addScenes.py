@@ -227,6 +227,8 @@ def recursive_add_folders(parent, folders, scene_to_add, path_with_ids):
             parent.save()
 
 
+# Not implemented correctly
+# right now there is no way to clean empty dirs from db.
 def clean_empty_folders():
     all_folders = Folder.objects.filter(level=0)
 

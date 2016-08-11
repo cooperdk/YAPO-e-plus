@@ -54,7 +54,7 @@ def parse_actors_in_scene(scene_to_parse, scene_path, actors, actors_alias):
 
     for actor in actors:
         # If actor name is only one word or exempt from being searched even though it is one word.
-        print("     Checking actor {}".format(actor.name))
+        # print("     Checking actor {}".format(actor.name))
         if actor.name.count(' ') > 0 or actor.is_exempt_from_one_word_search:
 
             regex_search_term = get_regex_search_term(actor.name, ' ')
@@ -69,7 +69,7 @@ def parse_actors_in_scene(scene_to_parse, scene_path, actors, actors_alias):
                 # print (actor.name + " is one word name")
 
     for alias in actors_alias:
-        print("             Checking alias {}".format(alias.name))
+        # print("             Checking alias {}".format(alias.name))
         actor_in_alias = alias.actors.first()
         if actor_in_alias:
             if alias.name.count(' ') > 0 or actor_in_alias.is_exempt_from_one_word_search:

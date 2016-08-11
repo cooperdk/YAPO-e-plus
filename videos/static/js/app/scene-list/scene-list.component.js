@@ -6,8 +6,8 @@ angular.module('sceneList').component('sceneList', {
         mainPage: '=',
         treeFolder: '='
     },
-    controller: ['$scope', 'Scene', 'helperService', 'scopeWatchService', 'pagerService', 'Actor', 'Website', 'SceneTag',
-        function SceneListController($scope, Scene, helperService, scopeWatchService, pagerService, Actor, Website, SceneTag, $rootScope) {
+    controller: ['$scope', 'Scene', 'helperService', 'scopeWatchService', 'pagerService', 'Actor', 'Website', 'SceneTag', '$http',
+        function SceneListController($scope, Scene, helperService, scopeWatchService, pagerService, Actor, Website, SceneTag, $http, $rootScope ) {
 
             var self = this;
             self.sceneArray = [];
@@ -287,12 +287,28 @@ angular.module('sceneList').component('sceneList', {
 
                 self.nextPage(0);
             });
+            
+            
+            self.sceneRunnerUpToggle = function (scene) {
+                
+                self.patchScene(scene.id,'is_runner_up',scene.is_runner_up)
+                
+            };
 
 
             self.sceneArrayPush = function (sceneId) {
 
                 self.sceneArray.push(sceneId);
                 // console.log("Scene-List: sceneArray is:" +  angular.toJson(self.sceneArray))
+            };
+
+            self.playScene = function (scene) {
+
+                return $http.get('play-scene/', {
+                    params: {
+                        sceneId: scene.id
+                    }
+                })
             };
 
 
