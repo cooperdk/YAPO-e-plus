@@ -198,6 +198,10 @@ body {
     display: inline-block;
     width: 30px;
     height: 17px;
+    /*left: 1em;*/
+    /*bottom: 0em;*/
+    margin-left: 0.5em;
+
 
 
 }

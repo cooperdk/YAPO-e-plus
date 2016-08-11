@@ -10,9 +10,19 @@
                 />
             </a>
         </td>
-        <td><h4>
+        <td>
+            <h4>
             <span>
-                {{$index + 1}}) <a href="/#!/scene/{{ scene.id }}">  {{ scene.name }}</a>
+                {{$index + 1}})
+                <a href="/#!/scene/{{ scene.id }}">  {{ scene.name }}</a>
+
+                            <span class="glyphicon glyphicon-play-circle on-hover-red-cursor-pointer"
+                                  uib-popover-html="'Play scene.'"
+                                  popover-trigger="mouseenter" popover-placement="right"
+                                  ng-click="$ctrl.playScene(scene)"
+
+
+                            ></span>
 
                 <label class="switch"
                        uib-popover-html="'Toggle Runner Up.'"
@@ -21,14 +31,12 @@
                 <div class="slider round"></div>
                 </label>
 
-                <span class="glyphicon glyphicon-play-circle on-hover-red-cursor-pointer" uib-popover-html="'Play scene.'"
-                       popover-trigger="mouseenter" popover-placement="right" ng-click="$ctrl.playScene(scene)"
-
-
-                ></span>
-
             </span>
+
+
             </h4>
+
+
 
 
 
