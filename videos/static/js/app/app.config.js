@@ -8,23 +8,23 @@ app.config(['$sceProvider', '$locationProvider', '$routeProvider', '$httpProvide
 
 
         $routeProvider.when('/actor', {
-            template: '<section-list-wrapper section-type="\'ActorList\'"></section-list-wrapper>'
+            template: '<section-list-wrapper main-page="true" section-type="\'ActorList\'"></section-list-wrapper>'
         }).when('/actor/:actorId', {
             template: '<actor-detail></actor-detail>'
         }).when('/scene/', {
-            template: '<section-list-wrapper section-type="\'SceneList\'"></section-list-wrapper>'
+            template: '<section-list-wrapper main-page="true" section-type="\'SceneList\'"></section-list-wrapper>'
         }).when('/scene/:sceneId', {
             template: '<scene-detail></scene-detail>'
         }).when('/actor-tag/', {
-            template: '<section-list-wrapper section-type="\'ActorTagList\'"></section-list-wrapper>'
+            template: '<section-list-wrapper main-page="true" section-type="\'ActorTagList\'"></section-list-wrapper>'
         }).when('/actor-tag/:actorTagId', {
             template: '<actor-tag-detail></actor-tag-detail>'
         }).when('/scene-tag/', {
-            template: '<section-list-wrapper section-type="\'SceneTagList\'"></section-list-wrapper>'
+            template: '<section-list-wrapper main-page="true" section-type="\'SceneTagList\'"></section-list-wrapper>'
         }).when('/scene-tag/:sceneTagId', {
             template: '<scene-tag-detail></scene-tag-detail>'
         }).when('/website/', {
-            template: '<section-list-wrapper section-type="\'WebsiteList\'"></section-list-wrapper>'
+            template: '<section-list-wrapper main-page="true"section-type="\'WebsiteList\'"></section-list-wrapper>'
         }).when('/website/:websiteId', {
             template: '<website-detail></website-detail>'
         }).when('/folder/', {

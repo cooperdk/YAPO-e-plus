@@ -1,7 +1,26 @@
-<pagination page-type="'Scene'"></pagination>
 
-<button ng-click="$ctrl.selectAll()">select All</button>
-<button ng-click="$ctrl.selectNone()">select none</button>
+<span>
+<pagination page-type="'Scene'"></pagination>
+</span>
+        <button type="button" ng-click="$ctrl.multiTag()" class="btn btn-default btn-sm">
+                            Tag Multiple Scenes
+        </button>
+
+                <button type="button" ng-if="$ctrl.tagMultiple" ng-click="$ctrl.selectAll()" class="btn btn-default btn-sm">
+                            Select All
+        </button>
+
+        <button type="button" ng-if="$ctrl.tagMultiple" ng-click="$ctrl.selectNone()" class="btn btn-default btn-sm">
+                            Select None
+        </button>
+
+
+
+
+
+
+
+<div id = big-scroll-item>
 <table>
     <tr ng-repeat="scene in $ctrl.scenes">
         <td>
@@ -14,7 +33,7 @@
         <td>
             <h4>
             <span>
-                <input type="checkbox" ng-model="scene.selected" ng-click="$ctrl.sceneSelectToggle(scene)">
+                <input ng-if="$ctrl.tagMultiple" type="checkbox" ng-model="scene.selected" ng-click="$ctrl.sceneSelectToggle(scene)">
                 {{$index + 1}})
                 <a href="/#!/scene/{{ scene.id }}">  {{ scene.name }}</a>
 
@@ -101,4 +120,4 @@
         </td>
     </tr>
 </table>
-
+</div>

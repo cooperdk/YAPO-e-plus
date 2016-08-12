@@ -53,34 +53,39 @@ angular.module('actorDetail').component('actorDetail', {
             });
 
 
-
-
             $scope.$on("addActorTagToList", function (event, actorTag) {
                 self.actorTagSelect(actorTag);
 
 
             });
 
+            $scope.$on("didActorLoad", function (event, actor) {
+                
+                if (gotPromise){
+                    scopeWatchService.actorLoaded(self.actor);
+                }
+            });
 
 
             console.log("1 actor-detail self.actor is :" + angular.toJson(self.actor));
             self.getActor = function () {
                 self.actor = Actor.get({actorId: $routeParams.actorId}).$promise.then(function (res) {
-                self.actor = res;
-                console.log("2 actor-detail self.actor is :" + angular.toJson(self.actor.name));
-                helperService.set2(self.actor);
+                    self.actor = res;
+                    console.log("2 actor-detail self.actor is :" + angular.toJson(self.actor.name));
+                    helperService.set2(self.actor);
 
-                scopeWatchService.actorLoaded(res);
-                $rootScope.title = res.name;
+                    scopeWatchService.actorLoaded(res);
+                    $rootScope.actorLoaded = true;
+                    $rootScope.loadedActor = res;
+                    $rootScope.title = res.name;
 
 
-                gotPromise = true;
-                // $scope.actor = res;
-            });
+                    gotPromise = true;
+                    // $scope.actor = res;
+                });
             };
 
             self.getActor();
-
 
 
             self.imageWidth = 240;
@@ -121,9 +126,9 @@ angular.module('actorDetail').component('actorDetail', {
 
                     // alert(self.actor.actor_aliases.toString());
                     self.updateActor(self.actor);
-                    
+
                     scopeWatchService.addAliasToList(newAlias);
-                    
+
 
                 });
 
@@ -160,7 +165,7 @@ angular.module('actorDetail').component('actorDetail', {
                         self.updateActor(self.actor);
 
                         scopeWatchService.addActorTagToList(actorTag);
-                        
+
                     }
 
 
@@ -262,11 +267,11 @@ angular.module('actorDetail').component('actorDetail', {
                 if (gotPromise) {
                     var newName = self.actor.name.replace(/ /g, delimiter);
                     // console.log("Name with delimeter " + delimiter + " is " + newName);
-                    if (imageSearch){
-                        newName = newName + delimiter + "pornstar";    
+                    if (imageSearch) {
+                        newName = newName + delimiter + "pornstar";
                     }
-                    
-                    console.log("Name with delimiter is:" +  newName);
+
+                    console.log("Name with delimiter is:" + newName);
                     return newName;
                 }
 
@@ -310,18 +315,17 @@ angular.module('actorDetail').component('actorDetail', {
             };
 
             self.howOld = function (datetime) {
-                var actorDob = new Date (datetime);
+                var actorDob = new Date(datetime);
                 var actorDobYear = actorDob.getFullYear();
-                
+
                 var dt = new Date();
                 var nowYear = dt.getFullYear();
 
                 // Display the month, day, and year. getMonth() returns a 0-based number.
-                
-                console.log("Actor Age:" +  nowYear - actorDobYear);
-                
+
+                console.log("Actor Age:" + nowYear - actorDobYear);
+
                 return (nowYear - actorDobYear)
-                
 
 
             }

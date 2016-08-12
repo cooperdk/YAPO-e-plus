@@ -6,7 +6,7 @@ angular.module('sceneList').component('sceneList', {
         mainPage: '=',
         treeFolder: '='
     },
-    controller: ['$scope', 'Scene', 'helperService', 'scopeWatchService', 'pagerService', 'Actor', 'Website', 'SceneTag', '$http',
+    controller: ['$scope', 'Scene', 'helperService', 'scopeWatchService', 'pagerService', 'Actor', 'Website', 'SceneTag', '$http', '$rootScope',
         function SceneListController($scope, Scene, helperService, scopeWatchService, pagerService, Actor, Website, SceneTag, $http, $rootScope) {
 
             var self = this;
@@ -19,6 +19,18 @@ angular.module('sceneList').component('sceneList', {
             self.selectedScenes = [];
 
             self.selectAllStatus = false;
+
+            self.tagMultiple = false;
+            
+            self.multiTag = function () {
+              
+                if (self.tagMultiple){
+                    self.tagMultiple = false;
+                }else{
+                    self.tagMultiple = true;
+                }
+                
+            };
 
 
             self.selectAll = function () {
@@ -156,11 +168,25 @@ angular.module('sceneList').component('sceneList', {
             });
 
 
+            // This is necessery for now because sometimes  the "actorLoaded" event is fired before
+            // this script is loaded so we miss it and don't load any scenes.
+            // This workaround fire an event that checks if an actor was loaded if it was it then fire the
+            // actorLoaded event that we can catch.
+            var actorLoaded = false;
+
             $scope.$on("actorLoaded", function (event, actor) {
                 self.actor = actor;
 
                 self.nextPage(0);
+                actorLoaded = true;
             });
+            
+            if (!actorLoaded){
+                scopeWatchService.didActorLoad("a");
+            }
+
+
+            
 
             $scope.$on("sceneTagLoaded", function (event, sceneTag) {
                 self.sceneTag = sceneTag;

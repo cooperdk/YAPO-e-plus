@@ -1,15 +1,15 @@
 angular.module('helper', []).factory('helperService', function ($rootScope, $localStorage, $sessionStorage) {
     $rootScope.$storage = $sessionStorage;
-    
+
     $rootScope.savedData = {};
     $rootScope.savedData2 = [];
 
     // $rootScope.$storage.scArray ;
-    
+
 
     function set(data) {
         $rootScope.$storage.scArray = data;
-        
+
         // console.log('helperService data1 is' + angular.toJson(savedData));
     }
 
@@ -51,10 +51,10 @@ angular.module('helper', []).factory('helperService', function ($rootScope, $loc
         return b;
     }
 
-    function resourceToArray(resource){
+    function resourceToArray(resource) {
         var ans = [];
-        for (var i in resource){
-            if (angular.isObject(resource[i])){
+        for (var i in resource) {
+            if (angular.isObject(resource[i])) {
                 ans.push(resource[i])
             }
         }
@@ -98,7 +98,7 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
         var _sceneTagId = "";
         var _websiteId = "";
         var _folderId = "";
-    var _runnerUp = "";
+        var _runnerUp = "";
 
         function nextPageInput(input) {
 
@@ -185,7 +185,7 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
                     } else {
                         _folderId = input["folder"];
                     }
-                    
+
                 }
 
             }
@@ -473,6 +473,14 @@ angular.module('scopeWatch', []).factory('scopeWatchService', function ($rootSco
     }
 
 
+    function didActorLoad(someVariable) {
+
+        console.log("app-service-scopeWatch: runnerUpChanged was triggered! ");
+        $rootScope.$broadcast("didActorLoad", someVariable);
+
+    }
+
+
     return {
         sceneChanged: sceneChanged,
         addActorToList: addActorToList,
@@ -495,7 +503,8 @@ angular.module('scopeWatch', []).factory('scopeWatchService', function ($rootSco
         paginationInit: paginationInit,
         paginationChange: paginationChange,
         addAliasToList: addAliasToList,
-        runnerUpChanged: runnerUpChanged
+        runnerUpChanged: runnerUpChanged,
+        didActorLoad: didActorLoad
 
 
     }

@@ -3,7 +3,8 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
         // Note: The URL is relative to our `index.html` file
         templateUrl: 'static/js/app/section-list-wrapper/section-wrapper.template.html',
         bindings: {
-            sectionType: '='
+            sectionType: '=',
+            mainPage: '='
 
         },
         controller: ['$scope', '$rootScope', '$rootScope', 'scopeWatchService',
@@ -18,6 +19,11 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
 
                 self.sectionTypefunc = function (typeToCheck) {
                     console.log("sectionTypefunc triggered " + self.sectionType);
+
+                    if (self.sectionType == typeToCheck) {
+                        console.log("self.sectionType == typeToCheck is" + (self.sectionType == typeToCheck))
+                    }
+
                     return self.sectionType == typeToCheck;
                 };
 
