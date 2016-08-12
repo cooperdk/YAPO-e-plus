@@ -20,7 +20,7 @@ angular.module('actorTagList').component('actorTagList', {
             self.nextPage = function (currentPage) {
 
 
-                input = {
+                var input = {
                     currentPage: currentPage,
                     pageType: self.pageType,
                     actor: self.actor,

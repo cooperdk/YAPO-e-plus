@@ -14,7 +14,7 @@ class ActorAlias(models.Model):
 
     # actor = models.ForeignKey(Actor, on_delete=models.CASCADE)
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s " % (self.name,)
 
 
@@ -29,7 +29,7 @@ class ActorTag(models.Model):
     rating = models.IntegerField(default=0)
     thumbnail = models.CharField(max_length=500, null=True, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s " % (self.name,)
 
 
@@ -44,7 +44,7 @@ class SceneTag(models.Model):
     rating = models.IntegerField(default=0)
     thumbnail = models.CharField(max_length=500, null=True, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s " % (self.name,)
 
 
@@ -89,7 +89,7 @@ class Actor(models.Model):
     def get_absolute_url(self):
         return reverse('videos:actor-details', kwargs={'pk': self.pk})
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name or u''
 
     def get_name_hyphens(self):
@@ -111,7 +111,7 @@ class Website(models.Model):
     thumbnail = models.CharField(max_length=500, null=True, blank=True)
     scene_tags = models.ManyToManyField(SceneTag, null=True, blank=True, related_name='websites')
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s " % (self.name,)
 
 
@@ -139,7 +139,7 @@ class Scene(models.Model):
     codec_name = models.CharField(null=True, blank=True, max_length=20)
     framerate = models.FloatField(null=True, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s " % (self.name,)
 
     def get_absolute_url(self):
@@ -153,7 +153,7 @@ class Folder(MPTTModel):
     scenes = models.ManyToManyField(Scene, null=True, related_name='folders_in_tree')
     path_with_ids = models.CharField(null=True, blank=True, max_length=900)
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s " % (self.name,)
 
     class MPTTMeta:

@@ -7,7 +7,7 @@ angular.module('sceneList').component('sceneList', {
         treeFolder: '='
     },
     controller: ['$scope', 'Scene', 'helperService', 'scopeWatchService', 'pagerService', 'Actor', 'Website', 'SceneTag', '$http',
-        function SceneListController($scope, Scene, helperService, scopeWatchService, pagerService, Actor, Website, SceneTag, $http, $rootScope ) {
+        function SceneListController($scope, Scene, helperService, scopeWatchService, pagerService, Actor, Website, SceneTag, $http, $rootScope) {
 
             var self = this;
             self.sceneArray = [];
@@ -15,6 +15,55 @@ angular.module('sceneList').component('sceneList', {
             self.scenesToAdd = [];
 
             self.pageType = 'Scene';
+
+            self.selectedScenes = [];
+
+            self.selectAllStatus = false;
+
+
+            self.selectAll = function () {
+
+                self.selectedScenes = [];
+                for (var i = 0; i < self.scenes.length; i++) {
+                    self.scenes[i].selected = true;
+                    self.selectedScenes.push(self.scenes[i].id)
+                }
+
+            };
+
+
+            self.selectNone = function () {
+
+                for (var i = 0; i < self.scenes.length; i++) {
+                    self.scenes[i].selected = false;
+                }
+                self.selectedScenes = [];
+
+            };
+
+            self.sceneSelectToggle = function (scene) {
+
+                var found = false;
+
+                for (var i = 0; i < self.selectedScenes.length; i++) {
+                    if (scene.id == self.selectedScenes[i]) {
+                        found = true;
+                    }
+
+                }
+
+                if (!found) {
+                    self.selectedScenes.push(scene.id)
+
+                }
+
+                if (found) {
+                    self.selectedScenes.splice(self.selectedScenes.indexOf(scene.id), 1)
+                }
+
+                // alert(angular.toJson(self.selectedScenes))
+
+            };
 
 
             // $rootScope.$storage = $localStorage;
@@ -47,7 +96,7 @@ angular.module('sceneList').component('sceneList', {
                 // self.sceneArrayClear();
                 console.log("scene-list: nextPage function triggered!");
 
-                input = {
+                var input = {
                     currentPage: currentPage,
                     pageType: self.pageType,
                     actor: self.actor,
@@ -65,25 +114,25 @@ angular.module('sceneList').component('sceneList', {
                 self.actorsToadd = pagerService.getNextPage(input
                 );
 
-                if (self.actorsToadd != undefined) {
-                    self.actorsToadd.$promise.then(function (res) {
 
-                        // self.actorsToadd = res[0];
+                self.actorsToadd.$promise.then(function (res) {
 
-                        var paginationInfo = {
-                            pageType: input.pageType,
-                            pageInfo: res[1]
-                        };
+                    // self.actorsToadd = res[0];
 
-                        scopeWatchService.paginationInit(paginationInfo);
+                    var paginationInfo = {
+                        pageType: input.pageType,
+                        pageInfo: res[1]
+                    };
 
-                        self.scenes = helperService.resourceToArray(res[0]);
+                    scopeWatchService.paginationInit(paginationInfo);
 
-                        self.sceneArraystore();
+                    self.scenes = helperService.resourceToArray(res[0]);
+
+                    self.sceneArraystore();
 
 
-                    });
-                }
+                });
+
 
             };
 
@@ -109,6 +158,7 @@ angular.module('sceneList').component('sceneList', {
 
             $scope.$on("actorLoaded", function (event, actor) {
                 self.actor = actor;
+
                 self.nextPage(0);
             });
 
@@ -122,7 +172,7 @@ angular.module('sceneList').component('sceneList', {
                 var found = false;
                 var ans = null;
                 for (var i = 0; i < self.scenes.length && !found; i++) {
-                    if (sceneToFind.id == self.scenes[i].id) {
+                    if (sceneToFind == self.scenes[i].id) {
                         found = true;
                         ans = i
                     }
@@ -132,39 +182,108 @@ angular.module('sceneList').component('sceneList', {
             };
 
 
-            self.patchScene = function (sceneToPatchId, patchType, patchData) {
+            self.updateScenesOnRemove = function (scenes, itemToRemove, typeOfItemToRemove) {
 
-                var type = {};
-                type[patchType] = patchData;
+                var resId = [];
+                var resObj = [];
 
-                Scene.patch({sceneId: sceneToPatchId}, type)
+                for (var j = 0; j < scenes.length; j++) {
+
+                    var sceneIndex = findIndexOfSceneInList(scenes[j]);
+
+
+                    for (var i = 0; i < self.scenes[sceneIndex][typeOfItemToRemove].length; i++) {
+                        if (itemToRemove.id != self.scenes[sceneIndex][typeOfItemToRemove][i].id) {
+                            resId.push(self.scenes[sceneIndex][typeOfItemToRemove][i].id);
+                            resObj.push(self.scenes[sceneIndex][typeOfItemToRemove][i]);
+                        }
+                    }
+
+                    self.scenes[sceneIndex][typeOfItemToRemove] = resObj;
+
+                    resObj = [];
+
+                }
+
+                return resId
 
 
             };
 
             self.removeItem = function (scene, itemToRemove, typeOfItemToRemove) {
 
-                var sceneIndex = findIndexOfSceneInList(scene);
 
                 var resId = [];
-                var resObj = [];
 
-                for (var i = 0; i < self.scenes[sceneIndex][typeOfItemToRemove].length; i++) {
-                    if (itemToRemove.id != self.scenes[sceneIndex][typeOfItemToRemove][i].id) {
-                        resId.push(self.scenes[sceneIndex][typeOfItemToRemove][i].id);
-                        resObj.push(self.scenes[sceneIndex][typeOfItemToRemove][i]);
-                    }
+
+                if (self.selectedScenes.length > 0 && checkIfSceneSelected(scene)) {
+
+                    self.updateScenesOnRemove(self.selectedScenes, itemToRemove, typeOfItemToRemove)
+                } else {
+                    var scenes = [];
+                    scenes.push(scene.id);
+                    resId = self.updateScenesOnRemove(scenes, itemToRemove, typeOfItemToRemove)
                 }
 
-                self.scenes[sceneIndex][typeOfItemToRemove] = resObj;
-                self.patchScene(self.scenes[sceneIndex].id, typeOfItemToRemove, resId)
+                var sceneIndex = findIndexOfSceneInList(scene.id);
+
+
+                if (self.selectedScenes.length > 0) {
+                    var itToRemove = [];
+                    itToRemove.push(itemToRemove.id);
+                    self.patchScene(self.scenes[sceneIndex].id, typeOfItemToRemove, itToRemove, 'remove', true)
+                } else {
+                    self.patchScene(self.scenes[sceneIndex].id, typeOfItemToRemove, resId, 'remove', false)
+                }
+
+
+                self.selectNone()
 
 
             };
 
+            var updateSceneOnPageOnAdd = function (sceneIndex, typeOfItemToAdd, itemToAdd) {
+
+                var found = false;
+                for (var i = 0; i < self.scenes[sceneIndex][typeOfItemToAdd].length && !found; i++) {
+                    if (self.scenes[sceneIndex][typeOfItemToAdd][i].id == itemToAdd.id) {
+                        found = true;
+                    }
+                }
+
+                if (!found) {
+                    self.scenes[sceneIndex][typeOfItemToAdd].push(itemToAdd);
+                }
+            };
+
+            var updateScenesOnPageOnAdd = function (itemToAdd, typeOfItemToAdd) {
+
+                for (var i = 0; i < self.selectedScenes.length; i++) {
+
+                    var sceneIndex = findIndexOfSceneInList(self.selectedScenes[i]);
+                    updateSceneOnPageOnAdd(sceneIndex, typeOfItemToAdd, itemToAdd);
+
+
+                }
+            };
+
+            var checkIfSceneSelected = function (scene) {
+                var found = false;
+                for (var i = 0; i < self.selectedScenes.length && !found; i++) {
+                    if (scene.id == self.selectedScenes[i]) {
+                        found = true;
+                    }
+
+                }
+
+                return found
+
+            };
+
+
             self.addItem = function (scene, itemToAdd, typeOfItemToAdd) {
 
-                var sceneIndex = findIndexOfSceneInList(scene);
+                var sceneIndex = findIndexOfSceneInList(scene.id);
 
                 if (self.scenes[sceneIndex][typeOfItemToAdd] == undefined) {
                     self.scenes[sceneIndex][typeOfItemToAdd] = [];
@@ -174,15 +293,34 @@ angular.module('sceneList').component('sceneList', {
                 if (itemToAdd.id != '-1') {
 
 
-                    self.scenes[sceneIndex][typeOfItemToAdd].push(itemToAdd);
+
+
+
+                    // console.log(self.scenes[sceneIndex][typeOfItemToAdd].indexOf(itemToAdd));
+                    // if (self.scenes[sceneIndex][typeOfItemToAdd].indexOf(itemToAdd) == '-1'){
+                    //     self.scenes[sceneIndex][typeOfItemToAdd].push(itemToAdd);
+                    // }
 
                     var patchData = [];
-                    for (var i = 0; i < self.scenes[sceneIndex][typeOfItemToAdd].length; i++) {
-                        patchData.push(self.scenes[sceneIndex][typeOfItemToAdd][i].id);
+                    if (self.selectedScenes.length > 0 && checkIfSceneSelected(scene)) {
+                        updateScenesOnPageOnAdd(itemToAdd, typeOfItemToAdd);
+
+
+                        patchData.push(itemToAdd.id);
+
+
+                        self.patchScene(scene.id, typeOfItemToAdd, patchData, 'add', true)
+                    } else {
+                        updateSceneOnPageOnAdd(sceneIndex, typeOfItemToAdd, itemToAdd);
+
+
+                        for (var i = 0; i < self.scenes[sceneIndex][typeOfItemToAdd].length; i++) {
+                            patchData.push(self.scenes[sceneIndex][typeOfItemToAdd][i].id);
+                        }
+
+                        self.patchScene(scene.id, typeOfItemToAdd, patchData, 'add', false)
                     }
 
-
-                    self.patchScene(scene.id, typeOfItemToAdd, patchData)
 
                 } else {
                     var newItem;
@@ -204,18 +342,77 @@ angular.module('sceneList').component('sceneList', {
                     newItem.$save().then(function (res) {
 
 
-                        self.scenes[sceneIndex][typeOfItemToAdd].push(res);
+                        // self.scenes[sceneIndex][typeOfItemToAdd].push(res);
+                        //
+                        // var patchData = [];
+                        // for (var i = 0; i < self.scenes[sceneIndex][typeOfItemToAdd].length; i++) {
+                        //     patchData.push(self.scenes[sceneIndex][typeOfItemToAdd][i].id);
+                        // }
+                        //
+                        // if (self.selectedScenes.length > 0 && checkIfSceneSelected(scene)) {
+                        //     updateScenesOnPageOnAdd(itemToAdd, typeOfItemToAdd);
+                        //     self.patchScene(scene.id, typeOfItemToAdd, patchData, 'add', true)
+                        // } else {
+                        //     updateSceneOnPageOnAdd(sceneIndex, typeOfItemToAdd, itemToAdd);
+                        //     self.patchScene(scene.id, typeOfItemToAdd, patchData, 'add', false)
+                        // }
+
+                        // self.patchScene(scene.id, typeOfItemToAdd, patchData, 'add');
+
+                        // self.updateActor(self.actor);
 
                         var patchData = [];
-                        for (var i = 0; i < self.scenes[sceneIndex][typeOfItemToAdd].length; i++) {
-                            patchData.push(self.scenes[sceneIndex][typeOfItemToAdd][i].id);
+                        if (self.selectedScenes.length > 0 && checkIfSceneSelected(scene)) {
+                            updateScenesOnPageOnAdd(res, typeOfItemToAdd);
+
+
+                            patchData.push(res.id);
+
+
+                            self.patchScene(scene.id, typeOfItemToAdd, patchData, 'add', true)
+                        } else {
+                            updateSceneOnPageOnAdd(sceneIndex, typeOfItemToAdd, res);
+
+
+                            for (var i = 0; i < self.scenes[sceneIndex][typeOfItemToAdd].length; i++) {
+                                patchData.push(self.scenes[sceneIndex][typeOfItemToAdd][i].id);
+                            }
+
+                            self.patchScene(scene.id, typeOfItemToAdd, patchData, 'add', false)
                         }
 
 
-                        self.patchScene(scene.id, typeOfItemToAdd, patchData);
-
-                        // self.updateActor(self.actor);
                     })
+                }
+
+
+            };
+
+            self.patchScene = function (sceneToPatchId, patchType, patchData, addOrRemove, multiple) {
+
+                var type = {};
+                type[patchType] = patchData;
+
+
+                if (multiple) {
+
+                    $http.post('tag-multiple-items/', {
+                        params: {
+                            type: 'scene',
+                            patchType: patchType,
+                            patchData: patchData,
+                            itemsToUpdate: self.selectedScenes,
+                            addOrRemove: addOrRemove
+                        }
+                    }).then(function (response) {
+                        console.log("Update finished successfully")
+                    }, function errorCallback(response) {
+                        alert("Something went wrong!");
+                    });
+
+
+                } else {
+                    Scene.patch({sceneId: sceneToPatchId}, type)
                 }
 
 
@@ -246,10 +443,11 @@ angular.module('sceneList').component('sceneList', {
 
             $scope.$on("websiteSelected", function (event, object) {
 
-                var selectedObject = object['selectedObject'];
-                var originalObject = object['originalObject'];
+                var selectedWebsite = object['selectedObject'];
+                var scene = object['originalObject'];
 
-                self.addItem(originalObject, selectedObject, 'websites');
+                self.addItem(scene, selectedWebsite, 'websites');
+
 
             });
 
@@ -287,12 +485,12 @@ angular.module('sceneList').component('sceneList', {
 
                 self.nextPage(0);
             });
-            
-            
+
+
             self.sceneRunnerUpToggle = function (scene) {
-                
-                self.patchScene(scene.id,'is_runner_up',scene.is_runner_up)
-                
+
+                self.patchScene(scene.id, 'is_runner_up', scene.is_runner_up, 'add', false)
+
             };
 
 

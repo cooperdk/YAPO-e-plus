@@ -168,6 +168,72 @@ class ScrapeActor(views.APIView):
 
 
 @api_view(['GET', 'POST'])
+def tag_multiple_items(request):
+    if request.method == 'POST':
+        print("We got a post request!")
+
+        params = request.data['params']
+
+        if params['type'] == 'scene':
+            print("Patching scene")
+
+            if params['patchType'] == 'websites':
+
+                website_id = params['patchData'][0]
+                website_to_add = Website.objects.get(pk=website_id)
+                scenes_to_update = params['itemsToUpdate']
+
+                if params['addOrRemove'] == 'add':
+
+                    for x in scenes_to_update:
+                        scene_to_update = Scene.objects.get(pk=x)
+                        scene_to_update.websites.add(website_to_add)
+                        scene_to_update.save()
+
+                if params['addOrRemove'] == 'remove':
+                    for x in scenes_to_update:
+                        scene_to_update = Scene.objects.get(pk=x)
+                        scene_to_update.websites.remove(website_to_add)
+                        scene_to_update.save()
+            elif params['patchType'] == 'scene_tags':
+                scene_tag_id = params['patchData'][0]
+                scene_tag_to_add = SceneTag.objects.get(pk=scene_tag_id)
+                scenes_to_update = params['itemsToUpdate']
+
+                if params['addOrRemove'] == 'add':
+
+                    for x in scenes_to_update:
+                        scene_to_update = Scene.objects.get(pk=x)
+                        scene_to_update.scene_tags.add(scene_tag_to_add)
+                        scene_to_update.save()
+
+                if params['addOrRemove'] == 'remove':
+                    for x in scenes_to_update:
+                        scene_to_update = Scene.objects.get(pk=x)
+                        scene_to_update.scene_tags.remove(scene_tag_to_add)
+                        scene_to_update.save()
+            elif params['patchType'] == 'actors':
+                actor_id = params['patchData'][0]
+                actor_to_add = Actor.objects.get(pk=actor_id)
+                scenes_to_update = params['itemsToUpdate']
+
+                if params['addOrRemove'] == 'add':
+
+                    for x in scenes_to_update:
+                        scene_to_update = Scene.objects.get(pk=x)
+                        scene_to_update.actors.add(actor_to_add)
+                        scene_to_update.save()
+
+                if params['addOrRemove'] == 'remove':
+                    for x in scenes_to_update:
+                        scene_to_update = Scene.objects.get(pk=x)
+                        scene_to_update.actors.remove(actor_to_add)
+                        scene_to_update.save()
+
+        return Response(status=200)
+
+
+@api_view(['GET', 'POST'])
 def settings(request):
     if request.method == 'GET':
 

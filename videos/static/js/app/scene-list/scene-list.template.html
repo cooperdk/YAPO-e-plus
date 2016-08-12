@@ -1,6 +1,7 @@
 <pagination page-type="'Scene'"></pagination>
 
-
+<button ng-click="$ctrl.selectAll()">select All</button>
+<button ng-click="$ctrl.selectNone()">select none</button>
 <table>
     <tr ng-repeat="scene in $ctrl.scenes">
         <td>
@@ -13,6 +14,7 @@
         <td>
             <h4>
             <span>
+                <input type="checkbox" ng-model="scene.selected" ng-click="$ctrl.sceneSelectToggle(scene)">
                 {{$index + 1}})
                 <a href="/#!/scene/{{ scene.id }}">  {{ scene.name }}</a>
 

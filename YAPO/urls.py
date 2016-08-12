@@ -73,6 +73,7 @@ urlpatterns = [
     url(r'^add-items/', views.AddItems.as_view()),
     url(r'^settings/', views.settings),
     url(r'^ffmpeg/', views.ffmpeg),
+    url(r'^tag-multiple-items/', views.tag_multiple_items),
 
     # REST FRAMEWORK
 

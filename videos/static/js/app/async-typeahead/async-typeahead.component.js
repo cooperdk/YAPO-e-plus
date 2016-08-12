@@ -7,7 +7,8 @@ angular.module('asyncTypeahead').component('asyncTypeahead', {
         objectType: '@?',
         sendingObject: '=',
         sendingObjectType: '@?',
-        selectedObject: '&'
+        selectedObject: '&',
+        isMany: '&'
     },
     controller: ['$scope', 'Actor', '$http', 'scopeWatchService',
         function AsyncTypeaheadController($scope, Actor, $http, scopeWatchService) {

@@ -17,7 +17,7 @@ angular.module('sceneTagList').component('sceneTagList', {
             self.nextPage = function (currentPage) {
 
 
-                input = {
+                var input = {
                     currentPage: currentPage,
                     pageType: self.pageType,
                     scene: self.scene,
