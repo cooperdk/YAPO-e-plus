@@ -1,17 +1,30 @@
 // Register `phoneList` component, along with its associated controller and template
 angular.module('actorList').component('actorList', {
     // Note: The URL is relative to our `index.html` file
-    templateUrl: 'static/js/app/actor-list/actor-list.template.html',
     bindings: {
 
         mainPage: '='
 
     },
+    templateUrl:   ['$element', '$attrs', function($element, $attrs) {
+
+
+        if ($attrs.sceneDetail == 'true'){
+           return 'static/js/app/actor-list/actor-list-row.template.html'
+        }else{
+            return 'static/js/app/actor-list/actor-list.template.html'    
+        }
+
+        
+    } ],
+
     controller: ['$scope', 'Actor', 'pagerService', 'Scene', 'ActorTag', 'scopeWatchService','helperService',
         function ActorListController($scope, Actor, pagerService, Scene, ActorTag, scopeWatchService, helperService) {
 
 
             var self = this;
+
+
 
             self.actors = [];
 
@@ -162,8 +175,11 @@ angular.module('actorList').component('actorList', {
                     // scopeWatchService.sceneChanged(self.scene);
 
                     self.actors = resObj;
-            }
+            };
+
+
 
         }
+
     ]
 });

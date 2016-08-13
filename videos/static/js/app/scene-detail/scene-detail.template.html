@@ -1,10 +1,21 @@
-<h1 align="center">{{$ctrl.scene.name}}</h1>
+<h1 align="center">
+
+
+    {{$ctrl.scene.name}}
+
+
+</h1>
 <a href="/#!/folder/{{ $ctrl.scene.folders_in_tree[0] }}"><h5 align="center">{{$ctrl.scene.path_to_dir}}</h5></a>
 <h2 align="center">
     <uib-rating ng-model="$ctrl.scene.rating" max="10" read-only="isReadonly" on-hover="hoveringOver(value)"
                 on-leave="overStar = null" titles="['one','two','three']"
                 aria-labelledby="default-rating" ng-change="$ctrl.updateScene($ctrl.scene)"></uib-rating>
     <br>
+    <a href="#!/scene/{{ $ctrl.prev }}"><span
+            uib-popover-html="'Previous Scene in list.'"
+            popover-trigger="mouseenter" popover-placement="bottom"
+            class="glyphicon glyphicon-step-backward"></span></a>
+
     <button type="button" ng-click="$ctrl.playScene()" class="btn btn-default btn-sm">
         <span class="glyphicon glyphicon-play-circle"></span> Play Scene
     </button>
@@ -19,6 +30,11 @@
     >
         <span class="glyphicon glyphicon-facetime-video"></span> Generate Sample Video
     </button>
+
+    <a href="#!/scene/{{ $ctrl.next }}"><span
+            uib-popover-html="'Next Scene in list.'"
+            popover-trigger="mouseenter" popover-placement="bottom"
+            class="glyphicon glyphicon-step-forward"></span></a>
 
 
 </h2>
@@ -41,6 +57,188 @@
     </li>
 </ul>
 
+
+<div class="row ">
+
+    <div class="col-md-4 pull-right">
+        <video ng-if="$ctrl.updatedSample" poster="{{ $ctrl.scene.thumbnail }}" ng-src="{{ $ctrl.samplePath }}"
+                       width="640" height="360" controls></video>
+
+        <actor-list mainPage="false" scene-detail="true" scene="$ctrl.scene"></actor-list>
+
+        <ul align="left">
+                    File info:
+                    <li>
+                        Video bitrate: {{ $ctrl.scene.bit_rate / 1000 }} Kb\s
+                    </li>
+                    <li>
+                        Video size: {{ $ctrl.scene.size / 1000000 }} MB
+                    </li>
+                    <li>
+                        Video resolution: {{ $ctrl.scene.width}}x{{ $ctrl.scene.height}}
+                    </li>
+                    <li>
+                        Video codec name: {{ $ctrl.scene.codec_name }}
+                    </li>
+                    <li>
+                        Video framerate: {{ $ctrl.scene.framerate }}
+                    </li>
+                    <li>
+                        Video druation: {{ $ctrl.scene.duration / 60 }} Minutes
+                    </li>
+                </ul>
+    </div>
+
+    <div class="col-md-4">
+        <ul>
+            <li>Tags:
+
+                <async-typeahead object="$ctrl.scene.scene_tags"
+                                 object-type='scene_tags'
+                                 sending-object="$ctrl.scene"
+                                 sending-object-type='Scene'
+                                 selected-object="$ctrl.selectedSceneTag = $event.selected"
+                ></async-typeahead>
+
+                <scene-tag-list pk="$ctrl.scene.scene_tags" scene="$ctrl.scene"></scene-tag-list>
+
+
+            </li>
+
+            <li>Actors:
+
+                <async-typeahead object="$ctrl.scene.actors"
+                                 object-type='actors'
+                                 sending-object="$ctrl.scene"
+                                 sending-object-type='Scene'
+                                 selected-object="$ctrl.selectedActor = $event.selected"
+                ></async-typeahead>
+
+
+
+            </li>
+
+            <li>Websites:
+
+                <async-typeahead object="$ctrl.scene.websites"
+                                 object-type='websites'
+                                 sending-object="$ctrl.scene"
+                                 sending-object-type='Scene'
+                                 selected-object="$ctrl.selectedWebsite = $event.selected"
+                ></async-typeahead>
+
+
+                <website-list pk="$ctrl.scene.websites" scene="$ctrl.scene"></website-list>
+            </li>
+
+        </ul>
+    </div>
+
+    <!--
+    <div class="col-md-4">
+        <table BORDER=2 CELLPADDING=4>
+            <tr>
+                <td>
+                    Tags:
+                </td>
+                <td>
+                    <table>
+                        <tr>
+                            <td>
+                                <async-typeahead object="$ctrl.scene.scene_tags"
+                                                 object-type='scene_tags'
+                                                 sending-object="$ctrl.scene"
+                                                 sending-object-type='Scene'
+                                                 selected-object="$ctrl.selectedSceneTag = $event.selected"
+                                ></async-typeahead>
+                            </td>
+                            <td>
+                                <scene-tag-list pk="$ctrl.scene.scene_tags" scene="$ctrl.scene"></scene-tag-list>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+
+
+            </tr>
+            <tr>
+                <td>
+                    Websites:
+                </td>
+                <td>
+                    <table>
+                        <tr>
+                            <td>
+                                <async-typeahead object="$ctrl.scene.websites"
+                                                 object-type='websites'
+                                                 sending-object="$ctrl.scene"
+                                                 sending-object-type='Scene'
+                                                 selected-object="$ctrl.selectedWebsite = $event.selected"
+                                ></async-typeahead>
+                            </td>
+                            <td>
+                                <website-list pk="$ctrl.scene.websites" scene="$ctrl.scene"></website-list>
+                            </td>
+                        </tr>
+                    </table>
+
+
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    Actors:
+                </td>
+                <td>
+                    <table>
+                        <tr>
+                            <td>
+                                <async-typeahead object="$ctrl.scene.actors"
+                                                 object-type='actors'
+                                                 sending-object="$ctrl.scene"
+                                                 sending-object-type='Scene'
+                                                 selected-object="$ctrl.selectedActor = $event.selected"
+                                ></async-typeahead>
+                            </td>
+                            <td>
+
+                            </td>
+                        </tr>
+                    </table>
+
+
+                </td>
+
+
+            </tr>
+
+            <tr>
+                <td>
+
+                </td>
+                <td>
+
+                </td>
+                <td>
+
+                </td>
+            </tr>
+
+        </table>
+    </div>
+        <div class="col-md-6" style="float: right">
+    -->
+
+
+
+</div>
+
+<!--
+<actor-list mainPage="false" scene-detail="true" scene="$ctrl.scene"></actor-list>
+
+
+<!--
 
 <p>{{$ctrl.scene.description}}</p>
 
@@ -70,8 +268,10 @@
                                  selected-object="$ctrl.selectedActor = $event.selected"
                 ></async-typeahead>
 
+                <div>
+                    <actor-list mainPage="false" scene="$ctrl.scene"></actor-list>
+                </div>
 
-                <actor-list class="pre-scrollable" mainPage="false" scene="$ctrl.scene"></actor-list>
             </li>
 
             <li>Websites:
@@ -84,7 +284,7 @@
                 ></async-typeahead>
 
 
-                <website-list class="pre-scrollable" pk="$ctrl.scene.websites" scene="$ctrl.scene"></website-list>
+                <website-list pk="$ctrl.scene.websites" scene="$ctrl.scene"></website-list>
             </li>
 
         </ul>
@@ -92,7 +292,8 @@
         <h1>{{ rate }}</h1>
 
 
-    </div>
+    </div>-->
+<!--
     <div class="col-md-4">
         <div>
             <div class="sample-video">
@@ -130,8 +331,8 @@
 
         </div>
     </div>
-</div>
 
+-->
 
 
 
