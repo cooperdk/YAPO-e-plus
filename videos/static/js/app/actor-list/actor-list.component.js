@@ -23,6 +23,8 @@ angular.module('actorList').component('actorList', {
 
 
             var self = this;
+            
+            var didSceneLoad = false;
 
 
 
@@ -96,8 +98,13 @@ angular.module('actorList').component('actorList', {
                 self.actors = [];
                 self.scene = scene;
                 self.nextPage(0);
+                didSceneLoad = true;
 
             });
+            
+            if (!didSceneLoad){
+                scopeWatchService.didSceneLoad('a')
+            }
 
 
             

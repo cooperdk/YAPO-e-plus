@@ -1,4 +1,3 @@
-import datetime
 import os
 import urllib
 from datetime import datetime
@@ -8,6 +7,7 @@ import tmdbsimple as tmdb
 import urllib.request as urllib
 import videos.const as const
 import videos.aux_functions as aux
+from django.utils import timezone
 django.setup()
 
 from videos.models import Actor, ActorAlias

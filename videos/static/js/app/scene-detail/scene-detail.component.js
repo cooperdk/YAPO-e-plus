@@ -72,6 +72,14 @@ angular.module('sceneDetail').component('sceneDetail', {
 
             };
 
+             $scope.$on("didSceneLoad", function (event, scene) {
+
+                if (gotPromise){
+                    scopeWatchService.sceneLoaded(self.scene)
+                }
+
+            });
+
             self.getCurrentScene();
 
 

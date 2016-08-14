@@ -9,7 +9,8 @@
                     <a href="#!/folder/{{ n.id }}"> {{ n.last_folder_name_only }}  </a>>
                 </span>
             </h3></div>
-
+            <label>Recursive? </label>
+            <input type="checkbox" ng-model="$ctrl.recursive" ng-change="$ctrl.recursiveToggle()">
             <ul class="dbFolders">
                 <li ng-model="$ctrl.dbFolders"
                     ng-repeat="folder in $ctrl.dbFolders"

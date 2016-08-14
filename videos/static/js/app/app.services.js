@@ -99,6 +99,7 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
         var _websiteId = "";
         var _folderId = "";
         var _runnerUp = "";
+        var _recursive= "";
 
         function nextPageInput(input) {
 
@@ -115,6 +116,7 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
                         _sceneTagId = "";
                         _websiteId = "";
                         _folderId = "";
+                        _recursive= "";
 
                     }
                 }
@@ -190,6 +192,14 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
 
             }
 
+            if ("recursive" in input) {
+                if (input["recursive"] != undefined) {
+                    _recursive = input["recursive"]
+
+                }
+
+            }
+
             if ("isRunnerUp" in input) {
                 if (input["isRunnerUp"] != undefined) {
                     if (input["isRunnerUp"]) {
@@ -250,7 +260,7 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
                     offset: _pageOffset,
                     limit: _pageLimit,
                     search: _searchTerm,
-                    actors: _actorId,
+                    actors: _actorId
 
                     // ordering: _ordering
 
@@ -275,7 +285,8 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
                     folders_in_tree: _folderId,
                     search: _searchTerm,
                     sortBy: _sortBy,
-                    is_runner_up: _runnerUp
+                    is_runner_up: _runnerUp,
+                    recursive: _recursive
 
                 })
             } else if (_pageType == 'SceneTag') {
@@ -479,6 +490,13 @@ angular.module('scopeWatch', []).factory('scopeWatchService', function ($rootSco
         $rootScope.$broadcast("didActorLoad", someVariable);
 
     }
+    
+    function didSceneLoad(someVariable) {
+
+        console.log("app-service-scopeWatch: runnerUpChanged was triggered! ");
+        $rootScope.$broadcast("didSceneLoad", someVariable);
+
+    }
 
 
     return {
@@ -504,7 +522,8 @@ angular.module('scopeWatch', []).factory('scopeWatchService', function ($rootSco
         paginationChange: paginationChange,
         addAliasToList: addAliasToList,
         runnerUpChanged: runnerUpChanged,
-        didActorLoad: didActorLoad
+        didActorLoad: didActorLoad,
+        didSceneLoad: didSceneLoad
 
 
     }

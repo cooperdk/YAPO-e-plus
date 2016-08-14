@@ -11,6 +11,7 @@ from mptt.models import MPTTModel, TreeForeignKey
 class ActorAlias(models.Model):
     name = models.CharField(max_length=50, unique=True)
     is_exempt_from_one_word_search = models.BooleanField(default=False)
+    date_added = models.DateTimeField(auto_now_add=True)
 
     # actor = models.ForeignKey(Actor, on_delete=models.CASCADE)
 
@@ -122,6 +123,7 @@ class Scene(models.Model):
     date_added = models.DateTimeField(auto_now_add=True)
     date_fav = models.DateTimeField(null=True, blank=True)
     date_runner_up = models.DateTimeField(null=True, blank=True)
+    last_filename_tag_lookup = models.DateTimeField(null=True, blank=True)
     play_count = models.IntegerField(default=0)
     is_fav = models.BooleanField(default=False)
     is_runner_up = models.BooleanField(default=False)

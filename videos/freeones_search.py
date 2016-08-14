@@ -15,7 +15,7 @@ import videos.aux_functions as aux
 from bs4 import BeautifulSoup
 from dateutil.parser import parse
 import videos.const as const
-
+from django.utils import timezone
 django.setup()
 
 from videos.models import Actor, ActorAlias, ActorTag

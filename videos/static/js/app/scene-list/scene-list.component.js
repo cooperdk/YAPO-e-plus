@@ -117,7 +117,8 @@ angular.module('sceneList').component('sceneList', {
                     folder: self.folder,
                     searchTerm: self.searchTerm,
                     sortBy: self.sortBy,
-                    isRunnerUp: self.runnerUp
+                    isRunnerUp: self.runnerUp,
+                    recursive: self.recursive
                 };
 
                 self.scrollBusy = true;
@@ -485,7 +486,9 @@ angular.module('sceneList').component('sceneList', {
             $scope.$on("folderOpened", function (event, folder) {
                 console.log("scene-list: folderOpened broadcast was caught");
                 self.scenes = [];
-                self.folder = folder;
+                self.folder = folder['dir'];
+                self.recursive = folder['recursive'];
+                // alert(folder['recursive']);
                 // self.scenes = [];
                 self.nextPage(0);
             });

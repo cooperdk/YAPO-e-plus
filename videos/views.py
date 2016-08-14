@@ -39,34 +39,64 @@ import pathlib
 
 
 # Aux Functions
+
+def get_scenes_in_folder_recursive(folder, scene_list):
+    scenes = list(folder.scenes.all())
+    scene_list = list(chain(scene_list, scenes))
+
+    if folder.children.count() == 0:
+        return scene_list
+
+    else:
+        for child in folder.children.all():
+            scene_list = get_scenes_in_folder_recursive(child, scene_list)
+
+        return scene_list
+
+
 def search_in_get_queryset(original_queryset, request):
     qs_list = list()
     term_is_not_null = False
     random = False
     sort_by = "name"
 
-    for qp in request.query_params:
-        # print (qp)
-        term_string = request.query_params.get(qp, None)
-        # print (term_string)
+    if 'recursive' in request.query_params and request.query_params['recursive'] == 'true':
+        print("Recursive is TRUE!!!!")
+        folder = Folder.objects.get(pk=int(request.query_params['folders_in_tree']))
+        qs_list = get_scenes_in_folder_recursive(folder,qs_list)
+        print (qs_list)
+        term_is_not_null = True
+    else:
+        for qp in request.query_params:
+            # print (qp)
+            term_string = request.query_params.get(qp, None)
+            # print (term_string)
 
-        if (term_string is not None) and \
-                (term_string != '') and \
-                (qp != 'limit') and \
-                (qp != 'offset') and \
-                (qp != 'ordering') and \
-                (qp != 'search'):
+            if (term_string is not None) and \
+                    (term_string != '') and \
+                    (qp != 'limit') and \
+                    (qp != 'offset') and \
+                    (qp != 'ordering') and \
+                    (qp != 'recursive') and \
+                    (qp != 'sortBy') and \
+                    (qp != 'search'):
 
-            if qp == 'sortBy':
-                sort_by = term_string
-                if sort_by == 'random':
-                    random = True
-            else:
+                # if qp == 'sortBy':
+                #     sort_by = term_string
+                #     if sort_by == 'random':
+                #         random = True
+                #
+                # else:
                 term_is_not_null = True
                 terms = term_string.split(',')
 
                 for term in terms:
                     qs_list = list(chain(qs_list, original_queryset.filter(**{qp: term})))
+
+    if 'sortBy' in request.query_params:
+        sort_by = request.query_params['sortBy']
+        if sort_by == 'random':
+            random = True
 
     if term_is_not_null:
         if random:
@@ -113,25 +143,28 @@ def scrape_all_actors(force):
 
 
 def tag_all_scenes():
-    scenes = Scene.objects.all()
-    scene_count = scenes.count()
-    counter = 1
+    filename_parser.parse_all_scenes()
+    return Response(status=200)
 
-    actors = list(Actor.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
-    actors_alias = list(ActorAlias.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
-    scene_tags = SceneTag.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
-    websites = Website.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
-
-    filtered_alias = list()
-
-    for alias in actors_alias:
-        if ' ' in alias.name or alias.is_exempt_from_one_word_search:
-            filtered_alias.append(alias)
-
-    for scene in scenes:
-        print("Scene {} out of {}".format(counter, scene_count))
-        filename_parser.parse_scene_all_metadata(scene, actors, filtered_alias, scene_tags, websites)
-        counter += 1
+    # scenes = Scene.objects.all()
+    # scene_count = scenes.count()
+    # counter = 1
+    #
+    # actors = list(Actor.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
+    # actors_alias = list(ActorAlias.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
+    # scene_tags = SceneTag.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
+    # websites = Website.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
+    #
+    # filtered_alias = list()
+    #
+    # for alias in actors_alias:
+    #     if ' ' in alias.name or alias.is_exempt_from_one_word_search:
+    #         filtered_alias.append(alias)
+    #
+    # for scene in scenes:
+    #     print("Scene {} out of {}".format(counter, scene_count))
+    #     filename_parser.parse_scene_all_metadata(scene, actors, filtered_alias, scene_tags, websites)
+    #     counter += 1
 
 
 # views

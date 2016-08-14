@@ -1,7 +1,8 @@
 import os
 import re
-
+import datetime
 import django
+from django.utils import timezone
 
 django.setup()
 
@@ -10,29 +11,57 @@ from videos.models import Actor, Scene, ActorAlias, SceneTag, Website
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 
 
+def filter_alias(actor_alias):
+    filtered_alias = list()
+    for alias in actor_alias:
+        if ' ' in alias.name or alias.is_exempt_from_one_word_search:
+            filtered_alias.append(alias)
+
+    return filtered_alias
+
+
 def parse_all_scenes():
     actors = list(Actor.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
     actors_alias = list(ActorAlias.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
-    scene_tags = SceneTag.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
-    websites = Website.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
+    scene_tags = list(SceneTag.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
+    websites = list(Website.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
 
-    filtered_alias = list()
     scenes = Scene.objects.all()
     scene_count = scenes.count()
     counter = 1
 
-    for alias in actors_alias:
-        if ' ' in alias.name or alias.is_exempt_from_one_word_search:
-            filtered_alias.append(alias)
-
     for scene in scenes:
+
         print("Scene {} out of {}".format(counter, scene_count))
-        parse_scene_all_metadata(scene, actors, filtered_alias, scene_tags, websites)
+
+        if scene.last_filename_tag_lookup:
+            actors_filtered = list(Actor.objects.filter(date_added__gt=scene.last_filename_tag_lookup))
+            actors_filtered.sort(key=lambda x: len(x.name), reverse=True)
+
+            actors_alias_filtered = list(ActorAlias.objects.filter(date_added__gt=scene.last_filename_tag_lookup))
+            actors_alias_filtered.sort(key=lambda x: len(x.name), reverse=True)
+
+            scene_tags_filtered = list(SceneTag.objects.filter(date_added__gt=scene.last_filename_tag_lookup))
+            scene_tags_filtered.sort(key=lambda x: len(x.name), reverse=True)
+
+            websites_filtered = list(Website.objects.filter(date_added__gt=scene.last_filename_tag_lookup))
+            websites_filtered.sort(key=lambda x: len(x.name), reverse=True)
+
+            actors_alias_filtered = filter_alias(actors_alias_filtered)
+
+            parse_scene_all_metadata(scene, actors_filtered, actors_alias_filtered, scene_tags_filtered,
+                                     websites_filtered)
+        else:
+
+            filtered_alias = filter_alias(actors_alias)
+
+            parse_scene_all_metadata(scene, actors, filtered_alias, scene_tags,
+                                     websites)
         counter += 1
 
 
 def parse_scene_all_metadata(scene, actors, actors_alias, scene_tags, websites):
-    print("Parsing scene's: {} path: {} for actors,tags,and websites ...".format(scene.name, scene.path_to_file))
+    print("Parsing scene path: {} for actors,tags,and websites ...".format(scene.path_to_file))
 
     scene_path = scene.path_to_file.lower()
 
@@ -40,13 +69,21 @@ def parse_scene_all_metadata(scene, actors, actors_alias, scene_tags, websites):
     # are not consistan through the files)
     scene_path = re.sub(r'"(.*)(\w+ \d{1,2}, \d{4})"', r'\1', scene_path)
 
+    print("Looking for websites...")
     scene_path = parse_website_in_scenes(scene, scene_path, websites)
 
+    print("Looking for actors and alias...")
     scene_path = parse_actors_in_scene(scene, scene_path, actors, actors_alias)
 
+    print("Looking for scene tags")
     scene_path = parse_scene_tags_in_scene(scene, scene_path, scene_tags)
 
-    print("Finished parsing scene's {} path...".format(scene.name))
+    scene.last_filename_tag_lookup = datetime.datetime.now()
+
+    print("Finished parsing scene's {} path... setting Last lookup to {}".format(scene.name,
+                                                                                 scene.last_filename_tag_lookup))
+
+    scene.save()
 
 
 def parse_actors_in_scene(scene_to_parse, scene_path, actors, actors_alias):
@@ -92,12 +129,9 @@ def parse_actors_in_scene(scene_to_parse, scene_path, actors, actors_alias):
 def add_actor_to_scene(actor_to_add, scene_to_add_to):
     # if not Scene.objects.filter(pk=scene_to_add_to.pk, actors__pk=actor_to_add.pk):
     if not scene_to_add_to.actors.filter(pk=actor_to_add.pk):
-
-        print("Adding " + actor_to_add.name + " to scene" + scene_to_add_to.name + "\n")
+        print("Adding Actor {} to the Scene {}".format(actor_to_add.name, scene_to_add_to.name))
         scene_to_add_to.actors.add(actor_to_add)
         scene_to_add_to.save()
-    else:
-        print(actor_to_add.name + "is already registered in " + scene_to_add_to.name + "\n")
 
 
 def get_regex_search_term(name, delimiter):
@@ -140,8 +174,7 @@ def parse_website_in_scenes(scene, scene_path, websites):
             if not scene.websites.filter(name=website.name):
                 print("Adding " + website.name + " to scene" + scene.name + "\n")
                 scene.websites.add(website)
-            else:
-                print(website.name + " is already in" + scene.name + "\n")
+
     return scene_path
 
 
