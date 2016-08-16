@@ -16,6 +16,7 @@ from bs4 import BeautifulSoup
 from dateutil.parser import parse
 import videos.const as const
 from django.utils import timezone
+
 django.setup()
 
 from videos.models import Actor, ActorAlias, ActorTag
@@ -96,28 +97,35 @@ def search_freeones(actor_to_search, alias):
         profile_thumb_perent = profile_thumb.parent
 
         print(profile_thumb_perent)
-        print(profile_thumb_perent['href'])
+        has_image = False
+
+        try:
+            print(profile_thumb_perent['href'])
+            has_image = True
+        except KeyError:
+            print("No image on Freeones")
 
         biography_page = urllib_parse.urljoin("http://www.freeones.com/", href_found)
 
-        images_page = profile_thumb_perent['href']
+        if has_image:
+            images_page = profile_thumb_perent['href']
 
-        r = requests.get(images_page)
-        soup = BeautifulSoup(r.content)
+            r = requests.get(images_page)
+            soup = BeautifulSoup(r.content)
 
-        if actor_to_search.thumbnail == const.UNKNOWN_PERSON_IMAGE_PATH:
-            if soup.find("div", {'id': 'PictureList'}):
+            if actor_to_search.thumbnail == const.UNKNOWN_PERSON_IMAGE_PATH:
+                if soup.find("div", {'id': 'PictureList'}):
 
-                picture_list = soup.find("div", {'id': 'PictureList'})
+                    picture_list = soup.find("div", {'id': 'PictureList'})
 
-                if picture_list.find("a"):
-                    first_picture = picture_list.find("a")
+                    if picture_list.find("a"):
+                        first_picture = picture_list.find("a")
 
-                    if first_picture['href']:
-                        first_picture_link = first_picture['href']
+                        if first_picture['href']:
+                            first_picture_link = first_picture['href']
 
-                        print(first_picture_link)
-                        aux.save_actor_profile_image_from_web(first_picture_link, actor_to_search)
+                            print(first_picture_link)
+                            aux.save_actor_profile_image_from_web(first_picture_link, actor_to_search)
 
         r = requests.get(biography_page)
 

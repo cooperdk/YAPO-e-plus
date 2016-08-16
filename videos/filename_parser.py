@@ -3,6 +3,9 @@ import re
 import datetime
 import django
 from django.utils import timezone
+from videos import const
+import json
+from multiprocessing import Pool,Lock
 
 django.setup()
 
@@ -20,6 +23,38 @@ def filter_alias(actor_alias):
     return filtered_alias
 
 
+def if_new_actors():
+    actors = list(Actor.objects.filter(date_added__gt=const.LAST_ALL_SCENE_TAG))
+    if len(actors) > 0:
+        return [True, actors]
+    else:
+        return [False, actors]
+
+
+def if_new_alias():
+    alias = list(ActorAlias.objects.filter(date_added__gt=const.LAST_ALL_SCENE_TAG))
+    if len(alias) > 0:
+        return [True, alias]
+    else:
+        return [False, alias]
+
+
+def if_new_tags():
+    tags = list(SceneTag.objects.filter(date_added__gt=const.LAST_ALL_SCENE_TAG))
+    if len(tags) > 0:
+        return [True, tags]
+    else:
+        return [False, tags]
+
+
+def if_new_websites():
+    website = list(Website.objects.filter(date_added__gt=const.LAST_ALL_SCENE_TAG))
+    if len(website) > 0:
+        return [True, website]
+    else:
+        return [False, website]
+
+
 def parse_all_scenes():
     actors = list(Actor.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
     actors_alias = list(ActorAlias.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
@@ -30,34 +65,93 @@ def parse_all_scenes():
     scene_count = scenes.count()
     counter = 1
 
-    for scene in scenes:
+    if const.LAST_ALL_SCENE_TAG:
 
-        print("Scene {} out of {}".format(counter, scene_count))
-
-        if scene.last_filename_tag_lookup:
-            actors_filtered = list(Actor.objects.filter(date_added__gt=scene.last_filename_tag_lookup))
-            actors_filtered.sort(key=lambda x: len(x.name), reverse=True)
-
-            actors_alias_filtered = list(ActorAlias.objects.filter(date_added__gt=scene.last_filename_tag_lookup))
-            actors_alias_filtered.sort(key=lambda x: len(x.name), reverse=True)
-
-            scene_tags_filtered = list(SceneTag.objects.filter(date_added__gt=scene.last_filename_tag_lookup))
-            scene_tags_filtered.sort(key=lambda x: len(x.name), reverse=True)
-
-            websites_filtered = list(Website.objects.filter(date_added__gt=scene.last_filename_tag_lookup))
-            websites_filtered.sort(key=lambda x: len(x.name), reverse=True)
-
-            actors_alias_filtered = filter_alias(actors_alias_filtered)
-
-            parse_scene_all_metadata(scene, actors_filtered, actors_alias_filtered, scene_tags_filtered,
-                                     websites_filtered)
+        a = if_new_actors()
+        if a[0]:
+            actors = a[1]
+            actors.sort(key=lambda x: len(x.name), reverse=True)
         else:
+            actors = list()
 
-            filtered_alias = filter_alias(actors_alias)
+        b = if_new_alias()
+        if b[0]:
+            actors_alias = b[1]
 
-            parse_scene_all_metadata(scene, actors, filtered_alias, scene_tags,
-                                     websites)
-        counter += 1
+            actors_alias = filter_alias(actors_alias)
+
+            actors_alias.sort(key=lambda x: len(x.name), reverse=True)
+        else:
+            actors_alias = list()
+
+        c = if_new_tags()
+        if c[0]:
+            scene_tags = c[1]
+            scene_tags.sort(key=lambda x: len(x.name), reverse=True)
+        else:
+            scene_tags = list()
+
+        d = if_new_websites()
+        if d[0]:
+            websites = d[1]
+            websites.sort(key=lambda x: len(x.name), reverse=True)
+        else:
+            websites = list()
+
+        for scene in scenes:
+            print("Scene {} out of {}".format(counter, scene_count))
+
+            if (a[0]) or (b[0]) or (c[0]) or (d[0]):
+
+
+                parse_scene_all_metadata(scene, actors, actors_alias, scene_tags,
+                                         websites)
+            counter += 1
+
+    else:
+        for scene in scenes:
+
+            print("Scene {} out of {}".format(counter, scene_count))
+
+            if scene.last_filename_tag_lookup:
+                actors_filtered = list(Actor.objects.filter(date_added__gt=scene.last_filename_tag_lookup))
+                actors_filtered.sort(key=lambda x: len(x.name), reverse=True)
+
+                actors_alias_filtered = list(ActorAlias.objects.filter(date_added__gt=scene.last_filename_tag_lookup))
+                actors_alias_filtered.sort(key=lambda x: len(x.name), reverse=True)
+
+                scene_tags_filtered = list(SceneTag.objects.filter(date_added__gt=scene.last_filename_tag_lookup))
+                scene_tags_filtered.sort(key=lambda x: len(x.name), reverse=True)
+
+                websites_filtered = list(Website.objects.filter(date_added__gt=scene.last_filename_tag_lookup))
+                websites_filtered.sort(key=lambda x: len(x.name), reverse=True)
+
+                actors_alias_filtered = filter_alias(actors_alias_filtered)
+
+                parse_scene_all_metadata(scene, actors_filtered, actors_alias_filtered, scene_tags_filtered,
+                                         websites_filtered)
+            else:
+
+                filtered_alias = filter_alias(actors_alias)
+
+                parse_scene_all_metadata(scene, actors, filtered_alias, scene_tags,
+                                         websites)
+            counter += 1
+
+    f = open('../YAPO/settings.json', 'r')
+    x = f.read()
+    settings_content = json.loads(x)
+    f.close()
+
+    settings_content['last_all_scene_tag'] = datetime.datetime.strftime(datetime.datetime.now(), "%Y-%m-%d %H:%M:%S")
+
+    f = open('../YAPO/settings.json', 'w')
+    f.write(json.dumps(settings_content))
+    f.close()
+
+    const.LAST_ALL_SCENE_TAG = datetime.datetime.strptime(settings_content['last_all_scene_tag'], "%Y-%m-%d %H:%M:%S")
+
+    print("finished parsing...")
 
 
 def parse_scene_all_metadata(scene, actors, actors_alias, scene_tags, websites):
@@ -82,6 +176,8 @@ def parse_scene_all_metadata(scene, actors, actors_alias, scene_tags, websites):
 
     print("Finished parsing scene's {} path... setting Last lookup to {}".format(scene.name,
                                                                                  scene.last_filename_tag_lookup))
+
+
 
     scene.save()
 
@@ -198,7 +294,9 @@ def clean_taling_spaces():
 def main():
     parse_all_scenes()
 
-
 if __name__ == "__main__":
-    # clean_taling_spaces()
     main()
+
+
+
+

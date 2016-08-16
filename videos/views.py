@@ -2,6 +2,8 @@ import os.path
 import subprocess
 import _thread
 
+
+
 import django.db
 
 from django.shortcuts import render
@@ -63,8 +65,8 @@ def search_in_get_queryset(original_queryset, request):
     if 'recursive' in request.query_params and request.query_params['recursive'] == 'true':
         print("Recursive is TRUE!!!!")
         folder = Folder.objects.get(pk=int(request.query_params['folders_in_tree']))
-        qs_list = get_scenes_in_folder_recursive(folder,qs_list)
-        print (qs_list)
+        qs_list = get_scenes_in_folder_recursive(folder, qs_list)
+        print(qs_list)
         term_is_not_null = True
     else:
         for qp in request.query_params:
@@ -124,11 +126,11 @@ def scrape_all_actors(force):
         if not force:
             if actor.last_lookup is None:
                 print("Searching in TMDB")
-                videos.tmdb_search.search_person_with_force_flag(actor, True)
+                videos.tmdb_search.search_person_with_force_flag(actor, False)
                 print("Finished TMDB search")
                 if actor.gender != 'M':
                     print("Searching in Freeones")
-                    videos.freeones_search.search_freeones_with_force_flag(actor, True)
+                    videos.freeones_search.search_freeones_with_force_flag(actor, False)
                     print("Finished Freeones search")
             else:
                 print("{} was already searched...".format(actor.name))
@@ -290,8 +292,17 @@ def settings(request):
 
                 if os.path.isfile(new_path_to_vlc):
                     print("Actual path to a file!")
-                    dict = {'vlc_path': new_path_to_vlc}
-                    y = json.dumps(dict)
+                    # dict = {'vlc_path': new_path_to_vlc}
+                    # y = json.dumps(dict)
+
+
+                    f = open('../YAPO/settings.json', 'r')
+                    x = f.read()
+
+                    settings_cont = json.loads(x)
+                    settings_cont['vlc_path'] = new_path_to_vlc
+                    y = json.dumps(settings_cont)
+
                     print(y)
 
                     f = open('../YAPO/settings.json', 'w')

@@ -521,6 +521,13 @@ angular.module('sceneList').component('sceneList', {
                 self.patchScene(scene.id, 'is_runner_up', scene.is_runner_up, 'add', false)
 
             };
+            
+            
+            self.sceneRatingPatch = function (scene) {
+
+                self.patchScene(scene.id, 'rating', scene.rating, 'add', false)
+
+            };
 
 
             self.sceneArrayPush = function (sceneId) {

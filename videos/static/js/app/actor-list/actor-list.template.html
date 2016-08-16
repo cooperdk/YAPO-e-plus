@@ -1,6 +1,4 @@
-
-
-        <!--
+<!--
         <div class="col-md-2">
 
 
@@ -21,27 +19,28 @@
 
         </div>
         -->
-        <pagination page-type="'Actor'"></pagination>
+<pagination page-type="'Actor'"></pagination>
 
 
-        <div class="col-md-10" id="big-scroll-item">
+<div class="col-md-10" id="big-scroll-item">
 
-            <ul class="actors">
-                <!--
+    <ul class="actors">
+        <!--
                 Search: <input ng-model="$ctrl.searchTerm"/>
                 {{ $ctrl.searchTerm }}
                 -->
 
 
-                <li ng-repeat="actor in $ctrl.actors | orderBy:actor.name "
-                    class="thumbnail phone-list-item">
+        <li ng-repeat="actor in $ctrl.actors | orderBy:actor.name "
+            class="thumbnail phone-list-item">
 
-                    <a href="/#!/actor/{{ actor.id }}" class="thumb">
-                        <img ng-src="{{ actor.thumbnail }}"
-                             alt="{{ actor.name }}"
-                             style="width: 64px;"/>
-                    </a>
-                    <h4><a href="/#!/actor/{{ actor.id }}">[{{$index + 1}}) {{ actor.name }}</a>
+            <a href="/#!/actor/{{ actor.id }}" class="thumb">
+                <img ng-src="{{ actor.thumbnail }}"
+                     alt="{{ actor.name }}"
+                     style="width: 64px;"/>
+            </a>
+            <h4><a href="/#!/actor/{{ actor.id }}">[{{$index + 1}}) {{ actor.name }}</a>
+
                             <span
                                     ng-if="!$ctrl.mainPage" ng-click="$ctrl.removeActorFromScene(actor)"
                                     class="glyphicon glyphicon-remove"
@@ -49,23 +48,24 @@
 
                             </span>
                             <span ng-if="$ctrl.mainPage" ng-click="$ctrl.deleteActor(actor)"
-                                  class="glyphicon glyphicon-trash on-hover-red-cursor-pointer" uib-popover-html="'<strong>Delete</strong> actor from database!'"
+                                  class="glyphicon glyphicon-trash on-hover-red-cursor-pointer"
+                                  uib-popover-html="'<strong>Delete</strong> actor from database!'"
                                   popover-trigger="mouseenter">
 
                             </span></h4>
 
-                    <p>Rating:{{ actor.rating }}, Ethnicity: {{ actor.ethnicity }}, Height: {{ actor.height }},
-                        Nationality: {{ actor.country_of_origin }}
-                        <br>
-                        {{ actor.description }}</p>
+            <p>Rating:{{ actor.rating }}, Ethnicity: {{ actor.ethnicity }}, Height: {{ actor.height }},
+                Nationality: {{ actor.country_of_origin }}
+                <br>
+                {{ actor.description }}</p>
 
 
-                </li>
+        </li>
 
 
-            </ul>
+    </ul>
 
-        </div>
+</div>
 
 
 

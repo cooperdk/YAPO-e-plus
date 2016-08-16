@@ -40,7 +40,7 @@ angular.module('addItems').component('addItems', {
                     }
                 }).then(function (response) {
                     // alert(angular.toJson(response))
-                    alert("Adding actors...");
+                    alert("Finished adding actors successfully...");
                 }, function errorCallback(response) {
                     alert("Something went wrong!");
                 });

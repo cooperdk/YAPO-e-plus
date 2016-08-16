@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 import os
 import json
 import videos.const as const
+from datetime import datetime
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -141,26 +142,53 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 30
 }
 
+SETTINGS_VERSION = 1
+default_dict = {'settings_version': '1', 'vlc_path': "", 'last_all_scene_tag': ""}
 try:
     f = open('settings.json', 'r')
     x = f.read()
+
     if x == "":
         f.close()
         print("Setting.json is empty")
-        default_dict = {'vlc_path': ""}
+
         f = open('settings.json', 'w')
         f.write(json.dumps(default_dict))
         f.close()
 
     else:
         # print(x)
+
         settings_content = json.loads(x)
+        f.close()
+
+        if ('settings_version' not in settings_content) or (
+                    int(settings_content['settings_version']) < SETTINGS_VERSION):
+            for x in settings_content:
+                if x in default_dict:
+                    default_dict[x] = settings_content[x]
+
+            f = open('settings.json', 'w')
+            f.write(json.dumps(default_dict))
+            f.close()
+
+            f = open('settings.json', 'r')
+            x = f.read()
+            settings_content = json.loads(x)
+
         print(settings_content['vlc_path'])
         const.VLC_PATH = settings_content['vlc_path']
+        if settings_content['last_all_scene_tag'] != "":
+            # 2016-08-14 18:03:10.153443
+            const.LAST_ALL_SCENE_TAG = datetime.strptime(settings_content['last_all_scene_tag'], "%Y-%m-%d %H:%M:%S")
+            print("Last full scene tagging : {}".format(const.LAST_ALL_SCENE_TAG))
+
+    f.close()
+
 except FileNotFoundError:
     f = open('settings.json', 'w')
     f.close()
-    default_dict = {'vlc_path': ""}
+
     f = open('settings.json', 'w')
     f.write(json.dumps(default_dict))
     f.close()
