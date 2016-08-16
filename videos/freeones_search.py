@@ -36,10 +36,11 @@ def search_freeones(actor_to_search, alias):
     if alias:
         name_with_plus = alias.name.replace(' ', '+')
         print("Searching freeones for " + actor_to_search.name + " alias: " + alias.name)
+        name = alias.name
     else:
         name_with_plus = name.replace(' ', '+')
         print("Searching freeones for " + actor_to_search.name)
-    r = requests.get("http://www.freeones.com/search/?t=1&q=" + name_with_plus + "sq=")
+    r = requests.get("http://www.freeones.com/search/?t=1&q=" + name_with_plus)
     soup = BeautifulSoup(r.content, "html.parser")
 
     # link = soup.find_all("a", {"text": "Isis Love"})
@@ -284,6 +285,14 @@ def search_freeones_with_force_flag(actor_to_search, force):
     success = False
     if force:
         success = search_freeones(actor_to_search, None)
+
+        if not success:
+            for alias in actor_to_search.actor_aliases.all():
+                if alias.name.count(' ') > 0 or alias.is_exempt_from_one_word_search:
+                    success = search_freeones(actor_to_search, alias)
+                    if success:
+                        break
+
     elif not actor_to_search.last_lookup:
         success = search_freeones(actor_to_search, None)
     return success
