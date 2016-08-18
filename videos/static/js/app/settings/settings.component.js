@@ -6,6 +6,7 @@ angular.module('settings').component('settings', {
 
                 var self = this;
                 self.response = "";
+                self.ignore_last_lookup = false;
 
                 // self.pathToVLC = "";
 
@@ -61,7 +62,8 @@ angular.module('settings').component('settings', {
                 self.tagAllScenes = function () {
                     $http.get('settings/', {
                         params: {
-                            tagAllScenes: 'True'
+                            tagAllScenes: 'true',
+                            ignoreLastLookup: self.ignore_last_lookup
                         }
 
                     }).then(function (response) {

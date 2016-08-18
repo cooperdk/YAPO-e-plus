@@ -26,7 +26,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 MEDIA_PATH = "videos\\media"
 
 
-def search_freeones(actor_to_search, alias):
+def search_freeones(actor_to_search, alias, force):
     success = False
     if Actor.objects.get(name=actor_to_search.name):
         actor_to_search = Actor.objects.get(name=actor_to_search.name)
@@ -114,7 +114,7 @@ def search_freeones(actor_to_search, alias):
             r = requests.get(images_page)
             soup = BeautifulSoup(r.content)
 
-            if actor_to_search.thumbnail == const.UNKNOWN_PERSON_IMAGE_PATH:
+            if actor_to_search.thumbnail == const.UNKNOWN_PERSON_IMAGE_PATH or force:
                 if soup.find("div", {'id': 'PictureList'}):
 
                     picture_list = soup.find("div", {'id': 'PictureList'})
@@ -126,7 +126,7 @@ def search_freeones(actor_to_search, alias):
                             first_picture_link = first_picture['href']
 
                             print(first_picture_link)
-                            aux.save_actor_profile_image_from_web(first_picture_link, actor_to_search)
+                            aux.save_actor_profile_image_from_web(first_picture_link, actor_to_search,force)
 
         r = requests.get(biography_page)
 
@@ -284,17 +284,17 @@ def match_text_in_link_to_query(soup_links, text_to_find):
 def search_freeones_with_force_flag(actor_to_search, force):
     success = False
     if force:
-        success = search_freeones(actor_to_search, None)
+        success = search_freeones(actor_to_search, None, force)
 
         if not success:
             for alias in actor_to_search.actor_aliases.all():
                 if alias.name.count(' ') > 0 or alias.is_exempt_from_one_word_search:
-                    success = search_freeones(actor_to_search, alias)
+                    success = search_freeones(actor_to_search, alias, force)
                     if success:
                         break
 
     elif not actor_to_search.last_lookup:
-        success = search_freeones(actor_to_search, None)
+        success = search_freeones(actor_to_search, None, force)
     return success
 
 

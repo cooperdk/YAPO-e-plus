@@ -20,6 +20,11 @@ from rest_framework.routers import DefaultRouter
 from videos import views
 from django.conf import settings
 from django.conf.urls.static import static
+import json
+
+from datetime import datetime
+import videos.const
+import videos.aux_functions
 
 # actor_alias_list = ActorAliasViewSet.as_view({
 #     'get': 'list',
@@ -100,3 +105,71 @@ urlpatterns = [
     #     name='actor-alias-details-rest'),
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+#  Startup script checks settings.json and creates it if it doesn't exist
+SETTINGS_VERSION = 2
+default_dict = {'settings_version': SETTINGS_VERSION, 'vlc_path': "", 'last_all_scene_tag': ""}
+need_update = False
+try:
+    f = open('settings.json', 'r')
+    x = f.read()
+
+    if x == "":
+        need_update = True
+        f.close()
+        print("Setting.json is empty")
+        f = open('settings.json', 'w')
+        f.write(json.dumps(default_dict))
+        f.close()
+
+    else:
+        # print(x)
+
+        settings_content = json.loads(x)
+        f.close()
+
+        if ('settings_version' not in settings_content) or (
+                    int(settings_content['settings_version']) < SETTINGS_VERSION):
+            need_update = True
+            for x in settings_content:
+                if x in default_dict:
+                    default_dict[x] = settings_content[x]
+
+            # default_dict['settings_version'] = SETTINGS_VERSION
+
+            f = open('settings.json', 'w')
+            f.write(json.dumps(default_dict))
+            f.close()
+
+            f = open('settings.json', 'r')
+            x = f.read()
+            settings_content = json.loads(x)
+
+        print(settings_content['vlc_path'])
+        videos.const.VLC_PATH = settings_content['vlc_path']
+        if settings_content['last_all_scene_tag'] != "":
+            # 2016-08-14 18:03:10.153443
+            videos.const.LAST_ALL_SCENE_TAG = datetime.strptime(settings_content['last_all_scene_tag'], "%Y-%m-%d %H:%M:%S")
+            print("Last full scene tagging : {}".format(videos.const.LAST_ALL_SCENE_TAG))
+
+    f.close()
+
+except FileNotFoundError:
+    f = open('settings.json', 'w')
+    f.close()
+
+    f = open('settings.json', 'w')
+    f.write(json.dumps(default_dict))
+    f.close()
+
+if need_update:
+    if videos.aux_functions.actor_folder_from_name_to_id():
+        f = open('settings.json', 'r')
+        x = f.read()
+        settings_content = json.loads(x)
+        f.close()
+        settings_content['settings_version'] = SETTINGS_VERSION
+
+        f = open('settings.json', 'w')
+        f.write(json.dumps(settings_content))
+        f.close()

@@ -5,7 +5,8 @@ import django
 from django.utils import timezone
 from videos import const
 import json
-from multiprocessing import Pool,Lock
+from multiprocessing import Pool, Lock
+import fnmatch
 
 django.setup()
 
@@ -55,7 +56,7 @@ def if_new_websites():
         return [False, website]
 
 
-def parse_all_scenes():
+def parse_all_scenes(ignore_last_lookup):
     actors = list(Actor.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
     actors_alias = list(ActorAlias.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
     scene_tags = list(SceneTag.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
@@ -65,78 +66,88 @@ def parse_all_scenes():
     scene_count = scenes.count()
     counter = 1
 
-    if const.LAST_ALL_SCENE_TAG:
-
-        a = if_new_actors()
-        if a[0]:
-            actors = a[1]
-            actors.sort(key=lambda x: len(x.name), reverse=True)
-        else:
-            actors = list()
-
-        b = if_new_alias()
-        if b[0]:
-            actors_alias = b[1]
-
-            actors_alias = filter_alias(actors_alias)
-
-            actors_alias.sort(key=lambda x: len(x.name), reverse=True)
-        else:
-            actors_alias = list()
-
-        c = if_new_tags()
-        if c[0]:
-            scene_tags = c[1]
-            scene_tags.sort(key=lambda x: len(x.name), reverse=True)
-        else:
-            scene_tags = list()
-
-        d = if_new_websites()
-        if d[0]:
-            websites = d[1]
-            websites.sort(key=lambda x: len(x.name), reverse=True)
-        else:
-            websites = list()
-
+    if ignore_last_lookup:
         for scene in scenes:
             print("Scene {} out of {}".format(counter, scene_count))
 
-            if (a[0]) or (b[0]) or (c[0]) or (d[0]):
+            filtered_alias = filter_alias(actors_alias)
 
-
-                parse_scene_all_metadata(scene, actors, actors_alias, scene_tags,
-                                         websites)
+            parse_scene_all_metadata(scene, actors, filtered_alias, scene_tags,
+                                     websites)
             counter += 1
 
     else:
-        for scene in scenes:
+        if const.LAST_ALL_SCENE_TAG:
 
-            print("Scene {} out of {}".format(counter, scene_count))
-
-            if scene.last_filename_tag_lookup:
-                actors_filtered = list(Actor.objects.filter(date_added__gt=scene.last_filename_tag_lookup))
-                actors_filtered.sort(key=lambda x: len(x.name), reverse=True)
-
-                actors_alias_filtered = list(ActorAlias.objects.filter(date_added__gt=scene.last_filename_tag_lookup))
-                actors_alias_filtered.sort(key=lambda x: len(x.name), reverse=True)
-
-                scene_tags_filtered = list(SceneTag.objects.filter(date_added__gt=scene.last_filename_tag_lookup))
-                scene_tags_filtered.sort(key=lambda x: len(x.name), reverse=True)
-
-                websites_filtered = list(Website.objects.filter(date_added__gt=scene.last_filename_tag_lookup))
-                websites_filtered.sort(key=lambda x: len(x.name), reverse=True)
-
-                actors_alias_filtered = filter_alias(actors_alias_filtered)
-
-                parse_scene_all_metadata(scene, actors_filtered, actors_alias_filtered, scene_tags_filtered,
-                                         websites_filtered)
+            a = if_new_actors()
+            if a[0]:
+                actors = a[1]
+                actors.sort(key=lambda x: len(x.name), reverse=True)
             else:
+                actors = list()
 
-                filtered_alias = filter_alias(actors_alias)
+            b = if_new_alias()
+            if b[0]:
+                actors_alias = b[1]
 
-                parse_scene_all_metadata(scene, actors, filtered_alias, scene_tags,
-                                         websites)
-            counter += 1
+                actors_alias = filter_alias(actors_alias)
+
+                actors_alias.sort(key=lambda x: len(x.name), reverse=True)
+            else:
+                actors_alias = list()
+
+            c = if_new_tags()
+            if c[0]:
+                scene_tags = c[1]
+                scene_tags.sort(key=lambda x: len(x.name), reverse=True)
+            else:
+                scene_tags = list()
+
+            d = if_new_websites()
+            if d[0]:
+                websites = d[1]
+                websites.sort(key=lambda x: len(x.name), reverse=True)
+            else:
+                websites = list()
+
+            for scene in scenes:
+                print("Scene {} out of {}".format(counter, scene_count))
+
+                if (a[0]) or (b[0]) or (c[0]) or (d[0]):
+                    parse_scene_all_metadata(scene, actors, actors_alias, scene_tags,
+                                             websites)
+                counter += 1
+
+        else:
+            for scene in scenes:
+
+                print("Scene {} out of {}".format(counter, scene_count))
+
+                if scene.last_filename_tag_lookup:
+                    actors_filtered = list(Actor.objects.filter(date_added__gt=scene.last_filename_tag_lookup))
+                    actors_filtered.sort(key=lambda x: len(x.name), reverse=True)
+
+                    actors_alias_filtered = list(
+                        ActorAlias.objects.filter(date_added__gt=scene.last_filename_tag_lookup))
+                    actors_alias_filtered.sort(key=lambda x: len(x.name), reverse=True)
+
+                    scene_tags_filtered = list(SceneTag.objects.filter(date_added__gt=scene.last_filename_tag_lookup))
+                    scene_tags_filtered.sort(key=lambda x: len(x.name), reverse=True)
+
+                    websites_filtered = list(Website.objects.filter(date_added__gt=scene.last_filename_tag_lookup))
+                    websites_filtered.sort(key=lambda x: len(x.name), reverse=True)
+
+                    actors_alias_filtered = filter_alias(actors_alias_filtered)
+
+                    parse_scene_all_metadata(scene, actors_filtered, actors_alias_filtered, scene_tags_filtered,
+                                             websites_filtered)
+                else:
+
+                    filtered_alias = filter_alias(actors_alias)
+
+                    parse_scene_all_metadata(scene, actors, filtered_alias, scene_tags,
+                                             websites)
+                counter += 1
 
     f = open('../YAPO/settings.json', 'r')
     x = f.read()
@@ -161,7 +172,7 @@ def parse_scene_all_metadata(scene, actors, actors_alias, scene_tags, websites):
 
     # remove dates from scene path (Maybe later parse dates for scene release dates, right now release dates formats
     # are not consistan through the files)
-    scene_path = re.sub(r'"(.*)(\w+ \d{1,2}, \d{4})"', r'\1', scene_path)
+    # scene_path = re.sub(r'"(.*)(\w+ \d{1,2}, \d{4})"', r'\1', scene_path)
 
     print("Looking for websites...")
     scene_path = parse_website_in_scenes(scene, scene_path, websites)
@@ -177,9 +188,130 @@ def parse_scene_all_metadata(scene, actors, actors_alias, scene_tags, websites):
     print("Finished parsing scene's {} path... setting Last lookup to {}".format(scene.name,
                                                                                  scene.last_filename_tag_lookup))
 
-
-
     scene.save()
+
+
+def occurrences(what, string_to_search):
+    ans = list()
+    can_be_next_occurrence = True
+    start_index = 0
+
+    while can_be_next_occurrence:
+        try:
+            index = string_to_search.index(what, start_index)
+            ans.append(index)
+            start_index = index + 1
+        except ValueError:
+            can_be_next_occurrence = False
+
+    return ans
+
+
+def string_search_without_regex(actor, scene_path):
+    ans = {'success': 0, 'scene_path': scene_path}
+    actor_name_lower = actor.name.lower()
+    string_to_search_in = scene_path
+
+    # scene_path_lower = scene_path.lower()
+
+    # actor_name_lower = actor_name_lower.replace(' ', '?')
+
+    actor_name_split = actor_name_lower.split(' ')
+
+    actor_name_split_backup = list(actor_name_split)
+    all_good = False
+    total_fail = False
+    total_success= False
+    name_to_check = actor_name_split[0]
+
+    first_name_occurrences = occurrences(name_to_check, string_to_search_in)
+    name_length = len(name_to_check)
+    del actor_name_split[0]
+    for x in range(len(first_name_occurrences)):
+        if not total_success:
+            all_good = True
+            begin_index = first_name_occurrences[x] + name_length
+            actor_name_split_index = 0
+            if not total_fail:
+                while actor_name_split_index < len(actor_name_split):
+                    next_name = actor_name_split[actor_name_split_index]
+                    next_name_length = len(next_name)
+                    substring = string_to_search_in[begin_index: begin_index + next_name_length + 1]
+                    try:
+                        index = substring.index(next_name)
+                        begin_index = begin_index + index + next_name_length
+                        actor_name_split_index += 1
+                        if actor_name_split_index >= len(actor_name_split):
+                            total_success = True
+                    except ValueError:
+                        try:
+                            last_occurrence = first_name_occurrences[x+1]
+                            break
+                        except IndexError:
+                            actor_name_split_index += 1
+                            all_good = False
+                            total_fail = True
+        else:
+            break
+
+
+
+    # try:
+    #     index = string_to_search_in.index(name_to_check)
+    #     name_length = len(name_to_check)
+    #     begin_index = index + name_length
+    #
+    #     del actor_name_split[0]
+    #
+    #     while actor_name_split != []:
+    #         next_name = actor_name_split[0]
+    #         next_name_length = len(next_name)
+    #         substring = string_to_search_in[begin_index: begin_index + next_name_length + 1]
+    #         try:
+    #             index = substring.index(next_name)
+    #             begin_index = begin_index + index + next_name_length
+    #             del actor_name_split[0]
+    #         except ValueError:
+    #             del actor_name_split[0]
+    #             all_good = False
+    #
+    # except ValueError:
+    #     all_good = False
+    #
+    # while actor_name_split != [] and all_good:
+    #     name_to_check = actor_name_split[0]
+    #
+    #     try:
+    #         index = string_to_search_in.index(name_to_check)
+    #         name_length = len(name_to_check)
+    #
+    #         try:
+    #             second_name = actor_name_split[1]
+    #             second_name_length = len(second_name)
+    #             out_index = index + name_length + second_name_length + 1
+    #             substring = string_to_search_in[index:out_index]
+    #
+    #             try:
+    #                 second_index = substring.index(second_name)
+    #             except ValueError:
+    #                 break
+    #
+    #
+    #         except IndexError:
+    #             print("no second name")
+    #
+    #         del actor_name_split[0]
+    #     except ValueError:
+    #         break
+
+    ans['success'] = all_good
+
+    if all_good:
+        for name in actor_name_split_backup:
+            scene_path = scene_path.replace(name, '')
+
+    ans['scene_path'] = scene_path
+    return ans
 
 
 def parse_actors_in_scene(scene_to_parse, scene_path, actors, actors_alias):
@@ -188,36 +320,52 @@ def parse_actors_in_scene(scene_to_parse, scene_path, actors, actors_alias):
     for actor in actors:
         # If actor name is only one word or exempt from being searched even though it is one word.
         # print("     Checking actor {}".format(actor.name))
+
         if actor.name.count(' ') > 0 or actor.is_exempt_from_one_word_search:
+            ans = string_search_without_regex(actor, scene_path)
 
-            regex_search_term = get_regex_search_term(actor.name, ' ')
-
-            if re.search(regex_search_term, scene_path, re.IGNORECASE) is not None:
-                # print (actor.name + " is in " + scene_path + "\n")
-                # scene_path = scene_path.replace(actor.name.lower(), '')
-                scene_path = re.sub(regex_search_term, '', scene_path, flags=re.IGNORECASE)
-                # print ("Trimmed scene path is: " + scene_path + "\n")
+            if ans['success']:
+                scene_path = ans['scene_path']
                 add_actor_to_scene(actor, scene_to_parse)
-                # else:
-                # print (actor.name + " is one word name")
+
+                # regex_search_term = get_regex_search_term(actor.name, ' ')
+                #
+                # if re.search(regex_search_term, scene_path, re.IGNORECASE) is not None:
+                #     # print (actor.name + " is in " + scene_path + "\n")
+                #     # scene_path = scene_path.replace(actor.name.lower(), '')
+                #     scene_path = re.sub(regex_search_term, '', scene_path, flags=re.IGNORECASE)
+                #     # print ("Trimmed scene path is: " + scene_path + "\n")
+                #     add_actor_to_scene(actor, scene_to_parse)
+                #     # else:
+                #     # print (actor.name + " is one word name")
 
     for alias in actors_alias:
         # print("             Checking alias {}".format(alias.name))
-        actor_in_alias = alias.actors.first()
-        if actor_in_alias:
-            if alias.name.count(' ') > 0 or actor_in_alias.is_exempt_from_one_word_search:
-                regex_search_term = get_regex_search_term(alias.name, ' ')
+        # actor_in_alias = alias.actors.first()
+        # if actor_in_alias:
+            if alias.name.count(' ') > 0 or alias.is_exempt_from_one_word_search:
+                # regex_search_term = get_regex_search_term(alias.name, ' ')
 
-                if re.search(regex_search_term, scene_path, re.IGNORECASE) is not None:
-                    # print (alias.name + " is in " + scene_path + "\n")
-                    # scene_path = scene_path.replace(alias.name.lower(), '')
-                    scene_path = re.sub(regex_search_term, '', scene_path, flags=re.IGNORECASE)
-                    # print ("Trimmed scene path is: " + scene_path + "\n")
+                    ans = string_search_without_regex(alias, scene_path)
 
-                    print(alias.name + " is alias for " + actor_in_alias.name)
-                    add_actor_to_scene(actor_in_alias, scene_to_parse)
-                    # else:
-                    # print(alias.name + " is one word alias")
+                    if ans['success']:
+                        scene_path = ans['scene_path']
+
+                        actor_in_alias = alias.actors.first()
+                        print(alias.name + " is alias for " + actor_in_alias.name)
+                        add_actor_to_scene(actor_in_alias, scene_to_parse)
+
+
+                # if re.search(regex_search_term, scene_path, re.IGNORECASE) is not None:
+                #     # print (alias.name + " is in " + scene_path + "\n")
+                #     # scene_path = scene_path.replace(alias.name.lower(), '')
+                #     scene_path = re.sub(regex_search_term, '', scene_path, flags=re.IGNORECASE)
+                #     # print ("Trimmed scene path is: " + scene_path + "\n")
+                #
+                #     print(alias.name + " is alias for " + actor_in_alias.name)
+                #     add_actor_to_scene(actor_in_alias, scene_to_parse)
+                #     # else:
+                #     # print(alias.name + " is one word alias")
 
     return scene_path
 
@@ -228,9 +376,15 @@ def add_actor_to_scene(actor_to_add, scene_to_add_to):
         print("Adding Actor {} to the Scene {}".format(actor_to_add.name, scene_to_add_to.name))
         scene_to_add_to.actors.add(actor_to_add)
         scene_to_add_to.save()
+    else:
+        print("Actor {} is already registered to scene {}".format(actor_to_add.name,scene_to_add_to.name))
 
 
 def get_regex_search_term(name, delimiter):
+    regex_special_chars = "\+*?[^]$(){}=!<>|:-"
+    for char in regex_special_chars:
+        if char in name:
+            name = name.replace(char, '')
     name_split_list = name.split(delimiter)
     is_first_iteration = True
     regex_search_term = ""
@@ -292,11 +446,8 @@ def clean_taling_spaces():
 
 
 def main():
-    parse_all_scenes()
+    parse_all_scenes(False)
+
 
 if __name__ == "__main__":
     main()
-
-
-
-

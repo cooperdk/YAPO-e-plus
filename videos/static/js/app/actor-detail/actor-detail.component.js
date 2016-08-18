@@ -29,6 +29,7 @@ angular.module('actorDetail').component('actorDetail', {
             self.selectedActorTag = null;
             self.alerts = [];
             self.updateImage = true;
+            self.forceScrape = false;
 
             self.addAlert = function (msg, type, timeout) {
                 self.alerts.push({msg: msg, type: type, timeout: timeout});
@@ -298,7 +299,8 @@ angular.module('actorDetail').component('actorDetail', {
                 return $http.get('scrape-actor/', {
                     params: {
                         actor: self.actor.id,
-                        scrapeSite: scrapeSite
+                        scrapeSite: scrapeSite,
+                        force: self.forceScrape
 
                     }
                 }).then(function (response) {

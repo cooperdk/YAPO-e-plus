@@ -19,7 +19,7 @@ tmdb.API_KEY = '04308f6d1c14608e9f373b84ad0e4e4c'
 MEDIA_PATH = "videos\\media"
 
 
-def search_person(actor_in_question, alias):
+def search_person(actor_in_question, alias, force):
     sucesss = False
     print("Looking for: " + actor_in_question.name)
     search = tmdb.Search()
@@ -65,12 +65,12 @@ def search_person(actor_in_question, alias):
                 actor_in_question.tmdb_id = person_info['id']
                 actor_in_question.imdb_id = person_info['imdb_id']
 
-            if actor_in_question.thumbnail == const.UNKNOWN_PERSON_IMAGE_PATH:
+            if actor_in_question.thumbnail == const.UNKNOWN_PERSON_IMAGE_PATH or force:
                 if person_info['profile_path'] is not None:
 
                     picture_link = "https://image.tmdb.org/t/p/original/" + person_info['profile_path']
 
-                    aux.save_actor_profile_image_from_web(picture_link,actor_in_question)
+                    aux.save_actor_profile_image_from_web(picture_link,actor_in_question,force)
 
                     # save_path = os.path.join(MEDIA_PATH,
                     #                          'actor/' + actor_in_question.name + '/profile/')
@@ -109,9 +109,9 @@ def search_person(actor_in_question, alias):
 def search_alias(actor_in_question, alias, force):
     success = False
     if force:
-        success = search_person(actor_in_question, alias)
+        success = search_person(actor_in_question, alias,force)
     elif not actor_in_question.last_lookup:
-        success = search_person(actor_in_question, alias)
+        success = search_person(actor_in_question, alias,force)
     return success
 
 
@@ -120,10 +120,10 @@ def search_person_with_force_flag(actor_in_question, force):
     print("Looking for " + actor_in_question.name)
     if force:
         print("Force flag is true, ignoring last lookup")
-        success = search_person(actor_in_question, None)
+        success = search_person(actor_in_question, None, force)
     elif not actor_in_question.last_lookup:
         print("Actor " + actor_in_question.name + " was not yet searched... Searching now")
-        success = search_person(actor_in_question, None)
+        success = search_person(actor_in_question, None, force)
 
     return success
 

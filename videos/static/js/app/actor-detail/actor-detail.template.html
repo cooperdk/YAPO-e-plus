@@ -71,12 +71,15 @@
                         <button type="button" ng-click="$ctrl.scrapeActor('TMDB')" class="btn btn-default btn-sm">
                             <span class="glyphicon glyphicon-plus"></span> Scrape TMdb
                         </button>
+
                         <button type="button" ng-click="$ctrl.scrapeActor('freeOnes')"
                                 class="btn btn-default btn-sm">
                             <span class="glyphicon glyphicon-plus"></span> Scrape Freeones
                         </button>
-                    </div>
+                        <input type="checkbox" ng-model="$ctrl.forceScrape" uib-popover-html="'Override existing values while scraping with selected scraper'"
+                 popover-trigger="mouseenter" popover-placement="top">
 
+                    </div>
                     <detail-profile-image ng-if="$ctrl.updateImage" actor="$ctrl.actor"></detail-profile-image>
 
 

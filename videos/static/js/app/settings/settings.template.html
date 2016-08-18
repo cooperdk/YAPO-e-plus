@@ -27,4 +27,13 @@
 
     ></span> Tag All Scenes
 </button>
+    <label
+    uib-popover-html="'If checked will ignore the last <b>Tag All Scenes</b> lookup date and will search for all tags, actors and websites in all the scenes
+    as though they were never searched before..'"
+        popover-trigger="mouseenter"  popover-placement="right-top"
+    >
+        Ignore Last Lookup?
+
+    <input type="checkbox" ng-model="$ctrl.ignore_last_lookup">
+    </label>
 </div>

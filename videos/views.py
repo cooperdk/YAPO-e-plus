@@ -144,8 +144,8 @@ def scrape_all_actors(force):
                 print("Finished Freeones search")
 
 
-def tag_all_scenes():
-    filename_parser.parse_all_scenes()
+def tag_all_scenes(ignore_last_lookup):
+    filename_parser.parse_all_scenes(ignore_last_lookup)
     return Response(status=200)
 
     # scenes = Scene.objects.all()
@@ -174,15 +174,21 @@ class ScrapeActor(views.APIView):
     def get(self, request, format=None):
         search_site = request.query_params['scrapeSite']
         actor_id = request.query_params['actor']
+        if request.query_params['force'] == 'true':
+            force = True
+        else:
+            force = False
         print("You are now in the scrape actor API REST view")
         print("Actor to scrape is " + Actor.objects.get(pk=actor_id).name)
         print("Site to scrape is " + search_site)
 
         if search_site == 'TMDB':
             actor_to_search = Actor.objects.get(pk=actor_id)
-
-            success = videos.tmdb_search.search_person_with_force_flag(actor_to_search, True)
-
+            success = False
+            if force:
+                success = videos.tmdb_search.search_person_with_force_flag(actor_to_search, True)
+            else:
+                success = videos.tmdb_search.search_person_with_force_flag(actor_to_search, False)
             if success:
                 return Response(status=200)
 
@@ -192,8 +198,11 @@ class ScrapeActor(views.APIView):
         elif search_site == 'freeOnes':
 
             actor_to_search = Actor.objects.get(pk=actor_id)
-
-            success = videos.freeones_search.search_freeones_with_force_flag(actor_to_search, True)
+            success = False
+            if force:
+                success = videos.freeones_search.search_freeones_with_force_flag(actor_to_search, True)
+            else:
+                success = videos.freeones_search.search_freeones_with_force_flag(actor_to_search, False)
 
             if success:
                 return Response(status=200)
@@ -325,8 +334,13 @@ def settings(request):
             return Response(status=200)
 
         if 'tagAllScenes' in request.query_params:
-            if request.query_params['tagAllScenes'] == "True":
-                threading.Thread(target=tag_all_scenes, ).start()
+            if request.query_params['tagAllScenes'] == "true":
+                if request.query_params['ignoreLastLookup'] == "true":
+                    threading.Thread(target=tag_all_scenes,
+                                     args=(True,)).start()
+                else:
+                    threading.Thread(target=tag_all_scenes,
+                                     args=(False,)).start()
                 # _thread.start_new_thread(tag_all_scenes, (), )
             return Response(status=200)
 
@@ -457,7 +471,7 @@ class AssetAdd(views.APIView):
                 if request.data['type'] == 'Actor':
                     actor = Actor.objects.get(pk=request.data['id'])
 
-                    current_tumb = os.path.join(const.MEDIA_PATH, 'actor/{}/'.format(actor.name), 'profile/profile.jpg')
+                    current_tumb = os.path.join(const.MEDIA_PATH, 'actor/{}/'.format(actor.id), 'profile/profile.jpg')
                     print(current_tumb)
 
                     rel_path = os.path.relpath(current_tumb, start='videos')
