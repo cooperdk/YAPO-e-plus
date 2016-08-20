@@ -24,6 +24,7 @@ angular.module('websiteList').component('websiteList', {
                     pageType: self.pageType,
                     scene: self.scene,
                     searchTerm: self.searchTerm,
+                    searchField: self.searchField,
                     sortBy: self.sortBy
                 };
 
@@ -74,17 +75,25 @@ angular.module('websiteList').component('websiteList', {
             });
 
             $scope.$on("searchTermChanged", function (event, searchTerm) {
-                self.websites = [];
-                self.searchTerm = searchTerm;
-                self.nextPage(0);
+                if (searchTerm['sectionType'] == 'WebsiteList'){
+                    self.websites = [];
+                    self.searchTerm = searchTerm['searchTerm'];
+                    self.searchField = searchTerm['searchField'];
+                    self.nextPage(0);    
+                }
+                
+
 
             });
 
             $scope.$on("sortOrderChanged", function (event, sortOrder) {
-                console.log("Sort Order Changed!");
-                self.websites = [];
-                self.sortBy = sortOrder;
-                self.nextPage(0);
+                if (sortOrder['sectionType'] == 'WebsiteList'){
+                    console.log("Sort Order Changed!");
+                    self.websites = [];
+                    self.sortBy = sortOrder['sortBy'];
+                    self.nextPage(0);
+                }
+
             });
 
 

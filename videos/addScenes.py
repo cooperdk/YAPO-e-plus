@@ -41,7 +41,7 @@ def get_files(walk_dir, make_video_sample):
             for filename_extension_to_test in ACCEPTED_VIDEO_EXTENSIONS:
                 if filename_extension_to_test == filename_extension:
                     output_string = "Filename is %s and the extension is %s" % (file_path, filename_extension,)
-                    print(output_string)
+                    print(output_string.encode('utf-8'))
                     create_scene(file_path, make_video_sample)
                     break
 

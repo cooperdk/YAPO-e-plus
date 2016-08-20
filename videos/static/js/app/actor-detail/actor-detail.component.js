@@ -311,6 +311,7 @@ angular.module('actorDetail').component('actorDetail', {
                     self.updateImage = true;
                 }, function errorCallback(response) {
                     self.addAlert(scrapeSite + "Could not find " + self.actor.name + "Try a different scraper or looking manually ", 'warning', '5000');
+                     console.log(angular.toJson(response))
                 });
 
 

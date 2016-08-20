@@ -2,8 +2,6 @@ import os.path
 import subprocess
 import _thread
 
-
-
 import django.db
 
 from django.shortcuts import render
@@ -35,7 +33,7 @@ from rest_framework import status
 from operator import attrgetter
 from random import shuffle
 import videos.const as const
-
+from django.utils.datastructures import MultiValueDictKeyError
 import threading
 import pathlib
 
@@ -56,11 +54,73 @@ def get_scenes_in_folder_recursive(folder, scene_list):
         return scene_list
 
 
+def get_folders_recursive(folder, folder_list):
+    # scenes = list(folder.scenes.all())
+    # scene_list = list(chain(scene_list, scenes))
+
+    if folder.children.count() == 0:
+        return list()
+
+    else:
+
+        for child in folder.children.all():
+            temp_list = get_folders_recursive(child, folder_list)
+
+            folders = list(folder.children.all())
+            # folder_list = list(chain(folder_list, folders))
+            folder_list = list(chain(folders, temp_list))
+
+        return folder_list
+
+
+def lambda_attrgetter(string, x):
+    y = attrgetter(string)
+
+    return y(x)
+
+
 def search_in_get_queryset(original_queryset, request):
     qs_list = list()
     term_is_not_null = False
     random = False
     sort_by = "name"
+    was_searched = False
+
+    if 'search' in request.query_params:
+        search_string = request.query_params['search']
+        if search_string:
+            search_field = request.query_params['searchField']
+
+            # if request.query_params['pageType']:
+            #     if request.query_params['pageType'] == 'DbFolder':
+            #         if request.query_params['parent']:
+            #             folder = Folder.objects.get(pk=int(request.query_params['parent']))
+            #             qs_list = get_folders_recursive(folder, qs_list)
+            #             term_is_not_null = True
+            #             tmp_list = list()
+            #             for i in qs_list:
+            #                 if search_string in getattr(i,search_field):
+            #                     tmp_list.append(i)
+            #
+            #             qs_list = tmp_list
+
+            if search_string.startswith('<'):
+                string_keyarg = search_field + "__lte"
+                search_string = search_string.replace('<', '')
+            elif search_string.startswith('>'):
+                string_keyarg = search_field + "__gte"
+                search_string = search_string.replace('>', '')
+            else:
+                string_keyarg = search_field + "__icontains"
+
+            if search_string:
+                original_queryset = original_queryset.filter(**{string_keyarg: search_string})
+                was_searched = True
+            # qs_list = [i for i in qs_list if (search_string in i.name)]
+        else:
+            if request.query_params['pageType']:
+                if request.query_params['pageType'] == 'DbFolder':
+                    original_queryset = original_queryset.filter(level=0)
 
     if 'recursive' in request.query_params and request.query_params['recursive'] == 'true':
         print("Recursive is TRUE!!!!")
@@ -68,32 +128,64 @@ def search_in_get_queryset(original_queryset, request):
         qs_list = get_scenes_in_folder_recursive(folder, qs_list)
         print(qs_list)
         term_is_not_null = True
+
     else:
-        for qp in request.query_params:
-            # print (qp)
-            term_string = request.query_params.get(qp, None)
-            # print (term_string)
+        z = False
+        try:
+            if request.query_params['pageType']:
 
-            if (term_string is not None) and \
-                    (term_string != '') and \
-                    (qp != 'limit') and \
-                    (qp != 'offset') and \
-                    (qp != 'ordering') and \
-                    (qp != 'recursive') and \
-                    (qp != 'sortBy') and \
-                    (qp != 'search'):
+                if request.query_params['pageType'] == 'DbFolder' and was_searched:
+                    z = True
+        except MultiValueDictKeyError:
+            pass
 
-                # if qp == 'sortBy':
-                #     sort_by = term_string
-                #     if sort_by == 'random':
-                #         random = True
-                #
-                # else:
-                term_is_not_null = True
-                terms = term_string.split(',')
+        if not z:
+            for qp in request.query_params:
+                # print (qp)
+                term_string = request.query_params.get(qp, None)
+                # print (term_string)
 
-                for term in terms:
-                    qs_list = list(chain(qs_list, original_queryset.filter(**{qp: term})))
+                if (term_string is not None) and \
+                        (term_string != '') and \
+                        (qp != 'limit') and \
+                        (qp != 'offset') and \
+                        (qp != 'ordering') and \
+                        (qp != 'recursive') and \
+                        (qp != 'sortBy') and \
+                        (qp != 'searchField') and \
+                        (qp != 'pageType') and \
+                        (qp != 'search'):
+
+                    # if qp == 'sortBy':
+                    #     sort_by = term_string
+                    #     if sort_by == 'random':
+                    #         random = True
+                    #
+                    # else:
+                    term_is_not_null = True
+                    terms = term_string.split(',')
+
+                    for term in terms:
+                        if qs_list:
+                            t_list = list()
+                            for i in qs_list:
+                                if type(getattr(i, qp)) is bool:
+                                    if bool(term) == getattr(i, qp):
+                                        t_list.append(i)
+                                elif (getattr(i, qp)).__class__.__name__ == 'ManyRelatedManager':
+                                    print(getattr(i, qp).all())
+                                    x = (getattr(i, qp).all())
+                                    for item in getattr(i, qp).all():
+                                        if item.id == term:
+                                            t_list.append(i)
+                                            break
+                                elif (getattr(i, qp)) == term:
+                                    t_list.append(i)
+                                    # if term in getattr(i, qp).all():
+                                    #     t_list.append(i)
+                            qs_list = t_list
+                        else:
+                            qs_list = list(chain(qs_list, original_queryset.filter(**{qp: term})))
 
     if 'sortBy' in request.query_params:
         sort_by = request.query_params['sortBy']
@@ -106,9 +198,17 @@ def search_in_get_queryset(original_queryset, request):
         else:
             if '-' in sort_by:
                 sort_by = sort_by.replace('-', '')
-                sorted(qs_list, key=attrgetter(sort_by), reverse=True)
+                temp_list = sorted(qs_list,
+                                   key=lambda k: (lambda_attrgetter(sort_by, k) is None,
+                                                  lambda_attrgetter(sort_by, k) == "",
+                                                  lambda_attrgetter(sort_by, k)), reverse=True)
             else:
-                sorted(qs_list, key=attrgetter(sort_by))
+
+                temp_list = sorted(qs_list,
+                                   key=lambda k: (lambda_attrgetter(sort_by, k) is None,
+                                                  lambda_attrgetter(sort_by, k) == "",
+                                                  lambda_attrgetter(sort_by, k)))
+            return temp_list
 
         return qs_list
     else:
@@ -341,7 +441,7 @@ def settings(request):
                 else:
                     threading.Thread(target=tag_all_scenes,
                                      args=(False,)).start()
-                # _thread.start_new_thread(tag_all_scenes, (), )
+                    # _thread.start_new_thread(tag_all_scenes, (), )
             return Response(status=200)
 
 
@@ -589,8 +689,8 @@ class SceneViewSet(viewsets.ModelViewSet):
             return SceneSerializer
 
     queryset = Scene.objects.all()
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
+    # filter_backends = (filters.SearchFilter,)
+    # search_fields = ('name',)
 
     # serializer_class = SceneSerializer
 
@@ -655,8 +755,8 @@ class ActorViewSet(viewsets.ModelViewSet):
         else:
             return ActorSerializer
 
-    filter_backends = (filters.SearchFilter,)
+    # filter_backends = (filters.SearchFilter,)
     # ordering_fields = '__all__'
-    search_fields = ('name',)
+    # search_fields = ('name',)
     queryset = Actor.objects.all()
     # serializer_class = ActorSerializer

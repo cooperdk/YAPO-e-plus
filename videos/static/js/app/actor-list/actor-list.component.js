@@ -45,6 +45,7 @@ angular.module('actorList').component('actorList', {
                     actorTag: self.actorTag,
                     scene: self.scene,
                     searchTerm: self.searchTerm,
+                    searchField: self.searchField,
                     sortBy: self.sortBy,
                     isRunnerUp: self.runnerUp
 
@@ -110,26 +111,34 @@ angular.module('actorList').component('actorList', {
             
 
             $scope.$on("searchTermChanged", function (event, searchTerm) {
-                self.actors = [];
-                self.searchTerm = searchTerm;
-                self.nextPage(0);
+                if (searchTerm['sectionType'] == 'ActorList'){
+                    self.actors = [];
+                    self.searchTerm = searchTerm['searchTerm'];
+                    self.searchField = searchTerm['searchField'];
+                    self.nextPage(0);    
+                }
+
 
             });
 
             $scope.$on("sortOrderChanged", function (event, sortOrder) {
-                console.log("Sort Order Changed!");
-                self.actors = [];
-                self.sortBy = sortOrder;
-                self.nextPage(0);
+                if (sortOrder['sectionType'] == 'ActorList'){
+                    console.log("Sort Order Changed!");
+                    self.actors = [];
+                    self.sortBy = sortOrder['sortBy'];
+                    self.nextPage(0);
+                }
+
             });
 
             $scope.$on("runnerUpChanged", function (event, runnerUp) {
-                console.log("Sort Order Changed!");
-                self.scenes = [];
-                self.runnerUp = runnerUp;
-
-
-                self.nextPage(0);
+                if (runnerUp['sectionType'] == 'ActorList'){
+                    console.log("Sort Order Changed!");
+                    self.actors = [];
+                    self.runnerUp = runnerUp['runnerUp'];
+                    self.nextPage(0);    
+                }
+                
             });
 
             self.removeActorFromScene = function (actorToRemove) {

@@ -25,6 +25,7 @@ angular.module('actorTagList').component('actorTagList', {
                     pageType: self.pageType,
                     actor: self.actor,
                     searchTerm: self.searchTerm,
+                    searchField: self.searchField,
                     sortBy: self.sortBy
                 };
 
@@ -78,17 +79,23 @@ angular.module('actorTagList').component('actorTagList', {
             });
 
             $scope.$on("searchTermChanged", function (event, searchTerm) {
-                self.tags = [];
-                self.searchTerm = searchTerm;
-                self.nextPage(0);
+                if (searchTerm['sectionType'] == 'ActorTagList'){
+                    self.tags = [];
+                    self.searchTerm = searchTerm['searchTerm'];
+                    self.searchField = searchTerm['searchField'];
+                    self.nextPage(0);
+                }
 
             });
 
             $scope.$on("sortOrderChanged", function (event, sortOrder) {
-                console.log("Sort Order Changed!");
-                self.tags = [];
-                self.sortBy = sortOrder;
-                self.nextPage(0);
+                if (sortOrder['sectionType'] == 'ActorTagList'){
+                    console.log("Sort Order Changed!");
+                    self.tags = [];
+                    self.sortBy = sortOrder['sortBy'];
+                    self.nextPage(0);
+                }
+
             });
 
 

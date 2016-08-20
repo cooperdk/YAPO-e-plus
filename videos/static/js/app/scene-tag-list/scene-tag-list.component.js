@@ -22,6 +22,7 @@ angular.module('sceneTagList').component('sceneTagList', {
                     pageType: self.pageType,
                     scene: self.scene,
                     searchTerm: self.searchTerm,
+                    searchField: self.searchField,
                     sortBy: self.sortBy
 
                 };
@@ -74,17 +75,24 @@ angular.module('sceneTagList').component('sceneTagList', {
             });
 
             $scope.$on("searchTermChanged", function (event, searchTerm) {
-                self.tags = [];
-                self.searchTerm = searchTerm;
-                self.nextPage(0);
+                if (searchTerm['sectionType'] == 'SceneTagList'){
+                    self.tags = [];
+                    self.searchTerm = searchTerm['searchTerm'];
+                    self.searchField = searchTerm['searchField'];
+                    self.nextPage(0);    
+                }
+                
 
             });
 
             $scope.$on("sortOrderChanged", function (event, sortOrder) {
-                console.log("Sort Order Changed!");
-                self.tags = [];
-                self.sortBy = sortOrder;
-                self.nextPage(0);
+                if (sortOrder['sectionType'] == 'SceneTagList'){
+                    console.log("Sort Order Changed!");
+                    self.tags = [];
+                    self.sortBy = sortOrder['sortBy'];
+                    self.nextPage(0);
+                }
+                
             });
 
 

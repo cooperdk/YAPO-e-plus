@@ -116,6 +116,7 @@ angular.module('sceneList').component('sceneList', {
                     website: self.website,
                     folder: self.folder,
                     searchTerm: self.searchTerm,
+                    searchField: self.searchField,
                     sortBy: self.sortBy,
                     isRunnerUp: self.runnerUp,
                     recursive: self.recursive
@@ -494,25 +495,34 @@ angular.module('sceneList').component('sceneList', {
             });
 
             $scope.$on("searchTermChanged", function (event, searchTerm) {
-                self.scenes = [];
-                self.searchTerm = searchTerm;
-                self.nextPage(0);
-
+                
+                if (searchTerm['sectionType'] == 'SceneList'){
+                    self.scenes = [];
+                    self.searchTerm = searchTerm['searchTerm'];
+                    self.searchField = searchTerm['searchField'];
+                    self.nextPage(0);    
+                }
+                
             });
 
             $scope.$on("sortOrderChanged", function (event, sortOrder) {
-                console.log("Sort Order Changed!");
-                self.scenes = [];
-                self.sortBy = sortOrder;
-                self.nextPage(0);
+                if (sortOrder['sectionType'] == 'SceneList'){
+                    console.log("Sort Order Changed!");
+                    self.scenes = [];
+                    self.sortBy = sortOrder['sortBy'];
+                    self.nextPage(0);
+                }
+
             });
 
             $scope.$on("runnerUpChanged", function (event, runnerUp) {
-                console.log("Sort Order Changed!");
-                self.scenes = [];
-                self.runnerUp = runnerUp;
-
-                self.nextPage(0);
+                if (runnerUp['sectionType'] == 'SceneList'){
+                    console.log("Sort Order Changed!");
+                    self.scenes = [];
+                    self.runnerUp = runnerUp['runnerUp'];
+                    self.nextPage(0);    
+                }
+                
             });
 
 

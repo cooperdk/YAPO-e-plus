@@ -28,9 +28,11 @@ app.config(['$sceProvider', '$locationProvider', '$routeProvider', '$httpProvide
         }).when('/website/:websiteId', {
             template: '<website-detail></website-detail>'
         }).when('/folder/', {
-            template: '<db-folder-tree></db-folder-tree>'
+            template: '<section-list-wrapper main-page="true"section-type="\'DbFolder\'"></section-list-wrapper>'
+            // template: '<db-folder-tree></db-folder-tree>'
         }).when('/folder/:parentId', {
-            template: '<db-folder-tree></db-folder-tree>'
+            template: '<section-list-wrapper main-page="true"section-type="\'DbFolder\'"></section-list-wrapper>'
+            // template: '<db-folder-tree></db-folder-tree>'
         }).when('/add/', {
             template: '<add-items></add-items>'
         }).when('/settings/', {

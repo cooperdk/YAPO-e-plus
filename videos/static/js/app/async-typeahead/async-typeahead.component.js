@@ -46,7 +46,8 @@ angular.module('asyncTypeahead').component('asyncTypeahead', {
 
                 return $http.get(httpGETUrl, {
                     params: {
-                        search: val
+                        search: val,
+                        searchField: 'name'
 
                     }
                 }).then(function (response) {
@@ -55,8 +56,12 @@ angular.module('asyncTypeahead').component('asyncTypeahead', {
                         return item;
                     });
 
+                    if (self.object == 'search') {
+                        return a
+                    }else{
 
-                    var b = [];
+
+                        var b = [];
                     var found = false;
                     for (var i = 0; i < a.length; i++) {
                         // console.log("Res to check:" + angular.toJson(a[i]));
@@ -84,6 +89,9 @@ angular.module('asyncTypeahead').component('asyncTypeahead', {
 
                     // alert(angular.toJson(a));
                     return b;
+
+                    }
+
                 });
 
 

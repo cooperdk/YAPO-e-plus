@@ -1,11 +1,12 @@
 angular.module('dbFolderTree').component('dbFolderTree', {
     templateUrl: 'static/js/app/db-folder-tree/db-folder-tree.template.html',
     bindings: {
-        parent: '=',
-        currentDirId: '='
+        // parent: '=',
+        route: '=',
+        mainPage: '='
     },
-    controller: ['$scope', '$routeParams', 'DbFolder', '$rootScope', 'scopeWatchService', 'helperService',
-        function DbFolderTreeController($scope, $routeParams, DbFolder, $rootScope, scopeWatchService, helperService) {
+    controller: ['$scope', '$routeParams', 'DbFolder', '$rootScope', 'scopeWatchService', 'helperService','pagerService',
+        function DbFolderTreeController($scope, $routeParams, DbFolder, $rootScope, scopeWatchService, helperService, pagerService) {
             var self = this;
             var redirectedFromNav = false;
             $rootScope.title = "Folders";
@@ -13,37 +14,107 @@ angular.module('dbFolderTree').component('dbFolderTree', {
             self.pageType = 'DbFolder';
             self.nav = [];
             self.recursive = false;
+            // self.parent = 0;
 
             self.routParam = $routeParams.parentId;
+            
+            self.nextPage = function (currentPage) {
 
+
+                input = {
+                    currentPage: currentPage,
+                    pageType: self.pageType,
+                    parent: self.parentFolder,
+                    searchTerm: self.searchTerm,
+                    searchField: self.searchField,
+                    sortBy: self.sortBy,
+                    isRunnerUp: self.runnerUp
+
+                };
+
+
+                self.actorsToadd = pagerService.getNextPage(input);
+
+                    self.actorsToadd.$promise.then(function (res) {
+
+                        // self.actorsToadd = res[0];
+
+                        var paginationInfo = {
+                            pageType: input.pageType,
+                            pageInfo: res[1]
+                        };
+
+                        scopeWatchService.paginationInit(paginationInfo);
+
+                        self.dbFolders = helperService.resourceToArray(res[0]);
+
+
+                    });
+
+
+            };
+
+            $scope.$on("searchTermChanged", function (event, searchTerm) {
+                if (searchTerm['sectionType'] == 'DbFolder'){
+                    self.dbFolders = [];
+                    self.searchTerm = searchTerm['searchTerm'];
+                    self.searchField = searchTerm['searchField'];
+                    self.nextPage(0);
+                }
+
+
+            });
+
+            $scope.$on("sortOrderChanged", function (event, sortOrder) {
+                if (sortOrder['sectionType'] == 'DbFolder'){
+                    console.log("Sort Order Changed!");
+                    self.dbFolders = [];
+                    self.sortBy = sortOrder['sortBy'];
+                    self.nextPage(0);
+                }
+
+            });
+
+            $scope.$on("runnerUpChanged", function (event, runnerUp) {
+                if (runnerUp['sectionType'] == 'DbFolder') {
+                    console.log("Sort Order Changed!");
+                    self.dbFolders = [];
+                    self.runnerUp = runnerUp['runnerUp'];
+                    self.nextPage(0);
+                }
+            });
+
+
+            $scope.$on("paginationChange", function (event, pageInfo) {
+                if (pageInfo.pageType == self.pageType){
+                    self.nextPage(pageInfo.page)
+                }
+            });
             self.appendFolders = function (clickedFolder) {
                 // alert(clickedFolder)
                 self.currentDir = clickedFolder;
+                self.parentFolder = clickedFolder;
                 // alert(this.dbFolders.toString())
                 self.dbFoldersToAppend = [];
-                self.dbFoldersToAppend = DbFolder.query({
-                    parent: clickedFolder.id, offset: '0',
-                    limit: '100'
-                });
+                self.nextPage(0);
+                
+                // self.dbFoldersToAppend = DbFolder.query({
+                //     parent: clickedFolder.id, offset: '0',
+                //     limit: '100'
+                // });
+                //
+                // self.dbFoldersToAppend.$promise.then(function (result) {
+                //
+                //     self.dbFoldersToAppend = helperService.resourceToArray(result[0]);
+                //
+                //
+                //
+                //     self.dbFolders = self.dbFoldersToAppend;
+                //
+                //
+                // });
 
-                self.dbFoldersToAppend.$promise.then(function (result) {
 
-                    self.dbFoldersToAppend = helperService.resourceToArray(result[0]);
-
-                    // alert(self.dbFoldersToAppend)
-                    // if (redirectedFromNav == false) {
-                    //     self.nav.push(clickedFolder)
-                    // }
-                    // redirectedFromNav = false;
-
-                    // self.dbFolders = self.dbFolders.concat(self.dbFoldersToAppend)
-
-                    self.dbFolders = self.dbFoldersToAppend;
-
-                    // alert(self.dbFolders.toString())
-                });
-
-                // scopeWatchdce.folderOpened(self.currentDir);
                 scopeWatchService.folderOpened({'dir': self.currentDir, 'recursive':self.recursive});
 
 
@@ -54,7 +125,10 @@ angular.module('dbFolderTree').component('dbFolderTree', {
             };
 
 
-            if ($routeParams.parentId != undefined) {
+
+
+
+            if (self.route != undefined) {
                 var temp = DbFolder.query({
                     id: $routeParams.parentId, offset: '0',
                     limit: '100'
@@ -66,6 +140,7 @@ angular.module('dbFolderTree').component('dbFolderTree', {
                     // res is a 2d array. In the [0] is another array of the result folders,
                     // while [1] is header info from the request.
                     var currentFolder = res[0][0];
+                    self.parentFolder = currentFolder;
 
 
                     for (var z in currentFolder.path_id) {

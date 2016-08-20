@@ -7,15 +7,18 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
             mainPage: '='
 
         },
-        controller: ['$scope', '$rootScope', '$rootScope', 'scopeWatchService',
-            function ActorListWrapperController($scope, Actor, $rootScope, scopeWatchService) {
+        controller: ['$scope', '$rootScope', '$rootScope', 'scopeWatchService', '$routeParams',
+            function ActorListWrapperController($scope, Actor, $rootScope, scopeWatchService, $routeParams) {
 
                 var self = this;
 
                 var searchTerm = "";
 
                 self.orderFields = "";
+                self.searchInFields = "";
                 self.runnerUp = 0;
+                
+                self.routParam = $routeParams.parentId;
 
                 self.sectionTypefunc = function (typeToCheck) {
                     console.log("sectionTypefunc triggered " + self.sectionType);
@@ -52,6 +55,17 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
 
                 };
 
+                var actorSearchInFields = {
+
+                    "name": "Name",
+                    "rating": "Rating",
+                    "height": "Height",
+                    "ethnicity": "Ethnicity",
+                    "weight": "Weight",
+                    "country_of_origin": "Country Of Origin",
+                    "measurements": "Measurements"
+                };
+
                 var sceneOrderFields = {
 
                     "name": "Name Asc",
@@ -62,10 +76,28 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                     "-path_to_dir": "Path Dsc",
                     "date_added": "Date Added Asc",
                     "-date_added": "Date Added Dsc",
+                    "resolution": "Resolution Asc",
+                    "-resolution": "Resolution Dsc",
+                    "duration": "Duration Asc",
+                    "-duration": "Duration Dsc",
+                    "size": "Size Asc",
+                    "-size": "Size Dsc",
+                    "framerate": "Framerate Asc",
+                    "-framerate": "Framerate Dsc",
                     "random": "Random"
+                };
+                
+                var sceneSearchInFields = {
 
+                    "name": "Name",
+                    "rating": "Rating",
+                    "path_to_file": "Path",
+                    "duration": "Duration",
+                    "size": "Size",
+                    "framerate": "Framerate"
 
                 };
+
 
                 var websiteOrderFields = {
 
@@ -78,6 +110,13 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                     "random": "Random"
 
 
+                };
+                
+                var websiteSearchInFields = {
+
+                    "name": "Name",
+                    "rating": "Rating"
+                    
                 };
 
                 var actorTagOrderFields = {
@@ -92,6 +131,14 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
 
 
                 };
+                
+                
+                var actorTagSearchInFields = {
+
+                    "name": "Name",
+                    "rating": "Rating"
+                    
+                };
 
                 var sceneTagOrderFields = {
 
@@ -105,46 +152,84 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
 
 
                 };
+                
+                var sceneTagSearchInFields = {
+
+                    "name": "Name",
+                    "rating": "Rating"
+                    
+                };
+
+
+                 var dbFolderOrderFields = {
+
+                    "name": "Path Asc",
+                    "-name": "Path Dsc", 
+                    "last_folder_name_only": "Last Folder Name Asc",
+                    "-last_folder_name_only": "Last Folder Name Dsc"
+
+
+                };
+
+                var dbFolderSearchInFields = {
+
+                    "name": "Path",
+                    "last_folder_name_only": "Last Folder Name"
+
+
+                };
 
 
                 if (self.sectionType == 'ActorList') {
                     self.orderFields = actorOrderFields;
+                    self.searchInFields = actorSearchInFields;
                     $rootScope.title = "Actors";
                 } else if (self.sectionType == 'SceneList') {
                     self.orderFields = sceneOrderFields;
+                    self.searchInFields = sceneSearchInFields;
                     $rootScope.title = "Scenes"
                 } else if (self.sectionType == 'WebsiteList') {
                     self.orderFields = websiteOrderFields;
+                    self.searchInFields = websiteSearchInFields;
                     $rootScope.title = "Websites"
                 } else if (self.sectionType == 'ActorTagList') {
                     self.orderFields = actorTagOrderFields;
+                    self.searchInFields = actorTagSearchInFields;
                     $rootScope.title = "Actor Tags"
                 } else if (self.sectionType == 'SceneTagList') {
                     self.orderFields = sceneTagOrderFields;
+                    self.searchInFields = sceneTagSearchInFields;
                     $rootScope.title = "Scene Tags"
+                } else if (self.sectionType == 'DbFolder') {
+                    self.orderFields = dbFolderOrderFields;
+                    self.searchInFields = dbFolderSearchInFields;
+                    $rootScope.title = "Folders"
                 }
 
 
                 self.sortBy = "name";
+                self.searchField = "name";
 
 
                 self.searchTerm = searchTerm;
 
+
                 self.searchTermChanged = function () {
 
-                    scopeWatchService.searchTermChanged(self.searchTerm)
+                    scopeWatchService.searchTermChanged({'sectionType': self.sectionType, 
+                                                         'searchTerm': self.searchTerm,
+                                                         'searchField': self.searchField})
                 };
 
 
                 self.sortOrderChanged = function () {
 
-                    scopeWatchService.sortOrderChanged(self.sortBy);
+                    scopeWatchService.sortOrderChanged({'sectionType': self.sectionType, 'sortBy': self.sortBy})
                 };
+
+
                 self.runnerUpFilterChange = function () {
-
-
-                    scopeWatchService.runnerUpChanged(self.runnerUp);
-
+                    scopeWatchService.runnerUpChanged({'sectionType': self.sectionType, 'runnerUp':self.runnerUp});
                 };
 
 

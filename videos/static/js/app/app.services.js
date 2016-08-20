@@ -73,7 +73,7 @@ angular.module('helper', []).factory('helperService', function ($rootScope, $loc
 });
 
 
-angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias, ActorTag, Scene, SceneTag, Website) {
+angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias, ActorTag, Scene, SceneTag, Website, DbFolder) {
 
         var _prevPage = "";
         var _nextPage = "";
@@ -90,6 +90,7 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
 
         var _pageType = "";
         var _searchTerm = "";
+        var _searchField = "";
         var _pk = "";
         var _sortBy = "";
         var _actorTagId = "";
@@ -100,6 +101,7 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
         var _folderId = "";
         var _runnerUp = "";
         var _recursive= "";
+        var _parent = "";
 
         function nextPageInput(input) {
 
@@ -117,6 +119,8 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
                         _websiteId = "";
                         _folderId = "";
                         _recursive= "";
+                        _searchField = "";
+                        _parent = "";
 
                     }
                 }
@@ -130,6 +134,10 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
             if ("searchTerm" in input) {
                 _searchTerm = input["searchTerm"];
             }
+            
+            if ("searchField" in input) {
+                _searchField = input["searchField"];
+            }
 
             if ("pk" in input) {
                 _pk = input["pk"];
@@ -140,9 +148,6 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
             }
 
 
-            if ("searchTerm" in input) {
-                _searchTerm = input["searchTerm"];
-            }
 
             if ("actorTag" in input) {
                 if (input["actorTag"] != undefined) {
@@ -176,6 +181,13 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
             if ("website" in input) {
                 if (input["website"] != undefined) {
                     _websiteId = input["website"].id;
+                }
+
+            }
+
+            if ("parent" in input) {
+                if (input["parent"] != undefined) {
+                    _parent = input["parent"].id;
                 }
 
             }
@@ -247,11 +259,13 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
                     offset: _pageOffset,
                     limit: _pageLimit,
                     search: _searchTerm,
+                    searchField: _searchField,
                     actor_tags: _actorTagId,
                     scenes: _sceneId,
                     pk: _pk,
                     sortBy: _sortBy,
-                    is_runner_up: _runnerUp
+                    is_runner_up: _runnerUp,
+                    pageType: _pageType
                     // ordering: _ordering
                 });
 
@@ -260,7 +274,9 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
                     offset: _pageOffset,
                     limit: _pageLimit,
                     search: _searchTerm,
-                    actors: _actorId
+                    searchField: _searchField,
+                    actors: _actorId,
+                    pageType: _pageType
 
                     // ordering: _ordering
 
@@ -271,8 +287,10 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
                     limit: _pageLimit,
                     actors: _actorId,
                     search: _searchTerm,
+                    searchField: _searchField,
                     sortBy: _sortBy,
-                    is_runner_up: _runnerUp
+                    is_runner_up: _runnerUp,
+                    pageType: _pageType
                     // ordering: _ordering
                 })
             } else if (_pageType == 'Scene') {
@@ -284,9 +302,11 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
                     websites: _websiteId,
                     folders_in_tree: _folderId,
                     search: _searchTerm,
+                    searchField: _searchField,
                     sortBy: _sortBy,
                     is_runner_up: _runnerUp,
-                    recursive: _recursive
+                    recursive: _recursive,
+                    pageType: _pageType
 
                 })
             } else if (_pageType == 'SceneTag') {
@@ -296,8 +316,10 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
                     actors: _actorId,
                     scenes: _sceneId,
                     search: _searchTerm,
+                    searchField: _searchField,
                     sortBy: _sortBy,
-                    is_runner_up: _runnerUp
+                    is_runner_up: _runnerUp,
+                    pageType: _pageType
                 })
             } else if (_pageType == 'Website') {
                 itemsToAdd = Website.query({
@@ -305,8 +327,22 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
                     limit: _pageLimit,
                     scenes: _sceneId,
                     search: _searchTerm,
+                    searchField: _searchField,
                     sortBy: _sortBy,
-                    is_runner_up: _runnerUp
+                    is_runner_up: _runnerUp,
+                    pageType: _pageType
+                })
+            }else if (_pageType == 'DbFolder') {
+                itemsToAdd = DbFolder.query({
+                    offset: _pageOffset,
+                    limit: _pageLimit,
+                    parent: _parent,
+                    search: _searchTerm,
+                    searchField: _searchField,
+                    sortBy: _sortBy,
+                    is_runner_up: _runnerUp,
+                    pageType: _pageType
+
                 })
             }
 
