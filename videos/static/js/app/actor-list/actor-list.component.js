@@ -192,6 +192,25 @@ angular.module('actorList').component('actorList', {
 
                     self.actors = resObj;
             };
+            
+            self.patchActor =function (actorToPatch, patchInfo) {
+                
+                 Actor.patch({actorId: actorToPatch.id}, patchInfo)
+            };
+            
+            self.setRating = function (actor) {
+              var patchInfo = {'rating': actor.rating};
+                
+                self.patchActor(actor,patchInfo)
+                
+            };
+            
+            self.toggleRunnerUp = function (actor) {
+              var patchInfo = {'is_runner_up': actor.is_runner_up};
+                
+                self.patchActor(actor,patchInfo)
+                
+            };
 
 
 

@@ -13,6 +13,9 @@ angular.module('core.actor').factory('Actor', ['$resource', 'helperService',
 
             update: {
                 method: 'PUT'
+            },
+            patch: {
+                method: 'PATCH'
             }
 
 

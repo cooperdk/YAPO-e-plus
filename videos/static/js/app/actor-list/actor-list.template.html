@@ -41,6 +41,8 @@
             </a>
             <h4><a href="/#!/actor/{{ actor.id }}">[{{$index + 1}}) {{ actor.name }}</a>
 
+
+
                             <span
                                     ng-if="!$ctrl.mainPage" ng-click="$ctrl.removeActorFromScene(actor)"
                                     class="glyphicon glyphicon-remove"
@@ -52,7 +54,19 @@
                                   uib-popover-html="'<strong>Delete</strong> actor from database!'"
                                   popover-trigger="mouseenter">
 
-                            </span></h4>
+                            </span>
+
+                <label class="switch"
+                       uib-popover-html="'Toggle Runner Up.'"
+                       popover-trigger="mouseenter" popover-placement="right">
+                <input type="checkbox" ng-model="actor.is_runner_up" ng-click="$ctrl.toggleRunnerUp(actor)">
+                <div class="slider round"></div>
+                </label>
+
+            </h4>
+            <uib-rating ng-model="actor.rating" max="10" read-only="isReadonly" on-hover="hoveringOver(value)"
+                        on-leave="overStar = null" titles="['one','two','three']"
+                        aria-labelledby="default-rating" ng-click="$ctrl.setRating(actor)"></uib-rating>
 
             <p>Rating:{{ actor.rating }}, Ethnicity: {{ actor.ethnicity }}, Height: {{ actor.height }},
                 Nationality: {{ actor.country_of_origin }}

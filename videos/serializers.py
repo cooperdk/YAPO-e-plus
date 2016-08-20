@@ -112,7 +112,8 @@ class ActorTagListSerializer(serializers.ModelSerializer):
 class ActorListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Actor
-        fields = ['id', 'name', 'thumbnail', 'rating', 'height', 'ethnicity', 'weight', 'country_of_origin']
+        fields = ['id', 'name', 'thumbnail', 'rating', 'height', 'ethnicity', 'weight', 'country_of_origin',
+                  'is_runner_up']
 
 
 class ActorSerializer(serializers.ModelSerializer):
