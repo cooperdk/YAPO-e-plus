@@ -501,17 +501,31 @@ def settings(request):
                 scenes = Scene.objects.all()
                 count = scenes.count()
                 counter = 1
+                print("Cleaning Scenes...")
                 for scene in scenes:
-                    print ("Checking scene {} out of {}".format(counter,count))
+                    print("Checking scene {} out of {}".format(counter, count))
                     if not os.path.isfile(scene.path_to_file):
-                        print("File for scene {} does not exist in path {}".format(scene.name,scene.path_to_file))
+                        print("File for scene {} does not exist in path {}".format(scene.name, scene.path_to_file))
                         permenatly_delete_scene_and_remove_from_db(scene)
                     counter += 1
+                print("Finished cleaning scenes...")
+
+
+
+                print("Cleaning Alias...")
+
+                aliases = ActorAlias.objects.all()
+                count = aliases.count()
+                counter = 1
+                for alias in aliases:
+                    print("Checking Alias {} out of {}".format(counter, count))
+                    if alias.actors.count() == 0:
+                        alias.delete()
+                        print("Alias {} has no actor.. deleting".format(alias.name))
+                    counter += 1
+                print("Finished alaises scenes...")
 
             return Response(status=200)
-
-
-
 
 
 @api_view(['GET'])
