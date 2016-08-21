@@ -1,39 +1,34 @@
-
 <span>
 <pagination page-type="'Scene'"></pagination>
 </span>
-        <button type="button" ng-click="$ctrl.multiTag()" class="btn btn-default btn-sm">
-                            Tag Multiple Scenes
-        </button>
+<button type="button" ng-click="$ctrl.multiTag()" class="btn btn-default btn-sm">
+    Tag Multiple Scenes
+</button>
 
-                <button type="button" ng-if="$ctrl.tagMultiple" ng-click="$ctrl.selectAll()" class="btn btn-default btn-sm">
-                            Select All
-        </button>
+<button type="button" ng-if="$ctrl.tagMultiple" ng-click="$ctrl.selectAll()" class="btn btn-default btn-sm">
+    Select All
+</button>
 
-        <button type="button" ng-if="$ctrl.tagMultiple" ng-click="$ctrl.selectNone()" class="btn btn-default btn-sm">
-                            Select None
-        </button>
-
-
+<button type="button" ng-if="$ctrl.tagMultiple" ng-click="$ctrl.selectNone()" class="btn btn-default btn-sm">
+    Select None
+</button>
 
 
-
-
-
-<div id = big-scroll-item>
-<table>
-    <tr ng-repeat="scene in $ctrl.scenes">
-        <td>
-            <a href="/#!/scene/{{ scene.id }}">
-                <img ng-src="{{ scene.thumbnail }}" class="thumb-wide"
-                     alt="{{ scene.name }}"
-                />
-            </a>
-        </td>
-        <td>
-            <h4>
+<div id=big-scroll-item>
+    <table>
+        <tr ng-repeat="scene in $ctrl.scenes">
+            <td>
+                <a href="/#!/scene/{{ scene.id }}">
+                    <img ng-src="{{ scene.thumbnail }}" class="thumb-wide"
+                         alt="{{ scene.name }}"
+                    />
+                </a>
+            </td>
+            <td>
+                <h4>
             <span>
-                <input ng-if="$ctrl.tagMultiple" type="checkbox" ng-model="scene.selected" ng-click="$ctrl.sceneSelectToggle(scene)">
+                <input ng-if="$ctrl.tagMultiple" type="checkbox" ng-model="scene.selected"
+                       ng-click="$ctrl.sceneSelectToggle(scene)">
                 {{$index + 1}})
                 <a href="/#!/scene/{{ scene.id }}">  {{ scene.name }}</a>
 
@@ -54,9 +49,15 @@
 
             </span>
 
+                                            <span ng-click="$ctrl.removeItem(scene,actor,'delete')"
+                                                  class="glyphicon glyphicon-trash on-hover-red-cursor-pointer"
+                                                  uib-popover-html="'<strong>Delete</strong> scene from database!'"
+                                                  popover-trigger="mouseenter">
+
+                            </span>
 
 
-            </h4>
+                </h4>
 
 
 
@@ -64,9 +65,11 @@
 
 
                         <span>
-                            <uib-rating ng-model="scene.rating" max="10" read-only="isReadonly" on-hover="hoveringOver(value)"
-                            on-leave="overStar = null" titles="['one','two','three']"
-                            aria-labelledby="default-rating" ng-click="$ctrl.sceneRatingPatch(scene)"></uib-rating>
+                            <uib-rating ng-model="scene.rating" max="10" read-only="isReadonly"
+                                        on-hover="hoveringOver(value)"
+                                        on-leave="overStar = null" titles="['one','two','three']"
+                                        aria-labelledby="default-rating"
+                                        ng-click="$ctrl.sceneRatingPatch(scene)"></uib-rating>
                             <br>
                             Websites:
                                 <button class="btn btn-success btn-xs"
@@ -88,7 +91,7 @@
 
                             </span>
 
-            <br>
+                <br>
                         <span>Tags:
                             <button class="btn btn-success btn-xs"
                                     popover-trigger="outsideClick"
@@ -107,7 +110,7 @@
                                     class="glyphicon glyphicon-remove"
                                     ng-click="$ctrl.removeItem(scene,tag,'scene_tags')"></span> {{$last ? '' : ', '}} </span>
                             </span>
-            <br>
+                <br>
                         <span>Performers:
                              <button class="btn btn-success btn-xs"
                                      popover-trigger="outsideClick"
@@ -127,7 +130,7 @@
                             </span>
 
 
-        </td>
-    </tr>
-</table>
+            </td>
+        </tr>
+    </table>
 </div>

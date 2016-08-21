@@ -116,7 +116,7 @@ def search_in_get_queryset(original_queryset, request):
             if search_string:
                 original_queryset = original_queryset.filter(**{string_keyarg: search_string})
                 was_searched = True
-            # qs_list = [i for i in qs_list if (search_string in i.name)]
+                # qs_list = [i for i in qs_list if (search_string in i.name)]
         else:
             if request.query_params['pageType']:
                 if request.query_params['pageType'] == 'DbFolder':
@@ -333,12 +333,14 @@ def tag_multiple_items(request):
                         scene_to_update = Scene.objects.get(pk=x)
                         scene_to_update.websites.add(website_to_add)
                         scene_to_update.save()
+                        print("added website {} to scene {}".format(website_to_add.name, scene_to_update.name))
 
                 if params['addOrRemove'] == 'remove':
                     for x in scenes_to_update:
                         scene_to_update = Scene.objects.get(pk=x)
                         scene_to_update.websites.remove(website_to_add)
                         scene_to_update.save()
+                        print("removed website {} from scene {}".format(website_to_add.name, scene_to_update.name))
             elif params['patchType'] == 'scene_tags':
                 scene_tag_id = params['patchData'][0]
                 scene_tag_to_add = SceneTag.objects.get(pk=scene_tag_id)
@@ -350,12 +352,14 @@ def tag_multiple_items(request):
                         scene_to_update = Scene.objects.get(pk=x)
                         scene_to_update.scene_tags.add(scene_tag_to_add)
                         scene_to_update.save()
+                        print("added Scene Tag {} to scene {}".format(scene_tag_to_add.name, scene_to_update.name))
 
                 if params['addOrRemove'] == 'remove':
                     for x in scenes_to_update:
                         scene_to_update = Scene.objects.get(pk=x)
                         scene_to_update.scene_tags.remove(scene_tag_to_add)
                         scene_to_update.save()
+                        print("Removed Scene Tag {} from scene {}".format(scene_tag_to_add.name, scene_to_update.name))
             elif params['patchType'] == 'actors':
                 actor_id = params['patchData'][0]
                 actor_to_add = Actor.objects.get(pk=actor_id)
@@ -367,12 +371,21 @@ def tag_multiple_items(request):
                         scene_to_update = Scene.objects.get(pk=x)
                         scene_to_update.actors.add(actor_to_add)
                         scene_to_update.save()
+                        print("Added Actor {} to scene {}".format(actor_to_add.name, scene_to_update.name))
 
                 if params['addOrRemove'] == 'remove':
                     for x in scenes_to_update:
                         scene_to_update = Scene.objects.get(pk=x)
                         scene_to_update.actors.remove(actor_to_add)
                         scene_to_update.save()
+                        print("Removed Actor {} from scene {}".format(actor_to_add.name, scene_to_update.name))
+
+            elif params['patchType'] == 'delete':
+                scenes_to_update = params['itemsToUpdate']
+                for x in scenes_to_update:
+                    scene_to_update = Scene.objects.get(pk=x)
+                    scene_to_update.delete()
+                    print("Removed scene {} from database".format(scene_to_update.name))
 
         return Response(status=200)
 

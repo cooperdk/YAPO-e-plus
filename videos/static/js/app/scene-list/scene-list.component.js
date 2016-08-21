@@ -253,30 +253,55 @@ angular.module('sceneList').component('sceneList', {
 
 
             self.updateScenesOnRemove = function (scenes, itemToRemove, typeOfItemToRemove) {
-
                 var resId = [];
                 var resObj = [];
+                if (typeOfItemToRemove == 'delete'){
 
-                for (var j = 0; j < scenes.length; j++) {
-
-                    var sceneIndex = findIndexOfSceneInList(scenes[j]);
-
-
-                    for (var i = 0; i < self.scenes[sceneIndex][typeOfItemToRemove].length; i++) {
-                        if (itemToRemove.id != self.scenes[sceneIndex][typeOfItemToRemove][i].id) {
-                            resId.push(self.scenes[sceneIndex][typeOfItemToRemove][i].id);
-                            resObj.push(self.scenes[sceneIndex][typeOfItemToRemove][i]);
-                        }
+                    for (var x = 0 ; x < scenes.length ; x++){
+                        self.removeSceneFromList(scenes[x]);
                     }
 
-                    self.scenes[sceneIndex][typeOfItemToRemove] = resObj;
+                }else{
 
-                    resObj = [];
+
+                    for (var j = 0; j < scenes.length; j++) {
+
+                        var sceneIndex = findIndexOfSceneInList(scenes[j]);
+
+
+                        for (var i = 0; i < self.scenes[sceneIndex][typeOfItemToRemove].length; i++) {
+                            if (itemToRemove.id != self.scenes[sceneIndex][typeOfItemToRemove][i].id) {
+                                resId.push(self.scenes[sceneIndex][typeOfItemToRemove][i].id);
+                                resObj.push(self.scenes[sceneIndex][typeOfItemToRemove][i]);
+                            }
+                        }
+
+                        self.scenes[sceneIndex][typeOfItemToRemove] = resObj;
+
+                        resObj = [];
+
+                    }
 
                 }
 
+
+
                 return resId
 
+
+            };
+
+            self.removeSceneFromList = function (sceneToRemvoe) {
+                
+                var index_of_scene = -1;
+    
+                if (typeof sceneToRemvoe === 'object' ){
+                    index_of_scene = findIndexOfSceneInList(sceneToRemvoe.id);
+                }else{
+                    index_of_scene = findIndexOfSceneInList(sceneToRemvoe);
+                }
+                
+                        self.scenes.splice(index_of_scene, 1);
 
             };
 
@@ -284,27 +309,39 @@ angular.module('sceneList').component('sceneList', {
 
 
                 var resId = [];
+                var sceneIndex = findIndexOfSceneInList(scene.id);
 
+
+                if (self.selectedScenes.length > 0 && checkIfSceneSelected(scene)) {
+                    if (typeOfItemToRemove != 'delete'){
+                        var itToRemove = [];
+                        itToRemove.push(itemToRemove.id);
+                    }
+
+                    self.patchScene(self.scenes[sceneIndex].id, typeOfItemToRemove, itToRemove, 'remove', true)
+                } else {
+                    self.patchScene(self.scenes[sceneIndex].id, typeOfItemToRemove, resId, 'remove', false)
+                }
 
                 if (self.selectedScenes.length > 0 && checkIfSceneSelected(scene)) {
 
                     self.updateScenesOnRemove(self.selectedScenes, itemToRemove, typeOfItemToRemove)
                 } else {
-                    var scenes = [];
+                    if (typeOfItemToRemove != 'delete'){
+                        var scenes = [];
                     scenes.push(scene.id);
                     resId = self.updateScenesOnRemove(scenes, itemToRemove, typeOfItemToRemove)
+                    }else{
+                        self.removeSceneFromList(scene)
+
+                    }
+
                 }
 
-                var sceneIndex = findIndexOfSceneInList(scene.id);
 
 
-                if (self.selectedScenes.length > 0) {
-                    var itToRemove = [];
-                    itToRemove.push(itemToRemove.id);
-                    self.patchScene(self.scenes[sceneIndex].id, typeOfItemToRemove, itToRemove, 'remove', true)
-                } else {
-                    self.patchScene(self.scenes[sceneIndex].id, typeOfItemToRemove, resId, 'remove', false)
-                }
+
+
 
 
                 self.selectNone()
@@ -482,7 +519,12 @@ angular.module('sceneList').component('sceneList', {
 
 
                 } else {
-                    Scene.patch({sceneId: sceneToPatchId}, type)
+                    if (patchType == 'delete'){
+                        Scene.remove({sceneId: sceneToPatchId});
+                    }else{
+                        Scene.patch({sceneId: sceneToPatchId}, type)
+                    }
+
                 }
 
 
@@ -581,6 +623,20 @@ angular.module('sceneList').component('sceneList', {
                         sceneId: scene.id
                     }
                 })
+            };
+
+
+
+            self.deleteScene = function (sceneToRemove) {
+
+                if (self.selectedScenes == [] || self.selectedScenes.indexOf(sceneToRemove.id) == -1) {
+                    Scene.remove({sceneId: sceneToRemove.id});
+
+                    var index_of_scene = findIndexOfSceneInList(sceneToRemove.id);
+                    self.scenes.splice(index_of_scene, 1);
+                }
+
+
             };
 
 
