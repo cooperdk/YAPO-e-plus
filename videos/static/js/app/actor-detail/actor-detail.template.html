@@ -10,7 +10,12 @@
     <uib-rating ng-model="$ctrl.actor.rating" max="10" read-only="isReadonly" on-hover="hoveringOver(value)"
                 on-leave="overStar = null" titles="['one','two','three']"
                 aria-labelledby="default-rating" ng-change="$ctrl.updateActor($ctrl.actor)"></uib-rating>
+    <br>
+    <button type="button" ng-click="$ctrl.hideDetailClick()" class="btn btn-default btn-sm">
+        {{ $ctrl.hideDetailButtomLable }}
+    </button>
 </h2>
+
 <ul>
     <li><span>Favorite
         <label class="switch">
@@ -52,7 +57,7 @@
 
 
 <div class="row">
-    <div class="col-md-8 ">
+    <div ng-if="$ctrl.hideDetail" class="col-md-12 ">
 
         <h3>{{ $ctrl.actor.name }} has {{ $ctrl.actor.scenes.length }} scenes: </h3>
 
@@ -60,7 +65,15 @@
 
 
     </div>
-    <div class="col-lg-4">
+    <div ng-if="!$ctrl.hideDetail" class="col-md-10 ">
+
+        <h3>{{ $ctrl.actor.name }} has {{ $ctrl.actor.scenes.length }} scenes: </h3>
+
+            <section-list-wrapper main-page="false" section-type="'SceneList'"></section-list-wrapper>
+
+
+    </div>
+    <div ng-if="!$ctrl.hideDetail" class="col-md-1 pull-right">
 
         <table class="actor-detail">
             <tr>

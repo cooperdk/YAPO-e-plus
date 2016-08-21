@@ -1,7 +1,16 @@
 // Register `phoneList` component, along with its associated controller and template
 angular.module('sceneList').component('sceneList', {
     // Note: The URL is relative to our `index.html` file
-    templateUrl: 'static/js/app/scene-list/scene-list.template.html',
+    templateUrl: ['$element', '$attrs', function ($element, $attrs) {
+
+        if ($attrs.viewStyle == 'grid') {
+            return 'static/js/app/scene-list/scene-list-grid.template.html'
+        } else {
+            return 'static/js/app/scene-list/scene-list.template.html'
+        }
+
+
+    }],
     bindings: {
         mainPage: '=',
         treeFolder: '='
@@ -10,6 +19,11 @@ angular.module('sceneList').component('sceneList', {
         function SceneListController($scope, Scene, helperService, scopeWatchService, pagerService, Actor, Website, SceneTag, $http, $rootScope) {
 
             var self = this;
+            var actorLoaded = false;
+            var sceneTagLoaded = false;
+            var websiteLoaded = false;
+            var folderLoaded = false;
+
             self.sceneArray = [];
 
             self.scenesToAdd = [];
@@ -21,15 +35,15 @@ angular.module('sceneList').component('sceneList', {
             self.selectAllStatus = false;
 
             self.tagMultiple = false;
-            
+
             self.multiTag = function () {
-              
-                if (self.tagMultiple){
+
+                if (self.tagMultiple) {
                     self.tagMultiple = false;
-                }else{
+                } else {
                     self.tagMultiple = true;
                 }
-                
+
             };
 
 
@@ -174,7 +188,7 @@ angular.module('sceneList').component('sceneList', {
             // this script is loaded so we miss it and don't load any scenes.
             // This workaround fire an event that checks if an actor was loaded if it was it then fire the
             // actorLoaded event that we can catch.
-            var actorLoaded = false;
+
 
             $scope.$on("actorLoaded", function (event, actor) {
                 self.actor = actor;
@@ -182,18 +196,46 @@ angular.module('sceneList').component('sceneList', {
                 self.nextPage(0);
                 actorLoaded = true;
             });
-            
-            if (!actorLoaded){
+
+            if (!actorLoaded) {
                 scopeWatchService.didActorLoad("a");
             }
 
 
-            
-
             $scope.$on("sceneTagLoaded", function (event, sceneTag) {
                 self.sceneTag = sceneTag;
                 self.nextPage(0);
+                sceneTagLoaded = true;
             });
+
+            if (!sceneTagLoaded) {
+                scopeWatchService.didSceneTagLoad("a");
+            }
+
+            $scope.$on("websiteLoaded", function (event, website) {
+                self.website = website;
+                self.nextPage(0);
+                websiteLoaded = true
+            });
+
+            if (!websiteLoaded) {
+                scopeWatchService.didWebsiteLoad('a');
+            }
+
+            $scope.$on("folderOpened", function (event, folder) {
+                console.log("scene-list: folderOpened broadcast was caught");
+                self.scenes = [];
+                self.folder = folder['dir'];
+                self.recursive = folder['recursive'];
+                // alert(folder['recursive']);
+                // self.scenes = [];
+                self.nextPage(0);
+                folderLoaded = true;
+            });
+
+            if (!folderLoaded) {
+                scopeWatchService.didFolderLoad('a');
+            }
 
 
             var findIndexOfSceneInList = function (sceneToFind) {
@@ -479,34 +521,20 @@ angular.module('sceneList').component('sceneList', {
 
             });
 
-            $scope.$on("websiteLoaded", function (event, website) {
-                self.website = website;
-                self.nextPage(0);
-            });
-
-            $scope.$on("folderOpened", function (event, folder) {
-                console.log("scene-list: folderOpened broadcast was caught");
-                self.scenes = [];
-                self.folder = folder['dir'];
-                self.recursive = folder['recursive'];
-                // alert(folder['recursive']);
-                // self.scenes = [];
-                self.nextPage(0);
-            });
 
             $scope.$on("searchTermChanged", function (event, searchTerm) {
-                
-                if (searchTerm['sectionType'] == 'SceneList'){
+
+                if (searchTerm['sectionType'] == 'SceneList') {
                     self.scenes = [];
                     self.searchTerm = searchTerm['searchTerm'];
                     self.searchField = searchTerm['searchField'];
-                    self.nextPage(0);    
+                    self.nextPage(0);
                 }
-                
+
             });
 
             $scope.$on("sortOrderChanged", function (event, sortOrder) {
-                if (sortOrder['sectionType'] == 'SceneList'){
+                if (sortOrder['sectionType'] == 'SceneList') {
                     console.log("Sort Order Changed!");
                     self.scenes = [];
                     self.sortBy = sortOrder['sortBy'];
@@ -516,13 +544,13 @@ angular.module('sceneList').component('sceneList', {
             });
 
             $scope.$on("runnerUpChanged", function (event, runnerUp) {
-                if (runnerUp['sectionType'] == 'SceneList'){
+                if (runnerUp['sectionType'] == 'SceneList') {
                     console.log("Sort Order Changed!");
                     self.scenes = [];
                     self.runnerUp = runnerUp['runnerUp'];
-                    self.nextPage(0);    
+                    self.nextPage(0);
                 }
-                
+
             });
 
 
@@ -531,8 +559,8 @@ angular.module('sceneList').component('sceneList', {
                 self.patchScene(scene.id, 'is_runner_up', scene.is_runner_up, 'add', false)
 
             };
-            
-            
+
+
             self.sceneRatingPatch = function (scene) {
 
                 self.patchScene(scene.id, 'rating', scene.rating, 'add', false)

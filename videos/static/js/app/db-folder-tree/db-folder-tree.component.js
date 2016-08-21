@@ -14,6 +14,7 @@ angular.module('dbFolderTree').component('dbFolderTree', {
             self.pageType = 'DbFolder';
             self.nav = [];
             self.recursive = false;
+            var gotPromise = false;
             // self.parent = 0;
 
             self.routParam = $routeParams.parentId;
@@ -90,6 +91,13 @@ angular.module('dbFolderTree').component('dbFolderTree', {
                     self.nextPage(pageInfo.page)
                 }
             });
+
+
+            $scope.$on("didFolderLoad", function (event, pageInfo) {
+                if (gotPromise){
+                    scopeWatchService.folderOpened({'dir': self.currentDir, 'recursive':self.recursive});
+                }
+            });
             self.appendFolders = function (clickedFolder) {
                 // alert(clickedFolder)
                 self.currentDir = clickedFolder;
@@ -116,12 +124,14 @@ angular.module('dbFolderTree').component('dbFolderTree', {
 
 
                 scopeWatchService.folderOpened({'dir': self.currentDir, 'recursive':self.recursive});
+                gotPromise = true;
 
 
             };
             
             self.recursiveToggle = function () {
                 scopeWatchService.folderOpened({'dir': self.currentDir, 'recursive':self.recursive});
+                gotPromise = true;
             };
 
 

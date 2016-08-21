@@ -22,6 +22,21 @@ body {
 
 }
 
+#actor-list-grid img{
+    border: solid black 2px;
+
+
+}
+
+#scene-list-grid img{
+    border: solid black 2px;
+    margin: 0.5em;
+
+
+}
+
+
+
 
 
 .actor-detail {

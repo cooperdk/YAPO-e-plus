@@ -4,7 +4,9 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
         templateUrl: 'static/js/app/section-list-wrapper/section-wrapper.template.html',
         bindings: {
             sectionType: '=',
-            mainPage: '='
+            mainPage: '=',
+            callingObject: '=',
+            callingObjectType: '='
 
         },
         controller: ['$scope', '$rootScope', '$rootScope', 'scopeWatchService', '$routeParams',
@@ -17,6 +19,8 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                 self.orderFields = "";
                 self.searchInFields = "";
                 self.runnerUp = 0;
+                
+                self.test = false;
                 
                 self.routParam = $routeParams.parentId;
 

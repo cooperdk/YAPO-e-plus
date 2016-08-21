@@ -8,7 +8,7 @@ sys.path.append(os.path.abspath('E:\djangoProject\YAPO\YAPO'))
 import shutil
 import subprocess
 import time
-import winsound
+
 
 import django
 import json
@@ -276,9 +276,7 @@ def move_sample_movie_to_correct_dir(scene, success, dest_filename, dest_path, o
                 delete_sucess = True
                 break
             except OSError as e:
-                Freq = 2500  # Set Frequency To 2500 Hertz
-                Dur = 1000  # Set Duration To 1000 ms == 1 second
-                winsound.Beep(Freq, Dur)
+
                 print(e.message)
                 time.sleep(5)
 

@@ -1,0 +1,22 @@
+<h5>
+    {{ scene.name }}
+</h5>
+
+<span ng-if="scene.websites.length > 0 ">Websites:
+    <span ng-repeat="site in scene.websites"> <strong>{{ site.name }}{{$last ? '' : ', '}}</strong></span>
+    <br>
+</span>
+
+
+<span ng-if="scene.tags.length > 0">Tags:
+    <span ng-repeat="tag in scene.tags"> <strong>{{ tag.name }}{{$last ? '' : ', '}}</strong></span>
+    <br>
+</span>
+
+<span ng-if="scene.actors.length > 0">Actors:
+    <span ng-repeat="actor in scene.actors"> <strong>{{ actor.name }}{{$last ? '' : ', '}}</strong></span>
+    <br>
+</span>
+
+<span>Path: {{ scene.path_to_file }}
+</span>

@@ -3,7 +3,9 @@ angular.module('actorList').component('actorList', {
     // Note: The URL is relative to our `index.html` file
     bindings: {
 
-        mainPage: '='
+        mainPage: '=',
+        callingObject: '=',
+        callingObjectType: '='
 
     },
     templateUrl:   ['$element', '$attrs', function($element, $attrs) {
@@ -11,6 +13,8 @@ angular.module('actorList').component('actorList', {
 
         if ($attrs.sceneDetail == 'true'){
            return 'static/js/app/actor-list/actor-list-row.template.html'
+        }else if ($attrs.viewStyle == 'grid'){
+            return 'static/js/app/actor-list/actor-list-grid.template.html'    
         }else{
             return 'static/js/app/actor-list/actor-list.template.html'    
         }
@@ -25,6 +29,7 @@ angular.module('actorList').component('actorList', {
             var self = this;
             
             var didSceneLoad = false;
+            var didActorTagLoad = false;
 
 
 
@@ -92,7 +97,10 @@ angular.module('actorList').component('actorList', {
                 self.actors = [];
                 self.actorTag = loadedActorTag;
                 self.nextPage(0);
+                didActorTagLoad = true
+                
             });
+            
 
             $scope.$on("sceneLoaded", function (event, scene) {
 
@@ -105,6 +113,10 @@ angular.module('actorList').component('actorList', {
             
             if (!didSceneLoad){
                 scopeWatchService.didSceneLoad('a')
+            }
+            
+            if (!didActorTagLoad){
+                scopeWatchService.didActorTagLoad('a')
             }
 
 

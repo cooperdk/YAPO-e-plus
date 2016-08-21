@@ -24,7 +24,20 @@ angular.module('actorDetail').component('actorDetail', {
             var self = this;
             var counter = 0;
             var gotPromise = false;
-
+            
+            
+            self.hideDetail = false;
+            self.hideDetailButtomLable = 'Hide Detail';
+            
+            self.hideDetailClick = function () {
+                if (self.hideDetail){
+                    self.hideDetail = false;
+                    self.hideDetailButtomLable = "Show Detail"
+                }else{
+                    self.hideDetail = true;
+                    self.hideDetailButtomLable = "Hide Detail"
+                }
+            };
 
             self.selectedActorTag = null;
             self.alerts = [];

@@ -100,7 +100,7 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
         var _websiteId = "";
         var _folderId = "";
         var _runnerUp = "";
-        var _recursive= "";
+        var _recursive = "";
         var _parent = "";
 
         function nextPageInput(input) {
@@ -118,7 +118,7 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
                         _sceneTagId = "";
                         _websiteId = "";
                         _folderId = "";
-                        _recursive= "";
+                        _recursive = "";
                         _searchField = "";
                         _parent = "";
 
@@ -134,7 +134,7 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
             if ("searchTerm" in input) {
                 _searchTerm = input["searchTerm"];
             }
-            
+
             if ("searchField" in input) {
                 _searchField = input["searchField"];
             }
@@ -146,7 +146,6 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
             if ("sortBy" in input) {
                 _sortBy = input["sortBy"];
             }
-
 
 
             if ("actorTag" in input) {
@@ -332,7 +331,7 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
                     is_runner_up: _runnerUp,
                     pageType: _pageType
                 })
-            }else if (_pageType == 'DbFolder') {
+            } else if (_pageType == 'DbFolder') {
                 itemsToAdd = DbFolder.query({
                     offset: _pageOffset,
                     limit: _pageLimit,
@@ -522,15 +521,44 @@ angular.module('scopeWatch', []).factory('scopeWatchService', function ($rootSco
 
     function didActorLoad(someVariable) {
 
-        console.log("app-service-scopeWatch: runnerUpChanged was triggered! ");
+        console.log("app-service-scopeWatch: didActorLoad was triggered! ");
         $rootScope.$broadcast("didActorLoad", someVariable);
 
     }
-    
+
+    function didSceneTagLoad(someVariable) {
+
+        console.log("app-service-scopeWatch: didSceneTagLoad was triggered! ");
+        $rootScope.$broadcast("didSceneTagLoad", someVariable);
+
+    }
+
+
+    function didWebsiteLoad(someVariable) {
+
+        console.log("app-service-scopeWatch: didWebsiteLoad was triggered! ");
+        $rootScope.$broadcast("didWebsiteLoad", someVariable);
+
+    }
+
+        function didFolderLoad(someVariable) {
+
+        console.log("app-service-scopeWatch: didFolderLoad was triggered! ");
+        $rootScope.$broadcast("didFolderLoad", someVariable);
+
+    }
+
     function didSceneLoad(someVariable) {
 
-        console.log("app-service-scopeWatch: runnerUpChanged was triggered! ");
+        console.log("app-service-scopeWatch: didSceneLoad was triggered! ");
         $rootScope.$broadcast("didSceneLoad", someVariable);
+
+    }
+
+    function didActorTagLoad(someVariable) {
+
+        console.log("app-service-scopeWatch: didActorTagLoad was triggered! ");
+        $rootScope.$broadcast("didActorTagLoad", someVariable);
 
     }
 
@@ -559,7 +587,11 @@ angular.module('scopeWatch', []).factory('scopeWatchService', function ($rootSco
         addAliasToList: addAliasToList,
         runnerUpChanged: runnerUpChanged,
         didActorLoad: didActorLoad,
-        didSceneLoad: didSceneLoad
+        didSceneLoad: didSceneLoad,
+        didActorTagLoad: didActorTagLoad,
+        didSceneTagLoad: didSceneTagLoad,
+        didWebsiteLoad: didWebsiteLoad,
+        didFolderLoad: didFolderLoad
 
 
     }

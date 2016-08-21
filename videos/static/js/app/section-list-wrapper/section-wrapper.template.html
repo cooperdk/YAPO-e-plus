@@ -15,15 +15,25 @@
     <label>Runner UP</label>
     <input type="checkbox" ng-model="$ctrl.runnerUp" ng-change="$ctrl.runnerUpFilterChange()">
 
+    <div ng-if="$ctrl.sectionTypefunc('ActorList') || $ctrl.sectionTypefunc('SceneList')">
+        <label>Grid View</label>
+        <input type="checkbox" ng-model="$ctrl.test">
+    </div>
 
 
 </div>
 
+<div ng-if="!$ctrl.test">
+    <actor-list main-page="$ctrl.mainPage"  ng-if="$ctrl.sectionTypefunc('ActorList')"></actor-list>
+    <scene-list main-page="$ctrl.mainPage" ng-if="$ctrl.sectionTypefunc('SceneList')"></scene-list>
+</div>
 
-<actor-list main-page="$ctrl.mainPage" ng-if="$ctrl.sectionTypefunc('ActorList')"></actor-list>
+<div ng-if="$ctrl.test">
+    <actor-list main-page="$ctrl.mainPage" view-style="grid"  ng-if="$ctrl.sectionTypefunc('ActorList')"></actor-list>
+    <scene-list main-page="$ctrl.mainPage" view-style="grid" ng-if="$ctrl.sectionTypefunc('SceneList')"></scene-list>
+</div>
 
 
-<scene-list main-page="$ctrl.mainPage" ng-if="$ctrl.sectionTypefunc('SceneList')"></scene-list>
 
 
 <website-list main-page="$ctrl.mainPage" ng-if="$ctrl.sectionTypefunc('WebsiteList')"></website-list>
