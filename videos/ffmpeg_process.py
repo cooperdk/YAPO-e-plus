@@ -9,7 +9,6 @@ import shutil
 import subprocess
 import time
 
-
 import django
 import json
 import re
@@ -19,18 +18,33 @@ django.setup()
 
 from videos.models import Scene
 
-FFPROBE_BIN = "videos\\ffmpeg\\ffprobe"
-FFMPEG_BIN = "videos\\ffmpeg\\ffmpeg"
-FFMPEG_TEMP_OUTPUT_IMAGES = "videos\\ffmpeg\\temp\\img%03d.jpg"
+# FFPROBE_BIN = os.path.join('videos', 'ffmpeg', 'ffprobe')
+# "videos\\ffmpeg\\ffprobe"
+# FFMPEG_BIN = "videos\\ffmpeg\\ffmpeg"
+# FFMPEG_TEMP_OUTPUT_IMAGES = "videos\\ffmpeg\\temp\\img%03d.jpg"
+# OUTPUT_VIDEO_FRAMERATE = 15
+# OUTPUT_VIDEO_NAME = "videos\\ffmpeg\\temp\\out.mp4"
+# TEMP_PATH = "videos\\ffmpeg\\temp\\"
+# FFPROBE_JSON_ARGUMENTS = "-v quiet -print_format json -show_format -show_streams"
+# FFMPEG_SCREENSHOT_ARGUMENTS = "-vf \"thumbnail,scale=1280:720,pad=ih*16/9:ih:(ow-iw)/2:(oh-ih)/2\" -frames:v 1"
+# DEFAULT_SCREENSHOT_TIME = "00:01:30"
+# SCREENSHOT_OUTPUT_PATH = "videos\\ffmpeg\\temp\\thumb.jpg"
+# MEDIA_PATH = "videos\\media"
+# SAMPLE_RESOLUTION = "640:360"
+
+FFPROBE_BIN = os.path.join('videos', 'ffmpeg', 'ffprobe')
+FFMPEG_BIN = os.path.join('videos', 'ffmpeg', 'ffmpeg')
+FFMPEG_TEMP_OUTPUT_IMAGES = os.path.join('videos', 'ffmpeg', 'temp', 'img%03d.jpg')
 OUTPUT_VIDEO_FRAMERATE = 15
-OUTPUT_VIDEO_NAME = "videos\\ffmpeg\\temp\\out.mp4"
-TEMP_PATH = "videos\\ffmpeg\\temp\\"
+OUTPUT_VIDEO_NAME = os.path.join('videos', 'ffmpeg', 'temp', 'out.mp4')
+TEMP_PATH = os.path.join('videos', 'ffmpeg', 'temp')
 FFPROBE_JSON_ARGUMENTS = "-v quiet -print_format json -show_format -show_streams"
 FFMPEG_SCREENSHOT_ARGUMENTS = "-vf \"thumbnail,scale=1280:720,pad=ih*16/9:ih:(ow-iw)/2:(oh-ih)/2\" -frames:v 1"
 DEFAULT_SCREENSHOT_TIME = "00:01:30"
-SCREENSHOT_OUTPUT_PATH = "videos\\ffmpeg\\temp\\thumb.jpg"
-MEDIA_PATH = "videos\\media"
+SCREENSHOT_OUTPUT_PATH = os.path.join('videos', 'ffmpeg', 'temp', 'thumb.jpg')
+MEDIA_PATH = os.path.join('videos', 'media')
 SAMPLE_RESOLUTION = "640:360"
+
 
 if not os.path.exists(TEMP_PATH):
     os.makedirs(TEMP_PATH)
@@ -199,7 +213,6 @@ def make_sample_video(filename, video_total_seconds, sample_video_length_in_seco
         output = extract_frames_in_given_time(filename, seek_time, frames_per_segment, start_number,
                                               )
         if output == -1:
-
             print("Something went wrong while extracting video frames, exiting funciton...")
             return success
         start_number += frames_per_segment
@@ -546,9 +559,9 @@ def ffmpeg_create_sammple_video(scene):
         # scene_resolution_width = scene.width
 
         success = make_sample_video(filename, video_total_seconds, sample_video_length_in_seconds, number_of_segments,
-                                input_fps,
-                                first_segment_start_in_seconds, last_segment_seconds_from_end,
-                                )
+                                    input_fps,
+                                    first_segment_start_in_seconds, last_segment_seconds_from_end,
+                                    )
 
         if success:
             time.sleep(5)

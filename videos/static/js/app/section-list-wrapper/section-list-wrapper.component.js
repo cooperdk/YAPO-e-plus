@@ -21,17 +21,23 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                 self.runnerUp = 0;
 
 
-                if (helperService.getGridView()['actor'] == undefined) {
+                if (helperService.getGridView() != undefined){
+                    if (helperService.getGridView()['actor'] == undefined) {
+                        self.actorGridView = false;
+                    } else {
+                        self.actorGridView = helperService.getGridView()['actor']
+                    }
+
+                    if (helperService.getGridView()['scene'] == undefined) {
+                        self.sceneGridView = false;
+                    } else {
+                        self.sceneGridView = helperService.getGridView()['scene']
+                    }
+                }else{
                     self.actorGridView = false;
-                } else {
-                    self.actorGridView = helperService.getGridView()['actor']
+                    self.sceneGridView = false;
                 }
 
-                if (helperService.getGridView()['scene'] == undefined) {
-                    self.sceneGridView = false;
-                } else {
-                    self.sceneGridView = helperService.getGridView()['scene']
-                }
                 
 
                 self.saveGridView = function () {
