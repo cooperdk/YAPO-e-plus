@@ -77,6 +77,25 @@ angular.module('settings').component('settings', {
                     
                 };
                 
+                
+                self.cleanDatabase = function () {
+                    $http.get('settings/', {
+                        params: {
+                            cleanDatabase: true
+                            
+                        }
+
+                    }).then(function (response) {
+                        // alert(angular.toJson(response));
+                        // self.response = response.data.vlc_path;
+                        // self.pathToVLC = response.data.vlc_path;
+                        // alert("Got response from server: " + self.pathToFolderToAdd);
+                    }, function errorCallback(response) {
+                        alert("Something went wrong!");
+                    });
+                    
+                };
+                
 
 
             }

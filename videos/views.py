@@ -494,7 +494,24 @@ def settings(request):
                     threading.Thread(target=tag_all_scenes,
                                      args=(False,)).start()
                     # _thread.start_new_thread(tag_all_scenes, (), )
+                return Response(status=200)
+
+        if 'cleanDatabase' in request.query_params:
+            if request.query_params['cleanDatabase']:
+                scenes = Scene.objects.all()
+                count = scenes.count()
+                counter = 1
+                for scene in scenes:
+                    print ("Checking scene {} out of {}".format(counter,count))
+                    if not os.path.isfile(scene.path_to_file):
+                        print("File for scene {} does not exist in path {}".format(scene.name,scene.path_to_file))
+                        permenatly_delete_scene_and_remove_from_db(scene)
+                    counter += 1
+
             return Response(status=200)
+
+
+
 
 
 @api_view(['GET'])

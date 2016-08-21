@@ -36,4 +36,15 @@
 
     <input type="checkbox" ng-model="$ctrl.ignore_last_lookup">
     </label>
+
+
+    <button type="button" ng-click="$ctrl.cleanDatabase()" class="btn btn-default btn-sm"
+        uib-popover-html="'Go over all scenes and if the files for the scenes no longer exist on disk, remove the scene from the library.
+        (Also deletes screenshots and vidoe sample for the scene)'"
+        popover-trigger="mouseenter"  popover-placement="right-top"
+>
+    <span class="glyphicon glyphicon-flash"
+
+    ></span> Clean Database
+</button>
 </div>
