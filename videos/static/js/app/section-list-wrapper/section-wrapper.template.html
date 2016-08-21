@@ -15,21 +15,36 @@
     <label>Runner UP</label>
     <input type="checkbox" ng-model="$ctrl.runnerUp" ng-change="$ctrl.runnerUpFilterChange()">
 
-    <div ng-if="$ctrl.sectionTypefunc('ActorList') || $ctrl.sectionTypefunc('SceneList')">
+    <div ng-if="$ctrl.sectionTypefunc('ActorList')">
         <label>Grid View</label>
-        <input type="checkbox" ng-model="$ctrl.test">
+        <input type="checkbox" ng-model="$ctrl.actorGridView" ng-change="$ctrl.saveGridView()">
+    </div>
+
+        <div ng-if="$ctrl.sectionTypefunc('SceneList')">
+        <label>Grid View</label>
+        <input type="checkbox" ng-model="$ctrl.sceneGridView" ng-change="$ctrl.saveGridView()">
     </div>
 
 
 </div>
 
-<div ng-if="!$ctrl.test">
+<div ng-if="!$ctrl.actorGridView && $ctrl.sectionTypefunc('ActorList')">
     <actor-list main-page="$ctrl.mainPage"  ng-if="$ctrl.sectionTypefunc('ActorList')"></actor-list>
-    <scene-list main-page="$ctrl.mainPage" ng-if="$ctrl.sectionTypefunc('SceneList')"></scene-list>
+
 </div>
 
-<div ng-if="$ctrl.test">
+<div ng-if="!$ctrl.sceneGridView && $ctrl.sectionTypefunc('SceneList')">
+    <scene-list main-page="$ctrl.mainPage" ng-if="$ctrl.sectionTypefunc('SceneList')"></scene-list>
+
+</div>
+
+<div ng-if="$ctrl.actorGridView && $ctrl.sectionTypefunc('ActorList')">
     <actor-list main-page="$ctrl.mainPage" view-style="grid"  ng-if="$ctrl.sectionTypefunc('ActorList')"></actor-list>
+
+</div>
+
+<div ng-if="$ctrl.sceneGridView && $ctrl.sectionTypefunc('SceneList')">
+
     <scene-list main-page="$ctrl.mainPage" view-style="grid" ng-if="$ctrl.sectionTypefunc('SceneList')"></scene-list>
 </div>
 

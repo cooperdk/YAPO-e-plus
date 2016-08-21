@@ -5,7 +5,16 @@ angular.module('helper', []).factory('helperService', function ($rootScope, $loc
     $rootScope.savedData2 = [];
 
     // $rootScope.$storage.scArray ;
+    
+    function setGridView(data) {
+        $rootScope.$storage.gridView = data;
 
+        // console.log('helperService data1 is' + angular.toJson(savedData));
+    }
+
+    function getGridView() {
+        return $rootScope.$storage.gridView;
+    }
 
     function set(data) {
         $rootScope.$storage.scArray = data;
@@ -67,7 +76,9 @@ angular.module('helper', []).factory('helperService', function ($rootScope, $loc
         set2: set2,
         get2: get2,
         packageDataAndHeaders: packageDataAndHeaders,
-        resourceToArray: resourceToArray
+        resourceToArray: resourceToArray,
+        setGridView: setGridView,
+        getGridView: getGridView
     }
 
 });

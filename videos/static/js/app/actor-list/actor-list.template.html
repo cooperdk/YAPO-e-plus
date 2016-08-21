@@ -31,7 +31,7 @@
                 -->
 
 
-        <li ng-repeat="actor in $ctrl.actors | orderBy:actor.name "
+        <li ng-repeat="actor in $ctrl.actors"
             class="thumbnail phone-list-item">
 
             <a href="/#!/actor/{{ actor.id }}" class="thumb">
@@ -59,8 +59,8 @@
                 <label class="switch"
                        uib-popover-html="'Toggle Runner Up.'"
                        popover-trigger="mouseenter" popover-placement="right">
-                <input type="checkbox" ng-model="actor.is_runner_up" ng-click="$ctrl.toggleRunnerUp(actor)">
-                <div class="slider round"></div>
+                    <input type="checkbox" ng-model="actor.is_runner_up" ng-click="$ctrl.toggleRunnerUp(actor)">
+                    <div class="slider round"></div>
                 </label>
 
             </h4>
@@ -68,10 +68,28 @@
                         on-leave="overStar = null" titles="['one','two','three']"
                         aria-labelledby="default-rating" ng-click="$ctrl.setRating(actor)"></uib-rating>
 
-            <p>Rating:{{ actor.rating }}, Ethnicity: {{ actor.ethnicity }}, Height: {{ actor.height }},
-                Nationality: {{ actor.country_of_origin }}
-                <br>
-                {{ actor.description }}</p>
+            <p>
+                   <span ng-if="actor.rating && actor.rating > 0">
+                        Rating: <strong>{{ actor.rating }}</strong>,
+                    </span>
+                    <span ng-if="actor.ethnicity">
+                        Ethnicity: <strong>{{ actor.ethnicity }}</strong>,
+                    </span>
+                    <span ng-if="actor.weight && actor.weight > 0">
+                        Weight: <strong>{{ actor.weight }}</strong> Kg
+                    </span>
+                    <span ng-if="actor.height && actor.height > 0">
+                        Height: <strong> {{ actor.height }}</strong> cm
+                    </span>
+                    <span ng-if="actor.measurements">
+                        Measurements: <strong>{{ actor.measurements }}</strong>
+                    </span>
+                    <span ng-if="actor.country_of_origin">
+                        Country Of Origin: <strong>{{ actor.country_of_origin }}</strong>
+                    </span>
+
+            </p>
+
 
 
         </li>

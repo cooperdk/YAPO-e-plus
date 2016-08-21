@@ -9,8 +9,8 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
             callingObjectType: '='
 
         },
-        controller: ['$scope', '$rootScope', '$rootScope', 'scopeWatchService', '$routeParams',
-            function ActorListWrapperController($scope, Actor, $rootScope, scopeWatchService, $routeParams) {
+        controller: ['$scope', '$rootScope', '$rootScope', 'scopeWatchService', '$routeParams', 'helperService',
+            function ActorListWrapperController($scope, Actor, $rootScope, scopeWatchService, $routeParams, helperService) {
 
                 var self = this;
 
@@ -19,9 +19,27 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                 self.orderFields = "";
                 self.searchInFields = "";
                 self.runnerUp = 0;
+
+
+                if (helperService.getGridView()['actor'] == undefined) {
+                    self.actorGridView = false;
+                } else {
+                    self.actorGridView = helperService.getGridView()['actor']
+                }
+
+                if (helperService.getGridView()['scene'] == undefined) {
+                    self.sceneGridView = false;
+                } else {
+                    self.sceneGridView = helperService.getGridView()['scene']
+                }
                 
-                self.test = false;
-                
+
+                self.saveGridView = function () {
+
+                    helperService.setGridView({'actor': self.actorGridView, 'scene': self.sceneGridView})
+                };
+
+
                 self.routParam = $routeParams.parentId;
 
                 self.sectionTypefunc = function (typeToCheck) {
@@ -80,8 +98,8 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                     "-path_to_dir": "Path Dsc",
                     "date_added": "Date Added Asc",
                     "-date_added": "Date Added Dsc",
-                    "resolution": "Resolution Asc",
-                    "-resolution": "Resolution Dsc",
+                    "height": "Resolution Height Asc",
+                    "-height": "Resolution Height Dsc",
                     "duration": "Duration Asc",
                     "-duration": "Duration Dsc",
                     "size": "Size Asc",
@@ -90,7 +108,7 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                     "-framerate": "Framerate Dsc",
                     "random": "Random"
                 };
-                
+
                 var sceneSearchInFields = {
 
                     "name": "Name",
@@ -98,7 +116,9 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                     "path_to_file": "Path",
                     "duration": "Duration",
                     "size": "Size",
-                    "framerate": "Framerate"
+                    "framerate": "Framerate",
+                    "height": "Resolution Height"
+
 
                 };
 
@@ -115,12 +135,12 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
 
 
                 };
-                
+
                 var websiteSearchInFields = {
 
                     "name": "Name",
                     "rating": "Rating"
-                    
+
                 };
 
                 var actorTagOrderFields = {
@@ -135,13 +155,13 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
 
 
                 };
-                
-                
+
+
                 var actorTagSearchInFields = {
 
                     "name": "Name",
                     "rating": "Rating"
-                    
+
                 };
 
                 var sceneTagOrderFields = {
@@ -156,19 +176,19 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
 
 
                 };
-                
+
                 var sceneTagSearchInFields = {
 
                     "name": "Name",
                     "rating": "Rating"
-                    
+
                 };
 
 
-                 var dbFolderOrderFields = {
+                var dbFolderOrderFields = {
 
                     "name": "Path Asc",
-                    "-name": "Path Dsc", 
+                    "-name": "Path Dsc",
                     "last_folder_name_only": "Last Folder Name Asc",
                     "-last_folder_name_only": "Last Folder Name Dsc"
 
@@ -220,9 +240,11 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
 
                 self.searchTermChanged = function () {
 
-                    scopeWatchService.searchTermChanged({'sectionType': self.sectionType, 
-                                                         'searchTerm': self.searchTerm,
-                                                         'searchField': self.searchField})
+                    scopeWatchService.searchTermChanged({
+                        'sectionType': self.sectionType,
+                        'searchTerm': self.searchTerm,
+                        'searchField': self.searchField
+                    })
                 };
 
 
@@ -233,7 +255,7 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
 
 
                 self.runnerUpFilterChange = function () {
-                    scopeWatchService.runnerUpChanged({'sectionType': self.sectionType, 'runnerUp':self.runnerUp});
+                    scopeWatchService.runnerUpChanged({'sectionType': self.sectionType, 'runnerUp': self.runnerUp});
                 };
 
 
