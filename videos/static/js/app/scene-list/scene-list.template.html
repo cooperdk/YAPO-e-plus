@@ -2,7 +2,7 @@
 <pagination page-type="'Scene'"></pagination>
 </span>
 <button type="button" ng-click="$ctrl.multiTag()" class="btn btn-default btn-sm">
-    Tag Multiple Scenes
+    Tag/Delete Multiple Scenes
 </button>
 
 <button type="button" ng-if="$ctrl.tagMultiple" ng-click="$ctrl.selectAll()" class="btn btn-default btn-sm">
@@ -47,14 +47,23 @@
                 <div class="slider round"></div>
                 </label>
 
-            </span>
+                </span>
 
-                                            <span ng-click="$ctrl.removeItem(scene,actor,'delete')"
-                                                  class="glyphicon glyphicon-trash on-hover-red-cursor-pointer"
-                                                  uib-popover-html="'<strong>Delete</strong> scene from database!'"
-                                                  popover-trigger="mouseenter">
+                    <span ng-click="$ctrl.removeItem(scene,actor,'delete',false)"
+                          class="glyphicon glyphicon-trash on-hover-red-cursor-pointer"
+                          uib-popover-html="'<strong>Delete</strong> scene from database!'"
+                          popover-trigger="mouseenter">
 
                             </span>
+
+                    <span ng-if="$ctrl.tagMultiple" ng-click="$ctrl.removeItem(scene,actor,'delete',true)"
+                          class="glyphicon glyphicon-fire on-hover-red-cursor-pointer"
+                          uib-popover-html="'<h2><font color=&quot;red&quot;>CAUTION!</h2></font><strong>Will Delete
+                          files on disk</strong> without asking for confirmation! <i> Will only work if at least one
+                          item is checked this is to avoid accidental deletion.'"
+                          popover-trigger="mouseenter">
+
+                    </span>
 
 
                 </h4>
@@ -87,7 +96,7 @@
                             <span ng-repeat="site in scene.websites"> <a
                                     href="/#!/website/{{ site.id }}">  {{ site.name }}</a> <span
                                     class="glyphicon glyphicon-remove"
-                                    ng-click="$ctrl.removeItem(scene,site,'websites')"></span> {{$last ? '' : ', '}} </span>
+                                    ng-click="$ctrl.removeItem(scene,site,'websites',false)"></span> {{$last ? '' : ', '}} </span>
 
                             </span>
 
@@ -108,7 +117,7 @@
                             <span ng-repeat="tag in scene.scene_tags"> <a
                                     href="/#!/scene-tag/{{ tag.id }}">  {{ tag.name }}</a> <span
                                     class="glyphicon glyphicon-remove"
-                                    ng-click="$ctrl.removeItem(scene,tag,'scene_tags')"></span> {{$last ? '' : ', '}} </span>
+                                    ng-click="$ctrl.removeItem(scene,tag,'scene_tags',false)"></span> {{$last ? '' : ', '}} </span>
                             </span>
                 <br>
                         <span>Performers:
@@ -126,7 +135,7 @@
                             <span ng-repeat="actor in scene.actors">  <a
                                     href="/#!/actor/{{ actor.id }}">  {{ actor.name }}</a> <span
                                     class="glyphicon glyphicon-remove"
-                                    ng-click="$ctrl.removeItem(scene,actor,'actors')"></span> {{$last ? '' : ', '}} </span>
+                                    ng-click="$ctrl.removeItem(scene,actor,'actors',false)"></span> {{$last ? '' : ', '}} </span>
                             </span>
 
 

@@ -3,7 +3,7 @@ import subprocess
 import _thread
 
 import django.db
-
+import errno
 from django.shortcuts import render
 
 import videos.addScenes
@@ -311,6 +311,38 @@ class ScrapeActor(views.APIView):
                 return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
 
 
+def permenatly_delete_scene_and_remove_from_db(scene):
+    success_delete_file = False
+    success_delete_media_path = False
+    try:
+        os.remove(scene.path_to_file)
+        print("Successfully deleted {}".format(scene.path_to_file))
+        success_delete_file = True
+    except OSError as e:
+        if e.errno == errno.ENOENT:
+            print("File already deleted!")
+            success_delete_file = True
+        else:
+            print("Got OSError while trying to delete {} : {}".format(scene.path_to_file, OSError.errno))
+
+    media_path = os.path.relpath(os.path.join(const.MEDIA_PATH, 'scenes', str(scene.id)))
+    print(os.path.dirname(os.path.abspath(__file__)))
+    try:
+        shutil.rmtree(media_path)
+        print("Deleted {}".format(media_path))
+        success_delete_media_path = True
+    except OSError as e:
+        if e.errno == errno.ENOENT:
+            print("Directory {} already deleted".format(media_path))
+            success_delete_media_path = True
+        else:
+            print("Got OSError while trying to delete {} : {}".format(media_path, OSError))
+
+    if success_delete_file and success_delete_media_path:
+        scene.delete()
+        print("Removed {} from database".format(scene.name))
+
+
 @api_view(['GET', 'POST'])
 def tag_multiple_items(request):
     if request.method == 'POST':
@@ -382,10 +414,17 @@ def tag_multiple_items(request):
 
             elif params['patchType'] == 'delete':
                 scenes_to_update = params['itemsToUpdate']
-                for x in scenes_to_update:
-                    scene_to_update = Scene.objects.get(pk=x)
-                    scene_to_update.delete()
-                    print("Removed scene {} from database".format(scene_to_update.name))
+
+                if params['permDelete']:
+                    print('permDelete true')
+                    for x in scenes_to_update:
+                        scene_to_update = Scene.objects.get(pk=x)
+                        permenatly_delete_scene_and_remove_from_db(scene_to_update)
+                else:
+                    for x in scenes_to_update:
+                        scene_to_update = Scene.objects.get(pk=x)
+                        scene_to_update.delete()
+                        print("Removed scene {} from database".format(scene_to_update.name))
 
         return Response(status=200)
 

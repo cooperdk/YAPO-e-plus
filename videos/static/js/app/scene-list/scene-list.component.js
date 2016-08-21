@@ -255,13 +255,13 @@ angular.module('sceneList').component('sceneList', {
             self.updateScenesOnRemove = function (scenes, itemToRemove, typeOfItemToRemove) {
                 var resId = [];
                 var resObj = [];
-                if (typeOfItemToRemove == 'delete'){
+                if (typeOfItemToRemove == 'delete') {
 
-                    for (var x = 0 ; x < scenes.length ; x++){
+                    for (var x = 0; x < scenes.length; x++) {
                         self.removeSceneFromList(scenes[x]);
                     }
 
-                }else{
+                } else {
 
 
                     for (var j = 0; j < scenes.length; j++) {
@@ -285,27 +285,26 @@ angular.module('sceneList').component('sceneList', {
                 }
 
 
-
                 return resId
 
 
             };
 
             self.removeSceneFromList = function (sceneToRemvoe) {
-                
+
                 var index_of_scene = -1;
-    
-                if (typeof sceneToRemvoe === 'object' ){
+
+                if (typeof sceneToRemvoe === 'object') {
                     index_of_scene = findIndexOfSceneInList(sceneToRemvoe.id);
-                }else{
+                } else {
                     index_of_scene = findIndexOfSceneInList(sceneToRemvoe);
                 }
-                
-                        self.scenes.splice(index_of_scene, 1);
+
+                self.scenes.splice(index_of_scene, 1);
 
             };
 
-            self.removeItem = function (scene, itemToRemove, typeOfItemToRemove) {
+            self.removeItem = function (scene, itemToRemove, typeOfItemToRemove, permDelete) {
 
 
                 var resId = [];
@@ -313,35 +312,34 @@ angular.module('sceneList').component('sceneList', {
 
 
                 if (self.selectedScenes.length > 0 && checkIfSceneSelected(scene)) {
-                    if (typeOfItemToRemove != 'delete'){
+                    if (typeOfItemToRemove != 'delete') {
                         var itToRemove = [];
                         itToRemove.push(itemToRemove.id);
                     }
 
-                    self.patchScene(self.scenes[sceneIndex].id, typeOfItemToRemove, itToRemove, 'remove', true)
+                    self.patchScene(self.scenes[sceneIndex].id, typeOfItemToRemove, itToRemove, 'remove', true, permDelete)
                 } else {
-                    self.patchScene(self.scenes[sceneIndex].id, typeOfItemToRemove, resId, 'remove', false)
+                    
+                    self.patchScene(self.scenes[sceneIndex].id, typeOfItemToRemove, resId, 'remove', false, permDelete)
                 }
 
                 if (self.selectedScenes.length > 0 && checkIfSceneSelected(scene)) {
 
                     self.updateScenesOnRemove(self.selectedScenes, itemToRemove, typeOfItemToRemove)
                 } else {
-                    if (typeOfItemToRemove != 'delete'){
+                    if (typeOfItemToRemove != 'delete') {
                         var scenes = [];
-                    scenes.push(scene.id);
-                    resId = self.updateScenesOnRemove(scenes, itemToRemove, typeOfItemToRemove)
-                    }else{
-                        self.removeSceneFromList(scene)
+                        scenes.push(scene.id);
+                        resId = self.updateScenesOnRemove(scenes, itemToRemove, typeOfItemToRemove)
+                    } else {
+                        if (!permDelete){
+                            self.removeSceneFromList(scene)    
+                        }
+                        
 
                     }
 
                 }
-
-
-
-
-
 
 
                 self.selectNone()
@@ -495,7 +493,7 @@ angular.module('sceneList').component('sceneList', {
 
             };
 
-            self.patchScene = function (sceneToPatchId, patchType, patchData, addOrRemove, multiple) {
+            self.patchScene = function (sceneToPatchId, patchType, patchData, addOrRemove, multiple, permDelete) {
 
                 var type = {};
                 type[patchType] = patchData;
@@ -509,7 +507,8 @@ angular.module('sceneList').component('sceneList', {
                             patchType: patchType,
                             patchData: patchData,
                             itemsToUpdate: self.selectedScenes,
-                            addOrRemove: addOrRemove
+                            addOrRemove: addOrRemove,
+                            permDelete: permDelete
                         }
                     }).then(function (response) {
                         console.log("Update finished successfully")
@@ -519,9 +518,12 @@ angular.module('sceneList').component('sceneList', {
 
 
                 } else {
-                    if (patchType == 'delete'){
-                        Scene.remove({sceneId: sceneToPatchId});
-                    }else{
+                    if (patchType == 'delete') {
+                        if (!permDelete){
+                            Scene.remove({sceneId: sceneToPatchId});    
+                        }
+
+                    } else {
                         Scene.patch({sceneId: sceneToPatchId}, type)
                     }
 
@@ -624,7 +626,6 @@ angular.module('sceneList').component('sceneList', {
                     }
                 })
             };
-
 
 
             self.deleteScene = function (sceneToRemove) {
