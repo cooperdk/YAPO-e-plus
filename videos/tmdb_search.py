@@ -103,6 +103,9 @@ def search_person(actor_in_question, alias, force):
             actor_in_question.last_lookup = datetime.now()
             actor_in_question.save()
             break
+
+    if not sucesss:
+        print ("Actor {} could not be found on TMdB".format(actor_in_question.name))
     return sucesss
 
 

@@ -23,7 +23,7 @@ from videos.models import Actor, ActorAlias, ActorTag
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 
-MEDIA_PATH = "videos\\media"
+# MEDIA_PATH = "videos\\media"
 
 
 def search_freeones(actor_to_search, alias, force):
@@ -302,9 +302,9 @@ def search_freeones_alias(actor_to_search, alias, force):
     success = False
 
     if force:
-        success = search_freeones(actor_to_search, alias)
+        success = search_freeones(actor_to_search, alias, force)
     elif not actor_to_search.last_lookup:
-        success = search_freeones(actor_to_search, alias)
+        success = search_freeones(actor_to_search, alias, force)
 
     return success
 

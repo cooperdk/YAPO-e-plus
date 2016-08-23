@@ -213,7 +213,7 @@ def make_sample_video(filename, video_total_seconds, sample_video_length_in_seco
         output = extract_frames_in_given_time(filename, seek_time, frames_per_segment, start_number,
                                               )
         if output == -1:
-            print("Something went wrong while extracting video frames, exiting funciton...")
+
             return success
         start_number += frames_per_segment
 
@@ -249,21 +249,17 @@ def extract_frames_in_given_time(filename, seek_time, frames_per_segment, start_
         ans = a[0]
     else:
         ans = -1
+        print("Something went wrong while extracting video frames, exiting function...")
+        print("This is the output of the error: {}".format(a[0]))
 
     if b"Output file is empty, nothing was encoded" in output:
         ans = -1
-
-    # p = subprocess.Popen(command_call, shell=True)
 
     return ans
 
 
 def move_sample_movie_to_correct_dir(scene, success, dest_filename, dest_path, org_path, type_of_media):
     if success:
-        # save_path = os.path.normpath("static\\scenes\\{}\\sample".format(scene.pk))
-        # filename = "sample.mp4"
-        #
-        # original_path = os.path.normpath('ffmpeg\\temp\\out.mp4')
 
         save_path = os.path.normpath(dest_path)
         filename = dest_filename
