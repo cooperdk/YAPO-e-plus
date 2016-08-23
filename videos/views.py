@@ -513,7 +513,7 @@ def settings(request):
 
 
 
-                print("Cleaning Alias...")
+                print("Cleaning Aliases...")
 
                 aliases = ActorAlias.objects.all()
                 count = aliases.count()
@@ -576,7 +576,8 @@ class AddItems(views.APIView):
 
             for x in actors_to_add.split(','):
                 actor_to_insert = Actor()
-                actor_to_insert.name = x.title()
+                actor_to_insert.strip = x.strip()
+                actor_to_insert.name = actor_to_insert.strip
                 actor_to_insert.thumbnail = const.UNKNOWN_PERSON_IMAGE_PATH
                 try:
                     if not ActorAlias.objects.filter(name=actor_to_insert.name):
