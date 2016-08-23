@@ -46,8 +46,6 @@ def search_freeones(actor_to_search, alias, force):
     # link = soup.find_all("a", {"text": "Isis Love"})
 
     soup_links = soup.find_all("a")
-    soup_all_tr = soup.find_all("tr", )
-    actor_page = ""
 
     href_found = match_text_in_link_to_query(soup_links, name)
     # if not href_found:
@@ -95,13 +93,13 @@ def search_freeones(actor_to_search, alias, force):
         # print (free_ones_biography, free_ones_career_status)
         # img class="middle bordered babeinfoblock-thumb"
         profile_thumb = soup.find("img", {'class': 'middle bordered babeinfoblock-thumb'})
-        profile_thumb_perent = profile_thumb.parent
+        profile_thumb_parent = profile_thumb.parent
 
-        print(profile_thumb_perent)
+        print(profile_thumb_parent)
         has_image = False
 
         try:
-            print(profile_thumb_perent['href'])
+            print(profile_thumb_parent['href'])
             has_image = True
         except KeyError:
             print("No image on Freeones")
@@ -109,7 +107,7 @@ def search_freeones(actor_to_search, alias, force):
         biography_page = urllib_parse.urljoin("http://www.freeones.com/", href_found)
 
         if has_image:
-            images_page = profile_thumb_perent['href']
+            images_page = profile_thumb_parent['href']
 
             r = requests.get(images_page)
             soup = BeautifulSoup(r.content)
