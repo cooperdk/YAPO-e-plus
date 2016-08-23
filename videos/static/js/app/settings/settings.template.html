@@ -11,7 +11,7 @@
 
 <br>
 <button type="button" ng-click="$ctrl.scrapAllActors()" class="btn btn-default btn-sm"
-        uib-popover-html="'Scrapes <strong>all</strong> previously unscraped actors with TMdB and Freeones scrapers.'"
+        uib-popover-html="'Scrapes <strong>all</strong> previously unscraped actors with the TMdB and Freeones scrapers.'"
         popover-trigger="mouseenter"  popover-placement="right-top"
 >
     <span class="glyphicon glyphicon-user"
@@ -20,7 +20,7 @@
 </button>
 
 <button type="button" ng-click="$ctrl.tagAllScenes()" class="btn btn-default btn-sm"
-        uib-popover-html="'Checks all scenes in the database against all known Tags,Websites and Actors, and tags them with the correct information.'"
+        uib-popover-html="'Checks all scenes in the database against all known Tags, Websites and Actors and tags them with the correct information.'"
         popover-trigger="mouseenter"  popover-placement="right-top"
 >
     <span class="glyphicon glyphicon-user"
@@ -28,8 +28,8 @@
     ></span> Tag All Scenes
 </button>
     <label
-    uib-popover-html="'If checked will ignore the last <b>Tag All Scenes</b> lookup date and will search for all tags, actors and websites in all the scenes
-    as though they were never searched before..'"
+    uib-popover-html="'If checked, will ignore the last <b>Tag All Scenes</b> lookup date and will search for all Tags, Actors and Websites in all the scenes
+    as though they were never searched before.'"
         popover-trigger="mouseenter"  popover-placement="right-top"
     >
         Ignore Last Lookup?
@@ -39,8 +39,8 @@
 
 
     <button type="button" ng-click="$ctrl.cleanDatabase()" class="btn btn-default btn-sm"
-        uib-popover-html="'Go over all scenes and if the files for the scenes no longer exist on disk, remove the scene from the library.
-        (Also deletes screenshots and vidoe sample for the scene) Also removes aliases without association with actors'"
+        uib-popover-html="'Checks all scenes and if the files for the scenes no longer exist on disk, removes the scene from the library.
+        (as well as deleting screenshots and video samples for the scene, and removing aliases without association with actors.)'"
         popover-trigger="mouseenter"  popover-placement="right-top"
 >
     <span class="glyphicon glyphicon-flash"

@@ -14,6 +14,7 @@ from videos import ffmpeg_process
 import urllib.request
 # For REST framework
 
+import platform
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -523,7 +524,7 @@ def settings(request):
                         alias.delete()
                         print("Alias {} has no actor.. deleting".format(alias.name))
                     counter += 1
-                print("Finished alaises scenes...")
+                print("Finished cleaning aliases...")
 
             return Response(status=200)
 
@@ -605,10 +606,18 @@ class PlayInVlc(views.APIView):
         return Response(status=200)
 
 
+def open_file_cross_platform(path):
+    if platform.system() == "Windows":
+        os.startfile(path)
+    else:
+        opener = "open" if platform.system() == "Darwin" else "xdg-open"
+        subprocess.call([opener, path])
+
+
 class OpenFolder(views.APIView):
     def get(self, request, format=None):
         path = request.query_params['path']
-        os.startfile(path)
+        open_file_cross_platform(path)
         return Response(status=200)
 
 
