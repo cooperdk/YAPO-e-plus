@@ -523,7 +523,7 @@ def settings(request):
                         alias.delete()
                         print("Alias {} has no actor.. deleting".format(alias.name))
                     counter += 1
-                print("Finished alaises scenes...")
+                print("Finished cleaning aliases...")
 
             return Response(status=200)
 
