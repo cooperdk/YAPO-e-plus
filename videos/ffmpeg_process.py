@@ -33,7 +33,7 @@ from videos.models import Scene
 # MEDIA_PATH = "videos\\media"
 # SAMPLE_RESOLUTION = "640:360"
 
-if platform.system() == "Linux" or platform.system() == "OS X":
+if platform.system() == "Linux" or platform.system() == "Darwin":
    # Linux or OS X
    FFPROBE_BIN = 'ffprobe'
    FFMPEG_BIN = 'ffmpeg'
