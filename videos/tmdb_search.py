@@ -16,7 +16,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 
 tmdb.API_KEY = '04308f6d1c14608e9f373b84ad0e4e4c'
 
-MEDIA_PATH = "videos\\media"
+MEDIA_PATH = os.path.join('videos', 'media')
 
 
 def search_person(actor_in_question, alias, force):
