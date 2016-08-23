@@ -37,7 +37,8 @@ if platform.system() == "Linux" or platform.system() == "OS X":
    # Linux or OS X
    FFPROBE_BIN = 'ffprobe'
    FFMPEG_BIN = 'ffmpeg'
-elif platform.system() == "Windows":   
+elif platform.system() == "Windows":
+   # Windows
    FFPROBE_BIN = os.path.join('videos', 'ffmpeg', 'ffprobe')
    FFMPEG_BIN = os.path.join('videos', 'ffmpeg', 'ffmpeg')
 
