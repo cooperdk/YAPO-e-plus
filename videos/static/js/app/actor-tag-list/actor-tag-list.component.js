@@ -106,28 +106,47 @@ angular.module('actorTagList').component('actorTagList', {
                     // alert(angular.toJson(self.actor.actor_tags));
                     // alert(angular.toJson(tagToDelete));
                     // alert(angular.toJson(self.actor.actor_tags.indexOf(tagToDelete.id)));
+                    
+                    
+                    var res = helperService.removeObjectFromArrayOfObjects(tagToDelete,self.tags);
+                    
+                    // var resId = [];
+                    // var resObject = [];
+                    // for (i = 0; i < self.tags.length; i++) {
+                    //     if (self.tags[i].id != tagToDelete.id) {
+                    //         resId.push(self.tags[i].id);
+                    //         resObject.push(self.tags[i]);
+                    //     }
+                    // }
 
-                    var resId = [];
-                    var resObject = [];
-                    for (i = 0; i < self.tags.length; i++) {
-                        if (self.tags[i].id != tagToDelete.id) {
-                            resId.push(self.tags[i].id);
-                            resObject.push(self.tags[i]);
-                        }
-                    }
-
-                    self.actor.actor_tags = resId;
+                    self.actor.actor_tags = res['redId'];
 
 
                     scopeWatchService.actorChaned(self.actor);
 
-                    self.tags = resObject;
+                    self.tags = res['resObject'];
 
 
                     // self.actor.actor_tags.splice(self.actor.actor_tags.indexOf(tagToDelete.id,1));
                     // alert(angular.toJson(self.actor.actor_tags));
                 }
+            };
+
+            self.deleteActorTagFromDb = function (tagToDelete) {
+
+                // var index = helperService.getObjectIndexFromArrayOfObjects(tagToDelete,self.tags);
+
+                ActorTag.remove({actorTagId: tagToDelete.id});
+
+                var ans = helperService.removeObjectFromArrayOfObjects(tagToDelete,self.tags);
+
+                self.tags = ans['resObject'];
+
+
+
             }
+
+
         }
     ]
 });

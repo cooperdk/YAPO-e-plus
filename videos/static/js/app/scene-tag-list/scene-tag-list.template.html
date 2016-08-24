@@ -25,7 +25,13 @@
 <ul class="tags">
     <li ng-repeat="tag in $ctrl.tags">
         <a href="/#!/scene-tag/{{ tag.id }}">{{ tag.name }}</a>
-        <span ng-click="$ctrl.deleteSceneTag(tag)" class="glyphicon glyphicon-remove"></span>
+        <span ng-if="!$ctrl.mainPage" ng-click="$ctrl.deleteSceneTag(tag)" class="glyphicon glyphicon-remove"></span>
+        <span ng-if="$ctrl.mainPage" ng-click="$ctrl.deleteSceneTagFromDb(tag)"
+              class="glyphicon glyphicon-trash on-hover-red-cursor-pointer"
+              uib-popover-html="'<strong>Delete</strong> tag from database!'"
+              popover-trigger="mouseenter">
+
+                            </span>
 
     </li>
 </ul>

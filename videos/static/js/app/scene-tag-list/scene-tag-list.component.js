@@ -104,25 +104,27 @@ angular.module('sceneTagList').component('sceneTagList', {
                     // alert(angular.toJson(tagToDelete));
                     // alert(angular.toJson(self.actor.actor_tags.indexOf(tagToDelete.id)));
 
-                    var resId = [];
-                    var resObjects = [];
-
-                    for (i = 0; i < self.tags.length; i++) {
-                        if (self.tags[i].id != tagToDelete.id) {
-                            resId.push(self.tags[i].id);
-                            resObjects.push(self.tags[i]);
-
-                        }
-                    }
-                    self.scene.scene_tags = resId;
+                    var res = helperService.removeObjectFromArrayOfObjects(tagToDelete,self.tags);
+                    
+                    self.scene.scene_tags = res['resId'];
                     scopeWatchService.sceneChanged(self.scene);
 
-                    self.tags = resObjects;
+                    self.tags = res['resObject'];
 
 
                     // self.actor.actor_tags.splice(self.actor.actor_tags.indexOf(tagToDelete.id,1));
                     // alert(angular.toJson(self.actor.actor_tags));
                 }
+            };
+            
+            self.deleteSceneTagFromDb = function (tagToDelete) {
+                
+                 SceneTag.remove({sceneTagId: tagToDelete.id});
+
+                var ans = helperService.removeObjectFromArrayOfObjects(tagToDelete,self.tags);
+
+                self.tags = ans['resObject'];
+                
             }
 
         }

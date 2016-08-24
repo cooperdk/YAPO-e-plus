@@ -186,23 +186,24 @@ angular.module('actorList').component('actorList', {
             
             self.deleteActor = function (actorToRemove) {
                 Actor.remove({actorId: actorToRemove.id});
+                
+                var ans = helperService.removeObjectFromArrayOfObjects(actorToRemove,self.actors);
+                // var resId = [];
+                //     var resObj = [];
+                //
+                //     for (var i = 0; i < self.actors.length; i++) {
+                //         if (self.actors[i].id != actorToRemove.id) {
+                //             resId.push(self.actors[i].id);
+                //             resObj.push(self.actors[i]);
+                //         }
+                //     }
+                //
+                //
+                //     // self.scene.actors = resId;
+                //
+                //     // scopeWatchService.sceneChanged(self.scene);
 
-                var resId = [];
-                    var resObj = [];
-
-                    for (var i = 0; i < self.actors.length; i++) {
-                        if (self.actors[i].id != actorToRemove.id) {
-                            resId.push(self.actors[i].id);
-                            resObj.push(self.actors[i]);
-                        }
-                    }
-
-
-                    // self.scene.actors = resId;
-
-                    // scopeWatchService.sceneChanged(self.scene);
-
-                    self.actors = resObj;
+                    self.actors = ans['resObject'];
             };
             
             self.patchActor =function (actorToPatch, patchInfo) {

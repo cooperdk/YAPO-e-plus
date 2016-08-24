@@ -97,32 +97,32 @@ angular.module('websiteList').component('websiteList', {
             });
 
 
-            self.removeWebsiteFromScene = function (tagToDelete) {
+            self.removeWebsiteFromScene = function (siteToDelete) {
                 if (angular.isObject(self.scene)) {
                     // self.pk.splice(self.pk.indexOf(aliasToDelete.id), 1);
                     // alert(angular.toJson(self.actor.actor_tags));
                     // alert(angular.toJson(tagToDelete));
                     // alert(angular.toJson(self.actor.actor_tags.indexOf(tagToDelete.id)));
-
-                    var resId = [];
-                    var resObject = [];
-
-                    for (i = 0; i < self.websites.length; i++) {
-                        if (self.websites[i].id != tagToDelete.id) {
-                            console.log("website " + self.websites[i].name + " is inside!");
-                            resId.push(self.websites[i].id);
-                            resObject.push(self.websites[i]);
-                        }
-                    }
-
-                    self.scene.websites = resId;
-                    self.websites = resObject;
+                    var res = helperService.removeObjectFromArrayOfObjects(siteToDelete, self.websites);
+                    
+                    self.scene.websites = res['resId'];
+                    self.websites = res['resObject'];
 
                     scopeWatchService.sceneChanged(self.scene);
 
                     // self.actor.actor_tags.splice(self.actor.actor_tags.indexOf(tagToDelete.id,1));
                     // alert(angular.toJson(self.actor.actor_tags));
                 }
+            };
+            
+            self.deleteWebsiteFromDb = function (siteToDelete) {
+                
+                Website.remove({websiteId: siteToDelete.id});
+
+                var ans = helperService.removeObjectFromArrayOfObjects(siteToDelete,self.websites);
+
+                self.websites = ans['resObject'];
+                
             }
 
         }
