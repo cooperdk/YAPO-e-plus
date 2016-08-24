@@ -1,6 +1,7 @@
 import glob
 import os
 import sys
+import platform
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 sys.path.append(os.path.abspath('E:\djangoProject\YAPO\YAPO'))
@@ -32,8 +33,15 @@ from videos.models import Scene
 # MEDIA_PATH = "videos\\media"
 # SAMPLE_RESOLUTION = "640:360"
 
-FFPROBE_BIN = os.path.join('videos', 'ffmpeg', 'ffprobe')
-FFMPEG_BIN = os.path.join('videos', 'ffmpeg', 'ffmpeg')
+if platform.system() == "Linux" or platform.system() == "Darwin":
+   # Linux or OS X
+   FFPROBE_BIN = 'ffprobe'
+   FFMPEG_BIN = 'ffmpeg'
+elif platform.system() == "Windows":
+   # Windows
+   FFPROBE_BIN = os.path.join('videos', 'ffmpeg', 'ffprobe')
+   FFMPEG_BIN = os.path.join('videos', 'ffmpeg', 'ffmpeg')
+
 FFMPEG_TEMP_OUTPUT_IMAGES = os.path.join('videos', 'ffmpeg', 'temp', 'img%03d.jpg')
 OUTPUT_VIDEO_FRAMERATE = 15
 OUTPUT_VIDEO_NAME = os.path.join('videos', 'ffmpeg', 'temp', 'out.mp4')
