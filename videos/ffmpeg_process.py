@@ -10,6 +10,7 @@ import shutil
 import subprocess
 import time
 
+import stat
 import django
 import json
 import re
@@ -34,13 +35,13 @@ from videos.models import Scene
 # SAMPLE_RESOLUTION = "640:360"
 
 if platform.system() == "Linux" or platform.system() == "Darwin":
-   # Linux or OS X
-   FFPROBE_BIN = 'ffprobe'
-   FFMPEG_BIN = 'ffmpeg'
+    # Linux or OS X
+    FFPROBE_BIN = 'ffprobe'
+    FFMPEG_BIN = 'ffmpeg'
 elif platform.system() == "Windows":
-   # Windows
-   FFPROBE_BIN = os.path.join('videos', 'ffmpeg', 'ffprobe')
-   FFMPEG_BIN = os.path.join('videos', 'ffmpeg', 'ffmpeg')
+    # Windows
+    FFPROBE_BIN = os.path.join('videos', 'ffmpeg', 'ffprobe')
+    FFMPEG_BIN = os.path.join('videos', 'ffmpeg', 'ffmpeg')
 
 FFMPEG_TEMP_OUTPUT_IMAGES = os.path.join('videos', 'ffmpeg', 'temp', 'img%03d.jpg')
 OUTPUT_VIDEO_FRAMERATE = 15
@@ -52,7 +53,6 @@ DEFAULT_SCREENSHOT_TIME = "00:01:30"
 SCREENSHOT_OUTPUT_PATH = os.path.join('videos', 'ffmpeg', 'temp', 'thumb.jpg')
 MEDIA_PATH = os.path.join('videos', 'media')
 SAMPLE_RESOLUTION = "640:360"
-
 
 if not os.path.exists(TEMP_PATH):
     os.makedirs(TEMP_PATH)
@@ -221,7 +221,6 @@ def make_sample_video(filename, video_total_seconds, sample_video_length_in_seco
         output = extract_frames_in_given_time(filename, seek_time, frames_per_segment, start_number,
                                               )
         if output == -1:
-
             return success
         start_number += frames_per_segment
 

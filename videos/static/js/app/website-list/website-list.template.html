@@ -2,9 +2,16 @@
 
 <ul class="websites">
     <li ng-repeat="site in $ctrl.websites">
-        <a href="/#!/website/{{ site.id }}">[{{$index + 1}}] {{ site.name }} </a><span
+        <a href="/#!/website/{{ site.id }}">[{{$index + 1}}] {{ site.name }} </a><span ng-if="!$ctrl.mainPage"
             ng-click="$ctrl.removeWebsiteFromScene(site)"
             class="glyphicon glyphicon-remove"></span>
+
+        <span ng-if="$ctrl.mainPage" ng-click="$ctrl.deleteWebsiteFromDb(site)"
+              class="glyphicon glyphicon-trash on-hover-red-cursor-pointer"
+              uib-popover-html="'<strong>Delete</strong> tag from database!'"
+              popover-trigger="mouseenter">
+
+                            </span>
 
     </li>
 </ul>

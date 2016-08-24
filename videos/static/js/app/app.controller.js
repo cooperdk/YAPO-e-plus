@@ -1,15 +1,15 @@
 // image crop controller from https://github.com/AllanBishop/angular-img-cropper
 
 
-angular.module('yapoApp').controller("ImageCropperCtrl", ['$scope', function ($scope) {
-    $scope.cropper = {};
-    $scope.cropper.sourceImage = null;
-    $scope.cropper.croppedImage = null;
-    $scope.bounds = {};
-    $scope.bounds.left = 0;
-    $scope.bounds.right = 0;
-    $scope.bounds.top = 0;
-    $scope.bounds.bottom = 0;
+angular.module('yapoApp').controller("ImageCropperCtrl", ['$scope', '$rootScope', function ($scope, $rootScope) {
+    $rootScope.cropper = {};
+    $rootScope.cropper.sourceImage = null;
+    $rootScope.cropper.croppedImage = null;
+    $rootScope.bounds = {};
+    $rootScope.bounds.left = 0;
+    $rootScope.bounds.right = 0;
+    $rootScope.bounds.top = 0;
+    $rootScope.bounds.bottom = 0;
 }]);
 
 
@@ -66,7 +66,7 @@ angular.module('yapoApp').controller('ModalCtrl', function ($scope, $uibModal, $
 // Please note that $uibModalInstance represents a modal window (instance) dependency.
 // It is not the same as the $uibModal service used above.
 
-angular.module('yapoApp').controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, items, modelContent) {
+angular.module('yapoApp').controller('ModalInstanceCtrl', function ($scope, $rootScope, $uibModalInstance, items, modelContent) {
 
     $scope.items = items;
     $scope.modelContent = modelContent;
@@ -74,8 +74,9 @@ angular.module('yapoApp').controller('ModalInstanceCtrl', function ($scope, $uib
         item: $scope.items[0]
     };
 
-    $scope.ok = function () {
-        $uibModalInstance.close($scope.selected.item);
+    $scope.ok = function (uploadingObject) {
+        $rootScope.uploadFile(uploadingObject);
+        $uibModalInstance.close();
     };
 
     $scope.cancel = function () {

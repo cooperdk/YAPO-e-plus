@@ -35,17 +35,22 @@ myApp.service('fileUpload', ['$http', function ($http) {
     }
 }]);
 
-myApp.controller('myCtrl', ['$scope', 'fileUpload', function ($scope, fileUpload) {
+myApp.controller('myCtrl', ['$scope', '$rootScope', 'fileUpload', function ($scope, $rootScope, fileUpload) {
 
-    $scope.uploadFile = function (uploadingObject) {
+    $rootScope.uploadFile = function (uploadingObject) {
         // console.log("Is cropper in scope?" +  $scope.cropper.croppedImage)
         // var file = $scope.myFile;
-        var file = $scope.cropper.croppedImage;
+        var file = $rootScope.cropper.croppedImage;
         console.log('file is ');
         console.dir(file);
         // var uploadingObject = $scope.modelContent;
         var uploadingObjectID = $scope.modelContent.id;
         fileUpload.uploadFileToUrl(file, uploadingObject, uploadingObjectID);
     };
+    
+    
+    $scope.edit = function () {
+        $rootScope.cropper.sourceImage = $scope.modelContent.thumbnail
+    }
 
 }]);

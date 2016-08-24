@@ -5,7 +5,7 @@ angular.module('helper', []).factory('helperService', function ($rootScope, $loc
     $rootScope.savedData2 = [];
 
     // $rootScope.$storage.scArray ;
-    
+
     function setGridView(data) {
         $rootScope.$storage.gridView = data;
 
@@ -70,6 +70,51 @@ angular.module('helper', []).factory('helperService', function ($rootScope, $loc
         return ans;
     }
 
+
+    function getObjectIndexFromArrayOfObjects(objectToFind, arrayOfObjects) {
+        var found = false;
+        var ans = null;
+        for (var i = 0; i < arrayOfObjects.length && !found; i++) {
+            if (objectToFind instanceof Object) {
+                if (objectToFind.id == arrayOfObjects[i].id) {
+                    found = true;
+                    ans = i
+                }
+            } else if (objectToFind == arrayOfObjects[i].id) {
+                found = true;
+                ans = i
+            }
+        }
+
+        return ans;
+    }
+
+
+    function removeObjectFromArrayOfObjects(objectToRemove, arrayOfObjects) {
+        var resId = [];
+        var resObject = [];
+        for (var i = 0; i < arrayOfObjects.length; i++) {
+
+            if (objectToRemove instanceof Object) {
+                if (arrayOfObjects[i].id != objectToRemove.id) {
+                    resId.push(arrayOfObjects[i].id);
+                    resObject.push(arrayOfObjects[i]);
+                }
+
+
+            } else if (arrayOfObjects[i].id != objectToRemove) {
+                resId.push(arrayOfObjects[i].id);
+                resObject.push(arrayOfObjects[i]);
+
+            }
+        }
+
+
+        return {'redId': resId, 'resObject': resObject};
+        
+    }
+
+
     return {
         set: set,
         get: get,
@@ -78,7 +123,9 @@ angular.module('helper', []).factory('helperService', function ($rootScope, $loc
         packageDataAndHeaders: packageDataAndHeaders,
         resourceToArray: resourceToArray,
         setGridView: setGridView,
-        getGridView: getGridView
+        getGridView: getGridView,
+        getObjectIndexFromArrayOfObjects: getObjectIndexFromArrayOfObjects,
+        removeObjectFromArrayOfObjects: removeObjectFromArrayOfObjects
     }
 
 });
@@ -552,7 +599,7 @@ angular.module('scopeWatch', []).factory('scopeWatchService', function ($rootSco
 
     }
 
-        function didFolderLoad(someVariable) {
+    function didFolderLoad(someVariable) {
 
         console.log("app-service-scopeWatch: didFolderLoad was triggered! ");
         $rootScope.$broadcast("didFolderLoad", someVariable);
