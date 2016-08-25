@@ -236,7 +236,7 @@ def extract_frames_in_given_time(filename, seek_time, frames_per_segment, start_
     # scale_argument = "-vf scale={}:trunc(ow/a/2)*2".format(image_width_pixels)
 
     # scales images to a fixed 16:9 size and adds black bars
-    scale_argument = "-vf scale={},'pad=ih*16/9:ih:(ow-iw)/2:(oh-ih)/2'".format(SAMPLE_RESOLUTION)
+    scale_argument = "-vf \"scale={},pad=ih*16/9:ih:(ow-iw)/2:(oh-ih)/2\"".format(SAMPLE_RESOLUTION)
     start_number_argument = "-start_number {}".format(start_number)
 
     command_call = "{} {} {} {} {} {} {}".format(FFMPEG_BIN, seek_argument, input_argument, number_of_frames_argument,
