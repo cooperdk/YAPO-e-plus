@@ -3,6 +3,7 @@ import os
 from videos import ffmpeg_process
 import django
 from videos import filename_parser
+import videos.const as const
 
 django.setup()
 
@@ -46,6 +47,16 @@ def get_files(walk_dir, make_video_sample):
                     break
 
 
+def create_sample_video(scene):
+    print("Trying to create a sample video for scene: {}".format(scene.name))
+    success = ffmpeg_process.ffmpeg_create_sammple_video(scene)
+    if success:
+        print("Sample video for scene: {} created successfully".format(scene.name))
+    else:
+        print(
+            "Something went wrong while trying to create video sample for scene {}".format(scene.name))
+
+
 def create_scene(scene_path, make_sample_video):
     current_scene = Scene()
     current_scene.path_to_file = scene_path
@@ -68,8 +79,17 @@ def create_scene(scene_path, make_sample_video):
 
                 ffmpeg_process.ffmpeg_take_scene_screenshot_without_save(scene_in_db)
 
-                print("Screenshot taken...".format(
+                print("Screenshot of scene {} taken...".format(
                     scene_in_db.name))
+
+        if make_sample_video:
+            video_filename_path = os.path.join(const.MEDIA_PATH, 'scenes', str(scene_in_db.id), 'sample',
+                                               'sample.mp4')
+            if not os.path.isfile(video_filename_path):
+                create_sample_video(scene_in_db)
+            else:
+                print("Sample for {} already exists!".format(scene_in_db.name))
+
             scene_in_db.save()
     else:
         current_scene.save()
@@ -86,13 +106,7 @@ def create_scene(scene_path, make_sample_video):
                 current_scene.name))
 
         if make_sample_video:
-            print("Trying to create a sample video for scene: {}".format(current_scene.name))
-            success = ffmpeg_process.ffmpeg_create_sammple_video(current_scene)
-            if success:
-                print("Sample video for scene: {} created successfully".format(current_scene.name))
-            else:
-                print(
-                    "Something went wrong while trying to create video sample for scene {}".format(current_scene.name))
+            make_sample_video(current_scene)
 
         add_scene_to_folder_view(current_scene)
 
@@ -102,8 +116,6 @@ def create_scene(scene_path, make_sample_video):
         actors_alias = list(ActorAlias.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
         scene_tags = SceneTag.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
         websites = Website.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
-
-        filtered_alias = list()
 
         filename_parser.parse_scene_all_metadata(current_scene, actors, actors_alias, scene_tags, websites)
 

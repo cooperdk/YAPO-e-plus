@@ -42,7 +42,21 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
 
                 self.saveGridView = function () {
 
-                    helperService.setGridView({'actor': self.actorGridView, 'scene': self.sceneGridView})
+
+                    // self.mainPage = false;
+
+                    helperService.setGridView({'actor': self.actorGridView, 'scene': self.sceneGridView});
+
+                    // scopeWatchService.searchTermChanged({
+                    //     'sectionType': self.sectionType,
+                    //     'searchTerm': self.searchTerm,
+                    //     'searchField': self.searchField
+                    // });
+                    //
+                    // scopeWatchService.sortOrderChanged({'sectionType': self.sectionType, 'sortBy': self.sortBy});
+                    // scopeWatchService.runnerUpChanged({'sectionType': self.sectionType, 'runnerUp': self.runnerUp});
+
+
                 };
 
 

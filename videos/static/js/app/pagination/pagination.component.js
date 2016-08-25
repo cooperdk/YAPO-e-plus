@@ -9,7 +9,16 @@ angular.module('pagination').component('pagination', {
             var self = this;
 
 
-            self.itemsPerPage = 50;
+            // self.itemsPerPage = 50;
+
+
+            if (helperService.getNumberOfItemsPerPaige() == undefined) {
+                self.itemsPerPage = 50;
+                helperService.setNumberOfItemsPerPaige(self.itemsPerPage)
+            } else {
+                self.itemsPerPage = helperService.getNumberOfItemsPerPaige()
+            }
+
             self.bigCurrentPage = "";
             self.maxSize = "";
             self.totalItems = "";
