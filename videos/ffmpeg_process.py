@@ -103,7 +103,7 @@ def ffmpeg_take_screenshot(screenshot_time, filename):
 
 def ffprobe(filename):
     command_call = "{} {} \"{}\"".format(FFPROBE_BIN, FFPROBE_JSON_ARGUMENTS, filename)
-    print("FFprobe command call: {}".format(command_call))
+    print("ffprobe command call: {}".format(command_call))
 
     return execute_subprocess(command_call, 'ffprobe')
 
@@ -154,7 +154,7 @@ def make_video_from_screenshots(framerate):
     output_video = OUTPUT_VIDEO_NAME
     command_call = "{} {} {} {} {}".format(FFMPEG_BIN, framerate_argument, input_argument, other_arguments,
                                            output_video)
-    print("Making video from frames, using ffmpeg command: \n{}".format(command_call))
+    print("Making video from frames... using ffmpeg command: \n{}".format(command_call))
     execute_subprocess(command_call, 'ffmpeg')
     # p = subprocess.Popen(command_call, shell=True)
     # p.wait()
