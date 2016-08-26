@@ -106,7 +106,7 @@ def create_scene(scene_path, make_sample_video):
                 current_scene.name))
 
         if make_sample_video:
-            make_sample_video(current_scene)
+            create_sample_video(current_scene)
 
         add_scene_to_folder_view(current_scene)
 

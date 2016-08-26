@@ -562,7 +562,7 @@ class AddItems(views.APIView):
             for folder_to_add_path in folders_to_add_path.split(','):
                 if os.path.isdir(folder_to_add_path):
                     # if the second argument is true - tries to make a sample video when inserting scene to db.
-                    if request.query_params['createSampleVideo']:
+                    if request.query_params['createSampleVideo'] == 'true':
                         videos.addScenes.get_files(folder_to_add_path, True)
                     else:
                         videos.addScenes.get_files(folder_to_add_path, False)
