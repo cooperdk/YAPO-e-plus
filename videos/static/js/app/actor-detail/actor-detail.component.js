@@ -40,6 +40,14 @@ angular.module('actorDetail').component('actorDetail', {
             self.hideDetail = false;
             self.hideDetailButtomLable = 'Hide Detail';
 
+            var checkHideDetailButton = function () {
+                if (self.hideDetail) {
+                    self.hideDetailButtomLable = 'Show Detail'
+                } else {
+                    self.hideDetailButtomLable = 'Hide Detail'
+                }
+            };
+
             self.hideDetailClick = function () {
                 if (self.hideDetail) {
                     self.hideDetail = false;
@@ -49,6 +57,22 @@ angular.module('actorDetail').component('actorDetail', {
                     self.hideDetailButtomLable = "Hide Detail"
                 }
             };
+
+
+            var checkGridOption = function () {
+                if ((helperService.getGridView() != undefined) && (helperService.getGridView()['scene'] != undefined)) {
+                    self.hideDetail = helperService.getGridView()['scene'];
+                    checkHideDetailButton();
+                }
+            };
+
+
+            checkGridOption();
+
+            $scope.$on("gridViewOptionChnaged", function (event, pageInfo) {
+                checkGridOption();
+                checkHideDetailButton();
+            });
 
             self.selectedActorTag = null;
             self.alerts = [];
@@ -131,7 +155,7 @@ angular.module('actorDetail').component('actorDetail', {
                 var yyyy = self.birthdate.getFullYear();
 
 
-                actor.date_of_birth = yyyy+'-'+mm+'-'+dd;
+                actor.date_of_birth = yyyy + '-' + mm + '-' + dd;
 
                 self.updateActor(actor);
 

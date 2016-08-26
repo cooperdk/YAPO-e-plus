@@ -639,6 +639,13 @@ angular.module('scopeWatch', []).factory('scopeWatchService', function ($rootSco
         $rootScope.$broadcast("didActorTagLoad", someVariable);
 
     }
+    
+    function gridViewOptionChnaged(someVariable) {
+
+        console.log("app-service-scopeWatch: gridViewOptionChnaged was triggered! ");
+        $rootScope.$broadcast("gridViewOptionChnaged", someVariable);
+
+    }
 
 
     return {
@@ -669,7 +676,8 @@ angular.module('scopeWatch', []).factory('scopeWatchService', function ($rootSco
         didActorTagLoad: didActorTagLoad,
         didSceneTagLoad: didSceneTagLoad,
         didWebsiteLoad: didWebsiteLoad,
-        didFolderLoad: didFolderLoad
+        didFolderLoad: didFolderLoad,
+        gridViewOptionChnaged: gridViewOptionChnaged
 
 
     }

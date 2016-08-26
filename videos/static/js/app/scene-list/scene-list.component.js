@@ -3,11 +3,11 @@ angular.module('sceneList').component('sceneList', {
     // Note: The URL is relative to our `index.html` file
     templateUrl: ['$element', '$attrs', function ($element, $attrs) {
 
-        if ($attrs.viewStyle == 'grid') {
-            return 'static/js/app/scene-list/scene-list-grid.template.html'
-        } else {
-            return 'static/js/app/scene-list/scene-list.template.html'
-        }
+        // if ($attrs.viewStyle == 'grid') {
+        //     return 'static/js/app/scene-list/scene-list-grid.template.html'
+        // } else {
+            return 'static/js/app/scene-list/scene-list.template.html';
+        // }
 
 
     }],
@@ -45,6 +45,22 @@ angular.module('sceneList').component('sceneList', {
                 }
 
             };
+            
+            
+            self.gridView = false;
+
+
+            var checkGridOption = function () {
+                if ((helperService.getGridView() != undefined) && (helperService.getGridView()['scene'] != undefined)) {
+                    self.gridView = helperService.getGridView()['scene']
+                }
+            };
+
+            checkGridOption();
+
+            $scope.$on("gridViewOptionChnaged", function (event, pageInfo) {
+                checkGridOption()
+            });
 
 
             self.selectAll = function () {
