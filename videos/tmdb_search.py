@@ -44,23 +44,23 @@ def search_person(actor_in_question, alias, force):
             person_aka = person_info['also_known_as']
             if person_info['biography'] is not None:
                 actor_in_question.description = person_info['biography']
-                print("Added description to " + actor_in_question.name)
+                print("Added description to: " + actor_in_question.name)
             else:
                 actor_in_question.description = ""
             if not person_info['birthday'] == "":
                 actor_in_question.date_of_birth = person_info['birthday']
-                print("Added Birthday to " + actor_in_question.name)
+                print("Added Birthday to: " + actor_in_question.name)
             if not actor_in_question.gender:
                 person_gender = person_info['gender']
                 if person_gender == 2:
                     actor_in_question.gender = 'M'
-                    print("Added Gender to " + actor_in_question.name)
+                    print("Added Gender to: " + actor_in_question.name)
                 elif person_gender == 1:
                     actor_in_question.gender = 'F'
-                    print("Added Gender to " + actor_in_question.name)
+                    print("Added Gender to: " + actor_in_question.name)
             if person_info['homepage']:
                 actor_in_question.official_pages = person_info['homepage']
-                print("Added Homepage to " + actor_in_question.name)
+                print("Added Homepage to: " + actor_in_question.name)
 
                 actor_in_question.tmdb_id = person_info['id']
                 actor_in_question.imdb_id = person_info['imdb_id']
@@ -105,7 +105,7 @@ def search_person(actor_in_question, alias, force):
             break
 
     if not sucesss:
-        print ("Actor {} could not be found on TMdB".format(actor_in_question.name))
+        print ("Actor: {} could not be found on TMdB".format(actor_in_question.name))
     return sucesss
 
 
@@ -120,12 +120,12 @@ def search_alias(actor_in_question, alias, force):
 
 def search_person_with_force_flag(actor_in_question, force):
     success = False
-    print("Looking for " + actor_in_question.name)
+    print("Looking for: " + actor_in_question.name)
     if force:
         print("Force flag is true, ignoring last lookup")
         success = search_person(actor_in_question, None, force)
     elif not actor_in_question.last_lookup:
-        print("Actor " + actor_in_question.name + " was not yet searched... Searching now")
+        print("Actor: " + actor_in_question.name + " was not yet searched... Searching now")
         success = search_person(actor_in_question, None, force)
 
     return success
