@@ -35,11 +35,11 @@ def search_freeones(actor_to_search, alias, force):
     # http://www.iafd.com/results.asp?searchtype=comprehensive&searchstring=isis+love
     if alias:
         name_with_plus = alias.name.replace(' ', '+')
-        print("Searching freeones for " + actor_to_search.name + " alias: " + alias.name)
+        print("Searching Freeones for: " + actor_to_search.name + " alias: " + alias.name)
         name = alias.name
     else:
         name_with_plus = name.replace(' ', '+')
-        print("Searching freeones for " + actor_to_search.name)
+        print("Searching Freeones for: " + actor_to_search.name)
     r = requests.get("http://www.freeones.com/search/?t=1&q=" + name_with_plus)
     soup = BeautifulSoup(r.content, "html.parser")
 
@@ -74,7 +74,7 @@ def search_freeones(actor_to_search, alias, force):
 
     if href_found:
         success = True
-        print(actor_to_search.name + "Was found on freeones!")
+        print(actor_to_search.name + " was found on Freeones!")
         actor_to_search.gender = 'F'
         actor_to_search.save()
         actor_page = urllib_parse.urljoin("http://www.freeones.com/", href_found)
@@ -102,7 +102,7 @@ def search_freeones(actor_to_search, alias, force):
             print(profile_thumb_parent['href'])
             has_image = True
         except KeyError:
-            print("No image on Freeones")
+            print("No image on Freeones!")
 
         biography_page = urllib_parse.urljoin("http://www.freeones.com/", href_found)
 
@@ -311,7 +311,7 @@ def main():
     print("test")
     for actor in Actor.objects.all():
 
-        print("Fetching info for " + actor.name)
+        print("Fetching info for: " + actor.name)
         if not actor.gender == 'M':
             time.sleep(10)
             sucess = search_freeones_with_force_flag(actor, True)
