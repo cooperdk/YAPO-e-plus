@@ -1,8 +1,8 @@
 angular.module('settings').component('settings', {
         // Note: The URL is relative to our `index.html` file
         templateUrl: 'static/js/app/settings/settings.template.html',
-        controller: ['$scope', '$rootScope', 'scopeWatchService', '$http',
-            function SettingsController($scope, $rootScope, scopeWatchService, $http) {
+        controller: ['$scope', '$rootScope', 'scopeWatchService', '$http','helperService',
+            function SettingsController($scope, $rootScope, scopeWatchService, $http, helperService) {
 
                 var self = this;
                 self.response = "";
@@ -10,7 +10,19 @@ angular.module('settings').component('settings', {
 
                 // self.pathToVLC = "";
 
+                self.itemsPerPage = 50;
 
+                
+                var x = helperService.getNumberOfItemsPerPaige();
+                if (helperService.getNumberOfItemsPerPaige() != undefined){
+                    self.itemsPerPage = helperService.getNumberOfItemsPerPaige()
+                }
+                
+                self.changeNumberOfItemsPerPage = function () {
+                    helperService.setNumberOfItemsPerPaige(self.itemsPerPage)
+                };
+                
+                
                 self.settings = $http.get('settings/', {
                     params: {
                             pathToVlc: ""

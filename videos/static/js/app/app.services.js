@@ -1,10 +1,19 @@
 angular.module('helper', []).factory('helperService', function ($rootScope, $localStorage, $sessionStorage) {
-    $rootScope.$storage = $sessionStorage;
+    $rootScope.$storage = $localStorage;
 
     $rootScope.savedData = {};
     $rootScope.savedData2 = [];
 
     // $rootScope.$storage.scArray ;
+
+    function setNumberOfItemsPerPaige(numberOfItems) {
+        $rootScope.$storage.numberOfItemsPerPage = numberOfItems
+    }
+
+    function getNumberOfItemsPerPaige() {
+        return $rootScope.$storage.numberOfItemsPerPage
+    }
+
 
     function setGridView(data) {
         $rootScope.$storage.gridView = data;
@@ -111,7 +120,7 @@ angular.module('helper', []).factory('helperService', function ($rootScope, $loc
 
 
         return {'redId': resId, 'resObject': resObject};
-        
+
     }
 
 
@@ -125,19 +134,30 @@ angular.module('helper', []).factory('helperService', function ($rootScope, $loc
         setGridView: setGridView,
         getGridView: getGridView,
         getObjectIndexFromArrayOfObjects: getObjectIndexFromArrayOfObjects,
-        removeObjectFromArrayOfObjects: removeObjectFromArrayOfObjects
+        removeObjectFromArrayOfObjects: removeObjectFromArrayOfObjects,
+        setNumberOfItemsPerPaige: setNumberOfItemsPerPaige,
+        getNumberOfItemsPerPaige: getNumberOfItemsPerPaige
     }
 
 });
 
 
-angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias, ActorTag, Scene, SceneTag, Website, DbFolder) {
+angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias, ActorTag, Scene, SceneTag, Website, DbFolder,helperService) {
 
         var _prevPage = "";
         var _nextPage = "";
         var _currentPage = 0;
         var _pageOffset = 0;
+
         var _pageLimit = 50;
+    
+        if (helperService.getNumberOfItemsPerPaige() == undefined) {
+            _pageLimit = 50;
+            helperService.setNumberOfItemsPerPaige(self.itemsPerPage)
+        } else {
+            _pageLimit = helperService.getNumberOfItemsPerPaige()
+        }
+       
 
         var _callId = 0;
         var _maxPage = -6;
