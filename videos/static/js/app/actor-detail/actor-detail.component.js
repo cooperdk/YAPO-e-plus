@@ -24,16 +24,27 @@ angular.module('actorDetail').component('actorDetail', {
             var self = this;
             var counter = 0;
             var gotPromise = false;
-            
-            
+
+
+            self.birthdate = null;
+
+            $scope.popup1 = {
+                opened: false
+            };
+
+            $scope.open1 = function () {
+                $scope.popup1.opened = true;
+            };
+
+
             self.hideDetail = false;
             self.hideDetailButtomLable = 'Hide Detail';
-            
+
             self.hideDetailClick = function () {
-                if (self.hideDetail){
+                if (self.hideDetail) {
                     self.hideDetail = false;
                     self.hideDetailButtomLable = "Show Detail"
-                }else{
+                } else {
                     self.hideDetail = true;
                     self.hideDetailButtomLable = "Hide Detail"
                 }
@@ -74,8 +85,8 @@ angular.module('actorDetail').component('actorDetail', {
             });
 
             $scope.$on("didActorLoad", function (event, actor) {
-                
-                if (gotPromise){
+
+                if (gotPromise) {
                     scopeWatchService.actorLoaded(self.actor);
                 }
             });
@@ -93,6 +104,8 @@ angular.module('actorDetail').component('actorDetail', {
                     $rootScope.loadedActor = res;
                     $rootScope.title = res.name;
 
+                    self.birthdate = new Date(res.date_of_birth);
+                    // alert(self.birthdate);
 
                     gotPromise = true;
                     // $scope.actor = res;
@@ -109,6 +122,19 @@ angular.module('actorDetail').component('actorDetail', {
 
             self.zoomDown = function zoomDown(zoomfactor) {
                 self.imageWidth = self.imageWidth / zoomfactor
+            };
+
+            self.updateBirthday = function (actor) {
+
+                var dd = self.birthdate.getDate();
+                var mm = self.birthdate.getMonth() + 1; //January is 0!
+                var yyyy = self.birthdate.getFullYear();
+
+
+                actor.date_of_birth = yyyy+'-'+mm+'-'+dd;
+
+                self.updateActor(actor);
+
             };
 
             self.updateActor = function (object) {
@@ -324,7 +350,7 @@ angular.module('actorDetail').component('actorDetail', {
                     self.updateImage = true;
                 }, function errorCallback(response) {
                     self.addAlert(scrapeSite + "Could not find " + self.actor.name + "Try a different scraper or looking manually ", 'warning', '5000');
-                     console.log(angular.toJson(response))
+                    console.log(angular.toJson(response))
                 });
 
 

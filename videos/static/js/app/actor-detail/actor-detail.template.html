@@ -1,11 +1,11 @@
 <uib-alert ng-repeat="alert in $ctrl.alerts" class="enter" type="{{ alert.type }}" close="$ctrl.closeAlert($index)"
            dismiss-on-timeout="{{ alert.timeout }}">{{ alert.msg }}</uib-alert>
 <h1 align="center">
-     <a href="#" editable-text="$ctrl.actor.name"
-                          onaftersave="$ctrl.updateActor($ctrl.actor)" style="cursor:text">
-                           {{ $ctrl.actor.name || 'NA' }}
-                       </a>
-   </h1>
+    <a href="#" editable-text="$ctrl.actor.name"
+       onaftersave="$ctrl.updateActor($ctrl.actor)" style="cursor:text">
+        {{ $ctrl.actor.name || 'NA' }}
+    </a>
+</h1>
 <h2 align="center">
     <uib-rating ng-model="$ctrl.actor.rating" max="10" read-only="isReadonly" on-hover="hoveringOver(value)"
                 on-leave="overStar = null" titles="['one','two','three']"
@@ -35,7 +35,7 @@
         <label class="switch" uib-popover-html="'By default actors with one word name (Ex: &quot;Stoya&quot; )
             are ignored when autotagging scenes. If checked this will allow this actor to be autotaged even though
             their consists name is one word only. <i>Use only on actors whos name are unique enough as to not cause incorrect tagging.</i>'"
-                 popover-trigger="mouseenter" popover-placement="right-top">
+               popover-trigger="mouseenter" popover-placement="right-top">
             <input type="checkbox" ng-model="$ctrl.actor.is_exempt_from_one_word_search"
                    ng-change="$ctrl.updateActor($ctrl.actor)">
             <div class="slider round"
@@ -61,7 +61,7 @@
 
         <h3>{{ $ctrl.actor.name }} has {{ $ctrl.actor.scenes.length }} scenes: </h3>
 
-            <section-list-wrapper main-page="false" section-type="'SceneList'"></section-list-wrapper>
+        <section-list-wrapper main-page="false" section-type="'SceneList'"></section-list-wrapper>
 
 
     </div>
@@ -69,7 +69,7 @@
 
         <h3>{{ $ctrl.actor.name }} has {{ $ctrl.actor.scenes.length }} scenes: </h3>
 
-            <section-list-wrapper main-page="false" section-type="'SceneList'"></section-list-wrapper>
+        <section-list-wrapper main-page="false" section-type="'SceneList'"></section-list-wrapper>
 
 
     </div>
@@ -89,8 +89,9 @@
                                 class="btn btn-default btn-sm">
                             <span class="glyphicon glyphicon-plus"></span> Scrape Freeones
                         </button>
-                        <input type="checkbox" ng-model="$ctrl.forceScrape" uib-popover-html="'Override existing values while scraping with selected scraper'"
-                 popover-trigger="mouseenter" popover-placement="top">
+                        <input type="checkbox" ng-model="$ctrl.forceScrape"
+                               uib-popover-html="'Override existing values while scraping with selected scraper'"
+                               popover-trigger="mouseenter" popover-placement="top">
 
                     </div>
                     <detail-profile-image ng-if="$ctrl.updateImage" actor="$ctrl.actor"></detail-profile-image>
@@ -117,11 +118,17 @@
                 </td>
                 <td class="alright">
                     <div>
-                        <a href="#" editable-bsdate="$ctrl.actor.date_of_birth" e-is-open="opened.$data"
-                       e-ng-click="open($event,'$data')"
-                       e-datepicker-popup="dd-MMMM-yyyy">
-                        {{ ($ctrl.actor.date_of_birth | date:"dd/MM/yyyy") || 'NA' }}
-                    </a>
+                        <p class="input-group">
+                            <input type="text" class="form-control" uib-datepicker-popup="dd.MM.yyyy"
+                                   ng-model="$ctrl.birthdate"
+                                   is-open="popup1.opened" datepicker-options="dateOptions" ng-required="true"
+                                   close-text="Close" alt-input-formats="altInputFormats" ng-change="$ctrl.updateBirthday($ctrl.actor)"/>
+                            <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" ng-click="open1()"><i
+                                    class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+
                         <br>
                         <span ng-if="$ctrl.actor != undefined && $ctrl.actor.date_of_birth != undefined">
                             ({{ $ctrl.howOld($ctrl.actor.date_of_birth)}} Years Old )
@@ -268,7 +275,8 @@
                         <li><a href="http://www.pornhub.com/pornstar/{{ $ctrl.actorNameDelimiter('-',false) }}"
                                target="_blank">{{ actor.name }} at Pornhub</a></li>
 
-                        <li><a href="http://www.empornium.me/torrents.php?taglist={{  $ctrl.actorNameDelimiter('.',false) }}"
+                        <li><a href="http://www.empornium.me/torrents.php?taglist=
+                                {{  $ctrl.actorNameDelimiter('.',false) }}"
                                target="_blank">{{ actor.name }} at Empornium</a></li>
 
                         <li><a href="http://www.xvideos.com/?k={{ $ctrl.actorNameDelimiter('.',false) }}"
@@ -280,9 +288,10 @@
 
 
                         <li><a
-                                href="https://www.google.com/search?as_st=y&tbm=isch&as_q={{  $ctrl.actorNameDelimiter('&#43;',true) }}&as_epq=&as_oq=&as_eq=&cr=&as_sitesearch=&safe=images&tbs=isz:l,iar:t
+                                href="https://www.google.com/search?as_st=y&tbm=isch&as_q=
+                                        {{  $ctrl.actorNameDelimiter('&#43;',true) }}&as_epq=&as_oq=&as_eq=&cr=&as_sitesearch=&safe=images&tbs=isz:l,iar:t
                             "
-                               target="_blank">{{ actor.name }} at Google Image Search </a></li>
+                                target="_blank">{{ actor.name }} at Google Image Search </a></li>
 
 
                     </ul>
