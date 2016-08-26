@@ -162,11 +162,11 @@ def parse_all_scenes(ignore_last_lookup):
 
     const.LAST_ALL_SCENE_TAG = datetime.datetime.strptime(settings_content['last_all_scene_tag'], "%Y-%m-%d %H:%M:%S")
 
-    print("finished parsing...")
+    print("Finished parsing...")
 
 
 def parse_scene_all_metadata(scene, actors, actors_alias, scene_tags, websites):
-    print("Parsing scene path: {} for actors,tags,and websites ...".format(scene.path_to_file))
+    print("Parsing scene path: {} for actors, tags, and websites...".format(scene.path_to_file))
 
     scene_path = scene.path_to_file.lower()
 
@@ -177,15 +177,15 @@ def parse_scene_all_metadata(scene, actors, actors_alias, scene_tags, websites):
     print("Looking for websites...")
     scene_path = parse_website_in_scenes(scene, scene_path, websites)
 
-    print("Looking for actors and alias...")
+    print("Looking for actors and aliases...")
     scene_path = parse_actors_in_scene(scene, scene_path, actors, actors_alias)
 
-    print("Looking for scene tags")
+    print("Looking for scene tags...")
     scene_path = parse_scene_tags_in_scene(scene, scene_path, scene_tags)
 
     scene.last_filename_tag_lookup = datetime.datetime.now()
 
-    print("Finished parsing scene's {} path... setting Last lookup to {}".format(scene.name,
+    print("Finished parsing scene: {}'s path... setting Last lookup to {}".format(scene.name,
                                                                                  scene.last_filename_tag_lookup))
 
     scene.save()
@@ -373,11 +373,11 @@ def parse_actors_in_scene(scene_to_parse, scene_path, actors, actors_alias):
 def add_actor_to_scene(actor_to_add, scene_to_add_to):
     # if not Scene.objects.filter(pk=scene_to_add_to.pk, actors__pk=actor_to_add.pk):
     if not scene_to_add_to.actors.filter(pk=actor_to_add.pk):
-        print("Adding Actor {} to the Scene {}".format(actor_to_add.name, scene_to_add_to.name))
+        print("Adding Actor: {} to the Scene {}".format(actor_to_add.name, scene_to_add_to.name))
         scene_to_add_to.actors.add(actor_to_add)
         scene_to_add_to.save()
     else:
-        print("Actor {} is already registered to scene {}".format(actor_to_add.name,scene_to_add_to.name))
+        print("Actor: {} is already registered to scene {}".format(actor_to_add.name,scene_to_add_to.name))
 
 
 def get_regex_search_term(name, delimiter):
@@ -407,11 +407,11 @@ def parse_scene_tags_in_scene(scene, scene_path, scene_tags):
         if re.search(regex_search_term, scene_path, re.IGNORECASE) is not None:
             scene_path = re.sub(regex_search_term, '', scene_path, flags=re.IGNORECASE)
             if not scene.scene_tags.filter(name=scene_tag.name):
-                print("Adding {} to scene {}".format(scene_tag.name, scene.name))
+                print("Adding tag: {} to scene {}".format(scene_tag.name, scene.name))
                 # print("Adding " + scene_tag.name + " to scene" + scene.name + "\n")
                 scene.scene_tags.add(scene_tag)
             else:
-                print("{} is already in {}".format(scene_tag.name, scene.name))
+                print("Tag: {} is already in {}".format(scene_tag.name, scene.name))
     return scene_path
 
 
@@ -422,7 +422,7 @@ def parse_website_in_scenes(scene, scene_path, websites):
         if re.search(regex_search_term, scene_path, re.IGNORECASE) is not None:
             scene_path = re.sub(regex_search_term, '', scene_path, flags=re.IGNORECASE)
             if not scene.websites.filter(name=website.name):
-                print("Adding " + website.name + " to scene" + scene.name + "\n")
+                print("Adding website: " + website.name + " to scene " + scene.name + "\n")
                 scene.websites.add(website)
 
     return scene_path
