@@ -51,7 +51,7 @@ def create_sample_video(scene):
     print("Trying to create a sample video for scene: {}".format(scene.name))
     success = ffmpeg_process.ffmpeg_create_sammple_video(scene)
     if success:
-        print("Sample video for scene: {} created successfully".format(scene.name))
+        print("Sample video for scene: {} created successfully.".format(scene.name))
     else:
         print(
             "Something went wrong while trying to create video sample for scene {}".format(scene.name))
@@ -74,7 +74,7 @@ def create_scene(scene_path, make_sample_video):
             print("Trying to use ffprobe on scene: {}".format(scene_in_db.name))
             if ffmpeg_process.ffprobe_get_data_without_save(scene_in_db):
                 print(
-                    "FFpbrobe successfully gathered information on scene {} ... Taking a screenshot wiht ffmpeg...".format(
+                    "ffprobe successfully gathered information on scene {} ... Taking a screenshot with ffmpeg...".format(
                         scene_in_db.name))
 
                 ffmpeg_process.ffmpeg_take_scene_screenshot_without_save(scene_in_db)
@@ -97,7 +97,7 @@ def create_scene(scene_path, make_sample_video):
         print("Trying to use ffprobe on scene: {}".format(current_scene.name))
         if ffmpeg_process.ffprobe_get_data_without_save(current_scene):
             print(
-                "FFpbrobe successfully gathered information on scene {} ... Taking a screenshot wiht ffmpeg...".format(
+                "ffprobe successfully gathered information on scene {} ... Taking a screenshot with ffmpeg...".format(
                     current_scene.name))
 
             ffmpeg_process.ffmpeg_take_scene_screenshot_without_save(current_scene)
@@ -232,7 +232,7 @@ def recursive_add_folders(parent, folders, scene_to_add, path_with_ids):
     else:
         if not parent.scenes.filter(name=scene_to_add.name):
             parent.scenes.add(scene_to_add)
-            print("Added Scene " + scene_to_add.name + " to virtual folder " + parent.name)
+            print("Added Scene: " + scene_to_add.name + " to virtual folder " + parent.name)
             parent.save()
 
 
