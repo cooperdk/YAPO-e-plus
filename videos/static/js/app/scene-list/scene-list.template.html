@@ -1,7 +1,8 @@
 <span>
 <pagination page-type="'Scene'"></pagination>
 </span>
-<button type="button" ng-click="$ctrl.multiTag()" class="btn btn-default btn-sm">
+<div ng-if="!$ctrl.gridView">
+    <button type="button" ng-click="$ctrl.multiTag()" class="btn btn-default btn-sm">
     Tag/Delete Multiple Scenes
 </button>
 
@@ -142,4 +143,24 @@
             </td>
         </tr>
     </table>
+</div>
+
+</div>
+<div class="col-md-12" id="big-scroll-item" ng-if="$ctrl.gridView">
+<div class="row-fluid" id="scene-list-grid">
+    <div class="col-md-3" ng-repeat="scene in $ctrl.scenes">
+        <a href="/#!/scene/{{ scene.id }}">
+            <img
+                 uib-popover-template="'static/js/app/scene-list/scene-list-grid-popover.template.html'"
+                                        popover-append-to-body="true"
+                 popover-trigger="mouseenter" popover-placement="bottom"
+
+                 ng-src="{{ scene.thumbnail }}"
+                 alt="{{ scene.name }}"
+                 style="width: 360px;"/>
+
+
+        </a>
+    </div>
+</div>
 </div>

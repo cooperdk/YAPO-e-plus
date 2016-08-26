@@ -22,16 +22,17 @@
 <pagination page-type="'Actor'"></pagination>
 
 
-<div class="col-md-10" id="big-scroll-item">
 
-    <ul class="actors">
+<div class="col-md-10" id="big-scroll-item" ng-if="!$ctrl.gridView" >
+
+    <ul class="actors" >
         <!--
                 Search: <input ng-model="$ctrl.searchTerm"/>
                 {{ $ctrl.searchTerm }}
                 -->
 
 
-        <li ng-repeat="actor in $ctrl.actors"
+        <li ng-repeat="actor in $ctrl.actors "
             class="thumbnail phone-list-item">
 
             <a href="/#!/actor/{{ actor.id }}" class="thumb">
@@ -91,12 +92,30 @@
             </p>
 
 
-
         </li>
 
 
     </ul>
 
+</div>
+
+<div class="col-md-12" id="big-scroll-item" ng-if="$ctrl.gridView">
+<div class="row-fluid" id="actor-list-grid">
+    <div class="col-md-2" ng-repeat="actor in $ctrl.actors">
+        <a href="/#!/actor/{{ actor.id }}">
+            <img
+                 uib-popover-template="'static/js/app/actor-list/actor-list-grid-popover.template.html'"
+                                        popover-append-to-body="true"
+                 popover-trigger="mouseenter" popover-placement="bottom"
+
+                 ng-src="{{ actor.thumbnail }}"
+                 alt="{{ actor.name }}"
+                 style="width: 200px; height: 300px"/>
+
+            <h4>{{ actor.name }}</h4>
+        </a>
+    </div>
+</div>
 </div>
 
 

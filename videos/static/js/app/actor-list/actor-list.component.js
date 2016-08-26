@@ -8,35 +8,52 @@ angular.module('actorList').component('actorList', {
         callingObjectType: '='
 
     },
-    templateUrl:   ['$element', '$attrs', function($element, $attrs) {
+    templateUrl: ['$element', '$attrs', function ($element, $attrs) {
 
+        // self.gridView = false;
+        if ($attrs.sceneDetail == 'true') {
+            return 'static/js/app/actor-list/actor-list-row.template.html';
 
-        if ($attrs.sceneDetail == 'true'){
-           return 'static/js/app/actor-list/actor-list-row.template.html'
-        }else if ($attrs.viewStyle == 'grid'){
-            return 'static/js/app/actor-list/actor-list-grid.template.html'    
-        }else{
-            return 'static/js/app/actor-list/actor-list.template.html'    
+            // }else if ($attrs.viewStyle == 'grid'){
+            //     self.gridView = true;
+            //     return 'static/js/app/actor-list/actor-list-grid.template.html'
+        } else {
+            return 'static/js/app/actor-list/actor-list.template.html'
         }
 
-        
-    } ],
 
-    controller: ['$scope', 'Actor', 'pagerService', 'Scene', 'ActorTag', 'scopeWatchService','helperService',
+    }],
+
+    controller: ['$scope', 'Actor', 'pagerService', 'Scene', 'ActorTag', 'scopeWatchService', 'helperService',
         function ActorListController($scope, Actor, pagerService, Scene, ActorTag, scopeWatchService, helperService) {
 
 
             var self = this;
-            
+
             var didSceneLoad = false;
             var didActorTagLoad = false;
-
 
 
             self.actors = [];
 
             self.ordering = "name";
             self.pageType = 'Actor';
+
+
+            self.gridView = false;
+
+
+            var checkGridOption = function () {
+                if ((helperService.getGridView() != undefined) && (helperService.getGridView()['actor'] != undefined)) {
+                    self.gridView = helperService.getGridView()['actor']
+                }
+            };
+
+            checkGridOption();
+
+            $scope.$on("gridViewOptionChnaged", function (event, pageInfo) {
+                checkGridOption()
+            });
 
 
 
@@ -59,21 +76,21 @@ angular.module('actorList').component('actorList', {
 
                 self.actorsToadd = pagerService.getNextPage(input);
 
-                    self.actorsToadd.$promise.then(function (res) {
+                self.actorsToadd.$promise.then(function (res) {
 
-                        // self.actorsToadd = res[0];
+                    // self.actorsToadd = res[0];
 
-                        var paginationInfo = {
-                            pageType: input.pageType,
-                            pageInfo: res[1]
-                        };
+                    var paginationInfo = {
+                        pageType: input.pageType,
+                        pageInfo: res[1]
+                    };
 
-                        scopeWatchService.paginationInit(paginationInfo);
+                    scopeWatchService.paginationInit(paginationInfo);
 
-                        self.actors = helperService.resourceToArray(res[0]);
+                    self.actors = helperService.resourceToArray(res[0]);
 
 
-                    });
+                });
 
 
             };
@@ -84,7 +101,7 @@ angular.module('actorList').component('actorList', {
             }
 
             $scope.$on("paginationChange", function (event, pageInfo) {
-                if (pageInfo.pageType == self.pageType){
+                if (pageInfo.pageType == self.pageType) {
                     self.nextPage(pageInfo.page)
                 }
             });
@@ -98,9 +115,9 @@ angular.module('actorList').component('actorList', {
                 self.actorTag = loadedActorTag;
                 self.nextPage(0);
                 didActorTagLoad = true
-                
+
             });
-            
+
 
             $scope.$on("sceneLoaded", function (event, scene) {
 
@@ -110,31 +127,29 @@ angular.module('actorList').component('actorList', {
                 didSceneLoad = true;
 
             });
-            
-            if (!didSceneLoad){
+
+            if (!didSceneLoad) {
                 scopeWatchService.didSceneLoad('a')
             }
-            
-            if (!didActorTagLoad){
+
+            if (!didActorTagLoad) {
                 scopeWatchService.didActorTagLoad('a')
             }
 
 
-            
-
             $scope.$on("searchTermChanged", function (event, searchTerm) {
-                if (searchTerm['sectionType'] == 'ActorList'){
+                if (searchTerm['sectionType'] == 'ActorList') {
                     self.actors = [];
                     self.searchTerm = searchTerm['searchTerm'];
                     self.searchField = searchTerm['searchField'];
-                    self.nextPage(0);    
+                    self.nextPage(0);
                 }
 
 
             });
 
             $scope.$on("sortOrderChanged", function (event, sortOrder) {
-                if (sortOrder['sectionType'] == 'ActorList'){
+                if (sortOrder['sectionType'] == 'ActorList') {
                     console.log("Sort Order Changed!");
                     self.actors = [];
                     self.sortBy = sortOrder['sortBy'];
@@ -144,13 +159,13 @@ angular.module('actorList').component('actorList', {
             });
 
             $scope.$on("runnerUpChanged", function (event, runnerUp) {
-                if (runnerUp['sectionType'] == 'ActorList'){
+                if (runnerUp['sectionType'] == 'ActorList') {
                     console.log("Sort Order Changed!");
                     self.actors = [];
                     self.runnerUp = runnerUp['runnerUp'];
-                    self.nextPage(0);    
+                    self.nextPage(0);
                 }
-                
+
             });
 
             self.removeActorFromScene = function (actorToRemove) {
@@ -183,11 +198,11 @@ angular.module('actorList').component('actorList', {
                     // alert(angular.toJson(self.actor.actor_tags));
                 }
             };
-            
+
             self.deleteActor = function (actorToRemove) {
                 Actor.remove({actorId: actorToRemove.id});
-                
-                var ans = helperService.removeObjectFromArrayOfObjects(actorToRemove,self.actors);
+
+                var ans = helperService.removeObjectFromArrayOfObjects(actorToRemove, self.actors);
                 // var resId = [];
                 //     var resObj = [];
                 //
@@ -203,28 +218,27 @@ angular.module('actorList').component('actorList', {
                 //
                 //     // scopeWatchService.sceneChanged(self.scene);
 
-                    self.actors = ans['resObject'];
-            };
-            
-            self.patchActor =function (actorToPatch, patchInfo) {
-                
-                 Actor.patch({actorId: actorToPatch.id}, patchInfo)
-            };
-            
-            self.setRating = function (actor) {
-              var patchInfo = {'rating': actor.rating};
-                
-                self.patchActor(actor,patchInfo)
-                
-            };
-            
-            self.toggleRunnerUp = function (actor) {
-              var patchInfo = {'is_runner_up': actor.is_runner_up};
-                
-                self.patchActor(actor,patchInfo)
-                
+                self.actors = ans['resObject'];
             };
 
+            self.patchActor = function (actorToPatch, patchInfo) {
+
+                Actor.patch({actorId: actorToPatch.id}, patchInfo)
+            };
+
+            self.setRating = function (actor) {
+                var patchInfo = {'rating': actor.rating};
+
+                self.patchActor(actor, patchInfo)
+
+            };
+
+            self.toggleRunnerUp = function (actor) {
+                var patchInfo = {'is_runner_up': actor.is_runner_up};
+
+                self.patchActor(actor, patchInfo)
+
+            };
 
 
         }

@@ -19,6 +19,8 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                 self.orderFields = "";
                 self.searchInFields = "";
                 self.runnerUp = 0;
+                
+                $scope.missingEthnicity= false;
 
 
                 if (helperService.getGridView() != undefined){
@@ -46,6 +48,8 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                     // self.mainPage = false;
 
                     helperService.setGridView({'actor': self.actorGridView, 'scene': self.sceneGridView});
+                    
+                    scopeWatchService.gridViewOptionChnaged("a");
 
                     // scopeWatchService.searchTermChanged({
                     //     'sectionType': self.sectionType,
