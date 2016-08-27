@@ -74,7 +74,7 @@ def create_scene(scene_path, make_sample_video):
             print("Trying to use ffprobe on scene: {}".format(scene_in_db.name))
             if ffmpeg_process.ffprobe_get_data_without_save(scene_in_db):
                 print(
-                    "ffprobe successfully gathered information on scene {}... Taking a screenshot with ffmpeg...".format(
+                    "ffprobe successfully gathered information on scene: {}... Taking a screenshot with ffmpeg...".format(
                         scene_in_db.name))
 
                 ffmpeg_process.ffmpeg_take_scene_screenshot_without_save(scene_in_db)
@@ -97,7 +97,7 @@ def create_scene(scene_path, make_sample_video):
         print("Trying to use ffprobe on scene: {}".format(current_scene.name))
         if ffmpeg_process.ffprobe_get_data_without_save(current_scene):
             print(
-                "ffprobe successfully gathered information on scene {}... Taking a screenshot with ffmpeg...".format(
+                "ffprobe successfully gathered information on scene: {}... Taking a screenshot with ffmpeg...".format(
                     current_scene.name))
 
             ffmpeg_process.ffmpeg_take_scene_screenshot_without_save(current_scene)
