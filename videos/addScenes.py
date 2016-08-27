@@ -64,7 +64,7 @@ def create_scene(scene_path, make_sample_video):
     current_scene.name = os.path.splitext(filename)[0]
     current_scene.path_to_dir = path_to_dir
 
-    print("Scene Name: \n%s\nPath to Dir\n%s\nPath to file\n%s" % (
+    print("Scene Name: %s\nPath to Dir: %s\nPath to File: %s" % (
         current_scene.name, current_scene.path_to_dir, current_scene.path_to_file))
 
     if Scene.objects.filter(path_to_file=current_scene.path_to_file):
@@ -74,7 +74,7 @@ def create_scene(scene_path, make_sample_video):
             print("Trying to use ffprobe on scene: {}".format(scene_in_db.name))
             if ffmpeg_process.ffprobe_get_data_without_save(scene_in_db):
                 print(
-                    "ffprobe successfully gathered information on scene {} ... Taking a screenshot with ffmpeg...".format(
+                    "ffprobe successfully gathered information on scene: {}...\nTaking a screenshot with ffmpeg...".format(
                         scene_in_db.name))
 
                 ffmpeg_process.ffmpeg_take_scene_screenshot_without_save(scene_in_db)
@@ -97,7 +97,7 @@ def create_scene(scene_path, make_sample_video):
         print("Trying to use ffprobe on scene: {}".format(current_scene.name))
         if ffmpeg_process.ffprobe_get_data_without_save(current_scene):
             print(
-                "ffprobe successfully gathered information on scene {} ... Taking a screenshot with ffmpeg...".format(
+                "ffprobe successfully gathered information on scene: {}...\nTaking a screenshot with ffmpeg...".format(
                     current_scene.name))
 
             ffmpeg_process.ffmpeg_take_scene_screenshot_without_save(current_scene)
@@ -126,10 +126,10 @@ def find_duplicates():
 
             if not scene_1.pk == scene_2.pk:
                 if scene_2.path_to_file == scene_1.path_to_file:
-                    print("Found duplicate scene : " +
-                          scene_1.id + " - " + scene_1.name + "\nFile path:" + scene_1.path_to_file +
+                    print("Found duplicate scene: " +
+                          scene_1.id + " - " + scene_1.name + "\nFile path: " + scene_1.path_to_file +
                           "\nis duplicate of " +
-                          scene_2.id + " - " + scene_2.name + "\nFile path:" + scene_2.path_to_file)
+                          scene_2.id + " - " + scene_2.name + "\nFile path: " + scene_2.path_to_file)
 
 
 def add_scene_to_folder_view(scene_to_add):

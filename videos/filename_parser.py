@@ -407,7 +407,7 @@ def parse_scene_tags_in_scene(scene, scene_path, scene_tags):
         if re.search(regex_search_term, scene_path, re.IGNORECASE) is not None:
             scene_path = re.sub(regex_search_term, '', scene_path, flags=re.IGNORECASE)
             if not scene.scene_tags.filter(name=scene_tag.name):
-                print("Adding tag: {} to scene {}".format(scene_tag.name, scene.name))
+                print("Adding Tag: {} to scene {}".format(scene_tag.name, scene.name))
                 # print("Adding " + scene_tag.name + " to scene" + scene.name + "\n")
                 scene.scene_tags.add(scene_tag)
             else:
@@ -422,7 +422,7 @@ def parse_website_in_scenes(scene, scene_path, websites):
         if re.search(regex_search_term, scene_path, re.IGNORECASE) is not None:
             scene_path = re.sub(regex_search_term, '', scene_path, flags=re.IGNORECASE)
             if not scene.websites.filter(name=website.name):
-                print("Adding website: " + website.name + " to scene " + scene.name + "\n")
+                print("Adding Website: " + website.name + " to scene " + scene.name + "\n")
                 scene.websites.add(website)
 
     return scene_path
