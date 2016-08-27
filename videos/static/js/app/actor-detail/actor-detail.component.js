@@ -24,7 +24,7 @@ angular.module('actorDetail').component('actorDetail', {
             var self = this;
             var counter = 0;
             var gotPromise = false;
-
+            var changingView = false;
 
             self.birthdate = null;
 
@@ -72,6 +72,7 @@ angular.module('actorDetail').component('actorDetail', {
             $scope.$on("gridViewOptionChnaged", function (event, pageInfo) {
                 checkGridOption();
                 checkHideDetailButton();
+                changingView = true
             });
 
             self.selectedActorTag = null;
@@ -108,10 +109,15 @@ angular.module('actorDetail').component('actorDetail', {
 
             });
 
+
             $scope.$on("didActorLoad", function (event, actor) {
 
                 if (gotPromise) {
+
                     scopeWatchService.actorLoaded(self.actor);
+
+
+                    changingView = false;
                 }
             });
 

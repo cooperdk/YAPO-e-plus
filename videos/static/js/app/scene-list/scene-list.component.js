@@ -6,7 +6,7 @@ angular.module('sceneList').component('sceneList', {
         // if ($attrs.viewStyle == 'grid') {
         //     return 'static/js/app/scene-list/scene-list-grid.template.html'
         // } else {
-            return 'static/js/app/scene-list/scene-list.template.html';
+        return 'static/js/app/scene-list/scene-list.template.html';
         // }
 
 
@@ -45,8 +45,8 @@ angular.module('sceneList').component('sceneList', {
                 }
 
             };
-            
-            
+
+
             self.gridView = false;
 
 
@@ -207,9 +207,11 @@ angular.module('sceneList').component('sceneList', {
 
 
             $scope.$on("actorLoaded", function (event, actor) {
+  
                 self.actor = actor;
-
                 self.nextPage(0);
+
+
                 actorLoaded = true;
             });
 
@@ -335,7 +337,7 @@ angular.module('sceneList').component('sceneList', {
 
                     self.patchScene(self.scenes[sceneIndex].id, typeOfItemToRemove, itToRemove, 'remove', true, permDelete)
                 } else {
-                    
+
                     self.patchScene(self.scenes[sceneIndex].id, typeOfItemToRemove, resId, 'remove', false, permDelete)
                 }
 
@@ -348,10 +350,10 @@ angular.module('sceneList').component('sceneList', {
                         scenes.push(scene.id);
                         resId = self.updateScenesOnRemove(scenes, itemToRemove, typeOfItemToRemove)
                     } else {
-                        if (!permDelete){
-                            self.removeSceneFromList(scene)    
+                        if (!permDelete) {
+                            self.removeSceneFromList(scene)
                         }
-                        
+
 
                     }
 
@@ -535,8 +537,8 @@ angular.module('sceneList').component('sceneList', {
 
                 } else {
                     if (patchType == 'delete') {
-                        if (!permDelete){
-                            Scene.remove({sceneId: sceneToPatchId});    
+                        if (!permDelete) {
+                            Scene.remove({sceneId: sceneToPatchId});
                         }
 
                     } else {
