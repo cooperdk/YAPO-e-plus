@@ -19,7 +19,8 @@ angular.module('settings').component('settings', {
                 }
                 
                 self.changeNumberOfItemsPerPage = function () {
-                    helperService.setNumberOfItemsPerPaige(self.itemsPerPage)
+                    helperService.setNumberOfItemsPerPaige(self.itemsPerPage);
+                    scopeWatchService.numberOfItemsPerPageChanged('a');
                 };
                 
                 
