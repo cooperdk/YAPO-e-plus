@@ -6,6 +6,7 @@ import django.db
 import errno
 from django.shortcuts import render
 
+import json
 import videos.addScenes
 import videos.filename_parser as filename_parser
 import videos.freeones_search
@@ -635,6 +636,35 @@ def play_scene_vlc(scene):
     file_path = os.path.normpath(scene.path_to_file)
     vlc_path = os.path.normpath(const.VLC_PATH)
     p = subprocess.Popen([vlc_path, file_path])
+
+
+@api_view(['GET', 'POST'])
+def play_in_vlc(request):
+    scene = None
+    if request.method == 'GET':
+        if 'sceneId' in request.query_params:
+            scene_id = request.query_params['sceneId']
+            scene = Scene.objects.get(pk=scene_id)
+        elif 'actor' in request.query_params and request.query_params['actor'] != '-6':
+            actor_id = request.query_params['actor']
+            scene = Scene.objects.filter(actors=actor_id).order_by('?').first()
+        elif 'sceneTag' in request.query_params and request.query_params['sceneTag'] != '-6':
+            scene_tag_id = request.query_params['sceneTag']
+            scene = Scene.objects.filter(scene_tags=scene_tag_id).order_by('?').first()
+        elif 'website' in request.query_params and request.query_params['website'] != '-6':
+            website_id = request.query_params['website']
+            scene = Scene.objects.filter(websites=website_id).order_by('?').first()
+        elif 'folder' in request.query_params and request.query_params['folder'] != '-6':
+            folder_id = request.query_params['folder']
+            scene = Scene.objects.filter(folders_in_tree=folder_id).order_by('?').first()
+        else:
+            scene = Scene.objects.order_by('?').first()
+
+        if scene:
+            play_scene_vlc(scene)
+            return Response(status=200)
+        else:
+            return Response(status=500)
 
 
 class PlayInVlc(views.APIView):
