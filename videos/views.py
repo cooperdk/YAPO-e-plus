@@ -36,6 +36,7 @@ from random import shuffle
 import videos.const as const
 from django.utils.datastructures import MultiValueDictKeyError
 import threading
+
 import pathlib
 
 
@@ -430,6 +431,41 @@ def tag_multiple_items(request):
         return Response(status=200)
 
 
+def clean_dir(type_of_model_to_clean):
+    number_of_folders = len(os.listdir(os.path.join(const.MEDIA_PATH, type_of_model_to_clean)))
+    index = 1
+
+    for dir_in_path in os.listdir(os.path.join(const.MEDIA_PATH, type_of_model_to_clean)):
+
+        print("Checking {} folder {} out of {}".format(type_of_model_to_clean, index, number_of_folders))
+        try:
+            dir_in_path_int = int(dir_in_path)
+
+            if type_of_model_to_clean == 'actor':
+                try:
+                    actor = Actor.objects.get(pk=dir_in_path_int)
+                except Actor.DoesNotExist:
+                    dir_to_delete = os.path.join(const.MEDIA_PATH, type_of_model_to_clean, dir_in_path)
+                    print("Actor id {} is not in the database ... Deleting folder {}".format(dir_in_path_int,
+                                                                                             dir_to_delete))
+                    shutil.rmtree(dir_to_delete)
+            elif type_of_model_to_clean == 'scenes':
+
+                try:
+                    scene = Scene.objects.get(pk=dir_in_path_int)
+                except Scene.DoesNotExist:
+                    dir_to_delete = os.path.join(const.MEDIA_PATH, type_of_model_to_clean, dir_in_path)
+                    print("Scene id {} is not in the database ... Deleting folder {}".format(dir_in_path_int,
+                                                                                             dir_to_delete))
+                    shutil.rmtree(dir_to_delete)
+            index += 1
+
+        except ValueError:
+            print("Dir name '{}' Could not be converted to an integer, Skipping ....".format(dir_in_path))
+            index += 1
+            pass
+
+
 @api_view(['GET', 'POST'])
 def settings(request):
     if request.method == 'GET':
@@ -502,16 +538,14 @@ def settings(request):
                 scenes = Scene.objects.all()
                 count = scenes.count()
                 counter = 1
-                print("Cleaning Scenes...")
-                for scene in scenes:
-                    print("Checking scene {} out of {}".format(counter, count))
-                    if not os.path.isfile(scene.path_to_file):
-                        print("File for scene {} does not exist in path {}".format(scene.name, scene.path_to_file))
-                        permenatly_delete_scene_and_remove_from_db(scene)
-                    counter += 1
-                print("Finished cleaning scenes...")
-
-
+                # print("Cleaning Scenes...")
+                # for scene in scenes:
+                #     print("Checking scene {} out of {}".format(counter, count))
+                #     if not os.path.isfile(scene.path_to_file):
+                #         print("File for scene {} does not exist in path {}".format(scene.name, scene.path_to_file))
+                #         permenatly_delete_scene_and_remove_from_db(scene)
+                #     counter += 1
+                # print("Finished cleaning scenes...")
 
                 print("Cleaning Aliases...")
 
@@ -526,7 +560,13 @@ def settings(request):
                     counter += 1
                 print("Finished cleaning aliases...")
 
-            return Response(status=200)
+                print("Cleaning actor dirs that are no longer in database...")
+
+                clean_dir('actor')
+                print("Cleaning scene dirs that are no longer in database...")
+                clean_dir('scenes')
+
+        return Response(status=200)
 
 
 @api_view(['GET'])
