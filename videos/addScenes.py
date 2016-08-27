@@ -11,7 +11,7 @@ from videos.models import *
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 
-ACCEPTED_VIDEO_EXTENSIONS = {".mp4", ".avi", ".mov", ".flv", ".rm", ".wmv", ".mov", ".m4v", ".mpg", ".mpeg"}
+ACCEPTED_VIDEO_EXTENSIONS = {".mp4", ".avi", ".mov", ".flv", ".rm", ".wmv", ".mov", ".m4v", ".mpg", ".mpeg", ".mkv"}
 TEST_PATH = "Z:\\XBMC\\PR\\19062016"
 
 
