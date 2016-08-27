@@ -3,30 +3,33 @@
 </span>
 <div ng-if="!$ctrl.gridView">
     <button type="button" ng-click="$ctrl.multiTag()" class="btn btn-default btn-sm">
-    Tag/Delete Multiple Scenes
-</button>
+        Tag/Delete Multiple Scenes
+    </button>
+    <button type="button" ng-click="$ctrl.playRandomScene()" class="btn btn-default btn-sm">
+        Play Random
+    </button>
 
-<button type="button" ng-if="$ctrl.tagMultiple" ng-click="$ctrl.selectAll()" class="btn btn-default btn-sm">
-    Select All
-</button>
+    <button type="button" ng-if="$ctrl.tagMultiple" ng-click="$ctrl.selectAll()" class="btn btn-default btn-sm">
+        Select All
+    </button>
 
-<button type="button" ng-if="$ctrl.tagMultiple" ng-click="$ctrl.selectNone()" class="btn btn-default btn-sm">
-    Select None
-</button>
+    <button type="button" ng-if="$ctrl.tagMultiple" ng-click="$ctrl.selectNone()" class="btn btn-default btn-sm">
+        Select None
+    </button>
 
 
-<div id=big-scroll-item>
-    <table>
-        <tr ng-repeat="scene in $ctrl.scenes">
-            <td>
-                <a href="/#!/scene/{{ scene.id }}">
-                    <img ng-src="{{ scene.thumbnail }}" class="thumb-wide"
-                         alt="{{ scene.name }}"
-                    />
-                </a>
-            </td>
-            <td>
-                <h4>
+    <div id=big-scroll-item>
+        <table>
+            <tr ng-repeat="scene in $ctrl.scenes">
+                <td>
+                    <a href="/#!/scene/{{ scene.id }}">
+                        <img ng-src="{{ scene.thumbnail }}" class="thumb-wide"
+                             alt="{{ scene.name }}"
+                        />
+                    </a>
+                </td>
+                <td>
+                    <h4>
             <span>
                 <input ng-if="$ctrl.tagMultiple" type="checkbox" ng-model="scene.selected"
                        ng-click="$ctrl.sceneSelectToggle(scene)">
@@ -67,7 +70,7 @@
                     </span>
 
 
-                </h4>
+                    </h4>
 
 
 
@@ -101,7 +104,7 @@
 
                             </span>
 
-                <br>
+                    <br>
                         <span>Tags:
                             <button class="btn btn-success btn-xs"
                                     popover-trigger="outsideClick"
@@ -120,7 +123,7 @@
                                     class="glyphicon glyphicon-remove"
                                     ng-click="$ctrl.removeItem(scene,tag,'scene_tags',false)"></span> {{$last ? '' : ', '}} </span>
                             </span>
-                <br>
+                    <br>
                         <span>Performers:
                              <button class="btn btn-success btn-xs"
                                      popover-trigger="outsideClick"
@@ -140,27 +143,27 @@
                             </span>
 
 
-            </td>
-        </tr>
-    </table>
-</div>
+                </td>
+            </tr>
+        </table>
+    </div>
 
 </div>
 <div class="col-md-12" id="big-scroll-item" ng-if="$ctrl.gridView">
-<div class="row-fluid" id="scene-list-grid">
-    <div class="col-md-3" ng-repeat="scene in $ctrl.scenes">
-        <a href="/#!/scene/{{ scene.id }}">
-            <img
-                 uib-popover-template="'static/js/app/scene-list/scene-list-grid-popover.template.html'"
-                                        popover-append-to-body="true"
-                 popover-trigger="mouseenter" popover-placement="bottom"
+    <div class="row-fluid" id="scene-list-grid">
+        <div class="col-md-3" ng-repeat="scene in $ctrl.scenes">
+            <a href="/#!/scene/{{ scene.id }}">
+                <img
+                        uib-popover-template="'static/js/app/scene-list/scene-list-grid-popover.template.html'"
+                        popover-append-to-body="true"
+                        popover-trigger="mouseenter" popover-placement="bottom"
 
-                 ng-src="{{ scene.thumbnail }}"
-                 alt="{{ scene.name }}"
-                 style="width: 360px;"/>
+                        ng-src="{{ scene.thumbnail }}"
+                        alt="{{ scene.name }}"
+                        style="width: 360px;"/>
 
 
-        </a>
+            </a>
+        </div>
     </div>
-</div>
 </div>

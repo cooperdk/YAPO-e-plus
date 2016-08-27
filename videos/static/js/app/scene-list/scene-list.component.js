@@ -207,7 +207,7 @@ angular.module('sceneList').component('sceneList', {
 
 
             $scope.$on("actorLoaded", function (event, actor) {
-  
+
                 self.actor = actor;
                 self.nextPage(0);
 
@@ -641,6 +641,40 @@ angular.module('sceneList').component('sceneList', {
                 return $http.get('play-scene/', {
                     params: {
                         sceneId: scene.id
+                    }
+                })
+            };
+
+            self.playRandomScene = function () {
+                var actorId = -6;
+                var sceneTagId = -6;
+                var websiteId = -6;
+                var folderId = -6;
+
+
+                if (self.actor != undefined) {
+                    actorId = self.actor.id
+                }
+
+                if (self.sceneTag != undefined) {
+                    sceneTagId = self.sceneTag.id
+                }
+
+                if (self.website != undefined) {
+                    websiteId = self.website.id
+                }
+                
+                 if (self.folder != undefined) {
+                    folderId = self.folder.id
+                }
+
+
+                return $http.get('play-scene/', {
+                    params: {
+                        actor: actorId,
+                        sceneTag: sceneTagId,
+                        website: websiteId,
+                        folder: folderId
                     }
                 })
             };

@@ -142,7 +142,8 @@ angular.module('helper', []).factory('helperService', function ($rootScope, $loc
 });
 
 
-angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias, ActorTag, Scene, SceneTag, Website, DbFolder,helperService) {
+angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias, ActorTag, Scene, SceneTag, Website,
+                                                              DbFolder, helperService) {
 
         var _prevPage = "";
         var _nextPage = "";
@@ -150,14 +151,7 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
         var _pageOffset = 0;
 
         var _pageLimit = 50;
-    
-        if (helperService.getNumberOfItemsPerPaige() == undefined) {
-            _pageLimit = 50;
-            helperService.setNumberOfItemsPerPaige(self.itemsPerPage)
-        } else {
-            _pageLimit = helperService.getNumberOfItemsPerPaige()
-        }
-       
+
 
         var _callId = 0;
         var _maxPage = -6;
@@ -182,6 +176,7 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
         var _parent = "";
 
         function nextPageInput(input) {
+
 
             if ("currentPage" in input) {
                 if (input["currentPage"] != undefined) {
@@ -309,7 +304,15 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
 
         function getNextPage(input) {
 
+
             nextPageInput(input);
+
+            if (helperService.getNumberOfItemsPerPaige() == undefined) {
+
+                helperService.setNumberOfItemsPerPaige(_pageLimit)
+            } else {
+                _pageLimit = helperService.getNumberOfItemsPerPaige()
+            }
 
             console.log("Current page is: " + _currentPage + " Max page is: " + _maxPage);
             _callId++;
@@ -639,13 +642,14 @@ angular.module('scopeWatch', []).factory('scopeWatchService', function ($rootSco
         $rootScope.$broadcast("didActorTagLoad", someVariable);
 
     }
-    
+
     function gridViewOptionChnaged(someVariable) {
 
         console.log("app-service-scopeWatch: gridViewOptionChnaged was triggered! ");
         $rootScope.$broadcast("gridViewOptionChnaged", someVariable);
 
     }
+    
 
 
     return {
@@ -677,7 +681,8 @@ angular.module('scopeWatch', []).factory('scopeWatchService', function ($rootSco
         didSceneTagLoad: didSceneTagLoad,
         didWebsiteLoad: didWebsiteLoad,
         didFolderLoad: didFolderLoad,
-        gridViewOptionChnaged: gridViewOptionChnaged
+        gridViewOptionChnaged: gridViewOptionChnaged,
+
 
 
     }
