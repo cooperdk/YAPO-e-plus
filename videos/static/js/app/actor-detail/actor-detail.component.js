@@ -134,7 +134,11 @@ angular.module('actorDetail').component('actorDetail', {
                     $rootScope.loadedActor = res;
                     $rootScope.title = res.name;
 
-                    self.birthdate = new Date(res.date_of_birth);
+                    var d = new Date(res.date_of_birth);
+                    d.setMinutes( d.getMinutes() + d.getTimezoneOffset() );
+                    self.birthdate = d;
+
+                    //self.birthdate = new Date(res.date_of_birth);
                     // alert(self.birthdate);
 
                     gotPromise = true;
