@@ -32,9 +32,9 @@
 
     </li>
     <li>Allow one word name when auto-tagging:
-        <label class="switch" uib-popover-html="'By default actors with one word name (Ex: &quot;Stoya&quot; )
-            are ignored when autotagging scenes. If checked this will allow this actor to be autotaged even though
-            their consists name is one word only. <i>Use only on actors whos name are unique enough as to not cause incorrect tagging.</i>'"
+        <label class="switch" uib-popover-html="'By default actors with a one word name (Ex: &quot;Stoya&quot; )
+            are ignored when autotagging scenes. If checked this will allow this actor to be autotagged even though
+            their name consists of one word only. <i>Use only on actors whose names are unique as not to cause incorrect tagging.</i>'"
                popover-trigger="mouseenter" popover-placement="right-top">
             <input type="checkbox" ng-model="$ctrl.actor.is_exempt_from_one_word_search"
                    ng-change="$ctrl.updateActor($ctrl.actor)">
@@ -82,7 +82,7 @@
 
                     <div class="alcenter">
                         <button type="button" ng-click="$ctrl.scrapeActor('TMDB')" class="btn btn-default btn-sm">
-                            <span class="glyphicon glyphicon-plus"></span> Scrape TMdb
+                            <span class="glyphicon glyphicon-plus"></span> Scrape TMDb
                         </button>
 
                         <button type="button" ng-click="$ctrl.scrapeActor('freeOnes')"
@@ -131,7 +131,7 @@
 
                         <br>
                         <span ng-if="$ctrl.actor != undefined && $ctrl.actor.date_of_birth != undefined">
-                            ({{ $ctrl.howOld($ctrl.actor.date_of_birth)}} Years Old )
+                            ({{ $ctrl.howOld($ctrl.actor.date_of_birth)}} Years Old)
                         </span>
 
                     </div>
@@ -264,12 +264,12 @@
                         <li ng-if="$ctrl.isNotEmpty('tmdb_id')"><a
                                 href="https://www.themoviedb.org/person/{{ $ctrl.actor.tmdb_id }}"
                                 target="_blank"> {{ actor.name }} at
-                            TMDB.com</a></li>
+                            TMDb</a></li>
 
                         <li ng-if="$ctrl.isNotEmpty('imdb_id')"><a
                                 href="http://www.imdb.com/name/{{ $ctrl.actor.imdb_id }}"
                                 target="_blank"> {{ actor.name }} at
-                            IMDB.com</a>
+                            IMDb</a>
                         </li>
 
                         <li><a href="http://www.pornhub.com/pornstar/{{ $ctrl.actorNameDelimiter('-',false) }}"

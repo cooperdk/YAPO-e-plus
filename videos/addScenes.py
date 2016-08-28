@@ -54,7 +54,7 @@ def create_sample_video(scene):
         print("Sample video for scene: {} created successfully.".format(scene.name))
     else:
         print(
-            "Something went wrong while trying to create video sample for scene {}".format(scene.name))
+            "Something went wrong while trying to create video sample for scene: {}".format(scene.name))
 
 
 def create_scene(scene_path, make_sample_video):
@@ -102,7 +102,7 @@ def create_scene(scene_path, make_sample_video):
 
             ffmpeg_process.ffmpeg_take_scene_screenshot_without_save(current_scene)
 
-            print("Screenshot taken...".format(
+            print("Screenshot of scene {} taken...".format(
                 current_scene.name))
 
         if make_sample_video:

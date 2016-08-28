@@ -228,9 +228,9 @@ def scrape_all_actors(force):
 
         if not force:
             if actor.last_lookup is None:
-                print("Searching in TMDB")
+                print("Searching in TMDb")
                 videos.tmdb_search.search_person_with_force_flag(actor, False)
-                print("Finished TMDB search")
+                print("Finished TMDb search")
                 if actor.gender != 'M':
                     print("Searching in Freeones")
                     videos.freeones_search.search_freeones_with_force_flag(actor, False)
@@ -238,9 +238,9 @@ def scrape_all_actors(force):
             else:
                 print("{} was already searched...".format(actor.name))
         else:
-            print("Searching in TMDB")
+            print("Searching in TMDb")
             videos.tmdb_search.search_person_with_force_flag(actor, True)
-            print("Finished TMDB search")
+            print("Finished TMDb search")
             if actor.gender != 'M':
                 print("Searching in Freeones")
                 videos.freeones_search.search_freeones_with_force_flag(actor, True)
@@ -282,10 +282,10 @@ class ScrapeActor(views.APIView):
         else:
             force = False
         print("You are now in the scrape actor API REST view")
-        print("Actor to scrape is " + Actor.objects.get(pk=actor_id).name)
-        print("Site to scrape is " + search_site)
+        print("Actor to scrape is: " + Actor.objects.get(pk=actor_id).name)
+        print("Site to scrape is: " + search_site)
 
-        if search_site == 'TMDB':
+        if search_site == 'TMDb':
             actor_to_search = Actor.objects.get(pk=actor_id)
             success = False
             if force:
@@ -298,7 +298,7 @@ class ScrapeActor(views.APIView):
             else:
                 return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
 
-        elif search_site == 'freeOnes':
+        elif search_site == 'Freeones':
 
             actor_to_search = Actor.objects.get(pk=actor_id)
             success = False
@@ -368,14 +368,14 @@ def tag_multiple_items(request):
                         scene_to_update = Scene.objects.get(pk=x)
                         scene_to_update.websites.add(website_to_add)
                         scene_to_update.save()
-                        print("added website {} to scene {}".format(website_to_add.name, scene_to_update.name))
+                        print("Added Website: {} to scene {}".format(website_to_add.name, scene_to_update.name))
 
                 if params['addOrRemove'] == 'remove':
                     for x in scenes_to_update:
                         scene_to_update = Scene.objects.get(pk=x)
                         scene_to_update.websites.remove(website_to_add)
                         scene_to_update.save()
-                        print("removed website {} from scene {}".format(website_to_add.name, scene_to_update.name))
+                        print("Removed Website: {} from scene {}".format(website_to_add.name, scene_to_update.name))
             elif params['patchType'] == 'scene_tags':
                 scene_tag_id = params['patchData'][0]
                 scene_tag_to_add = SceneTag.objects.get(pk=scene_tag_id)
@@ -387,14 +387,14 @@ def tag_multiple_items(request):
                         scene_to_update = Scene.objects.get(pk=x)
                         scene_to_update.scene_tags.add(scene_tag_to_add)
                         scene_to_update.save()
-                        print("added Scene Tag {} to scene {}".format(scene_tag_to_add.name, scene_to_update.name))
+                        print("Added Scene Tag: {} to scene {}".format(scene_tag_to_add.name, scene_to_update.name))
 
                 if params['addOrRemove'] == 'remove':
                     for x in scenes_to_update:
                         scene_to_update = Scene.objects.get(pk=x)
                         scene_to_update.scene_tags.remove(scene_tag_to_add)
                         scene_to_update.save()
-                        print("Removed Scene Tag {} from scene {}".format(scene_tag_to_add.name, scene_to_update.name))
+                        print("Removed Scene Tag: {} from scene {}".format(scene_tag_to_add.name, scene_to_update.name))
             elif params['patchType'] == 'actors':
                 actor_id = params['patchData'][0]
                 actor_to_add = Actor.objects.get(pk=actor_id)
@@ -406,14 +406,14 @@ def tag_multiple_items(request):
                         scene_to_update = Scene.objects.get(pk=x)
                         scene_to_update.actors.add(actor_to_add)
                         scene_to_update.save()
-                        print("Added Actor {} to scene {}".format(actor_to_add.name, scene_to_update.name))
+                        print("Added Actor: {} to scene {}".format(actor_to_add.name, scene_to_update.name))
 
                 if params['addOrRemove'] == 'remove':
                     for x in scenes_to_update:
                         scene_to_update = Scene.objects.get(pk=x)
                         scene_to_update.actors.remove(actor_to_add)
                         scene_to_update.save()
-                        print("Removed Actor {} from scene {}".format(actor_to_add.name, scene_to_update.name))
+                        print("Removed Actor: {} from scene {}".format(actor_to_add.name, scene_to_update.name))
 
             elif params['patchType'] == 'delete':
                 scenes_to_update = params['itemsToUpdate']
@@ -447,7 +447,7 @@ def clean_dir(type_of_model_to_clean):
                     actor = Actor.objects.get(pk=dir_in_path_int)
                 except Actor.DoesNotExist:
                     dir_to_delete = os.path.join(const.MEDIA_PATH, type_of_model_to_clean, dir_in_path)
-                    print("Actor id {} is not in the database ... Deleting folder {}".format(dir_in_path_int,
+                    print("Actor id {} is not in the database... Deleting folder {}".format(dir_in_path_int,
                                                                                              dir_to_delete))
                     shutil.rmtree(dir_to_delete)
             elif type_of_model_to_clean == 'scenes':
@@ -456,13 +456,13 @@ def clean_dir(type_of_model_to_clean):
                     scene = Scene.objects.get(pk=dir_in_path_int)
                 except Scene.DoesNotExist:
                     dir_to_delete = os.path.join(const.MEDIA_PATH, type_of_model_to_clean, dir_in_path)
-                    print("Scene id {} is not in the database ... Deleting folder {}".format(dir_in_path_int,
+                    print("Scene id {} is not in the database... Deleting folder {}".format(dir_in_path_int,
                                                                                              dir_to_delete))
                     shutil.rmtree(dir_to_delete)
             index += 1
 
         except ValueError:
-            print("Dir name '{}' Could not be converted to an integer, Skipping ....".format(dir_in_path))
+            print("Dir name '{}' Could not be converted to an integer, skipping...".format(dir_in_path))
             index += 1
             pass
 
@@ -557,7 +557,7 @@ def settings(request):
                     print("Checking Alias {} out of {}".format(counter, count))
                     if alias.actors.count() == 0:
                         alias.delete()
-                        print("Alias {} has no actor.. deleting".format(alias.name))
+                        print("Alias {} has no actor... deleting".format(alias.name))
                     counter += 1
                 print("Finished cleaning aliases...")
 

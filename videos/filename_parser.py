@@ -352,7 +352,7 @@ def parse_actors_in_scene(scene_to_parse, scene_path, actors, actors_alias):
                         scene_path = ans['scene_path']
 
                         actor_in_alias = alias.actors.first()
-                        print(alias.name + " is alias for " + actor_in_alias.name)
+                        print(alias.name + " is an alias for " + actor_in_alias.name)
                         add_actor_to_scene(actor_in_alias, scene_to_parse)
 
 
@@ -373,7 +373,7 @@ def parse_actors_in_scene(scene_to_parse, scene_path, actors, actors_alias):
 def add_actor_to_scene(actor_to_add, scene_to_add_to):
     # if not Scene.objects.filter(pk=scene_to_add_to.pk, actors__pk=actor_to_add.pk):
     if not scene_to_add_to.actors.filter(pk=actor_to_add.pk):
-        print("Adding Actor: {} to the Scene {}".format(actor_to_add.name, scene_to_add_to.name))
+        print("Adding Actor: {} to scene {}".format(actor_to_add.name, scene_to_add_to.name))
         scene_to_add_to.actors.add(actor_to_add)
         scene_to_add_to.save()
     else:

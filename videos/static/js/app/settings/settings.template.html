@@ -3,7 +3,7 @@
     <label>Path to VLC player:</label><input class="form-control" id="inputdefault" type="text"
                                          ng-model="$ctrl.pathToVLC">
 <button type="button" ng-click="$ctrl.updateVlcPath()" class="btn btn-default btn-sm"
-        uib-popover-html="'Sets Yapos VLC path to the path in the text input.'"
+        uib-popover-html="'Sets YAPO's VLC path to the path in the text input.'"
         popover-trigger="mouseenter" popover-placement="right-top"
 >
     <span class="glyphicon glyphicon-cog"></span> Set VLC Path
@@ -11,7 +11,7 @@
 
 <br>
 <button type="button" ng-click="$ctrl.scrapAllActors()" class="btn btn-default btn-sm"
-        uib-popover-html="'Scrapes <strong>all</strong> previously unscraped actors with the TMdB and Freeones scrapers.'"
+        uib-popover-html="'Scrapes <strong>all</strong> previously unscraped actors with the TMDb and Freeones scrapers.'"
         popover-trigger="mouseenter"  popover-placement="right-top"
 >
     <span class="glyphicon glyphicon-user"
@@ -39,8 +39,8 @@
 
 
     <button type="button" ng-click="$ctrl.cleanDatabase()" class="btn btn-default btn-sm"
-        uib-popover-html="'Checks all scenes and if the files for the scenes no longer exist on disk, removes the scene from the library.
-        (as well as deleting screenshots and video samples for the scene, and removing aliases without association with actors.)'"
+        uib-popover-html="'Checks all scenes and if a scene has been removed or if the file for the scene no longer exists on disk, deletes the scene from the database 
+        (and also deletes screenshots and video samples for the scene). As well, also cleans up actors no longer in the database and removes aliases without association with actors.)'"
         popover-trigger="mouseenter"  popover-placement="right-top"
 >
     <span class="glyphicon glyphicon-flash"
