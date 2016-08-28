@@ -105,7 +105,7 @@ def search_person(actor_in_question, alias, force):
             break
 
     if not sucesss:
-        print ("Actor: {} could not be found on TMdB".format(actor_in_question.name))
+        print ("Actor: {} could not be found on TMDb".format(actor_in_question.name))
     return sucesss
 
 
@@ -125,7 +125,7 @@ def search_person_with_force_flag(actor_in_question, force):
         print("Force flag is true, ignoring last lookup")
         success = search_person(actor_in_question, None, force)
     elif not actor_in_question.last_lookup:
-        print("Actor: " + actor_in_question.name + " was not yet searched... Searching now")
+        print("Actor: " + actor_in_question.name + " was not yet searched... Searching now!")
         success = search_person(actor_in_question, None, force)
 
     return success
