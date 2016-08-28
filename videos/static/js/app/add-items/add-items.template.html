@@ -3,13 +3,13 @@
 <input class="form-control" id="inputdefault" type="text"
                                              ng-model="$ctrl.pathToFolderToAdd">
 <button type="button" ng-click="$ctrl.addFolderClicked()" class="btn btn-default btn-sm"
- uib-popover-html="'Add selected path and all supported videos in it to the Yapo database.(For now the path needs to be added manually Ex: C:\\myVideos\\)'"
+ uib-popover-html="'Add selected path and all supported videos in it to the YAPO database (for now the path needs to be added manually Ex: C:\\myVideos\\).'"
         popover-trigger="mouseenter" popover-placement="right-top"
 >
-    <span class="glyphicon glyphicon-plus"></span> Add Folder
+    <span class="glyphicon ,-plus"></span> Add Folder
 </button>
 <input type="checkbox" ng-model="$ctrl.createSampleVideo"
-uib-popover-html="'If checked will try to create a mp4 sample video for each scene in the *Add folder* path.<strong>Each</strong> sample video takes about 10Mb
+uib-popover-html="'If checked, will try to create a MP4 sample video for each scene in the *Add Folder* path. <strong>Each</strong> sample video takes about 10MB
 of storage on average and it takes about 30 seconds to create. The sample length is between 30 and 90 seconds depending on the duration of the original scene.
 The samples are stored in media/scenes/(sceneId)/sample'"
         popover-trigger="mouseenter" popover-placement="right-top"
