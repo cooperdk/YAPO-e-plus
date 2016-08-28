@@ -120,12 +120,12 @@ body {
     border: 1px solid black;
 
     /*height: 400px;*/
+    margin: auto;
     /*margin-bottom: 2em;*/
     /*margin-right: 3em;*/
     /*padding: 2em;*/
-    /*margin-top: 0.5em;*/
+    margin-top: 1.0em;
     /*width: 400px;*/
-    margin: 10px;
     /*padding: 10px;*/
     /*float: left;*/
 }
