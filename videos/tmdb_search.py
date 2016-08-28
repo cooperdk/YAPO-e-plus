@@ -44,7 +44,7 @@ def search_person(actor_in_question, alias, force):
             person_aka = person_info['also_known_as']
             if person_info['biography'] is not None:
                 actor_in_question.description = person_info['biography']
-                print("Added description to: " + actor_in_question.name)
+                print("Added Description to: " + actor_in_question.name)
             else:
                 actor_in_question.description = ""
             if not person_info['birthday'] == "":
