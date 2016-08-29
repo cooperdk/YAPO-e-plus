@@ -7,7 +7,7 @@ Greetings fellow pervs!
 YAPO is a software I made to organize and manage porn collections.
 It's not finished yet, but if you want to try it anyway, at the bottom of the page there are videos that will have you running YAPO in less than 15 minutes. There are also screenshots at the bottom of the page as well.
 
-#### Demo/tutorial video of YAPO usage:
+#### Demo/Tutorial video of YAPO usage:
 [![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/1LjWD2L8cjI/0.jpg)](https://www.youtube.com/watch?v=1LjWD2L8cjI)
 
 #####  Background 
