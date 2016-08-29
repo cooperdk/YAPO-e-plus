@@ -45,7 +45,7 @@ I hope some people who know Python, HTML, AngularJS and CSS will find it interes
 
 
 ### What can YAPO do as of now?
-[*]It can import scenes to it's database and create screenshots for them. (Later I want to make an option to create a screenshot contact sheet like we have on EMP (Empornium) for each torrent, and for the user to be able to open the video at the specific time where he/she clicks on the contact sheet.)
+* It can import scenes to it's database and create screenshots for them. (Later I want to make an option to create a screenshot contact sheet like we have on EMP (Empornium) for each torrent, and for the user to be able to open the video at the specific time where he/she clicks on the contact sheet.)
 
 * It can optionally create a sample video for the imported scenes, a sample is about 10MB in size and is between 30 and 90 seconds long. For now the length and the number of segments of the sample videos are extrapolated from the source duration, but eventually the user will be able to make their own sample videos.
 
