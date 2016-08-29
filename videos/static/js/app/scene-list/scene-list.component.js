@@ -321,7 +321,15 @@ angular.module('sceneList').component('sceneList', {
                 self.scenes.splice(index_of_scene, 1);
 
             };
-
+            
+            self.confirmRemove = function (originalScene, originalItemToRemove, originalTypeOfItemToRemove, originalPermDelete) {
+            	
+            	if (confirm('Are you sure you want to remove ' + originalScene.name + ' from the DB?')){
+            		self.removeItem(originalScene,originalItemToRemove,originalTypeOfItemToRemove,originalPermDelete);
+            	} else {};
+            	
+            };
+            
             self.removeItem = function (scene, itemToRemove, typeOfItemToRemove, permDelete) {
 
 
