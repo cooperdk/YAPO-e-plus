@@ -92,10 +92,9 @@ def create_scene(scene_path, make_sample_video):
 
             scene_in_db.save()
     else:
-        current_scene.save()
-
         print("Trying to use ffprobe on scene: {}".format(current_scene.name))
         if ffmpeg_process.ffprobe_get_data_without_save(current_scene):
+            current_scene.save()
             print(
                 "ffprobe successfully gathered information on scene: {}...\nTaking a screenshot with ffmpeg...".format(
                     current_scene.name))
@@ -105,19 +104,23 @@ def create_scene(scene_path, make_sample_video):
             print("Screenshot of scene {} taken...".format(
                 current_scene.name))
 
-        if make_sample_video:
-            create_sample_video(current_scene)
+            if make_sample_video:
+                create_sample_video(current_scene)
 
-        add_scene_to_folder_view(current_scene)
+            add_scene_to_folder_view(current_scene)
 
-        current_scene.save()
+            current_scene.save()
 
-        actors = list(Actor.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
-        actors_alias = list(ActorAlias.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
-        scene_tags = SceneTag.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
-        websites = Website.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
+            actors = list(Actor.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
+            actors_alias = list(ActorAlias.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
+            scene_tags = SceneTag.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
+            websites = Website.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
 
-        filename_parser.parse_scene_all_metadata(current_scene, actors, actors_alias, scene_tags, websites)
+            filename_parser.parse_scene_all_metadata(current_scene, actors, actors_alias, scene_tags, websites)
+        else:
+            print("Failed to probe scene {}, skipping scene...".format(current_scene.name))
+
+
 
 
 def find_duplicates():
