@@ -14,10 +14,7 @@
 
     <label>Runner UP</label>
     <input type="checkbox" ng-model="$ctrl.runnerUp" ng-change="$ctrl.runnerUpFilterChange()">
-
-    <label>Missing Ethnicity</label>
-    <input type="checkbox" ng-model="missingEthnicity">
-
+    
     <div ng-if="$ctrl.sectionTypefunc('ActorList')">
         <label>Grid View</label>
         <input type="checkbox" ng-model="$ctrl.actorGridView" ng-change="$ctrl.saveGridView()">

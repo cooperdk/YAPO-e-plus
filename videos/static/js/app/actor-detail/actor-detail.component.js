@@ -27,7 +27,7 @@ angular.module('actorDetail').component('actorDetail', {
             var changingView = false;
 
             self.birthdate = null;
-          
+
             $scope.popup1 = {
                 opened: false
             };
@@ -135,9 +135,9 @@ angular.module('actorDetail').component('actorDetail', {
                     $rootScope.title = res.name;
 
                     var d = new Date(res.date_of_birth);
-                    d.setMinutes( d.getMinutes() + d.getTimezoneOffset() );
+                    d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
                     self.birthdate = d;
-                    
+
                     //self.birthdate = new Date(res.date_of_birth);
                     // alert(self.birthdate);
 
@@ -405,38 +405,42 @@ angular.module('actorDetail').component('actorDetail', {
 
 
             };
-            
-            self.heightConvertFeet = function (val) {
-            	            	    	
-            	var heightMetric = self.actor.height;
-            	
-            	var totalInches=Math.round(heightMetric/2.54);
-                var inches=totalInches%12;      
-                var Feet=(totalInches-inches)/12;
-            	
-            	return (Feet)
-            	
-            };
-            
+
+            // self.heightConvertFeet = function (val) {
+            //
+            //     var heightMetric = self.actor.height;
+            //
+            //     var totalInches = Math.round(heightMetric / 2.54);
+            //     var inches = totalInches % 12;
+            //     var Feet = (totalInches - inches) / 12;
+            //
+            //     return (Feet)
+            //
+            // };
+
             self.heightConvertInches = function (val) {
-            	
-            	var heightMetric = self.actor.height;
-            	
-            	var totalInches=Math.round(heightMetric/2.54);
-                var inches=totalInches%12;
-                
-                return (inches)
-                
+
+                // var heightMetric = self.actor.height;
+                var totalInches = Math.round(val / 2.54);
+
+                var inches = totalInches % 12;
+                var feet = Math.floor(totalInches / 12);
+
+                var ans = {'inches': inches, 'feet': feet};
+
+
+                return (ans)
+
             };
-            
+
             self.weightConvertPounds = function (val) {
-            	
-            	var weightMetric = self.actor.weight;
-            	
-            	var pounds=Math.round(weightMetric*2.2);
-            	
-            	return (pounds)
-            	
+
+                // var weightMetric = self.actor.weight; redundant  because already got metric weight in 'val' variable.
+
+                var pounds = Math.round(val * 2.2);
+
+                return (pounds)
+
             };
 
         }

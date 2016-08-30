@@ -195,7 +195,7 @@
             	<td></td>
             	<td class="alright">
                     <span ng-if="$ctrl.actor != undefined && $ctrl.actor.height != undefined">
-                            ({{ $ctrl.heightConvertFeet($ctrl.actor.height)}} feet {{ $ctrl.heightConvertInches($ctrl.actor.height)}} inches)
+                            ({{ $ctrl.heightConvertInches($ctrl.actor.height)['feet'] }} feet {{ $ctrl.heightConvertInches($ctrl.actor.height)['inches']}} inches)
                     </span>
                 </td>
             </tr>
