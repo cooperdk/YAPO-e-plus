@@ -27,7 +27,7 @@ angular.module('actorDetail').component('actorDetail', {
             var changingView = false;
 
             self.birthdate = null;
-
+          
             $scope.popup1 = {
                 opened: false
             };
@@ -137,7 +137,7 @@ angular.module('actorDetail').component('actorDetail', {
                     var d = new Date(res.date_of_birth);
                     d.setMinutes( d.getMinutes() + d.getTimezoneOffset() );
                     self.birthdate = d;
-
+                    
                     //self.birthdate = new Date(res.date_of_birth);
                     // alert(self.birthdate);
 
@@ -404,7 +404,40 @@ angular.module('actorDetail').component('actorDetail', {
                 return (nowYear - actorDobYear)
 
 
-            }
+            };
+            
+            self.heightConvertFeet = function (val) {
+            	            	    	
+            	var heightMetric = self.actor.height;
+            	
+            	var totalInches=Math.round(heightMetric/2.54);
+                var inches=totalInches%12;      
+                var Feet=(totalInches-inches)/12;
+            	
+            	return (Feet)
+            	
+            };
+            
+            self.heightConvertInches = function (val) {
+            	
+            	var heightMetric = self.actor.height;
+            	
+            	var totalInches=Math.round(heightMetric/2.54);
+                var inches=totalInches%12;
+                
+                return (inches)
+                
+            };
+            
+            self.weightConvertPounds = function (val) {
+            	
+            	var weightMetric = self.actor.weight;
+            	
+            	var pounds=Math.round(weightMetric*2.2);
+            	
+            	return (pounds)
+            	
+            };
 
         }
     ]
