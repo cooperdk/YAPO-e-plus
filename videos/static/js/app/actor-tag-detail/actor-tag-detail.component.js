@@ -19,7 +19,7 @@ angular.module('actorTagDetail').component('actorTagDetail', {
                 // alert(self.actorPks)
             });
 
-             $scope.$on("didSceneLoad", function (event, scene) {
+             $scope.$on("didActorTagLoad", function (event, scene) {
 
                 if (gotPromise){
                     scopeWatchService.actorTagLoaded(self.actorTag)

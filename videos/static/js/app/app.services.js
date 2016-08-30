@@ -25,6 +25,22 @@ angular.module('helper', []).factory('helperService', function ($rootScope, $loc
         return $rootScope.$storage.gridView;
     }
 
+    function setSortByInSectionWrapper(sortBy, section) {
+
+        if ($rootScope.$storage.sectionWraperOrderBy == undefined) {
+            $rootScope.$storage.sectionWraperOrderBy = {};
+        }
+
+        $rootScope.$storage.sectionWraperOrderBy[section] = sortBy
+
+    }
+
+    function getSortByInSectionWrapper() {
+
+        return $rootScope.$storage.sectionWraperOrderBy;
+
+    }
+
     function set(data) {
         $rootScope.$storage.scArray = data;
 
@@ -136,7 +152,9 @@ angular.module('helper', []).factory('helperService', function ($rootScope, $loc
         getObjectIndexFromArrayOfObjects: getObjectIndexFromArrayOfObjects,
         removeObjectFromArrayOfObjects: removeObjectFromArrayOfObjects,
         setNumberOfItemsPerPaige: setNumberOfItemsPerPaige,
-        getNumberOfItemsPerPaige: getNumberOfItemsPerPaige
+        getNumberOfItemsPerPaige: getNumberOfItemsPerPaige,
+        setSortByInSectionWrapper: setSortByInSectionWrapper,
+        getSortByInSectionWrapper: getSortByInSectionWrapper
     }
 
 });
@@ -649,7 +667,14 @@ angular.module('scopeWatch', []).factory('scopeWatchService', function ($rootSco
         $rootScope.$broadcast("gridViewOptionChnaged", someVariable);
 
     }
-    
+
+
+    function didSectionListWrapperLoaded(callingSection) {
+
+        console.log("app-service-scopeWatch: gridViewOptionChnaged was triggered! ");
+        $rootScope.$broadcast("didSectionListWrapperLoaded", callingSection);
+
+    }
 
 
     return {
@@ -682,7 +707,7 @@ angular.module('scopeWatch', []).factory('scopeWatchService', function ($rootSco
         didWebsiteLoad: didWebsiteLoad,
         didFolderLoad: didFolderLoad,
         gridViewOptionChnaged: gridViewOptionChnaged,
-
+        didSectionListWrapperLoaded: didSectionListWrapperLoaded
 
 
     }

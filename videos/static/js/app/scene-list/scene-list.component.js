@@ -23,6 +23,7 @@ angular.module('sceneList').component('sceneList', {
             var sceneTagLoaded = false;
             var websiteLoaded = false;
             var folderLoaded = false;
+            var didSectionListWrapperLoad = false;
 
             self.sceneArray = [];
 
@@ -181,10 +182,10 @@ angular.module('sceneList').component('sceneList', {
             };
 
 
-            if (self.mainPage) {
-                console.log("main page is true! + " + self.mainPage);
-                self.nextPage(0);
-            }
+            // if (self.mainPage) {
+            //     console.log("main page is true! + " + self.mainPage);
+            //     self.nextPage(0);
+            // }
 
             if (self.treeFolder != undefined) {
                 self.folder = self.treeFolder;
@@ -204,6 +205,25 @@ angular.module('sceneList').component('sceneList', {
             // this script is loaded so we miss it and don't load any scenes.
             // This workaround fire an event that checks if an actor was loaded if it was it then fire the
             // actorLoaded event that we can catch.
+
+            $scope.$on("sortOrderChanged", function (event, sortOrder) {
+                if (sortOrder['sectionType'] == 'SceneList') {
+                    console.log("Sort Order Changed!");
+                    self.scenes = [];
+                    self.sortBy = sortOrder['sortBy'];
+
+                    if (sortOrder.mainPage == undefined || sortOrder.mainPage == true ) {
+                        self.nextPage(0);
+                    }
+                    didSectionListWrapperLoad = true;
+
+                }
+
+            });
+
+            if (!didSectionListWrapperLoad) {
+                scopeWatchService.didSectionListWrapperLoaded('SceneList')
+            }
 
 
             $scope.$on("actorLoaded", function (event, actor) {
@@ -239,6 +259,7 @@ angular.module('sceneList').component('sceneList', {
             if (!websiteLoaded) {
                 scopeWatchService.didWebsiteLoad('a');
             }
+
 
             $scope.$on("folderOpened", function (event, folder) {
                 console.log("scene-list: folderOpened broadcast was caught");
@@ -321,17 +342,17 @@ angular.module('sceneList').component('sceneList', {
                 self.scenes.splice(index_of_scene, 1);
 
             };
-            
-            self.confirmRemove = function (originalScene, originalItemToRemove, originalTypeOfItemToRemove, originalPermDelete) {
-            	
-            	if (confirm('Are you sure you want to remove ' + originalScene.name + ' from the DB?')){
-            		self.removeItem(originalScene,originalItemToRemove,originalTypeOfItemToRemove,originalPermDelete);
-            	} else {
 
-                };
-            	
+            self.confirmRemove = function (originalScene, originalItemToRemove, originalTypeOfItemToRemove, originalPermDelete) {
+
+                if (confirm('Are you sure you want to remove ' + originalScene.name + ' from the DB?')) {
+                    self.removeItem(originalScene, originalItemToRemove, originalTypeOfItemToRemove, originalPermDelete);
+                } else {
+
+                }
+
             };
-            
+
             self.removeItem = function (scene, itemToRemove, typeOfItemToRemove, permDelete) {
 
 
@@ -605,15 +626,6 @@ angular.module('sceneList').component('sceneList', {
 
             });
 
-            $scope.$on("sortOrderChanged", function (event, sortOrder) {
-                if (sortOrder['sectionType'] == 'SceneList') {
-                    console.log("Sort Order Changed!");
-                    self.scenes = [];
-                    self.sortBy = sortOrder['sortBy'];
-                    self.nextPage(0);
-                }
-
-            });
 
             $scope.$on("runnerUpChanged", function (event, runnerUp) {
                 if (runnerUp['sectionType'] == 'SceneList') {
@@ -673,8 +685,8 @@ angular.module('sceneList').component('sceneList', {
                 if (self.website != undefined) {
                     websiteId = self.website.id
                 }
-                
-                 if (self.folder != undefined) {
+
+                if (self.folder != undefined) {
                     folderId = self.folder.id
                 }
 

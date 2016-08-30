@@ -5,16 +5,15 @@ angular.module('actorTagList').component('actorTagList', {
     bindings: {
         mainPage: '='
     },
-    controller: ['$scope', 'ActorTag', 'pagerService', 'scopeWatchService','helperService',
+    controller: ['$scope', 'ActorTag', 'pagerService', 'scopeWatchService', 'helperService',
         function ActorTagListController($scope, ActorTag, pagerService, scopeWatchService, helperService) {
 
             // this.tags = ActorTag.query();
 
 
             var self = this;
+            var didSectionListWrapperLoad = false;
             self.pageType = 'ActorTag';
-            
-
 
 
             self.nextPage = function (currentPage) {
@@ -50,10 +49,10 @@ angular.module('actorTagList').component('actorTagList', {
 
             };
 
-            if (self.mainPage) {
-                console.log("main page is true! + " + self.mainPage);
-                self.nextPage(0);
-            }
+            // if (self.mainPage) {
+            //     console.log("main page is true! + " + self.mainPage);
+            //     self.nextPage(0);
+            // }
 
 
             $scope.$on("actorLoaded", function (event, actor) {
@@ -65,7 +64,7 @@ angular.module('actorTagList').component('actorTagList', {
             });
 
             $scope.$on("paginationChange", function (event, pageInfo) {
-                if (pageInfo.pageType == self.pageType){
+                if (pageInfo.pageType == self.pageType) {
                     self.nextPage(pageInfo.page)
                 }
 
@@ -79,7 +78,7 @@ angular.module('actorTagList').component('actorTagList', {
             });
 
             $scope.$on("searchTermChanged", function (event, searchTerm) {
-                if (searchTerm['sectionType'] == 'ActorTagList'){
+                if (searchTerm['sectionType'] == 'ActorTagList') {
                     self.tags = [];
                     self.searchTerm = searchTerm['searchTerm'];
                     self.searchField = searchTerm['searchField'];
@@ -89,14 +88,21 @@ angular.module('actorTagList').component('actorTagList', {
             });
 
             $scope.$on("sortOrderChanged", function (event, sortOrder) {
-                if (sortOrder['sectionType'] == 'ActorTagList'){
+                if (sortOrder['sectionType'] == 'ActorTagList') {
                     console.log("Sort Order Changed!");
                     self.tags = [];
                     self.sortBy = sortOrder['sortBy'];
-                    self.nextPage(0);
+                    if (sortOrder.mainPage == undefined || sortOrder.mainPage == true) {
+                        self.nextPage(0);
+                    }
+                    didSectionListWrapperLoad = true;
                 }
 
             });
+
+            if (!didSectionListWrapperLoad) {
+                scopeWatchService.didSectionListWrapperLoaded('ActorTagList')
+            }
 
 
             self.deleteActorTag = function (tagToDelete) {
@@ -106,10 +112,10 @@ angular.module('actorTagList').component('actorTagList', {
                     // alert(angular.toJson(self.actor.actor_tags));
                     // alert(angular.toJson(tagToDelete));
                     // alert(angular.toJson(self.actor.actor_tags.indexOf(tagToDelete.id)));
-                    
-                    
-                    var res = helperService.removeObjectFromArrayOfObjects(tagToDelete,self.tags);
-                    
+
+
+                    var res = helperService.removeObjectFromArrayOfObjects(tagToDelete, self.tags);
+
                     // var resId = [];
                     // var resObject = [];
                     // for (i = 0; i < self.tags.length; i++) {
@@ -138,10 +144,9 @@ angular.module('actorTagList').component('actorTagList', {
 
                 ActorTag.remove({actorTagId: tagToDelete.id});
 
-                var ans = helperService.removeObjectFromArrayOfObjects(tagToDelete,self.tags);
+                var ans = helperService.removeObjectFromArrayOfObjects(tagToDelete, self.tags);
 
                 self.tags = ans['resObject'];
-
 
 
             }

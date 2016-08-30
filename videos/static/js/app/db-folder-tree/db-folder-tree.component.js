@@ -5,7 +5,7 @@ angular.module('dbFolderTree').component('dbFolderTree', {
         route: '=',
         mainPage: '='
     },
-    controller: ['$scope', '$routeParams', 'DbFolder', '$rootScope', 'scopeWatchService', 'helperService','pagerService',
+    controller: ['$scope', '$routeParams', 'DbFolder', '$rootScope', 'scopeWatchService', 'helperService', 'pagerService',
         function DbFolderTreeController($scope, $routeParams, DbFolder, $rootScope, scopeWatchService, helperService, pagerService) {
             var self = this;
             var redirectedFromNav = false;
@@ -15,10 +15,11 @@ angular.module('dbFolderTree').component('dbFolderTree', {
             self.nav = [];
             self.recursive = false;
             var gotPromise = false;
+            var didSectionListWrapperLoad = false;
             // self.parent = 0;
 
             self.routParam = $routeParams.parentId;
-            
+
             self.nextPage = function (currentPage) {
 
 
@@ -34,70 +35,28 @@ angular.module('dbFolderTree').component('dbFolderTree', {
                 };
 
 
-                self.actorsToadd = pagerService.getNextPage(input);
+                self.folders = pagerService.getNextPage(input);
 
-                    self.actorsToadd.$promise.then(function (res) {
+                self.folders.$promise.then(function (res) {
 
-                        // self.actorsToadd = res[0];
+                    // self.actorsToadd = res[0];
 
-                        var paginationInfo = {
-                            pageType: input.pageType,
-                            pageInfo: res[1]
-                        };
+                    var paginationInfo = {
+                        pageType: input.pageType,
+                        pageInfo: res[1]
+                    };
 
-                        scopeWatchService.paginationInit(paginationInfo);
+                    scopeWatchService.paginationInit(paginationInfo);
 
-                        self.dbFolders = helperService.resourceToArray(res[0]);
+                    self.dbFolders = helperService.resourceToArray(res[0]);
 
 
-                    });
+                });
 
 
             };
 
-            $scope.$on("searchTermChanged", function (event, searchTerm) {
-                if (searchTerm['sectionType'] == 'DbFolder'){
-                    self.dbFolders = [];
-                    self.searchTerm = searchTerm['searchTerm'];
-                    self.searchField = searchTerm['searchField'];
-                    self.nextPage(0);
-                }
 
-
-            });
-
-            $scope.$on("sortOrderChanged", function (event, sortOrder) {
-                if (sortOrder['sectionType'] == 'DbFolder'){
-                    console.log("Sort Order Changed!");
-                    self.dbFolders = [];
-                    self.sortBy = sortOrder['sortBy'];
-                    self.nextPage(0);
-                }
-
-            });
-
-            $scope.$on("runnerUpChanged", function (event, runnerUp) {
-                if (runnerUp['sectionType'] == 'DbFolder') {
-                    console.log("Sort Order Changed!");
-                    self.dbFolders = [];
-                    self.runnerUp = runnerUp['runnerUp'];
-                    self.nextPage(0);
-                }
-            });
-
-
-            $scope.$on("paginationChange", function (event, pageInfo) {
-                if (pageInfo.pageType == self.pageType){
-                    self.nextPage(pageInfo.page)
-                }
-            });
-
-
-            $scope.$on("didFolderLoad", function (event, pageInfo) {
-                if (gotPromise){
-                    scopeWatchService.folderOpened({'dir': self.currentDir, 'recursive':self.recursive});
-                }
-            });
             self.appendFolders = function (clickedFolder) {
                 // alert(clickedFolder)
                 self.currentDir = clickedFolder;
@@ -105,7 +64,7 @@ angular.module('dbFolderTree').component('dbFolderTree', {
                 // alert(this.dbFolders.toString())
                 self.dbFoldersToAppend = [];
                 self.nextPage(0);
-                
+
                 // self.dbFoldersToAppend = DbFolder.query({
                 //     parent: clickedFolder.id, offset: '0',
                 //     limit: '100'
@@ -123,19 +82,16 @@ angular.module('dbFolderTree').component('dbFolderTree', {
                 // });
 
 
-                scopeWatchService.folderOpened({'dir': self.currentDir, 'recursive':self.recursive});
+                scopeWatchService.folderOpened({'dir': self.currentDir, 'recursive': self.recursive});
                 gotPromise = true;
 
 
             };
-            
+
             self.recursiveToggle = function () {
-                scopeWatchService.folderOpened({'dir': self.currentDir, 'recursive':self.recursive});
+                scopeWatchService.folderOpened({'dir': self.currentDir, 'recursive': self.recursive});
                 gotPromise = true;
             };
-
-
-
 
 
             if (self.route != undefined) {
@@ -185,6 +141,58 @@ angular.module('dbFolderTree').component('dbFolderTree', {
 
                 });
             }
+
+
+            $scope.$on("searchTermChanged", function (event, searchTerm) {
+                if (searchTerm['sectionType'] == 'DbFolder') {
+                    self.dbFolders = [];
+                    self.searchTerm = searchTerm['searchTerm'];
+                    self.searchField = searchTerm['searchField'];
+                    self.nextPage(0);
+                }
+
+
+            });
+
+            $scope.$on("sortOrderChanged", function (event, sortOrder) {
+                if (sortOrder['sectionType'] == 'DbFolder') {
+                    console.log("Sort Order Changed!");
+                    self.dbFolders = [];
+                    self.sortBy = sortOrder['sortBy'];
+                    if (sortOrder.mainPage == undefined) {
+                        self.nextPage(0);
+                    }
+                    didSectionListWrapperLoad = true;
+                }
+
+            });
+
+            if (!didSectionListWrapperLoad) {
+                scopeWatchService.didSectionListWrapperLoaded('DbFolder')
+            }
+
+            $scope.$on("runnerUpChanged", function (event, runnerUp) {
+                if (runnerUp['sectionType'] == 'DbFolder') {
+                    console.log("Sort Order Changed!");
+                    self.dbFolders = [];
+                    self.runnerUp = runnerUp['runnerUp'];
+                    self.nextPage(0);
+                }
+            });
+
+
+            $scope.$on("paginationChange", function (event, pageInfo) {
+                if (pageInfo.pageType == self.pageType) {
+                    self.nextPage(pageInfo.page)
+                }
+            });
+
+
+            $scope.$on("didFolderLoad", function (event, pageInfo) {
+                if (gotPromise) {
+                    scopeWatchService.folderOpened({'dir': self.currentDir, 'recursive': self.recursive});
+                }
+            });
 
 
             //

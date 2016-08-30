@@ -13,6 +13,7 @@ angular.module('websiteList').component('websiteList', {
 
 
             var self = this;
+            var didSectionListWrapperLoad = false;
             self.pageType = 'Website';
 
 
@@ -50,10 +51,10 @@ angular.module('websiteList').component('websiteList', {
             };
 
 
-            if (self.mainPage) {
-                console.log("main page is true! + " + self.mainPage);
-                self.nextPage(0);
-            }
+            // if (self.mainPage) {
+            //     console.log("main page is true! + " + self.mainPage);
+            //     self.nextPage(0);
+            // }
 
             $scope.$on("sceneLoaded", function (event, scene) {
                 self.scene = scene;
@@ -91,10 +92,17 @@ angular.module('websiteList').component('websiteList', {
                     console.log("Sort Order Changed!");
                     self.websites = [];
                     self.sortBy = sortOrder['sortBy'];
-                    self.nextPage(0);
+                    if (sortOrder.mainPage == undefined || sortOrder.mainPage == true ) {
+                        self.nextPage(0);
+                    }
+                    didSectionListWrapperLoad = true;
                 }
 
             });
+
+            if (!didSectionListWrapperLoad) {
+                scopeWatchService.didSectionListWrapperLoaded('WebsiteList')
+            }
 
 
             self.removeWebsiteFromScene = function (siteToDelete) {

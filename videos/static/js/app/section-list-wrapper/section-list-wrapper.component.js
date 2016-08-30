@@ -16,14 +16,16 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
 
                 var searchTerm = "";
 
+                var sectionListWrapperLoaded = false;
+
                 self.orderFields = "";
                 self.searchInFields = "";
                 self.runnerUp = 0;
-                
-                $scope.missingEthnicity= false;
+
+                $scope.missingEthnicity = false;
 
 
-                if (helperService.getGridView() != undefined){
+                if (helperService.getGridView() != undefined) {
                     if (helperService.getGridView()['actor'] == undefined) {
                         self.actorGridView = false;
                     } else {
@@ -35,12 +37,11 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                     } else {
                         self.sceneGridView = helperService.getGridView()['scene']
                     }
-                }else{
+                } else {
                     self.actorGridView = false;
                     self.sceneGridView = false;
                 }
 
-                
 
                 self.saveGridView = function () {
 
@@ -48,7 +49,7 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                     // self.mainPage = false;
 
                     helperService.setGridView({'actor': self.actorGridView, 'scene': self.sceneGridView});
-                    
+
                     scopeWatchService.gridViewOptionChnaged("a");
 
                     // scopeWatchService.searchTermChanged({
@@ -214,7 +215,8 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                     "name": "Path Asc",
                     "-name": "Path Dsc",
                     "last_folder_name_only": "Last Folder Name Asc",
-                    "-last_folder_name_only": "Last Folder Name Dsc"
+                    "-last_folder_name_only": "Last Folder Name Dsc",
+                    "random": "Random"
 
 
                 };
@@ -228,34 +230,26 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                 };
 
 
-                if (self.sectionType == 'ActorList') {
-                    self.orderFields = actorOrderFields;
-                    self.searchInFields = actorSearchInFields;
-                    $rootScope.title = "Actors";
-                } else if (self.sectionType == 'SceneList') {
-                    self.orderFields = sceneOrderFields;
-                    self.searchInFields = sceneSearchInFields;
-                    $rootScope.title = "Scenes"
-                } else if (self.sectionType == 'WebsiteList') {
-                    self.orderFields = websiteOrderFields;
-                    self.searchInFields = websiteSearchInFields;
-                    $rootScope.title = "Websites"
-                } else if (self.sectionType == 'ActorTagList') {
-                    self.orderFields = actorTagOrderFields;
-                    self.searchInFields = actorTagSearchInFields;
-                    $rootScope.title = "Actor Tags"
-                } else if (self.sectionType == 'SceneTagList') {
-                    self.orderFields = sceneTagOrderFields;
-                    self.searchInFields = sceneTagSearchInFields;
-                    $rootScope.title = "Scene Tags"
-                } else if (self.sectionType == 'DbFolder') {
-                    self.orderFields = dbFolderOrderFields;
-                    self.searchInFields = dbFolderSearchInFields;
-                    $rootScope.title = "Folders"
-                }
+                var getSortBy = function (section) {
+                    var ans = "name";
+
+                    var sectionSortByDict = helperService.getSortByInSectionWrapper();
+
+                    if (sectionSortByDict != undefined) {
+
+                        if (sectionSortByDict[section] != undefined) {
+
+                            ans = sectionSortByDict[section]
+                        }
+
+                    }
+
+                    return ans;
+
+                };
 
 
-                self.sortBy = "name";
+                // self.sortBy = "name";
                 self.searchField = "name";
 
 
@@ -274,13 +268,80 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
 
                 self.sortOrderChanged = function () {
 
-                    scopeWatchService.sortOrderChanged({'sectionType': self.sectionType, 'sortBy': self.sortBy})
+                    scopeWatchService.sortOrderChanged({'sectionType': self.sectionType, 'sortBy': self.sortBy});
+                    helperService.setSortByInSectionWrapper(self.sortBy, self.sectionType)
+                };
+
+                self.mainPageInit = function () {
+                    scopeWatchService.sortOrderChanged({
+                        'sectionType': self.sectionType,
+                        'sortBy': self.sortBy,
+                        'mainPage': self.mainPage
+                    });
                 };
 
 
                 self.runnerUpFilterChange = function () {
                     scopeWatchService.runnerUpChanged({'sectionType': self.sectionType, 'runnerUp': self.runnerUp});
                 };
+
+
+                if (self.sectionType == 'ActorList') {
+                    self.orderFields = actorOrderFields;
+                    self.searchInFields = actorSearchInFields;
+                    $rootScope.title = "Actors";
+                    self.sortBy = getSortBy('ActorList');
+                    self.mainPageInit();
+
+
+                } else if (self.sectionType == 'SceneList') {
+                    self.orderFields = sceneOrderFields;
+                    self.searchInFields = sceneSearchInFields;
+                    $rootScope.title = "Scenes";
+                    self.sortBy = getSortBy('SceneList');
+                    self.mainPageInit();
+
+                } else if (self.sectionType == 'WebsiteList') {
+                    self.orderFields = websiteOrderFields;
+                    self.searchInFields = websiteSearchInFields;
+                    $rootScope.title = "Websites";
+                    self.sortBy = getSortBy('WebsiteList');
+                    self.mainPageInit();
+
+                } else if (self.sectionType == 'ActorTagList') {
+                    self.orderFields = actorTagOrderFields;
+                    self.searchInFields = actorTagSearchInFields;
+                    $rootScope.title = "Actor Tags";
+                    self.sortBy = getSortBy('ActorTagList');
+                    self.mainPageInit();
+
+                } else if (self.sectionType == 'SceneTagList') {
+                    self.orderFields = sceneTagOrderFields;
+                    self.searchInFields = sceneTagSearchInFields;
+                    $rootScope.title = "Scene Tags";
+                    self.sortBy = getSortBy('SceneTagList');
+                    self.mainPageInit();
+
+                } else if (self.sectionType == 'DbFolder') {
+                    self.orderFields = dbFolderOrderFields;
+                    self.searchInFields = dbFolderSearchInFields;
+                    $rootScope.title = "Folders";
+                    self.sortBy = getSortBy('DbFolder');
+                    self.mainPageInit();
+
+
+                }
+
+                sectionListWrapperLoaded = true;
+
+
+                $scope.$on("didSectionListWrapperLoaded", function (event, callingSection) {
+
+                    if (self.sectionType == callingSection) {
+                        self.mainPageInit();
+                    }
+
+                });
 
 
             }

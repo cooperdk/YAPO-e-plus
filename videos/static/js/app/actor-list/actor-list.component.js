@@ -32,6 +32,7 @@ angular.module('actorList').component('actorList', {
 
             var didSceneLoad = false;
             var didActorTagLoad = false;
+            var didSectionListWrapperLoad = false;
 
 
             self.actors = [];
@@ -54,8 +55,6 @@ angular.module('actorList').component('actorList', {
             $scope.$on("gridViewOptionChnaged", function (event, pageInfo) {
                 checkGridOption()
             });
-
-
 
 
             self.nextPage = function (currentPage) {
@@ -95,10 +94,10 @@ angular.module('actorList').component('actorList', {
 
             };
 
-            if (self.mainPage) {
-                console.log("main page is true! + " + self.mainPage);
-                self.actorsToadd = self.nextPage(0);
-            }
+            // if (self.mainPage) {
+            //     console.log("main page is true! + " + self.mainPage);
+            //     self.actorsToadd = self.nextPage(0);
+            // }
 
             $scope.$on("paginationChange", function (event, pageInfo) {
                 if (pageInfo.pageType == self.pageType) {
@@ -128,12 +127,30 @@ angular.module('actorList').component('actorList', {
 
             });
 
+            $scope.$on("sortOrderChanged", function (event, sortOrder) {
+                if (sortOrder['sectionType'] == 'ActorList') {
+                    console.log("Sort Order Changed!");
+                    self.actors = [];
+                    self.sortBy = sortOrder['sortBy'];
+                    
+                    if (sortOrder.mainPage == undefined || sortOrder.mainPage == true ) {
+                        self.nextPage(0);
+                    }
+                    didSectionListWrapperLoad = true;
+                }
+
+            });
+
             if (!didSceneLoad) {
                 scopeWatchService.didSceneLoad('a')
             }
 
             if (!didActorTagLoad) {
                 scopeWatchService.didActorTagLoad('a')
+            }
+
+            if (!didSectionListWrapperLoad) {
+                scopeWatchService.didSectionListWrapperLoaded('ActorList')
             }
 
 
@@ -148,15 +165,6 @@ angular.module('actorList').component('actorList', {
 
             });
 
-            $scope.$on("sortOrderChanged", function (event, sortOrder) {
-                if (sortOrder['sectionType'] == 'ActorList') {
-                    console.log("Sort Order Changed!");
-                    self.actors = [];
-                    self.sortBy = sortOrder['sortBy'];
-                    self.nextPage(0);
-                }
-
-            });
 
             $scope.$on("runnerUpChanged", function (event, runnerUp) {
                 if (runnerUp['sectionType'] == 'ActorList') {

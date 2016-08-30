@@ -9,6 +9,7 @@ angular.module('sceneTagList').component('sceneTagList', {
         function SceneTagListController($scope, SceneTag, scopeWatchService, pagerService, helperService) {
 
             var self = this;
+            var didSectionListWrapperLoad = false;
             // self.tags = [];
             self.pageType = 'SceneTag';
 
@@ -49,10 +50,10 @@ angular.module('sceneTagList').component('sceneTagList', {
             };
 
 
-            if (self.mainPage) {
-                console.log("main page is true! + " + self.mainPage);
-                self.nextPage(0);
-            }
+            // if (self.mainPage) {
+            //     console.log("main page is true! + " + self.mainPage);
+            //     self.nextPage(0);
+            // }
 
             $scope.$on("sceneLoaded", function (event, scene) {
                 self.scene = scene;
@@ -90,10 +91,17 @@ angular.module('sceneTagList').component('sceneTagList', {
                     console.log("Sort Order Changed!");
                     self.tags = [];
                     self.sortBy = sortOrder['sortBy'];
-                    self.nextPage(0);
+                     if (sortOrder.mainPage == undefined || sortOrder.mainPage == true ) {
+                        self.nextPage(0);
+                    }
+                    didSectionListWrapperLoad = true;
                 }
                 
             });
+
+            if (!didSectionListWrapperLoad) {
+                scopeWatchService.didSectionListWrapperLoaded('SceneTagList')
+            }
 
 
             self.deleteSceneTag = function (tagToDelete) {
