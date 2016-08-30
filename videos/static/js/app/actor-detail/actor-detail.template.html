@@ -187,7 +187,16 @@
                     <span>
                     <a href="#!" editable-text="$ctrl.actor.height" onaftersave="$ctrl.updateActor($ctrl.actor)">
                         {{ $ctrl.actor.height || 'NA' }} cm</a>
-                     </span>
+                    </span>
+                </td>
+            </tr>
+            
+            <tr>
+            	<td></td>
+            	<td class="alright">
+                    <span ng-if="$ctrl.actor != undefined && $ctrl.actor.height != undefined">
+                            ({{ $ctrl.heightConvertFeet($ctrl.actor.height)}} feet {{ $ctrl.heightConvertInches($ctrl.actor.height)}} inches)
+                    </span>
                 </td>
             </tr>
 
@@ -202,6 +211,15 @@
                     <a href="#!" editable-text="$ctrl.actor.weight" onaftersave="$ctrl.updateActor($ctrl.actor)">
                         {{ $ctrl.actor.weight || 'NA' }} Kg</a>
                      </span>
+                </td>
+            </tr>
+            
+            <tr>
+                <td></td>
+                <td class="alright">
+                    <span ng-if="$ctrl.actor != undefined && $ctrl.actor.weight != undefined">
+                            ({{ $ctrl.weightConvertPounds($ctrl.actor.height)}} pounds)
+                    </span>
                 </td>
             </tr>
 
