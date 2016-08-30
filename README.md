@@ -147,7 +147,7 @@ This will actually make the adjustments to the database it took note of in the p
 
 #### Notes:
 
-In case you get the following error: 
+In case when updating YAPO, you get the following error: 
 
 > You are trying to add a non-nullable field **'date_added'** to folder without a default; we can't do that (the database needs  something to populate existing rows).
 
