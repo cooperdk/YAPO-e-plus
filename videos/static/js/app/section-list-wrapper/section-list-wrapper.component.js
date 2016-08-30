@@ -216,6 +216,8 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                     "-name": "Path Dsc",
                     "last_folder_name_only": "Last Folder Name Asc",
                     "-last_folder_name_only": "Last Folder Name Dsc",
+                    "date_added": "Date Added Asc",
+                    "-date_added": "Date Added Dsc",
                     "random": "Random"
 
 

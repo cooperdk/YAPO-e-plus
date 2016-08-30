@@ -38,7 +38,7 @@ class FolderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Folder
-        fields = ['id', 'level', 'name', 'last_folder_name_only', 'parent', 'scenes', 'path_id']
+        fields = ['id', 'level', 'name', 'last_folder_name_only', 'parent', 'scenes', 'path_id', 'date_added']
         # fields = ['name', 'path_id']
 
 

@@ -155,6 +155,7 @@ class Folder(MPTTModel):
     parent = TreeForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
     scenes = models.ManyToManyField(Scene, null=True, related_name='folders_in_tree')
     path_with_ids = models.CharField(null=True, blank=True, max_length=900)
+    date_added = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return "%s " % (self.name,)
