@@ -145,7 +145,9 @@ This will actually make the adjustments to the database it took note of in the p
 
 (In this case py3virtualenv is the name of **your** virtual environment and C:\yapo\YAPO is **your** YAPO install dir )
 
-In case you get the follwoing Error: 
+#### Notes:
+
+In case you get the following error: 
 
 > You are trying to add a non-nullable field **'date_added'** to folder without a default; we can't do that (the database needs  something to populate existing rows).
 
@@ -154,7 +156,7 @@ In case you get the follwoing Error:
  2) Quit, and let me add a default in models.py
  Select an option:
 
-You should selecet option 1 and type in `datetime.datetime.now()`
+You should select option 1 and type in `datetime.datetime.now()`
 
 
 
