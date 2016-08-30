@@ -326,7 +326,9 @@ angular.module('sceneList').component('sceneList', {
             	
             	if (confirm('Are you sure you want to remove ' + originalScene.name + ' from the DB?')){
             		self.removeItem(originalScene,originalItemToRemove,originalTypeOfItemToRemove,originalPermDelete);
-            	} else {};
+            	} else {
+
+                };
             	
             };
             

@@ -16,7 +16,6 @@ import videos.const
 # import videos.aux_functions
 from datetime import datetime
 
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -34,8 +33,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'dal',
-    'dal_select2',
+    # 'dal',
+    # 'dal_select2',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -74,6 +73,13 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.media',
             ],
+            'libraries': {
+                # Adding this section should work around the issue. (https://github.com/pyinstaller/pyinstaller/issues/1717)
+                # (This is for pyinstaller to recognize staticfiles tag
+                'staticfiles': 'django.templatetags.static',
+                'i18n': 'django.templatetags.i18n',
+
+            },
         },
     },
 ]
@@ -124,9 +130,11 @@ USE_L10N = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
+STATIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, "videos/static"))
 STATIC_URL = '/static/'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'videos/media')
+
+MEDIA_ROOT = os.path.abspath(os.path.join(BASE_DIR, 'videos/media'))
 MEDIA_URL = '/media/'
 
 # APPEND_SLASH = True
