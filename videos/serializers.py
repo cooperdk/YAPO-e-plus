@@ -61,7 +61,7 @@ class WebsiteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Website
         fields = ['id', 'name', 'date_added', 'play_count', 'date_fav', 'date_runner_up', 'is_fav', 'is_runner_up',
-                  'rating', 'thumbnail', 'scene_tags', 'scenes']
+                  'rating', 'thumbnail', 'scene_tags', 'scenes', 'website_alias']
 
 
 class WebsiteIdNameSerailzier(serializers.ModelSerializer):
@@ -76,7 +76,7 @@ class SceneTagSerializer(serializers.ModelSerializer):
     class Meta:
         model = SceneTag
         fields = ['id', 'name', 'date_added', 'play_count', 'date_fav', 'date_runner_up', 'is_fav', 'is_runner_up',
-                  'rating', 'thumbnail', 'websites', 'scenes']
+                  'rating', 'thumbnail', 'websites', 'scenes', 'scene_tag_alias']
 
 
 class SceneTagIdNameSerialzier(serializers.ModelSerializer):

@@ -17,6 +17,10 @@ angular.module('sceneTagDetail').component('sceneTagDetail', {
                     scopeWatchService.sceneTagLoaded(self.sceneTag);
                 }
             });
+            
+            self.update = function () {
+              SceneTag.update({sceneTagId: self.sceneTag.id}, self.sceneTag)
+            }
 
         }
     ]

@@ -8,6 +8,13 @@ angular.module('core.website').factory('Website', ['$resource', 'helperService',
 
                     return helperService.packageDataAndHeaders(data, headers);
                 }
+
+            },
+            update: {
+                method: 'PUT'
+            },
+            patch: {
+                method: 'PATCH'
             }
         });
     }

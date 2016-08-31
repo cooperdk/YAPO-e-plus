@@ -1,14 +1,28 @@
-<h1>{{$ctrl.sceneTag.name}}</h1>
-<h3>This tag is used {{$ctrl.sceneTag.scenes.length}} times </h3>
-<p>{{$ctrl.sceneTag.description}}</p>
+<h1 align="center">
+    <a href="#" editable-text="$ctrl.sceneTag.name"
+       onaftersave="$ctrl.update()" style="cursor:text">
+        {{ $ctrl.sceneTag.name || 'NA' }}
+    </a>
+</h1>
+<div align="center">
+<h2 >
+    <uib-rating ng-model="$ctrl.sceneTag.rating" max="10" read-only="isReadonly" on-hover="hoveringOver(value)"
+                on-leave="overStar = null" titles="['one','two','three']"
+                aria-labelledby="default-rating" ng-change="$ctrl.update()"></uib-rating>
+    <br>
+   <h3>This tag is used {{$ctrl.sceneTag.scenes.length}} times </h3>
+
+    </h2>
+    <label>Scene Tag's Alias:</label>
+    <a href="#" editable-textarea="$ctrl.sceneTag.scene_tag_alias" e-rows="5" e-cols="100"
+       onaftersave="$ctrl.update()">
+        {{ $ctrl.sceneTag.scene_tag_alias || 'no alias' }}
+    </a>
+
+</div>
+
 
 <section-list-wrapper main-page="false" section-type="'SceneList'"></section-list-wrapper>
-
-
-<ul class="specs">
-
-
-</ul>
 
 
 

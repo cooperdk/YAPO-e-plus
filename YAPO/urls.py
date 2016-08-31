@@ -16,6 +16,7 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from rest_framework.routers import DefaultRouter
+from django.views.static import serve
 
 from videos import views
 from django.conf import settings
@@ -106,6 +107,7 @@ urlpatterns = [
                   #     name='actor-alias-details-rest'),
 
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
 
 #  Startup script checks settings.json and creates it if it doesn't exist
 SETTINGS_VERSION = 2

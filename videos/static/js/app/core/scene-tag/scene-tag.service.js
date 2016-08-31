@@ -9,6 +9,12 @@ angular.module('core.sceneTag').factory('SceneTag', ['$resource', 'helperService
                     return helperService.packageDataAndHeaders(data, headers);
                 }
 
+            },
+            update: {
+                method: 'PUT'
+            },
+            patch: {
+                method: 'PATCH'
             }
         });
     }

@@ -30,6 +30,8 @@ class ActorTag(models.Model):
     is_runner_up = models.BooleanField(default=False)
     rating = models.IntegerField(default=0)
     thumbnail = models.CharField(max_length=500, null=True, blank=True)
+    actor_tag_alias = models.TextField(default="", blank=True)
+    modified_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return "%s " % (self.name,)
@@ -45,6 +47,8 @@ class SceneTag(models.Model):
     is_runner_up = models.BooleanField(default=False)
     rating = models.IntegerField(default=0)
     thumbnail = models.CharField(max_length=500, null=True, blank=True)
+    scene_tag_alias = models.TextField(default="", blank=True)
+    modified_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return "%s " % (self.name,)
@@ -87,6 +91,7 @@ class Actor(models.Model):
     last_lookup = models.DateTimeField(null=True, blank=True)
     is_exempt_from_one_word_search = models.BooleanField(default=False)
     actor_aliases = models.ManyToManyField(ActorAlias, null=True, blank=True, related_name='actors')
+    modified_date = models.DateTimeField(auto_now=True)
 
     def get_absolute_url(self):
         return reverse('videos:actor-details', kwargs={'pk': self.pk})
@@ -112,6 +117,8 @@ class Website(models.Model):
     rating = models.IntegerField(default=0)
     thumbnail = models.CharField(max_length=500, null=True, blank=True)
     scene_tags = models.ManyToManyField(SceneTag, null=True, blank=True, related_name='websites')
+    website_alias = models.TextField(default="", blank=True)
+    modified_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return "%s " % (self.name,)
@@ -141,6 +148,7 @@ class Scene(models.Model):
     size = models.IntegerField(null=True, blank=True)
     codec_name = models.CharField(null=True, blank=True, max_length=20)
     framerate = models.FloatField(null=True, blank=True)
+    modified_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return "%s " % (self.name,)
@@ -156,6 +164,7 @@ class Folder(MPTTModel):
     scenes = models.ManyToManyField(Scene, null=True, related_name='folders_in_tree')
     path_with_ids = models.CharField(null=True, blank=True, max_length=900)
     date_added = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return "%s " % (self.name,)
@@ -166,3 +175,4 @@ class Folder(MPTTModel):
 
 class LocalSceneFolders(models.Model):
     name = models.CharField(max_length=500, unique=True)
+
