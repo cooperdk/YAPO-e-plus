@@ -371,11 +371,11 @@ def parse_actors_in_scene(scene_to_parse, scene_path, actors, actors_alias):
 def add_actor_to_scene(actor_to_add, scene_to_add_to):
     # if not Scene.objects.filter(pk=scene_to_add_to.pk, actors__pk=actor_to_add.pk):
     if not scene_to_add_to.actors.filter(pk=actor_to_add.pk):
-        print("Adding Actor: {} to scene {}".format(actor_to_add.name, scene_to_add_to.name))
+        print("Adding Actor: {} to the scene {}".format(actor_to_add.name, scene_to_add_to.name))
         scene_to_add_to.actors.add(actor_to_add)
         scene_to_add_to.save()
     else:
-        print("Actor: {} is already registered to scene {}".format(actor_to_add.name, scene_to_add_to.name))
+        print("Actor: {} is already registered to the scene {}".format(actor_to_add.name, scene_to_add_to.name))
 
 
 def get_regex_search_term(name, delimiter):
@@ -405,7 +405,7 @@ def parse_scene_tags_in_scene(scene, scene_path, scene_tags):
         if re.search(regex_search_term, scene_path, re.IGNORECASE) is not None:
             scene_path = re.sub(regex_search_term, '', scene_path, flags=re.IGNORECASE)
             if not scene.scene_tags.filter(name=scene_tag.name):
-                print("Adding Tag: {} to scene {}".format(scene_tag.name, scene.name))
+                print("Adding Tag: {} to the scene {}".format(scene_tag.name, scene.name))
                 # print("Adding " + scene_tag.name + " to scene" + scene.name + "\n")
                 scene.scene_tags.add(scene_tag)
             else:
@@ -413,12 +413,13 @@ def parse_scene_tags_in_scene(scene, scene_path, scene_tags):
 
         if scene_tag.scene_tag_alias != "":
             for scene_tag_alias in scene_tag.scene_tag_alias.split(','):
-                regex_search_term = get_regex_search_term(scene_tag_alias, '.')
+                scene_tag_alias_stripped = scene_tag_alias.strip()
+                regex_search_term = get_regex_search_term(scene_tag_alias_stripped, '.')
 
                 if re.search(regex_search_term, scene_path, re.IGNORECASE) is not None:
                     scene_path = re.sub(regex_search_term, '', scene_path, flags=re.IGNORECASE)
                     if not scene.scene_tags.filter(name=scene_tag.name):
-                        print("Adding tag '{}' to the scene {}".format(scene_tag.name, scene.name))
+                        print("Adding Tag: '{}' to the scene {}".format(scene_tag.name, scene.name))
                         scene.scene_tags.add(scene_tag)
     return scene_path
 
@@ -430,18 +431,19 @@ def parse_website_in_scenes(scene, scene_path, websites):
         if re.search(regex_search_term, scene_path, re.IGNORECASE) is not None:
             scene_path = re.sub(regex_search_term, '', scene_path, flags=re.IGNORECASE)
             if not scene.websites.filter(name=website.name):
-                print("Adding website '{}' to the scene {}".format(website.name, scene.name))
+                print("Adding Website: '{}' to the scene {}".format(website.name, scene.name))
                 scene.websites.add(website)
 
                 #         check website alias
         if website.website_alias != "":
             for website_alias in website.website_alias.split(','):
-                regex_search_term = get_regex_search_term(website_alias, '.')
+                website_alias_stripped = website_alias.strip()
+                regex_search_term = get_regex_search_term(website_alias_stripped, '.')
 
                 if re.search(regex_search_term, scene_path, re.IGNORECASE) is not None:
                     scene_path = re.sub(regex_search_term, '', scene_path, flags=re.IGNORECASE)
                     if not scene.websites.filter(name=website.name):
-                        print("Adding website '{}' to the scene {}".format(website.name, scene.name))
+                        print("Adding Website: '{}' to the scene {}".format(website.name, scene.name))
                         scene.websites.add(website)
 
     return scene_path

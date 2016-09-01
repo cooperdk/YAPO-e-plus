@@ -13,12 +13,16 @@
    <h3>This tag is used {{$ctrl.sceneTag.scenes.length}} times </h3>
 
     </h2>
-    <label>Scene Tag's Alias:</label>
+    <label
+            uib-popover-html="'Aliases that will be used when auto-tagging scenes. You can specify multiple aliases by separating them with a comma.
+            Also &quot;.&quot; is used to represent any character so an alias such as &quot;P.O.V&quot; will match &quot;pov&quot;,&quot;p1o2v&quot;,&quot;po?v&quot; etc...'"
+            popover-trigger="mouseenter" popover-placement="right">
+    Scene Tag Aliases:
     <a href="#" editable-textarea="$ctrl.sceneTag.scene_tag_alias" e-rows="5" e-cols="100"
        onaftersave="$ctrl.update()">
         {{ $ctrl.sceneTag.scene_tag_alias || 'no alias' }}
     </a>
-
+    </label>
 </div>
 
 

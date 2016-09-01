@@ -14,11 +14,10 @@
 
     </h2>
     <label
-            uib-popover-html="'Aliases that will be used when auto-tagging scenes. Aliases should be comma separated <b>without</b> spaces.
-            EX:&quot;FFM,MFF&quot; not &quot;FFM, MFF&quot; (Unless you you want the alias to match a space character specifically).
-            Also &quot;.&quot; is used to represent any character so an alias &quot;P.O.V&quot; will match &quot;pov&quot;,&quot;p1o2v&quot;,&quot;po?v&quot; etc...'"
+            uib-popover-html="'Aliases that will be used when auto-tagging scenes. You can specify multiple aliases by separating them with a comma.
+            Also &quot;.&quot; is used to represent any character so an alias such as &quot;P.O.V&quot; will match &quot;pov&quot;,&quot;p1o2v&quot;,&quot;po?v&quot; etc...'"
             popover-trigger="mouseenter" popover-placement="right">
-        Website's Alias:
+        Website Aliases:
         <a href="#" editable-textarea="$ctrl.website.website_alias" e-rows="5" e-cols="100"
            onaftersave="$ctrl.update()">
             {{ $ctrl.website.website_alias || 'no alias' }}
