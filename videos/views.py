@@ -38,7 +38,7 @@ import videos.const as const
 from django.utils.datastructures import MultiValueDictKeyError
 import threading
 
-import pathlib
+# import pathlib
 
 
 # Aux Functions
@@ -196,7 +196,13 @@ def search_in_get_queryset(original_queryset, request):
             random = True
         if 'usage_count' in sort_by:
             term_is_not_null = True
+            # qs_temp1 = original_queryset.values()
+            # qs_list = qs_temp1
             qs_list = list(original_queryset)
+
+            # temp = original_queryset.values()
+            # list_temp = [entry for entry in temp]
+            # qs_list = list_temp
 
     if term_is_not_null:
         if random:
@@ -264,7 +270,27 @@ def scrape_all_actors(force):
 
 
 def tag_all_scenes(ignore_last_lookup):
+
+    f = open('../YAPO/settings.json', 'r')
+    x = f.read()
+
+    settings_content = json.loads(x)
+    f.close()
+
+    current_setting_version = int(settings_content['settings_version'])
+    if current_setting_version < 3:
+
+        for actorTag in ActorTag.objects.all():
+            if not SceneTag.objects.filter(name=actorTag.name):
+                SceneTag.objects.create(name=actorTag.name)
+
+            scene_tag_to_add = SceneTag.objects.get(name=actorTag.name)
+            actorTag.scene_tags.add(scene_tag_to_add)
+            print(
+                "Added scene tag {} ot actor tag {}".format(SceneTag.objects.filter(name=actorTag.name), actorTag.name))
+
     filename_parser.parse_all_scenes(ignore_last_lookup)
+
     return Response(status=200)
 
     # scenes = Scene.objects.all()
@@ -476,6 +502,52 @@ def tag_multiple_items(request):
                         scene_to_update = Scene.objects.get(pk=x)
                         scene_to_update.delete()
                         print("Removed scene \'{}\' from database".format(scene_to_update.name))
+
+            else:
+                scenes_to_update = params['itemsToUpdate']
+                for x in scenes_to_update:
+                    scene_to_update = Scene.objects.get(pk=x)
+                    patch_type = params['patchType']
+                    patch_data = params['patchData']
+                    setattr(scene_to_update, patch_type, patch_data)
+                    # scene_to_update[patch_type] = patch_data
+
+                    print("Set scene's '{}' attribute '{}' to '{}'".format(scene_to_update, patch_type, patch_data))
+                    scene_to_update.save()
+
+        elif params['type'] == 'actor':
+            if params['patchType'] == 'actor_tags':
+                actor_tag_id = params['patchData'][0]
+                actor_tag_to_add = ActorTag.objects.get(pk=actor_tag_id)
+                actors_to_update = params['itemsToUpdate']
+
+                if params['addOrRemove'] == 'add':
+
+                    for x in actors_to_update:
+                        actor_to_update = Actor.objects.get(pk=x)
+                        actor_to_update.actor_tags.add(actor_tag_to_add)
+                        actor_to_update.save()
+                        print("Added Actor Tag '{}' to actor {}".format(actor_tag_to_add.name,
+                                                                        actor_to_update.name))
+                elif params['addOrRemove'] == 'remove':
+
+                    for x in actors_to_update:
+                        actor_to_update = Actor.objects.get(pk=x)
+                        actor_to_update.actor_tags.remove(actor_tag_to_add)
+                        actor_to_update.save()
+                        print("Removed Actor Tag '{}' to actor {}".format(actor_tag_to_add.name,
+                                                                          actor_to_update.name))
+            else:
+                actors_to_update = params['itemsToUpdate']
+                for x in actors_to_update:
+                    actor_to_update = Actor.objects.get(pk=x)
+                    patch_type = params['patchType']
+                    patch_data = params['patchData']
+                    setattr(actor_to_update, patch_type, patch_data)
+                    # scene_to_update[patch_type] = patch_data
+
+                    print("Set actors's '{}' attribute '{}' to '{}'".format(actor_to_update, patch_type, patch_data))
+                    actor_to_update.save()
 
         return Response(status=200)
 

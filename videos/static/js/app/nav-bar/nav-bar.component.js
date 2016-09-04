@@ -2,8 +2,8 @@ angular.module('navBar', []).component('navBar', {
     // Note: The URL is relative to our `index.html` file
     templateUrl: 'static/js/app/nav-bar/nav-bar.template.html',
     bindings: {},
-    controller: ['$scope', '$rootScope', 'Actor', 'SceneTag', 'Website', 'helperService', '$http',
-        function NavBarController($scope, $rootScope, Actor, SceneTag, Website, helperService, $http ) {
+    controller: ['$scope', '$rootScope', 'Actor', 'SceneTag', 'Website', 'ActorTag', 'helperService', '$http',
+        function NavBarController($scope, $rootScope, Actor, SceneTag, Website, ActorTag, helperService, $http ) {
             
             // Global function to create new item
             $rootScope.createNewItem = function (typeOfItemToAdd, newItemName) {
@@ -19,6 +19,9 @@ angular.module('navBar', []).component('navBar', {
                     } else if (typeOfItemToAdd == 'websites') {
                         newItem = new Website;
                         newItem.scenes = [];
+                    } else if (typeOfItemToAdd == 'actor_tags'){
+                        newItem = new ActorTag;
+                        newItem.actors = [];
                     }
     
                     newItem.name = newItemName;
@@ -26,16 +29,17 @@ angular.module('navBar', []).component('navBar', {
                     return newItem
                 };
             
-            $rootScope.patchScene = function (sceneToPatchId, patchType, patchData, addOrRemove, multiple, permDelete) {
+            $rootScope.patchEntity = function (entityToPatchType, entityToPatchId, patchType, patchData, addOrRemove,
+                                              multiple, permDelete, selectedScenes) {
 
                 var type = {};
                 type[patchType] = patchData;
 
                 var itemsToUpdate = [];
                 if (multiple) {
-                    itemsToUpdate = self.selectedScenes
+                    itemsToUpdate = selectedScenes
                 } else {
-                    itemsToUpdate.push(sceneToPatchId)
+                    itemsToUpdate.push(entityToPatchId)
                 }
 
 
@@ -43,7 +47,7 @@ angular.module('navBar', []).component('navBar', {
 
                 $http.post('tag-multiple-items/', {
                     params: {
-                        type: 'scene',
+                        type: entityToPatchType,
                         patchType: patchType,
                         patchData: patchData,
                         itemsToUpdate: itemsToUpdate,

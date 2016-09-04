@@ -111,9 +111,10 @@ urlpatterns = [
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 #  Startup script checks settings.json and creates it if it doesn't exist
-SETTINGS_VERSION = 3
+setting_version = videos.const.SETTINGS_VERSION
+current_setting_version = 0
 
-default_dict = {'settings_version': SETTINGS_VERSION, 'vlc_path': "", 'last_all_scene_tag': ""}
+default_dict = {'settings_version': setting_version, 'vlc_path': "", 'last_all_scene_tag': ""}
 need_update = False
 
 try:
@@ -135,21 +136,24 @@ try:
         f.close()
 
         if ('settings_version' not in settings_content) or (
-                    int(settings_content['settings_version']) < SETTINGS_VERSION):
-            need_update = True
-            for x in settings_content:
-                if x in default_dict:
-                    default_dict[x] = settings_content[x]
+                    int(settings_content['settings_version']) < setting_version):
 
-            # default_dict['settings_version'] = SETTINGS_VERSION
+            current_setting_version = int(settings_content['settings_version'])
+            if current_setting_version < 2:
+                need_update = True
+                for x in settings_content:
+                    if x in default_dict:
+                        default_dict[x] = settings_content[x]
 
-            f = open('settings.json', 'w')
-            f.write(json.dumps(default_dict))
-            f.close()
+                # default_dict['settings_version'] = SETTINGS_VERSION
 
-            f = open('settings.json', 'r')
-            x = f.read()
-            settings_content = json.loads(x)
+                f = open('settings.json', 'w')
+                f.write(json.dumps(default_dict))
+                f.close()
+
+                f = open('settings.json', 'r')
+                x = f.read()
+                settings_content = json.loads(x)
 
         print(settings_content['vlc_path'])
         videos.const.VLC_PATH = settings_content['vlc_path']
@@ -171,22 +175,11 @@ except FileNotFoundError:
 
 if need_update:
     if videos.aux_functions.actor_folder_from_name_to_id():
-
-        for actorTag in ActorTag.objects.all():
-            if not SceneTag.objects.filter(name=actorTag.name):
-                SceneTag.objects.create(name=actorTag.name)
-
-            scene_tag_to_add = SceneTag.objects.get(name=actorTag.name)
-            actorTag.scene_tags.add(scene_tag_to_add)
-            print(
-                "Added scene tag {} ot actor tag {}".format(SceneTag.objects.filter(name=actorTag.name), actorTag.name))
-
-
         f = open('settings.json', 'r')
         x = f.read()
         settings_content = json.loads(x)
         f.close()
-        settings_content['settings_version'] = SETTINGS_VERSION
+        settings_content['settings_version'] = setting_version
 
         f = open('settings.json', 'w')
         f.write(json.dumps(settings_content))

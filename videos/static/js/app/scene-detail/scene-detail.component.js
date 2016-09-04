@@ -32,13 +32,13 @@ angular.module('sceneDetail').component('sceneDetail', {
                     patchData.push(itemToAdd.id);
                     self.scene = $rootScope.addItemToScene(self.scene, itemToAdd, typeOfItemToAdd);
                     // function (sceneToPatchId, patchType, patchData, addOrRemove, multiple, permDelete)
-                    $rootScope.patchScene(self.scene.id, typeOfItemToAdd, patchData, 'add', false, false)
+                    $rootScope.patchEntity('scene',self.scene.id, typeOfItemToAdd, patchData, 'add', false, false, null)
                 } else {
                     var newItem = $rootScope.createNewItem(typeOfItemToAdd, itemToAdd.value);
                     newItem.$save().then(function (res) {
                         self.scene = $rootScope.addItemToScene(self.scene, res, typeOfItemToAdd);
                         patchData.push(res.id);
-                        $rootScope.patchScene(self.scene.id, typeOfItemToAdd, patchData, 'add', false, false)
+                        $rootScope.patchEntity('scene', self.scene.id, typeOfItemToAdd, patchData, 'add', false, false, null)
                     });
 
                 }
@@ -49,7 +49,7 @@ angular.module('sceneDetail').component('sceneDetail', {
                 var patchData = [];
                 patchData.push(itemToRemove.id);
                 self.scene = $rootScope.removeItemFromScene(self.scene,itemToRemove,typeOfItemToRemove);
-                $rootScope.patchScene(self.scene.id,typeOfItemToRemove,patchData,'remove',false,false)
+                $rootScope.patchEntity('scene',self.scene.id,typeOfItemToRemove,patchData,'remove',false,false,null)
             };
 
 
