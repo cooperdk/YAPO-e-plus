@@ -92,7 +92,7 @@ Folder view:
 ![alt text](https://jerking.empornium.ph/images/2016/08/10/chrome_2016-08-10_14-09-44.jpg)
 
 
-Currently YAPO is under heavy development and as far as I see it, it's not anywhere near being ready for end user distribution mainly because the slightly tedious installation process.
+Currently YAPO is under heavy development and as far as I see it, it's not anywhere near being ready for end user distribution mainly because of the slightly tedious installation process.
 In the end I want it to be 1 portable .EXE for Windows and whatever executable Linux and Mac OS use.
 But for now if you want to try it, there are a few hoops you need to jump through, namely install the dependencies and download the code from GitHub.
 It's not as hard as it seems and it takes less than 15 minutes to set everything up, though I understand if people find it intimidating.
@@ -147,7 +147,7 @@ This will actually make the adjustments to the database it took note of in the p
 
 #### Notes:
 
-In case when updating YAPO, you get the following error: 
+When updating YAPO, if you get the following error: 
 
 > You are trying to add a non-nullable field **'date_added'** to folder without a default; we can't do that (the database needs  something to populate existing rows).
 
@@ -156,7 +156,7 @@ In case when updating YAPO, you get the following error:
  2) Quit, and let me add a default in models.py
  Select an option:
 
-You should select option 1 and type in `datetime.datetime.now()`
+You should select option 1 and type in `datetime.datetime.now()` and press enter.
 
 
 
