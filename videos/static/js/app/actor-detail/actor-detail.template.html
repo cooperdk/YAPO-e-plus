@@ -122,7 +122,8 @@
                             <input type="text" class="form-control" uib-datepicker-popup="dd.MM.yyyy"
                                    ng-model="$ctrl.birthdate"
                                    is-open="popup1.opened" datepicker-options="dateOptions" ng-required="true"
-                                   close-text="Close" alt-input-formats="altInputFormats" ng-change="$ctrl.updateBirthday($ctrl.actor)"/>
+                                   close-text="Close" alt-input-formats="altInputFormats"
+                                   ng-change="$ctrl.updateBirthday($ctrl.actor)"/>
                             <span class="input-group-btn">
                             <button type="button" class="btn btn-default" ng-click="open1()"><i
                                     class="glyphicon glyphicon-calendar"></i></button>
@@ -175,7 +176,22 @@
                     ></async-typeahead>
                 </td>
                 <td class="alright">
-                    <actor-tag-list pk="$ctrl.actor.actor_tags" actor="$ctrl.actor"></actor-tag-list>
+                    <ul class="tags">
+
+                        <li ng-repeat="tag in $ctrl.actor.actor_tags">
+                            <a href="/#!/actor-tag/{{ tag.id }}">{{ tag.name }} [{{ tag.usage_count }}]</a> <span
+                                ng-if="!$ctrl.mainPage" ng-click="$ctrl.deleteActorTag(tag)"
+                                class="glyphicon glyphicon-remove"></span>
+
+                                    <span ng-if="$ctrl.mainPage" ng-click="$ctrl.deleteActorTagFromDb(tag)"
+                                          class="glyphicon glyphicon-trash on-hover-red-cursor-pointer"
+                                          uib-popover-html="'<strong>Delete</strong> tag from database!'"
+                                          popover-trigger="mouseenter">
+
+                            </span>
+
+                        </li>
+                    </ul>
                 </td>
             </tr>
             <tr>
@@ -190,10 +206,10 @@
                     </span>
                 </td>
             </tr>
-            
+
             <tr>
-            	<td></td>
-            	<td class="alright">
+                <td></td>
+                <td class="alright">
                     <span ng-if="$ctrl.actor != undefined && $ctrl.actor.height != undefined">
                             ({{ $ctrl.heightConvertInches($ctrl.actor.height)['feet'] }} feet {{ $ctrl.heightConvertInches($ctrl.actor.height)['inches']}} inches)
                     </span>
@@ -213,7 +229,7 @@
                      </span>
                 </td>
             </tr>
-            
+
             <tr>
                 <td></td>
                 <td class="alright">

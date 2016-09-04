@@ -135,8 +135,28 @@ angular.module('helper', []).factory('helperService', function ($rootScope, $loc
         }
 
 
-        return {'redId': resId, 'resObject': resObject};
+        return {'resId': resId, 'resObject': resObject};
 
+    }
+
+    function createNewItem(typeOfItemToAdd, newItemName) {
+        var newItem;
+        if (typeOfItemToAdd == 'actors') {
+            newItem = new Actor();
+            newItem.thumbnail = 'media/images/actor/Unknown/profile/profile.jpg'; //need to change this to a constant!
+            newItem.scenes = [];
+        } else if (typeOfItemToAdd == 'scene_tags') {
+            newItem = new SceneTag();
+            newItem.scenes = [];
+            newItem.websites = [];
+        } else if (typeOfItemToAdd == 'websites') {
+            newItem = new Website;
+            newItem.scenes = [];
+        }
+
+        newItem.name = newItemName;
+        
+        return newItem
     }
 
 
@@ -154,7 +174,8 @@ angular.module('helper', []).factory('helperService', function ($rootScope, $loc
         setNumberOfItemsPerPaige: setNumberOfItemsPerPaige,
         getNumberOfItemsPerPaige: getNumberOfItemsPerPaige,
         setSortByInSectionWrapper: setSortByInSectionWrapper,
-        getSortByInSectionWrapper: getSortByInSectionWrapper
+        getSortByInSectionWrapper: getSortByInSectionWrapper,
+        createNewItem: createNewItem
     }
 
 });

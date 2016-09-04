@@ -23,6 +23,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 import json
 
+from videos.models import ActorTag, SceneTag
+
 from datetime import datetime
 import videos.const
 import videos.aux_functions
@@ -108,9 +110,8 @@ urlpatterns = [
 
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-
 #  Startup script checks settings.json and creates it if it doesn't exist
-SETTINGS_VERSION = 2
+SETTINGS_VERSION = 3
 
 default_dict = {'settings_version': SETTINGS_VERSION, 'vlc_path': "", 'last_all_scene_tag': ""}
 need_update = False
@@ -170,6 +171,17 @@ except FileNotFoundError:
 
 if need_update:
     if videos.aux_functions.actor_folder_from_name_to_id():
+
+        for actorTag in ActorTag.objects.all():
+            if not SceneTag.objects.filter(name=actorTag.name):
+                SceneTag.objects.create(name=actorTag.name)
+
+            scene_tag_to_add = SceneTag.objects.get(name=actorTag.name)
+            actorTag.scene_tags.add(scene_tag_to_add)
+            print(
+                "Added scene tag {} ot actor tag {}".format(SceneTag.objects.filter(name=actorTag.name), actorTag.name))
+
+
         f = open('settings.json', 'r')
         x = f.read()
         settings_content = json.loads(x)

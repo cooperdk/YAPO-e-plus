@@ -97,6 +97,8 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                     "-date_of_birth": "Date Of Birth Dsc",
                     "measurements": "Measurements Asc",
                     "-measurements": "Measurements Dsc",
+                    "usage_count": "Usage Count Asc",
+                    "-usage_count": "Usage Count Dsc",
                     "random": "Random"
 
 
@@ -123,6 +125,10 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                     "-path_to_dir": "Path Dsc",
                     "date_added": "Date Added Asc",
                     "-date_added": "Date Added Dsc",
+                    "date_last_played": "Date Last Played Asc",
+                    "-date_last_played": "Date Last Played Dsc",
+                    "play_count": "Play Count Asc",
+                    "-play_count": "Play Count Dsc",
                     "height": "Resolution Height Asc",
                     "-height": "Resolution Height Dsc",
                     "duration": "Duration Asc",
@@ -142,7 +148,8 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                     "duration": "Duration",
                     "size": "Size",
                     "framerate": "Framerate",
-                    "height": "Resolution Height"
+                    "height": "Resolution Height",
+                    "play_count": "Play Count"
 
 
                 };
@@ -156,6 +163,8 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                     "-rating": "Rating Dsc",
                     "date_added": "Date Added Asc",
                     "-date_added": "Date Added Dsc",
+                    "usage_count": "Usage Count Asc",
+                    "-usage_count": "Usage Count Dsc",
                     "random": "Random"
 
 
@@ -176,6 +185,8 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                     "-rating": "Rating Dsc",
                     "date_added": "Date Added Asc",
                     "-date_added": "Date Added Dsc",
+                    "usage_count": "Usage Count Asc",
+                    "-usage_count": "Usage Count Dsc",
                     "random": "Random"
 
 
@@ -197,6 +208,8 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                     "-rating": "Rating Dsc",
                     "date_added": "Date Added Asc",
                     "-date_added": "Date Added Dsc",
+                    "usage_count": "Usage Count Asc",
+                    "-usage_count": "Usage Count Dsc",
                     "random": "Random"
 
 

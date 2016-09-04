@@ -126,7 +126,8 @@ angular.module('asyncTypeahead').component('asyncTypeahead', {
 
                 var ans = {
                     'originalObject': self.object,
-                    'selectedObject': $item
+                    'selectedObject': $item,
+                    'sendingObjectType': self.sendingObjectType
                 };
 
                 if (self.objectType == 'actor_tags') {

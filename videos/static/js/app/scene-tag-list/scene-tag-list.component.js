@@ -113,7 +113,8 @@ angular.module('sceneTagList').component('sceneTagList', {
                     // alert(angular.toJson(self.actor.actor_tags.indexOf(tagToDelete.id)));
 
                     var res = helperService.removeObjectFromArrayOfObjects(tagToDelete,self.tags);
-                    
+
+                    console.log(res['resId']);
                     self.scene.scene_tags = res['resId'];
                     scopeWatchService.sceneChanged(self.scene);
 
@@ -127,7 +128,7 @@ angular.module('sceneTagList').component('sceneTagList', {
             
             self.deleteSceneTagFromDb = function (tagToDelete) {
                 
-                 SceneTag.remove({sceneTagId: tagToDelete.id});
+                SceneTag.remove({sceneTagId: tagToDelete.id});
 
                 var ans = helperService.removeObjectFromArrayOfObjects(tagToDelete,self.tags);
 

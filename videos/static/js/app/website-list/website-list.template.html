@@ -2,7 +2,7 @@
 
 <ul class="websites">
     <li ng-repeat="site in $ctrl.websites">
-        <a href="/#!/website/{{ site.id }}">[{{$index + 1}}] {{ site.name }} </a><span ng-if="!$ctrl.mainPage"
+        <a href="/#!/website/{{ site.id }}">{{ site.name }} [{{ site.usage_count }}] </a><span ng-if="!$ctrl.mainPage"
             ng-click="$ctrl.removeWebsiteFromScene(site)"
             class="glyphicon glyphicon-remove"></span>
 

@@ -125,7 +125,7 @@ angular.module('actorTagList').component('actorTagList', {
                     //     }
                     // }
 
-                    self.actor.actor_tags = res['redId'];
+                    self.actor.actor_tags = res['resId'];
 
 
                     scopeWatchService.actorChaned(self.actor);

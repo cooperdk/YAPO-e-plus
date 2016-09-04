@@ -26,6 +26,10 @@ angular.module('actorTagDetail').component('actorTagDetail', {
                 }
 
             });
+            
+            self.update = function () {
+                ActorTag.update({actorTagId: self.actorTag.id}, self.actorTag)
+            }
 
         }
     ]

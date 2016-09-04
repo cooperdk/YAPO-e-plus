@@ -9,6 +9,11 @@ angular.module('core.actorTag').factory('ActorTag', ['$resource', 'helperService
                     return helperService.packageDataAndHeaders(data, headers);
                 }
 
+            }, update: {
+                method: 'PUT'
+            },
+            patch: {
+                method: 'PATCH'
             }
         });
     }

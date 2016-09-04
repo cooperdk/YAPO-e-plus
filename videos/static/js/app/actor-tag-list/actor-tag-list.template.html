@@ -27,7 +27,7 @@
 <ul class="tags">
 
     <li ng-repeat="tag in $ctrl.tags">
-        <a href="/#!/actor-tag/{{ tag.id }}">{{ tag.name }}</a> <span ng-if="!$ctrl.mainPage" ng-click="$ctrl.deleteActorTag(tag)"
+        <a href="/#!/actor-tag/{{ tag.id }}">{{ tag.name }} [{{ tag.usage_count }}]</a> <span ng-if="!$ctrl.mainPage" ng-click="$ctrl.deleteActorTag(tag)"
                                                                       class="glyphicon glyphicon-remove"></span>
 
                                     <span ng-if="$ctrl.mainPage" ng-click="$ctrl.deleteActorTagFromDb(tag)"
