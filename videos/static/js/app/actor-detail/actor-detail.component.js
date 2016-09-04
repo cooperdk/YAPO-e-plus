@@ -379,11 +379,11 @@ angular.module('actorDetail').component('actorDetail', {
                 }).then(function (response) {
                     // alert(angular.toJson(response))
                     self.updateImage = false;
-                    self.addAlert("Succesfully Scraped " + self.actor.name + " From " + scrapeSite, 'success', '5000');
+                    self.addAlert("Succesfully scraped: " + self.actor.name + " from " + scrapeSite, 'success', '5000');
                     self.getActor()
                     self.updateImage = true;
                 }, function errorCallback(response) {
-                    self.addAlert(scrapeSite + "Could not find " + self.actor.name + "Try a different scraper or looking manually ", 'warning', '5000');
+                    self.addAlert(scrapeSite + " could not find: " + self.actor.name + " - Try a different scraper or try looking manually! ", 'warning', '5000');
                     console.log(angular.toJson(response))
                 });
 
