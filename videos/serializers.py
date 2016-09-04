@@ -207,7 +207,7 @@ class SceneSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'path_to_file', 'path_to_dir', 'date_added', 'date_fav', 'date_runner_up', 'play_count',
                   'is_fav', 'is_runner_up', 'rating', 'thumbnail', 'scene_tags', 'actors', 'websites', 'width',
                   'height',
-                  'bit_rate', 'duration', 'size', 'codec_name', 'framerate', 'folders_in_tree']
+                  'bit_rate', 'duration', 'size', 'codec_name', 'framerate', 'folders_in_tree', 'date_last_played']
 
 
 class ActorTagSerializer(serializers.ModelSerializer):

@@ -386,7 +386,8 @@ def tag_multiple_items(request):
                                 if tag in scene_to_update.scene_tags.all():
                                     scene_to_update.scene_tags.remove(tag)
                                     print(
-                                        "Removed Scene Tag \'{}\' from scene \'{}\'".format(tag.name, scene_to_update.name))
+                                        "Removed Scene Tag \'{}\' from scene \'{}\'".format(tag.name,
+                                                                                            scene_to_update.name))
                         scene_to_update.save()
 
             elif params['patchType'] == 'scene_tags':
@@ -441,8 +442,9 @@ def tag_multiple_items(request):
                                 if actor_tag.scene_tags.first() in scene_to_update.scene_tags.all():
                                     scene_to_update.scene_tags.remove(actor_tag.scene_tags.first())
                                     print(
-                                        "Removed Scene Tag \'{}\' to scene \'{}\'".format(actor_tag.scene_tags.first().name,
-                                                                                          scene_to_update.name))
+                                        "Removed Scene Tag \'{}\' to scene \'{}\'".format(
+                                            actor_tag.scene_tags.first().name,
+                                            scene_to_update.name))
                         scene_to_update.save()
 
             elif params['patchType'] == 'delete':
@@ -666,6 +668,12 @@ def play_scene_vlc(scene):
     file_path = os.path.normpath(scene.path_to_file)
     vlc_path = os.path.normpath(const.VLC_PATH)
     p = subprocess.Popen([vlc_path, file_path])
+    scene.play_count += 1
+    scene.date_last_played = datetime.datetime.now()
+    print("Play count for scene '{}' is now '{}' and the date the scene was last played is '{}'".format(scene.name,
+                                                                                                        scene.play_count,
+                                                                                                        scene.date_last_played))
+    scene.save()
 
 
 @api_view(['GET', 'POST'])

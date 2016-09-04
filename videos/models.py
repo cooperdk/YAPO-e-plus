@@ -134,6 +134,7 @@ class Scene(models.Model):
     path_to_dir = models.CharField(max_length=500)
     date_added = models.DateTimeField(auto_now_add=True)
     date_fav = models.DateTimeField(null=True, blank=True)
+    date_last_played = models.DateTimeField(null=True, blank=True)
     date_runner_up = models.DateTimeField(null=True, blank=True)
     last_filename_tag_lookup = models.DateTimeField(null=True, blank=True)
     play_count = models.IntegerField(default=0)

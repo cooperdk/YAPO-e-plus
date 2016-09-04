@@ -123,6 +123,10 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                     "-path_to_dir": "Path Dsc",
                     "date_added": "Date Added Asc",
                     "-date_added": "Date Added Dsc",
+                    "date_last_played": "Date Last Played Asc",
+                    "-date_last_played": "Date Last Played Dsc",
+                    "play_count": "Play Count Asc",
+                    "-play_count": "Play Count Dsc",
                     "height": "Resolution Height Asc",
                     "-height": "Resolution Height Dsc",
                     "duration": "Duration Asc",
@@ -142,7 +146,8 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                     "duration": "Duration",
                     "size": "Size",
                     "framerate": "Framerate",
-                    "height": "Resolution Height"
+                    "height": "Resolution Height",
+                    "play_count": "Play Count"
 
 
                 };
