@@ -37,6 +37,38 @@ angular.module('actorDetail').component('actorDetail', {
             };
 
 
+            self.addItem = function (actor, itemToAdd, typeOfItemToAdd) {
+
+               var patchData = [];
+               
+
+                if (itemToAdd.id != '-1') {
+                    patchData.push(itemToAdd.id);
+                    self.actor = $rootScope.addItemToScene(self.actor, itemToAdd, typeOfItemToAdd);
+                    // function (sceneToPatchId, patchType, patchData, addOrRemove, multiple, permDelete)
+                    $rootScope.patchEntity('actor', self.actor.id, typeOfItemToAdd, patchData, 'add', false, false, null)
+                } else {
+                    var newItem = $rootScope.createNewItem(typeOfItemToAdd, itemToAdd.value);
+                    newItem.$save().then(function (res) {
+                        self.scene = $rootScope.addItemToScene(self.actor, res, typeOfItemToAdd);
+                        patchData.push(res.id);
+                        $rootScope.patchEntity('actor', self.actor.id, typeOfItemToAdd, patchData, 'add', false, false, null)
+                    });
+
+                }
+
+            };
+            
+             self.removeItem = function (itemToRemove, typeOfItemToRemove) {
+                var patchData = [];
+                patchData.push(itemToRemove.id);
+                self.actor = $rootScope.removeItemFromScene(self.actor,itemToRemove,typeOfItemToRemove);
+                $rootScope.patchEntity('actor',self.actor.id,typeOfItemToRemove,patchData,'remove',false,false,null)
+            };
+            
+            
+
+
             self.hideDetail = false;
             self.hideDetailButtomLable = 'Hide Detail';
 
@@ -90,6 +122,8 @@ angular.module('actorDetail').component('actorDetail', {
 
 
             $scope.$on("actorTagSelected", function (event, actorTag) {
+                // alert(angular.toJson(actorTag));
+                self.addItem(self.actor,actorTag,'actor_tags');
                 self.actorTagSelect(actorTag);
 
 
@@ -167,7 +201,8 @@ angular.module('actorDetail').component('actorDetail', {
 
                 actor.date_of_birth = yyyy + '-' + mm + '-' + dd;
 
-                self.updateActor(actor);
+                $rootScope.patchEntity('actor', self.actor.id, 'date_of_birth', $ctrl.actor.date_of_birth, 'add',
+                                              false, false, null)
 
             };
 

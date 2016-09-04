@@ -2,14 +2,19 @@
            dismiss-on-timeout="{{ alert.timeout }}">{{ alert.msg }}</uib-alert>
 <h1 align="center">
     <a href="#" editable-text="$ctrl.actor.name"
-       onaftersave="$ctrl.updateActor($ctrl.actor)" style="cursor:text">
+       onaftersave="$root.patchEntity('actor', $ctrl.actor.id, 'name', $ctrl.actor.name, 'add',
+                                              false, false, null)" style="cursor:text">
         {{ $ctrl.actor.name || 'NA' }}
     </a>
 </h1>
 <h2 align="center">
     <uib-rating ng-model="$ctrl.actor.rating" max="10" read-only="isReadonly" on-hover="hoveringOver(value)"
                 on-leave="overStar = null" titles="['one','two','three']"
-                aria-labelledby="default-rating" ng-change="$ctrl.updateActor($ctrl.actor)"></uib-rating>
+                aria-labelledby="default-rating"
+                ng-change="$root.patchEntity('actor', $ctrl.actor.id, 'rating', $ctrl.actor.rating, 'add',
+                                              false, false, null)">
+
+    </uib-rating>
     <br>
     <button type="button" ng-click="$ctrl.hideDetailClick()" class="btn btn-default btn-sm">
         {{ $ctrl.hideDetailButtomLable }}
@@ -19,14 +24,18 @@
 <ul>
     <li><span>Favorite
         <label class="switch">
-  <input type="checkbox" ng-model="$ctrl.actor.is_fav" ng-change="$ctrl.updateActor($ctrl.actor)">
+  <input type="checkbox" ng-model="$ctrl.actor.is_fav"
+         ng-change="$root.patchEntity('actor', $ctrl.actor.id, 'is_fav', $ctrl.actor.is_fav, 'add',
+                                              false, false, null)">
   <div class="slider round"></div></span>
         </label>
 
     </li>
     <li>Runner up
         <label class="switch">
-            <input type="checkbox" ng-model="$ctrl.actor.is_runner_up" ng-change="$ctrl.updateActor($ctrl.actor)">
+            <input type="checkbox" ng-model="$ctrl.actor.is_runner_up"
+                   ng-change="$root.patchEntity('actor', $ctrl.actor.id, 'is_runner_up', $ctrl.actor.is_runner_up, 'add',
+                                              false, false, null)">
             <div class="slider round"></div>
         </label>
 
@@ -37,7 +46,8 @@
             their name consists of one word only. <i>Use only on actors whose names are unique as not to cause incorrect tagging.</i>'"
                popover-trigger="mouseenter" popover-placement="right-top">
             <input type="checkbox" ng-model="$ctrl.actor.is_exempt_from_one_word_search"
-                   ng-change="$ctrl.updateActor($ctrl.actor)">
+                   ng-change="$root.patchEntity('actor', $ctrl.actor.id, 'is_exempt_from_one_word_search', $ctrl.actor.is_exempt_from_one_word_search, 'add',
+                                              false, false, null)">
             <div class="slider round"
 
             ></div>
@@ -103,7 +113,8 @@
                 <td colspan="2">
                     <div class="actor-bio">
                         <a href="#" editable-textarea="$ctrl.actor.description" e-rows="5" e-cols="100"
-                           onaftersave="$ctrl.updateActor($ctrl.actor)">
+                           onaftersave="$root.patchEntity('actor', $ctrl.actor.id, 'description', $ctrl.actor.description, 'add',
+                                              false, false, null)">
                             {{ $ctrl.actor.description || 'no description' }}
                         </a>
                     </div>
@@ -146,7 +157,8 @@
                 </td>
                 <td class="alright">
                     <a href="#" editable-text="$ctrl.actor.ethnicity"
-                       onaftersave="$ctrl.updateActor($ctrl.actor)">
+                       onaftersave="$root.patchEntity('actor', $ctrl.actor.id, 'ethnicity', $ctrl.actor.ethnicity, 'add',
+                                              false, false, null)">
                         {{ $ctrl.actor.ethnicity || 'NA' }}
                     </a>
                 </td>
@@ -180,15 +192,10 @@
 
                         <li ng-repeat="tag in $ctrl.actor.actor_tags">
                             <a href="/#!/actor-tag/{{ tag.id }}">{{ tag.name }} [{{ tag.usage_count }}]</a> <span
-                                ng-if="!$ctrl.mainPage" ng-click="$ctrl.deleteActorTag(tag)"
+                                ng-click="$ctrl.removeItem(tag,'actor_tags')"
                                 class="glyphicon glyphicon-remove"></span>
 
-                                    <span ng-if="$ctrl.mainPage" ng-click="$ctrl.deleteActorTagFromDb(tag)"
-                                          class="glyphicon glyphicon-trash on-hover-red-cursor-pointer"
-                                          uib-popover-html="'<strong>Delete</strong> tag from database!'"
-                                          popover-trigger="mouseenter">
 
-                            </span>
 
                         </li>
                     </ul>
@@ -201,7 +208,9 @@
                 </td>
                 <td class="alright">
                     <span>
-                    <a href="#!" editable-text="$ctrl.actor.height" onaftersave="$ctrl.updateActor($ctrl.actor)">
+                    <a href="#!" editable-text="$ctrl.actor.height"
+                       onaftersave="$root.patchEntity('actor', $ctrl.actor.id, 'height', $ctrl.actor.height, 'add',
+                                              false, false, null)">
                         {{ $ctrl.actor.height || 'NA' }} cm</a>
                     </span>
                 </td>
@@ -224,7 +233,9 @@
                 </td>
                 <td class="alright">
                     <span>
-                    <a href="#!" editable-text="$ctrl.actor.weight" onaftersave="$ctrl.updateActor($ctrl.actor)">
+                    <a href="#!" editable-text="$ctrl.actor.weight"
+                       onaftersave="$root.patchEntity('actor', $ctrl.actor.id, 'weight', $ctrl.actor.weight, 'add',
+                                              false, false, null)">
                         {{ $ctrl.actor.weight || 'NA' }} Kg</a>
                      </span>
                 </td>
@@ -246,7 +257,9 @@
                 </td>
                 <td class="alright">
                     <span>
-                    <a href="#" editable-text="$ctrl.actor.measurements" onaftersave="$ctrl.updateActor($ctrl.actor)">
+                    <a href="#" editable-text="$ctrl.actor.measurements"
+                       onaftersave="$root.patchEntity('actor', $ctrl.actor.id, 'measurements', $ctrl.actor.measurements, 'add',
+                                              false, false, null)">
                         {{ $ctrl.actor.measurements || 'NA' }}
                         </a>
                      </span>
@@ -260,7 +273,9 @@
                 </td>
                 <td class="alright">
                     <span>
-                        <a href="#" editable-text="$ctrl.actor.gender" onaftersave="$ctrl.updateActor($ctrl.actor)">
+                        <a href="#" editable-text="$ctrl.actor.gender"
+                           onaftersave="$root.patchEntity('actor', $ctrl.actor.id, 'gender', $ctrl.actor.gender, 'add',
+                                              false, false, null)">
                         {{ $ctrl.actor.gender || 'NA' }}
                         </a>
 
@@ -276,7 +291,8 @@
                 <td class="alright">
                     <span>
                        <a href="#" editable-text="$ctrl.actor.country_of_origin"
-                          onaftersave="$ctrl.updateActor($ctrl.actor)">
+                          onaftersave="$root.patchEntity('actor', $ctrl.actor.id, 'country_of_origin', $ctrl.actor.country_of_origin, 'add',
+                                              false, false, null)">
                            {{ $ctrl.actor.country_of_origin || 'NA' }}
                        </a>
 

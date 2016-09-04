@@ -353,10 +353,10 @@ angular.module('sceneList').component('sceneList', {
                 itToRemove.push(itemToRemove.id);
 
                 if (self.selectedScenes.length > 0 && checkIfSceneSelected(scene)) {
-                    self.patchScene(self.scenes[sceneIndex].id, typeOfItemToRemove, itToRemove, 'remove', true, permDelete);
+                    $rootScope.patchEntity('scene', self.scenes[sceneIndex].id, typeOfItemToRemove, itToRemove, 'remove', true, permDelete, self.selectedScenes);
                     self.updateScenesOnRemove(self.selectedScenes, itemToRemove, typeOfItemToRemove)
                 } else {
-                    self.patchScene(self.scenes[sceneIndex].id, typeOfItemToRemove, itToRemove, 'remove', false, permDelete);
+                    $rootScope.patchEntity('scene', self.scenes[sceneIndex].id, typeOfItemToRemove, itToRemove, 'remove', false, permDelete, self.selectedScenes);
                     if (typeOfItemToRemove != 'delete') {
                         var scenes = [];
                         scenes.push(scene.id);
@@ -432,7 +432,7 @@ angular.module('sceneList').component('sceneList', {
 
                         updateScenesOnPageOnAdd(itemToAdd, typeOfItemToAdd);
 
-                        self.patchScene(scene.id, typeOfItemToAdd, patchData, 'add', true)
+                        $rootScope.patchEntity('scene',scene.id, typeOfItemToAdd, patchData, 'add', true, false, self.selectedScenes);
                     } else {
                         updateSceneOnPageOnAdd(sceneIndex, typeOfItemToAdd, itemToAdd);
 
@@ -441,7 +441,7 @@ angular.module('sceneList').component('sceneList', {
                         //     patchData.push(self.scenes[sceneIndex][typeOfItemToAdd][i].id);
                         // }
 
-                        self.patchScene(scene.id, typeOfItemToAdd, patchData, 'add', false)
+                        $rootScope.patchEntity('scene', scene.id, typeOfItemToAdd, patchData, 'add', false, false, self.selectedScenes)
 
 
                     }
@@ -475,11 +475,11 @@ angular.module('sceneList').component('sceneList', {
                             updateScenesOnPageOnAdd(res, typeOfItemToAdd);
 
 
-                            self.patchScene(scene.id, typeOfItemToAdd, patchData, 'add', true)
+                            $rootScope.patchEntity('scene', scene.id, typeOfItemToAdd, patchData, 'add', true, false, self.selectedScenes)
                         } else {
                             updateSceneOnPageOnAdd(sceneIndex, typeOfItemToAdd, res);
 
-                            self.patchScene(scene.id, typeOfItemToAdd, patchData, 'add', false)
+                            $rootScope.patchEntity('scene', scene.id, typeOfItemToAdd, patchData, 'add', false, false, self.selectedScenes)
                         }
 
 
@@ -583,14 +583,17 @@ angular.module('sceneList').component('sceneList', {
 
             self.sceneRunnerUpToggle = function (scene) {
 
-                self.patchScene(scene.id, 'is_runner_up', scene.is_runner_up, 'add', false)
+                $rootScope.patchEntity('scene', scene.id, 'is_runner_up', scene.is_runner_up, 'add', false, false, self.selectedScenes);
+                
 
             };
 
 
             self.sceneRatingPatch = function (scene) {
+                
+                $rootScope.patchEntity('scene', scene.id, 'rating', scene.rating, 'add', false, false, self.selectedScenes);
 
-                self.patchScene(scene.id, 'rating', scene.rating, 'add', false)
+                
 
             };
 
