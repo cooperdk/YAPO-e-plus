@@ -60,7 +60,7 @@ I hope some people who know Python, HTML, AngularJS and CSS will find it interes
 ### What are the limitations of YAPO?
 Due to the limitation of web-apps it's currently impossible to play the videos inside the browser window (though it will be possible in the future using ffmpeg to transcode the video, exactly in the way [Emby Media Center](https://emby.media/)  does it). Right now YAPO can only show the sample videos inside the browser window and relies on an external player (VLC) to play the full scenes, (just like Pornganizer).
 
-##### What YAPO's potential in the future?
+##### What is YAPO's potential in the future?
 * Well, because it's a local server, it can do neat things. For instance it can be accessed from your phone over the local network. Actually not only phones, anything with a browser. Though my main goal right now is not making YAPO mobile-friendly, but because the client side is built with AngularJS and HTML bootstrap it's kind of mobile-friendly already.
 
 * Again, because it's a client-server thing, in the future it will be possible to cast video streams to other devices. It can even be possible over the Internet, not only on the local network. Kind of like your own personal Pornhub.
