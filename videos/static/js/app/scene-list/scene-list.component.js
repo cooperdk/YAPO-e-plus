@@ -212,7 +212,7 @@ angular.module('sceneList').component('sceneList', {
                     self.scenes = [];
                     self.sortBy = sortOrder['sortBy'];
 
-                    if (sortOrder.mainPage == undefined || sortOrder.mainPage == true ) {
+                    if (sortOrder.mainPage == undefined || sortOrder.mainPage == true) {
                         self.nextPage(0);
                     }
                     didSectionListWrapperLoad = true;
@@ -292,8 +292,7 @@ angular.module('sceneList').component('sceneList', {
 
 
             self.updateScenesOnRemove = function (scenes, itemToRemove, typeOfItemToRemove) {
-                var resId = [];
-                var resObj = [];
+
                 if (typeOfItemToRemove == 'delete') {
 
                     for (var x = 0; x < scenes.length; x++) {
@@ -308,23 +307,13 @@ angular.module('sceneList').component('sceneList', {
                         var sceneIndex = findIndexOfSceneInList(scenes[j]);
 
 
-                        for (var i = 0; i < self.scenes[sceneIndex][typeOfItemToRemove].length; i++) {
-                            if (itemToRemove.id != self.scenes[sceneIndex][typeOfItemToRemove][i].id) {
-                                resId.push(self.scenes[sceneIndex][typeOfItemToRemove][i].id);
-                                resObj.push(self.scenes[sceneIndex][typeOfItemToRemove][i]);
-                            }
-                        }
+                        self.scenes[sceneIndex] = $rootScope.removeItemFromScene(self.scenes[sceneIndex], itemToRemove, typeOfItemToRemove);
 
-                        self.scenes[sceneIndex][typeOfItemToRemove] = resObj;
-
-                        resObj = [];
 
                     }
 
+
                 }
-
-
-                return resId
 
 
             };
@@ -356,58 +345,43 @@ angular.module('sceneList').component('sceneList', {
             self.removeItem = function (scene, itemToRemove, typeOfItemToRemove, permDelete) {
 
 
-                var resId = [];
+                // var resId = [];
+
                 var sceneIndex = findIndexOfSceneInList(scene.id);
 
+                var itToRemove = [];
+                itToRemove.push(itemToRemove.id);
 
                 if (self.selectedScenes.length > 0 && checkIfSceneSelected(scene)) {
-                    if (typeOfItemToRemove != 'delete') {
-                        var itToRemove = [];
-                        itToRemove.push(itemToRemove.id);
-                    }
-
-                    self.patchScene(self.scenes[sceneIndex].id, typeOfItemToRemove, itToRemove, 'remove', true, permDelete)
-                } else {
-
-                    self.patchScene(self.scenes[sceneIndex].id, typeOfItemToRemove, resId, 'remove', false, permDelete)
-                }
-
-                if (self.selectedScenes.length > 0 && checkIfSceneSelected(scene)) {
-
+                    self.patchScene(self.scenes[sceneIndex].id, typeOfItemToRemove, itToRemove, 'remove', true, permDelete);
                     self.updateScenesOnRemove(self.selectedScenes, itemToRemove, typeOfItemToRemove)
                 } else {
+                    self.patchScene(self.scenes[sceneIndex].id, typeOfItemToRemove, itToRemove, 'remove', false, permDelete);
                     if (typeOfItemToRemove != 'delete') {
                         var scenes = [];
                         scenes.push(scene.id);
-                        resId = self.updateScenesOnRemove(scenes, itemToRemove, typeOfItemToRemove)
+                        self.updateScenesOnRemove(scenes, itemToRemove, typeOfItemToRemove)
                     } else {
                         if (!permDelete) {
                             self.removeSceneFromList(scene)
                         }
-
-
                     }
 
+
+                    self.selectNone()
+
+
                 }
+            }
+            ;
 
-
-                self.selectNone()
-
-
-            };
 
             var updateSceneOnPageOnAdd = function (sceneIndex, typeOfItemToAdd, itemToAdd) {
 
-                var found = false;
-                for (var i = 0; i < self.scenes[sceneIndex][typeOfItemToAdd].length && !found; i++) {
-                    if (self.scenes[sceneIndex][typeOfItemToAdd][i].id == itemToAdd.id) {
-                        found = true;
-                    }
-                }
 
-                if (!found) {
-                    self.scenes[sceneIndex][typeOfItemToAdd].push(itemToAdd);
-                }
+                self.scenes[sceneIndex] = $rootScope.addItemToScene(self.scenes[sceneIndex], itemToAdd, typeOfItemToAdd);
+
+
             };
 
             var updateScenesOnPageOnAdd = function (itemToAdd, typeOfItemToAdd) {
@@ -437,100 +411,73 @@ angular.module('sceneList').component('sceneList', {
 
             self.addItem = function (scene, itemToAdd, typeOfItemToAdd) {
 
+                // Find the scene in question in self.scenes
                 var sceneIndex = findIndexOfSceneInList(scene.id);
 
+                // if the type of item to add does not exist in the scene (EX: The websites array does not exist)
+                // create empty one.
                 if (self.scenes[sceneIndex][typeOfItemToAdd] == undefined) {
                     self.scenes[sceneIndex][typeOfItemToAdd] = [];
                 }
 
-
+                // id '-1' signifies that the item in question does not exist in the database yet and needs to be
+                // created.
                 if (itemToAdd.id != '-1') {
 
-
-
-
-
-                    // console.log(self.scenes[sceneIndex][typeOfItemToAdd].indexOf(itemToAdd));
-                    // if (self.scenes[sceneIndex][typeOfItemToAdd].indexOf(itemToAdd) == '-1'){
-                    //     self.scenes[sceneIndex][typeOfItemToAdd].push(itemToAdd);
-                    // }
-
                     var patchData = [];
+                    patchData.push(itemToAdd.id);
+
+                    // If more than one scene is checked and if current scene is one of the checked scenes.
                     if (self.selectedScenes.length > 0 && checkIfSceneSelected(scene)) {
+
                         updateScenesOnPageOnAdd(itemToAdd, typeOfItemToAdd);
-
-
-                        patchData.push(itemToAdd.id);
-
 
                         self.patchScene(scene.id, typeOfItemToAdd, patchData, 'add', true)
                     } else {
                         updateSceneOnPageOnAdd(sceneIndex, typeOfItemToAdd, itemToAdd);
 
-
-                        for (var i = 0; i < self.scenes[sceneIndex][typeOfItemToAdd].length; i++) {
-                            patchData.push(self.scenes[sceneIndex][typeOfItemToAdd][i].id);
-                        }
+                        //
+                        // for (var i = 0; i < self.scenes[sceneIndex][typeOfItemToAdd].length; i++) {
+                        //     patchData.push(self.scenes[sceneIndex][typeOfItemToAdd][i].id);
+                        // }
 
                         self.patchScene(scene.id, typeOfItemToAdd, patchData, 'add', false)
+
+
                     }
 
 
                 } else {
-                    var newItem;
-                    if (typeOfItemToAdd == 'actors') {
-                        newItem = new Actor();
-                        newItem.thumbnail = 'media/images/actor/Unknown/profile/profile.jpg'; //need to change this to a constant!
-                        newItem.scenes = [];
-                    } else if (typeOfItemToAdd == 'scene_tags') {
-                        newItem = new SceneTag();
-                        newItem.scenes = [];
-                        newItem.websites = [];
-                    } else if (typeOfItemToAdd == 'websites') {
-                        newItem = new Website;
-                        newItem.scenes = [];
-                    }
 
-                    newItem.name = itemToAdd.value;
+                    var newItem = $rootScope.createNewItem(typeOfItemToAdd, itemToAdd.value);
+                    // if (typeOfItemToAdd == 'actors') {
+                    //     newItem = new Actor();
+                    //     newItem.thumbnail = 'media/images/actor/Unknown/profile/profile.jpg'; //need to change this to a constant!
+                    //     newItem.scenes = [];
+                    // } else if (typeOfItemToAdd == 'scene_tags') {
+                    //     newItem = new SceneTag();
+                    //     newItem.scenes = [];
+                    //     newItem.websites = [];
+                    // } else if (typeOfItemToAdd == 'websites') {
+                    //     newItem = new Website;
+                    //     newItem.scenes = [];
+                    // }
+                    //
+                    // newItem.name = itemToAdd.value;
 
                     newItem.$save().then(function (res) {
 
-
-                        // self.scenes[sceneIndex][typeOfItemToAdd].push(res);
-                        //
-                        // var patchData = [];
-                        // for (var i = 0; i < self.scenes[sceneIndex][typeOfItemToAdd].length; i++) {
-                        //     patchData.push(self.scenes[sceneIndex][typeOfItemToAdd][i].id);
-                        // }
-                        //
-                        // if (self.selectedScenes.length > 0 && checkIfSceneSelected(scene)) {
-                        //     updateScenesOnPageOnAdd(itemToAdd, typeOfItemToAdd);
-                        //     self.patchScene(scene.id, typeOfItemToAdd, patchData, 'add', true)
-                        // } else {
-                        //     updateSceneOnPageOnAdd(sceneIndex, typeOfItemToAdd, itemToAdd);
-                        //     self.patchScene(scene.id, typeOfItemToAdd, patchData, 'add', false)
-                        // }
-
-                        // self.patchScene(scene.id, typeOfItemToAdd, patchData, 'add');
-
-                        // self.updateActor(self.actor);
-
+                        // Duplicate code from  [if (itemToAdd.id != '-1')] need to clean up.
                         var patchData = [];
+                        patchData.push(res.id);
+
                         if (self.selectedScenes.length > 0 && checkIfSceneSelected(scene)) {
                             updateScenesOnPageOnAdd(res, typeOfItemToAdd);
-
-
-                            patchData.push(res.id);
 
 
                             self.patchScene(scene.id, typeOfItemToAdd, patchData, 'add', true)
                         } else {
                             updateSceneOnPageOnAdd(sceneIndex, typeOfItemToAdd, res);
-
-
-                            for (var i = 0; i < self.scenes[sceneIndex][typeOfItemToAdd].length; i++) {
-                                patchData.push(self.scenes[sceneIndex][typeOfItemToAdd][i].id);
-                            }
 
                             self.patchScene(scene.id, typeOfItemToAdd, patchData, 'add', false)
                         }
@@ -547,38 +494,30 @@ angular.module('sceneList').component('sceneList', {
                 var type = {};
                 type[patchType] = patchData;
 
-
+                var itemsToUpdate = [];
                 if (multiple) {
-
-                    $http.post('tag-multiple-items/', {
-                        params: {
-                            type: 'scene',
-                            patchType: patchType,
-                            patchData: patchData,
-                            itemsToUpdate: self.selectedScenes,
-                            addOrRemove: addOrRemove,
-                            permDelete: permDelete
-                        }
-                    }).then(function (response) {
-                        console.log("Update finished successfully")
-                    }, function errorCallback(response) {
-                        alert("Something went wrong!");
-                    });
-
-
+                    itemsToUpdate = self.selectedScenes
                 } else {
-                    if (patchType == 'delete') {
-                        if (!permDelete) {
-                            Scene.remove({sceneId: sceneToPatchId});
-                        }
-
-                    } else {
-                        Scene.patch({sceneId: sceneToPatchId}, type)
-                    }
-
+                    itemsToUpdate.push(sceneToPatchId)
                 }
 
 
+                // if (multiple) {
+
+                $http.post('tag-multiple-items/', {
+                    params: {
+                        type: 'scene',
+                        patchType: patchType,
+                        patchData: patchData,
+                        itemsToUpdate: itemsToUpdate,
+                        addOrRemove: addOrRemove,
+                        permDelete: permDelete
+                    }
+                }).then(function (response) {
+                    console.log("Update finished successfully")
+                }, function errorCallback(response) {
+                    alert("Something went wrong!");
+                });
             };
 
             // $scope.$on("sceneTagSelected", function (event, object) {
@@ -597,10 +536,13 @@ angular.module('sceneList').component('sceneList', {
 
             $scope.$on("sceneTagSelected", function (event, object) {
 
-                var selectedObject = object['selectedObject'];
-                var originalObject = object['originalObject'];
+                if (object['sendingObjectType'] == 'Scene-List') {
+                    var selectedObject = object['selectedObject'];
+                    var originalObject = object['originalObject'];
 
-                self.addItem(originalObject, selectedObject, 'scene_tags');
+                    self.addItem(originalObject, selectedObject, 'scene_tags');
+                }
+
 
             });
 
@@ -608,6 +550,7 @@ angular.module('sceneList').component('sceneList', {
 
                 var selectedWebsite = object['selectedObject'];
                 var scene = object['originalObject'];
+
 
                 self.addItem(scene, selectedWebsite, 'websites');
 

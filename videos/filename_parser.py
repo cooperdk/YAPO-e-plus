@@ -124,17 +124,18 @@ def parse_all_scenes(ignore_last_lookup):
                 print("Scene {} out of {}".format(counter, scene_count))
 
                 if scene.last_filename_tag_lookup:
-                    actors_filtered = list(Actor.objects.filter(date_added__gt=scene.last_filename_tag_lookup))
+                    actors_filtered = list(Actor.objects.filter(modified_date__gt=scene.last_filename_tag_lookup))
                     actors_filtered.sort(key=lambda x: len(x.name), reverse=True)
 
                     actors_alias_filtered = list(
                         ActorAlias.objects.filter(date_added__gt=scene.last_filename_tag_lookup))
                     actors_alias_filtered.sort(key=lambda x: len(x.name), reverse=True)
 
-                    scene_tags_filtered = list(SceneTag.objects.filter(date_added__gt=scene.last_filename_tag_lookup))
+                    scene_tags_filtered = list(
+                        SceneTag.objects.filter(modified_date__gt=scene.last_filename_tag_lookup))
                     scene_tags_filtered.sort(key=lambda x: len(x.name), reverse=True)
 
-                    websites_filtered = list(Website.objects.filter(date_added__gt=scene.last_filename_tag_lookup))
+                    websites_filtered = list(Website.objects.filter(modified_date__gt=scene.last_filename_tag_lookup))
                     websites_filtered.sort(key=lambda x: len(x.name), reverse=True)
 
                     actors_alias_filtered = filter_alias(actors_alias_filtered)
@@ -326,6 +327,13 @@ def parse_actors_in_scene(scene_to_parse, scene_path, actors, actors_alias):
                 scene_path = ans['scene_path']
                 add_actor_to_scene(actor, scene_to_parse)
 
+                if actor.actor_tags.count() > 0:
+                    for actor_tag in actor.actor_tags.all():
+                        current_tag = actor_tag.scene_tags.first()
+                        if not scene_to_parse.scene_tags.filter(id=current_tag.id):
+                            print("Adding SceneTag '{}' to the scene {}".format(current_tag.name, scene_to_parse.name))
+                            scene_to_parse.scene_tags.add(current_tag)
+
                 # regex_search_term = get_regex_search_term(actor.name, ' ')
                 #
                 # if re.search(regex_search_term, scene_path, re.IGNORECASE) is not None:
@@ -336,6 +344,8 @@ def parse_actors_in_scene(scene_to_parse, scene_path, actors, actors_alias):
                 #     add_actor_to_scene(actor, scene_to_parse)
                 #     # else:
                 #     # print (actor.name + " is one word name")
+
+
 
     for alias in actors_alias:
         # print("             Checking alias {}".format(alias.name))
@@ -434,6 +444,12 @@ def parse_website_in_scenes(scene, scene_path, websites):
                 print("Adding Website: '{}' to the scene {}".format(website.name, scene.name))
                 scene.websites.add(website)
 
+            if website.scene_tags.count() > 0:
+                for scene_tag in website.scene_tags.all():
+                    if not scene.scene_tags.filter(id=scene_tag.id):
+                        print("Adding SceneTag '{}' to the scene {}".format(website.name, scene.name))
+                        scene.scene_tags.add(scene_tag)
+
                 #         check website alias
         if website.website_alias != "":
             for website_alias in website.website_alias.split(','):
@@ -445,6 +461,8 @@ def parse_website_in_scenes(scene, scene_path, websites):
                     if not scene.websites.filter(name=website.name):
                         print("Adding Website: '{}' to the scene {}".format(website.name, scene.name))
                         scene.websites.add(website)
+
+
 
     return scene_path
 

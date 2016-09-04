@@ -21,7 +21,36 @@ angular.module('sceneDetail').component('sceneDetail', {
             self.selectedWebsite = null;
 
             self.isSampleExists = false;
-            self.updatedSample= true;
+            self.updatedSample = true;
+
+            self.addItem = function (itemToAdd, typeOfItemToAdd) {
+
+                var patchData = [];
+               
+
+                if (itemToAdd.id != '-1') {
+                    patchData.push(itemToAdd.id);
+                    self.scene = $rootScope.addItemToScene(self.scene, itemToAdd, typeOfItemToAdd);
+                    // function (sceneToPatchId, patchType, patchData, addOrRemove, multiple, permDelete)
+                    $rootScope.patchScene(self.scene.id, typeOfItemToAdd, patchData, 'add', false, false)
+                } else {
+                    var newItem = $rootScope.createNewItem(typeOfItemToAdd, itemToAdd.value);
+                    newItem.$save().then(function (res) {
+                        self.scene = $rootScope.addItemToScene(self.scene, res, typeOfItemToAdd);
+                        patchData.push(res.id);
+                        $rootScope.patchScene(self.scene.id, typeOfItemToAdd, patchData, 'add', false, false)
+                    });
+
+                }
+
+            };
+            
+            self.removeItem = function (itemToRemove, typeOfItemToRemove) {
+                var patchData = [];
+                patchData.push(itemToRemove.id);
+                self.scene = $rootScope.removeItemFromScene(self.scene,itemToRemove,typeOfItemToRemove);
+                $rootScope.patchScene(self.scene.id,typeOfItemToRemove,patchData,'remove',false,false)
+            };
 
 
             $scope.$on("sceneChanged", function (event, scene) {
@@ -32,18 +61,21 @@ angular.module('sceneDetail').component('sceneDetail', {
 
             $scope.$on("actorSelected", function (event, selectedActor) {
                 self.actor = selectedActor['selectedObject'];
-                self.actorSelect(self.actor);
+                // self.actorSelect(self.actor);
+                self.addItem(selectedActor['selectedObject'], 'actors')
             });
 
 
             $scope.$on("websiteSelected", function (event, website) {
                 self.website = website['selectedObject'];
-                self.websiteSelect(self.website);
+                // self.websiteSelect(self.website);
+                self.addItem(website['selectedObject'], 'websites')
+
             });
 
             $scope.$on("sceneTagSelected", function (event, sceneTag) {
-
-                self.sceneTagSelect(sceneTag['selectedObject']);
+                // self.sceneTagSelect(sceneTag['selectedObject'], true);
+                self.addItem(sceneTag['selectedObject'], 'scene_tags')
             });
 
 
@@ -54,34 +86,32 @@ angular.module('sceneDetail').component('sceneDetail', {
             self.getCurrentScene = function () {
 
                 self.scene = Scene.get({sceneId: $routeParams.sceneId}).$promise.then(function (res) {
-                self.currentScene = res.id;
-                console.log("scene-detail: current id is " + angular.toJson(self.currentScene));
-                self.scene = res;
-                gotPromise = true;
+                    self.currentScene = res.id;
+                    console.log("scene-detail: current id is " + angular.toJson(self.currentScene));
+                    self.scene = res;
+                    gotPromise = true;
 
-                self.samplePath = '/media/scenes/' + res.id + '/sample/sample.mp4';
-                $rootScope.title = res.name;
+                    self.samplePath = '/media/scenes/' + res.id + '/sample/sample.mp4';
+                    $rootScope.title = res.name;
 
 
+                    scopeWatchService.sceneLoaded(res);
 
-                scopeWatchService.sceneLoaded(res);
-
-                self.getNext();
-                self.getPrev();
-            });
+                    self.getNext();
+                    self.getPrev();
+                });
 
             };
 
-             $scope.$on("didSceneLoad", function (event, scene) {
+            $scope.$on("didSceneLoad", function (event, scene) {
 
-                if (gotPromise){
+                if (gotPromise) {
                     scopeWatchService.sceneLoaded(self.scene)
                 }
 
             });
 
             self.getCurrentScene();
-
 
 
             self.didGetPromise = function () {
@@ -100,7 +130,7 @@ angular.module('sceneDetail').component('sceneDetail', {
                 Scene.update({sceneId: scene.id}, scene);
             };
 
-            self.sceneTagSelect = function (sceneTag) {
+            self.sceneTagSelect = function (sceneTag, isSourceOfRequest) {
                 // alert("item " +
                 // angular.toJson($item) +
                 // "model:" + angular.toJson($model) +
@@ -117,7 +147,11 @@ angular.module('sceneDetail').component('sceneDetail', {
                     }
                     if (!found) {
                         self.scene.scene_tags.push(sceneTag.id);
-                        self.updateScene(self.scene);
+
+                        if (isSourceOfRequest) {
+                            self.updateScene(self.scene);
+                        }
+
 
                         scopeWatchService.addSceneTagToList(sceneTag);
 
@@ -158,6 +192,13 @@ angular.module('sceneDetail').component('sceneDetail', {
                     if (!found) {
 
                         self.scene.websites.push(website.id);
+
+                        if (website.scene_tags_with_names.length > 0) {
+                            for (var i = 0; i < website.scene_tags_with_names.length; i++) {
+                                self.sceneTagSelect(website.scene_tags_with_names[i], false)
+                            }
+                        }
+
                         self.updateScene(self.scene);
                         scopeWatchService.addWebsiteToList(website);
 
@@ -309,9 +350,9 @@ angular.module('sceneDetail').component('sceneDetail', {
                     }
                 })
             };
-            
+
             self.generateSampleVideo = function (scene) {
-                
+
                 $http.get('ffmpeg/', {
                     params: {
                         generateSampleVideo: true,
@@ -323,7 +364,7 @@ angular.module('sceneDetail').component('sceneDetail', {
                 }, function errorCallback(response) {
                     alert("Something went wrong!");
                 });
-            }
+            };
 
 
         }

@@ -55,19 +55,28 @@ class SceneIdNameSerializer(serializers.ModelSerializer):
         fields = ['id', 'name']
 
 
+class SceneTagIdNameSerialzier(serializers.ModelSerializer):
+    class Meta:
+        model = SceneTag
+        fields = ['id', 'name']
+
+
 class WebsiteSerializer(serializers.ModelSerializer):
     # scenes = SceneIdNameSerializer(read_only=True, many=True)
+    scene_tags_with_names = SceneTagIdNameSerialzier(many=True, read_only=True, source='scene_tags')
 
     class Meta:
         model = Website
         fields = ['id', 'name', 'date_added', 'play_count', 'date_fav', 'date_runner_up', 'is_fav', 'is_runner_up',
-                  'rating', 'thumbnail', 'scene_tags', 'scenes', 'website_alias']
+                  'rating', 'thumbnail', 'scenes', 'website_alias', 'scene_tags', 'scene_tags_with_names']
 
 
 class WebsiteIdNameSerailzier(serializers.ModelSerializer):
+    scene_tags_with_names = SceneTagIdNameSerialzier(many=True, read_only=True, source='scene_tags')
+
     class Meta:
         model = Website
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'scene_tags_with_names']
 
 
 class SceneTagSerializer(serializers.ModelSerializer):
@@ -77,12 +86,6 @@ class SceneTagSerializer(serializers.ModelSerializer):
         model = SceneTag
         fields = ['id', 'name', 'date_added', 'play_count', 'date_fav', 'date_runner_up', 'is_fav', 'is_runner_up',
                   'rating', 'thumbnail', 'websites', 'scenes', 'scene_tag_alias']
-
-
-class SceneTagIdNameSerialzier(serializers.ModelSerializer):
-    class Meta:
-        model = SceneTag
-        fields = ['id', 'name']
 
 
 class ActorAliasSerializer(serializers.ModelSerializer):
@@ -95,25 +98,30 @@ class ActorAliasSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'is_exempt_from_one_word_search']
 
 
-class ActorIdNameSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Actor
-        fields = ['id', 'name']
-
-
 class ActorTagListSerializer(serializers.ModelSerializer):
     # actors = ActorIdNameSerializer(many=True, read_only=True)
+    scene_tags = SceneTagIdNameSerialzier(many=True, read_only=True)
 
     class Meta:
         model = ActorTag
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'scene_tags']
+
+
+class ActorIdNameSerializer(serializers.ModelSerializer):
+    actor_tags = ActorTagListSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Actor
+        fields = ['id', 'name', 'thumbnail', 'actor_tags']
 
 
 class ActorListSerializer(serializers.ModelSerializer):
+    actor_tags = ActorTagListSerializer(many=True,read_only=True)
+
     class Meta:
         model = Actor
         fields = ['id', 'name', 'thumbnail', 'rating', 'height', 'ethnicity', 'weight', 'country_of_origin',
-                  'is_runner_up']
+                  'is_runner_up', 'actor_tags']
 
 
 class ActorSerializer(serializers.ModelSerializer):
@@ -129,6 +137,8 @@ class ActorSerializer(serializers.ModelSerializer):
 
     # scenes = SceneIdNameSerializer(many=True, read_only=True)
     # actor_tags = ActorIdNameSerializer(many=True, read_only=True)
+
+    actor_tags = ActorTagListSerializer(many=True, read_only=True)
 
     class Meta:
         model = Actor
@@ -182,6 +192,10 @@ class SceneListSerializer(serializers.ModelSerializer):
 
 
 class SceneSerializer(serializers.ModelSerializer):
+    actors = ActorIdNameSerializer(many=True, read_only=True)
+    scene_tags = SceneIdNameSerializer(many=True, read_only=True)
+    websites = WebsiteIdNameSerailzier(many=True, read_only=True)
+
     class Meta:
         model = Scene
 
@@ -199,10 +213,10 @@ class SceneSerializer(serializers.ModelSerializer):
 class ActorTagSerializer(serializers.ModelSerializer):
     # actors = ActorIdNameSerializer(many=True, read_only=True)
 
-
+    scene_tags = SceneTagIdNameSerialzier(many=True, read_only=True)
 
     class Meta:
         model = ActorTag
         # depth = 1
         fields = ['id', 'name', 'date_added', 'date_fav', 'date_runner_up', 'play_count', 'is_fav', 'is_runner_up',
-                  'rating', 'thumbnail', 'actors']
+                  'rating', 'thumbnail', 'actors', 'scene_tags']

@@ -23,6 +23,24 @@
             {{ $ctrl.website.website_alias || 'no alias' }}
         </a>
     </label>
+    <br>
+    <label>
+        Website Scene Tags:
+    </label>
+    <async-typeahead object="$ctrl.website.scene_tags"
+                     object-type='scene_tags'
+                     sending-object="$ctrl.scene"
+                     sending-object-type='Website-Detail'
+                     selected-object="$ctrl.selectedSceneTag = $event.selected"
+    ></async-typeahead>
+
+    <span ng-repeat="tag in $ctrl.website.scene_tags_with_names"> <a
+            href="/#!/scene-tag/{{ tag.id }}">  {{ tag.name }}</a> <span
+            class="glyphicon glyphicon-remove"
+            ng-click="$ctrl.removeSceneTag(tag)"></span> {{$last ? '' : ', '}} </span>
+    </span>
+
+    <scene-tag-list pk="$ctrl.scene.scene_tags" scene="$ctrl.scene"></scene-tag-list>
 </div>
 
 <section-list-wrapper main-page="false" section-type="'SceneList'"></section-list-wrapper>

@@ -3,6 +3,9 @@ from __future__ import unicode_literals
 from django.core.urlresolvers import reverse
 from django.db import models
 from mptt.models import MPTTModel, TreeForeignKey
+from django.dispatch import receiver
+from django.db.models import signals
+
 import datetime
 
 
@@ -20,23 +23,6 @@ class ActorAlias(models.Model):
         return "%s " % (self.name,)
 
 
-class ActorTag(models.Model):
-    name = models.CharField(max_length=50, unique=True)
-    date_added = models.DateTimeField(auto_now_add=True)
-    date_fav = models.DateTimeField(null=True, blank=True)
-    date_runner_up = models.DateTimeField(null=True, blank=True)
-    play_count = models.IntegerField(default=0)
-    is_fav = models.BooleanField(default=False)
-    is_runner_up = models.BooleanField(default=False)
-    rating = models.IntegerField(default=0)
-    thumbnail = models.CharField(max_length=500, null=True, blank=True)
-    actor_tag_alias = models.TextField(default="", blank=True)
-    modified_date = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return "%s " % (self.name,)
-
-
 class SceneTag(models.Model):
     name = models.CharField(max_length=50, unique=True)
     date_added = models.DateTimeField(auto_now_add=True)
@@ -48,6 +34,24 @@ class SceneTag(models.Model):
     rating = models.IntegerField(default=0)
     thumbnail = models.CharField(max_length=500, null=True, blank=True)
     scene_tag_alias = models.TextField(default="", blank=True)
+    modified_date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return "%s " % (self.name,)
+
+
+class ActorTag(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    date_added = models.DateTimeField(auto_now_add=True)
+    date_fav = models.DateTimeField(null=True, blank=True)
+    date_runner_up = models.DateTimeField(null=True, blank=True)
+    play_count = models.IntegerField(default=0)
+    is_fav = models.BooleanField(default=False)
+    is_runner_up = models.BooleanField(default=False)
+    rating = models.IntegerField(default=0)
+    thumbnail = models.CharField(max_length=500, null=True, blank=True)
+    actor_tag_alias = models.TextField(default="", blank=True)
+    scene_tags = models.ManyToManyField(SceneTag, null=True, blank=True, related_name='actor_tags')
     modified_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -176,3 +180,16 @@ class Folder(MPTTModel):
 class LocalSceneFolders(models.Model):
     name = models.CharField(max_length=500, unique=True)
 
+
+@receiver(signals.post_save, sender=ActorTag)
+def create_scene_tag(sender, **kwargs):
+    saved_actor_tag_instance = kwargs.get('instance')
+
+    if not SceneTag.objects.filter(name=saved_actor_tag_instance.name):
+        SceneTag.objects.create(name=saved_actor_tag_instance.name)
+
+    saved_actor_tag_instance.scene_tags.add(SceneTag.objects.get(name=saved_actor_tag_instance.name))
+
+    signals.post_save.disconnect(create_scene_tag, sender=ActorTag)
+    saved_actor_tag_instance.save()
+    signals.post_save.connect(create_scene_tag, sender=ActorTag)
