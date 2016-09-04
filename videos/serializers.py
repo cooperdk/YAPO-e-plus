@@ -56,9 +56,14 @@ class SceneIdNameSerializer(serializers.ModelSerializer):
 
 
 class SceneTagIdNameSerialzier(serializers.ModelSerializer):
+    usage_count = serializers.SerializerMethodField()
+
     class Meta:
         model = SceneTag
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'usage_count']
+
+    def get_usage_count(self, obj):
+        return obj.scenes.count()
 
 
 class WebsiteSerializer(serializers.ModelSerializer):
@@ -73,10 +78,14 @@ class WebsiteSerializer(serializers.ModelSerializer):
 
 class WebsiteIdNameSerailzier(serializers.ModelSerializer):
     scene_tags_with_names = SceneTagIdNameSerialzier(many=True, read_only=True, source='scene_tags')
+    usage_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Website
-        fields = ['id', 'name', 'scene_tags_with_names']
+        fields = ['id', 'name', 'scene_tags_with_names', 'usage_count']
+
+    def get_usage_count(self, obj):
+        return obj.scenes.count()
 
 
 class SceneTagSerializer(serializers.ModelSerializer):
@@ -102,9 +111,14 @@ class ActorTagListSerializer(serializers.ModelSerializer):
     # actors = ActorIdNameSerializer(many=True, read_only=True)
     scene_tags = SceneTagIdNameSerialzier(many=True, read_only=True)
 
+    usage_count = serializers.SerializerMethodField()
+
     class Meta:
         model = ActorTag
-        fields = ['id', 'name', 'scene_tags']
+        fields = ['id', 'name', 'scene_tags', 'usage_count']
+
+    def get_usage_count(self, obj):
+        return obj.actors.count()
 
 
 class ActorIdNameSerializer(serializers.ModelSerializer):
@@ -116,12 +130,16 @@ class ActorIdNameSerializer(serializers.ModelSerializer):
 
 
 class ActorListSerializer(serializers.ModelSerializer):
-    actor_tags = ActorTagListSerializer(many=True,read_only=True)
+    actor_tags = ActorTagListSerializer(many=True, read_only=True)
+    usage_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Actor
         fields = ['id', 'name', 'thumbnail', 'rating', 'height', 'ethnicity', 'weight', 'country_of_origin',
-                  'is_runner_up', 'actor_tags']
+                  'is_runner_up', 'actor_tags', 'usage_count']
+
+    def get_usage_count(self, obj):
+        return obj.scenes.count()
 
 
 class ActorSerializer(serializers.ModelSerializer):

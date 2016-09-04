@@ -97,6 +97,8 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                     "-date_of_birth": "Date Of Birth Dsc",
                     "measurements": "Measurements Asc",
                     "-measurements": "Measurements Dsc",
+                    "usage_count": "Usage Count Asc",
+                    "-usage_count": "Usage Count Dsc",
                     "random": "Random"
 
 
@@ -161,6 +163,8 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                     "-rating": "Rating Dsc",
                     "date_added": "Date Added Asc",
                     "-date_added": "Date Added Dsc",
+                    "usage_count": "Usage Count Asc",
+                    "-usage_count": "Usage Count Dsc",
                     "random": "Random"
 
 
@@ -181,6 +185,8 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                     "-rating": "Rating Dsc",
                     "date_added": "Date Added Asc",
                     "-date_added": "Date Added Dsc",
+                    "usage_count": "Usage Count Asc",
+                    "-usage_count": "Usage Count Dsc",
                     "random": "Random"
 
 
@@ -202,6 +208,8 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                     "-rating": "Rating Dsc",
                     "date_added": "Date Added Asc",
                     "-date_added": "Date Added Dsc",
+                    "usage_count": "Usage Count Asc",
+                    "-usage_count": "Usage Count Dsc",
                     "random": "Random"
 
 

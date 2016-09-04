@@ -194,6 +194,9 @@ def search_in_get_queryset(original_queryset, request):
         sort_by = request.query_params['sortBy']
         if sort_by == 'random':
             random = True
+        if 'usage_count' in sort_by:
+            term_is_not_null = True
+            qs_list = list(original_queryset)
 
     if term_is_not_null:
         if random:
@@ -201,16 +204,29 @@ def search_in_get_queryset(original_queryset, request):
         else:
             if '-' in sort_by:
                 sort_by = sort_by.replace('-', '')
-                temp_list = sorted(qs_list,
-                                   key=lambda k: (lambda_attrgetter(sort_by, k) is None,
-                                                  lambda_attrgetter(sort_by, k) == "",
-                                                  lambda_attrgetter(sort_by, k)), reverse=True)
+                if sort_by == 'usage_count':
+                    try:
+                        temp_list = sorted(qs_list, key=lambda k: k.scenes.count(), reverse=True)
+                    except AttributeError:
+                        temp_list = sorted(qs_list, key=lambda k: k.actors.count(), reverse=True)
+                else:
+                    temp_list = sorted(qs_list,
+                                       key=lambda k: (lambda_attrgetter(sort_by, k) is None,
+                                                      lambda_attrgetter(sort_by, k) == "",
+                                                      lambda_attrgetter(sort_by, k)), reverse=True)
+
             else:
 
-                temp_list = sorted(qs_list,
-                                   key=lambda k: (lambda_attrgetter(sort_by, k) is None,
-                                                  lambda_attrgetter(sort_by, k) == "",
-                                                  lambda_attrgetter(sort_by, k)))
+                if sort_by == 'usage_count':
+                    try:
+                        temp_list = sorted(qs_list, key=lambda k: k.scenes.count())
+                    except AttributeError:
+                        temp_list = sorted(qs_list, key=lambda k: k.actors.count())
+                else:
+                    temp_list = sorted(qs_list,
+                                       key=lambda k: (lambda_attrgetter(sort_by, k) is None,
+                                                      lambda_attrgetter(sort_by, k) == "",
+                                                      lambda_attrgetter(sort_by, k)))
             return temp_list
 
         return qs_list
