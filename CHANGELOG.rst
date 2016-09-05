@@ -1,11 +1,13 @@
 Changelog
 =========
 
-0.1.0 (unreleased)
+0.1.0 (2016-09-04)
 ------------------
 
 New
 ~~~
+
+- Updated CHANGELOG.rst. [Shaun Clayton]
 
 - Added stub for CHANGELOG.rst. [Shaun Clayton]
 
