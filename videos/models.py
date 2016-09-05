@@ -182,6 +182,11 @@ class LocalSceneFolders(models.Model):
     name = models.CharField(max_length=500, unique=True)
 
 
+class Playlist(models.Model):
+    name = models.CharField(max_length=500, unique=True)
+
+
+
 @receiver(signals.post_save, sender=ActorTag)
 def create_scene_tag(sender, **kwargs):
     saved_actor_tag_instance = kwargs.get('instance')

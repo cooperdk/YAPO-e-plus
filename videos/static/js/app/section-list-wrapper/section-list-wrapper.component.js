@@ -99,6 +99,8 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                     "-measurements": "Measurements Dsc",
                     "usage_count": "Usage Count Asc",
                     "-usage_count": "Usage Count Dsc",
+                    "play_count": "Play Count Asc",
+                    "-play_count": "Play Count Dsc",
                     "random": "Random"
 
 
@@ -165,6 +167,8 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                     "-date_added": "Date Added Dsc",
                     "usage_count": "Usage Count Asc",
                     "-usage_count": "Usage Count Dsc",
+                    "play_count": "Play Count Asc",
+                    "-play_count": "Play Count Dsc",
                     "random": "Random"
 
 
@@ -210,6 +214,8 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                     "-date_added": "Date Added Dsc",
                     "usage_count": "Usage Count Asc",
                     "-usage_count": "Usage Count Dsc",
+                    "play_count": "Play Count Asc",
+                    "-play_count": "Play Count Dsc",
                     "random": "Random"
 
 

@@ -60,7 +60,7 @@ class SceneTagIdNameSerialzier(serializers.ModelSerializer):
 
     class Meta:
         model = SceneTag
-        fields = ['id', 'name', 'usage_count']
+        fields = ['id', 'name', 'usage_count', 'play_count']
 
     def get_usage_count(self, obj):
         return obj.scenes.count()
@@ -82,7 +82,7 @@ class WebsiteIdNameSerailzier(serializers.ModelSerializer):
 
     class Meta:
         model = Website
-        fields = ['id', 'name', 'scene_tags_with_names', 'usage_count']
+        fields = ['id', 'name', 'scene_tags_with_names', 'usage_count', 'play_count']
 
     def get_usage_count(self, obj):
         return obj.scenes.count()
@@ -136,7 +136,7 @@ class ActorListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Actor
         fields = ['id', 'name', 'thumbnail', 'rating', 'height', 'ethnicity', 'weight', 'country_of_origin',
-                  'is_runner_up', 'actor_tags', 'usage_count']
+                  'is_runner_up', 'actor_tags', 'usage_count', 'play_count']
 
     def get_usage_count(self, obj):
         return obj.scenes.count()

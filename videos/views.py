@@ -38,6 +38,7 @@ import videos.const as const
 from django.utils.datastructures import MultiValueDictKeyError
 import threading
 
+
 # import pathlib
 
 
@@ -270,7 +271,6 @@ def scrape_all_actors(force):
 
 
 def tag_all_scenes(ignore_last_lookup):
-
     f = open('../YAPO/settings.json', 'r')
     x = f.read()
 
@@ -762,6 +762,21 @@ def play_scene_vlc(scene):
                                                                                                         scene.play_count,
                                                                                                         scene.date_last_played))
     scene.save()
+
+    for scene_tag in scene.scene_tags.all():
+        scene_tag.play_count += 1
+        print("Play count for scene tag '{}' is now '{}'".format(scene_tag.name, scene_tag.play_count))
+        scene_tag.save()
+
+    for actor in scene.actors.all():
+        actor.play_count += 1
+        print("Play count for actor '{}' is now '{}'".format(actor.name, actor.play_count))
+        actor.save()
+
+    for website in scene.websites.all():
+        website.play_count += 1
+        print("Play count for site '{}' is now '{}'".format(website.name, website.play_count))
+        website.save()
 
 
 @api_view(['GET', 'POST'])
