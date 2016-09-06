@@ -129,6 +129,14 @@ class ActorIdNameSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'thumbnail', 'actor_tags']
 
 
+class ActorIdNameMinimalSerializer(serializers.ModelSerializer):
+
+
+    class Meta:
+        model = Actor
+        fields = ['id', 'name']
+
+
 class ActorListSerializer(serializers.ModelSerializer):
     actor_tags = ActorTagListSerializer(many=True, read_only=True)
     usage_count = serializers.SerializerMethodField()
@@ -196,9 +204,14 @@ class ActorSerializer(serializers.ModelSerializer):
 class SceneListSerializer(serializers.ModelSerializer):
     # actorss = ActorListSerializer(source='actors')
 
-    actors = ActorIdNameSerializer(many=True, read_only=True)
+    actors = ActorIdNameMinimalSerializer(many=True, read_only=True)
     scene_tags = SceneIdNameSerializer(many=True, read_only=True)
     websites = WebsiteIdNameSerailzier(many=True, read_only=True)
+
+    def setup_eager_loading(self, queryset):
+        """ Perform necessary eager loading of data. """
+        queryset = queryset.prefetch_related('actors', 'scene_tags', 'websites')
+        return queryset
 
     class Meta:
         model = Scene
@@ -207,6 +220,8 @@ class SceneListSerializer(serializers.ModelSerializer):
         #           'is_fav', 'is_runner_up', 'rating', 'description', 'thumbnail', 'scene_tags', 'actors', 'websites' ]
         fields = ['id', 'name', 'actors', 'scene_tags', 'websites', 'thumbnail', 'folders_in_tree', 'is_runner_up',
                   'rating', 'path_to_file']
+
+
 
 
 class SceneSerializer(serializers.ModelSerializer):

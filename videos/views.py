@@ -157,6 +157,7 @@ def search_in_get_queryset(original_queryset, request):
                         (qp != 'recursive') and \
                         (qp != 'sortBy') and \
                         (qp != 'searchField') and \
+                        (qp != 'format') and \
                         (qp != 'pageType') and \
                         (qp != 'search'):
 
@@ -983,7 +984,8 @@ class SceneTagViewSet(viewsets.ModelViewSet):
 class SceneViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Scene.objects.all()
-
+        # queryset = self.get_serializer_class().setup_eager_loading(queryset,queryset)
+        queryset = SceneListSerializer.setup_eager_loading(queryset, queryset)
         return search_in_get_queryset(queryset, self.request)
 
     def get_serializer_class(self):

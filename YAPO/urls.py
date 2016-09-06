@@ -22,6 +22,7 @@ from videos import views
 from django.conf import settings
 from django.conf.urls.static import static
 import json
+from rest_framework.urlpatterns import format_suffix_patterns
 
 from videos.models import ActorTag, SceneTag
 
@@ -84,31 +85,11 @@ urlpatterns = [
                   url(r'^ffmpeg/', views.ffmpeg),
                   url(r'^tag-multiple-items/', views.tag_multiple_items),
 
-                  # REST FRAMEWORK
 
-                  # url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-
-                  # url(r'^rest/api$', views.api_root),
-
-                  # url(r'^rest/actor-alias/',
-                  #     views.ActorAliasListRest.as_view(),
-                  #     name='actor-alias-list-rest'),
-                  #
-                  # url(r'^rest/actors/',
-                  #     views.ActorListRest.as_view(),
-                  #     name='actors-list-rest'),
-                  #
-                  # url(r'^rest/actor-alias/details/(?P<pk>[0-9]+)/', views.ActorAliasDetailsRest.as_view(),
-                  #     name='actor-alias-details-rest'),
-                  #
-                  # url(r'^rest/actor/details/(?P<pk>[0-9]+)/$',
-                  #     views.ActorDetailsRest.as_view(),
-                  #     name='actor-details-rest'),
-                  # url(r'^rest/actor-alias/details/(?P<pk>[0-9]+)/html',
-                  #     views.ActorAliasHTMLRest.as_view(),
-                  #     name='actor-alias-details-rest'),
 
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# urlpatterns = format_suffix_patterns(urlpatterns, allowed=['json'])
 
 #  Startup script checks settings.json and creates it if it doesn't exist
 setting_version = videos.const.SETTINGS_VERSION
