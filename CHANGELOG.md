@@ -118,7 +118,7 @@
 
 * Added rating bar to scene list view, also added settings.json versioning and &#x27;last lookup&#x27; field for all scenes in settings.json. [Curt Wagner]
 
-* Added toggleable recursion option to folder view. Now it&#x27;s possible to view scenes that are inside of the current subfolders. [Curt Wagner]
+* Added toggleable recursion option to folder view. Now it&#x27;s possible to view scenes that are inside of the current folder only or view scenes inside the current folder and all of it's subfolders. [Curt Wagner]
 
 * Made scenes in Actor, Scene Tags, and websites searchable, also added applicable order options to each one of them. [Curt Wagner]
 
