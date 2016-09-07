@@ -130,8 +130,6 @@ class ActorIdNameSerializer(serializers.ModelSerializer):
 
 
 class ActorIdNameMinimalSerializer(serializers.ModelSerializer):
-
-
     class Meta:
         model = Actor
         fields = ['id', 'name']
@@ -221,7 +219,7 @@ class SceneListSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'actors', 'scene_tags', 'websites', 'thumbnail', 'folders_in_tree', 'is_runner_up',
                   'rating', 'path_to_file']
 
-
+        # fields = ['id', 'name']
 
 
 class SceneSerializer(serializers.ModelSerializer):
@@ -253,3 +251,21 @@ class ActorTagSerializer(serializers.ModelSerializer):
         # depth = 1
         fields = ['id', 'name', 'date_added', 'date_fav', 'date_runner_up', 'play_count', 'is_fav', 'is_runner_up',
                   'rating', 'thumbnail', 'actors', 'scene_tags']
+
+
+class PlaylistListSerializer(serializers.ModelSerializer):
+    usage_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Playlist
+        fields = ['id', 'name', 'usage_count']
+
+    def get_usage_count(self, obj):
+        return obj.scenes.count()
+
+
+class PlaylistSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Playlist
+        fields = '__all__'

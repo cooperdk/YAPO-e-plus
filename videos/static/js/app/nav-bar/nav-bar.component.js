@@ -2,8 +2,8 @@ angular.module('navBar', []).component('navBar', {
     // Note: The URL is relative to our `index.html` file
     templateUrl: 'static/js/app/nav-bar/nav-bar.template.html',
     bindings: {},
-    controller: ['$scope', '$rootScope', 'Actor', 'SceneTag', 'Website', 'ActorTag', 'helperService', '$http',
-        function NavBarController($scope, $rootScope, Actor, SceneTag, Website, ActorTag, helperService, $http ) {
+    controller: ['$scope', '$rootScope', 'Actor', 'SceneTag', 'Website', 'ActorTag', 'helperService', '$http','Playlist',
+        function NavBarController($scope, $rootScope, Actor, SceneTag, Website, ActorTag, helperService, $http, Playlist ) {
             
             // Global function to create new item
             $rootScope.createNewItem = function (typeOfItemToAdd, newItemName) {
@@ -22,6 +22,9 @@ angular.module('navBar', []).component('navBar', {
                     } else if (typeOfItemToAdd == 'actor_tags'){
                         newItem = new ActorTag;
                         newItem.actors = [];
+                    } else if (typeOfItemToAdd == 'playlists'){
+                        newItem = new Playlist;
+                        newItem.scenes = []
                     }
     
                     newItem.name = newItemName;
@@ -62,6 +65,10 @@ angular.module('navBar', []).component('navBar', {
             };
             
             $rootScope.addItemToScene = function (scene, itemToAdd, typeOfItemToAdd) {
+
+                if (scene[typeOfItemToAdd] == undefined) {
+                    scene[typeOfItemToAdd] = [];
+                }
                 
                 var found = helperService.getObjectIndexFromArrayOfObjects(itemToAdd, scene[typeOfItemToAdd]);
                 
@@ -91,6 +98,10 @@ angular.module('navBar', []).component('navBar', {
             $rootScope.removeItemFromScene = function (scene, itemToRemove, typeOfItemToRemove) {
                 var resId = [];
                 var resObj = [];
+
+                if (scene[typeOfItemToRemove] == undefined){
+                    scene[typeOfItemToRemove] = [];
+                }
 
                 for (var i = 0; i < scene[typeOfItemToRemove].length; i++) {
                     if (itemToRemove.id != scene[typeOfItemToRemove][i].id) {

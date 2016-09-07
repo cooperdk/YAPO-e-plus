@@ -20,6 +20,7 @@ angular.module('asyncTypeahead').component('asyncTypeahead', {
             var sceneTagsURL = '/api/scene-tag/';
             var actorsURL = '/api/actor/';
             var websiteURL = 'api/website/';
+            var playlistURL = 'api/playlist/';
             var httpGETUrl = null;
 
 
@@ -42,6 +43,8 @@ angular.module('asyncTypeahead').component('asyncTypeahead', {
                     httpGETUrl = actorsURL;
                 } else if (self.objectType == 'websites') {
                     httpGETUrl = websiteURL;
+                } else if (self.objectType == 'playlists') {
+                    httpGETUrl = playlistURL;
                 }
 
                 return $http.get(httpGETUrl, {
@@ -140,6 +143,8 @@ angular.module('asyncTypeahead').component('asyncTypeahead', {
                     scopeWatchService.actorSelected(ans)
                 } else if (self.objectType == 'websites') {
                     scopeWatchService.websiteSelected(ans)
+                } else if (self.objectType == 'playlists') {
+                    scopeWatchService.playlistSelected(ans)
                 }
                 // console.log("typeaheadActorTag object afyer assingment is " + angular.toJson( $scope.typeaheadActorTag));
             };

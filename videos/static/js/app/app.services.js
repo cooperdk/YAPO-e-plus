@@ -213,6 +213,7 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
         var _runnerUp = "";
         var _recursive = "";
         var _parent = "";
+        var _playlist = "";
 
         function nextPageInput(input) {
 
@@ -233,6 +234,7 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
                         _recursive = "";
                         _searchField = "";
                         _parent = "";
+                        _playlist ="";
 
                     }
                 }
@@ -337,6 +339,12 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
 
             }
 
+            if ("playlist" in input){
+                if (input["playlist"] != undefined){
+                    _playlist = input["playlist"].id
+                }
+            }
+
 
         }
 
@@ -425,7 +433,8 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
                     sortBy: _sortBy,
                     is_runner_up: _runnerUp,
                     recursive: _recursive,
-                    pageType: _pageType
+                    pageType: _pageType,
+                    playlists: _playlist
 
                 })
             } else if (_pageType == 'SceneTag') {
@@ -580,6 +589,13 @@ angular.module('scopeWatch', []).factory('scopeWatchService', function ($rootSco
         $rootScope.$broadcast("websiteSelected", website);
 
     }
+    
+    function playlistSelected(playlist) {
+
+        console.log("app-service-scopeWatch: playlistSelected was triggered! ");
+        $rootScope.$broadcast("playlistSelected", playlist);
+
+    }
 
     function sceneTagSelected(sceneTag) {
 
@@ -696,6 +712,21 @@ angular.module('scopeWatch', []).factory('scopeWatchService', function ($rootSco
         $rootScope.$broadcast("didSectionListWrapperLoaded", callingSection);
 
     }
+    
+    function didPlaylistLoad(someVariable) {
+
+        console.log("app-service-scopeWatch: didPlaylistLoad was triggered! ");
+        $rootScope.$broadcast("didPlaylistLoad", someVariable);
+
+    }
+
+
+    function playlistLoaded(playlist) {
+
+        console.log("app-service-scopeWatch: playlistLoaded was triggered! ");
+        $rootScope.$broadcast("playlistLoaded", playlist);
+
+    }
 
 
     return {
@@ -728,7 +759,10 @@ angular.module('scopeWatch', []).factory('scopeWatchService', function ($rootSco
         didWebsiteLoad: didWebsiteLoad,
         didFolderLoad: didFolderLoad,
         gridViewOptionChnaged: gridViewOptionChnaged,
-        didSectionListWrapperLoaded: didSectionListWrapperLoaded
+        didSectionListWrapperLoaded: didSectionListWrapperLoaded,
+        didPlaylistLoad: didPlaylistLoad,
+        playlistLoaded: playlistLoaded,
+        playlistSelected: playlistSelected
 
 
     }

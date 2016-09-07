@@ -504,6 +504,28 @@ def tag_multiple_items(request):
                         scene_to_update.delete()
                         print("Removed scene \'{}\' from database".format(scene_to_update.name))
 
+            elif params['patchType'] == 'playlists':
+                playlist_id = params['patchData'][0]
+                playlist_to_add = Playlist.objects.get(pk=playlist_id)
+                scenes_to_update = params['itemsToUpdate']
+
+                if params['addOrRemove'] == 'add':
+
+                    for x in scenes_to_update:
+                        scene_to_update = Scene.objects.get(pk=x)
+                        scene_to_update.playlists.add(playlist_to_add)
+                        print(
+                            "Scene '{}' was added to playlist '{}'".format(scene_to_update.name, playlist_to_add.name))
+                        scene_to_update.save()
+                if params['addOrRemove'] == 'remove':
+                    for x in scenes_to_update:
+                        scene_to_update = Scene.objects.get(pk=x)
+                        scene_to_update.playlists.remove(playlist_to_add)
+                        print(
+                            "Scene '{}' was removed to playlist '{}'".format(scene_to_update.name,
+                                                                             playlist_to_add.name))
+                        scene_to_update.save()
+
             else:
                 scenes_to_update = params['itemsToUpdate']
                 for x in scenes_to_update:
@@ -753,7 +775,7 @@ class AddItems(views.APIView):
             return Response(status=200)
 
 
-def play_scene_vlc(scene):
+def play_scene_vlc(scene, random):
     file_path = os.path.normpath(scene.path_to_file)
     vlc_path = os.path.normpath(const.VLC_PATH)
     p = subprocess.Popen([vlc_path, file_path])
@@ -779,14 +801,31 @@ def play_scene_vlc(scene):
         print("Play count for site '{}' is now '{}'".format(website.name, website.play_count))
         website.save()
 
+    if random:
+        if not Playlist.objects.filter(name='Random Plays'):
+            pls = Playlist(name='Random Plays')
+            pls.save()
+
+        pls = Playlist.objects.filter(name='Random Plays').first()
+        if not pls.scenes.filter(id=scene.id):
+            pls.scenes.add(scene)
+            pls.save()
+            print("Added scene '{}' to Random Plays playlist.".format(scene.name))
+        else:
+            print("Scene '{}' already in playlist Random Plays.".format(scene.name))
+
+
 
 @api_view(['GET', 'POST'])
 def play_in_vlc(request):
     scene = None
+    random = True
+
     if request.method == 'GET':
         if 'sceneId' in request.query_params:
             scene_id = request.query_params['sceneId']
             scene = Scene.objects.get(pk=scene_id)
+            random = False
         elif 'actor' in request.query_params and request.query_params['actor'] != '-6':
             actor_id = request.query_params['actor']
             scene = Scene.objects.filter(actors=actor_id).order_by('?').first()
@@ -799,11 +838,14 @@ def play_in_vlc(request):
         elif 'folder' in request.query_params and request.query_params['folder'] != '-6':
             folder_id = request.query_params['folder']
             scene = Scene.objects.filter(folders_in_tree=folder_id).order_by('?').first()
+        elif 'playlist' in request.query_params and request.query_params['playlist'] != '-6':
+            playlist_id = request.query_params['playlist']
+            scene = Scene.objects.filter(playlists=playlist_id).order_by('?').first()
         else:
             scene = Scene.objects.order_by('?').first()
 
         if scene:
-            play_scene_vlc(scene)
+            play_scene_vlc(scene, random)
             return Response(status=200)
         else:
             return Response(status=500)
@@ -924,6 +966,16 @@ class ActorAliasHTMLRest(generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
         alias = self.get_object()
         return Response(alias.name)
+
+
+class PlaylistViewSet(viewsets.ModelViewSet):
+    queryset = Playlist.objects.all()
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return PlaylistListSerializer
+        else:
+            return PlaylistSerializer
 
 
 class LocalSceneFoldersViewSet(viewsets.ModelViewSet):

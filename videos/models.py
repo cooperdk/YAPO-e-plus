@@ -182,11 +182,14 @@ class LocalSceneFolders(models.Model):
     name = models.CharField(max_length=500, unique=True)
 
 
-# class Playlist(models.Model):
-#     name = models.CharField(max_length=500, unique=True)
-#     scenes = models.ManyToManyField(Scene, null=True, related_name='playlists')
-#     date_added = models.DateTimeField(auto_now_add=True)
-#     modified_date = models.DateTimeField(auto_now=True)
+class Playlist(models.Model):
+    name = models.CharField(max_length=500, unique=True)
+    scenes = models.ManyToManyField(Scene, null=True, related_name='playlists', blank=True)
+    date_added = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return "%s " % (self.name,)
 
 
 

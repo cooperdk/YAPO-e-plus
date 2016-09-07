@@ -68,6 +68,7 @@ router.register(r'scene-tag', views.SceneTagViewSet)
 router.register(r'website', views.WebsiteViewSet)
 router.register(r'folder', views.FolderViewSet)
 router.register(r'folder-local', views.LocalSceneFoldersViewSet)
+router.register(r'playlist', views.PlaylistViewSet)
 # router.register(r'^upload/(?P<filename>[^/]+)', views.FileUploadView.as_view())
 
 

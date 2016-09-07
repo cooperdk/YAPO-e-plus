@@ -149,7 +149,7 @@ REST_FRAMEWORK = {
 
     #
     'DEFAULT_PAGINATION_CLASS': 'YAPO.pagination.HeaderLimitOffsetPagination',
-    'PAGE_SIZE': 30
+    'PAGE_SIZE': 500
 }
 #
 # SETTINGS_VERSION = 1

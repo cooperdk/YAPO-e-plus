@@ -1,0 +1,20 @@
+
+
+<pagination page-type="'Playlist'"></pagination>
+
+<ul class="playlist">
+    <li ng-repeat="playlist in $ctrl.playlists">
+        <a href="/#!/playlist/{{ playlist.id }}">{{ playlist.name }} [{{ playlist.usage_count }}] </a>
+        <span
+                ng-click="$ctrl.removePlaylist(playlist)"
+                uib-popover-html="'<strong>Remove</strong> playlist from database! &#40;If playlist contains scenes, they will not be deleted.&#41;'"
+                popover-trigger="mouseenter"
+
+                class="glyphicon glyphicon-remove">
+        </span>
+
+
+
+    </li>
+</ul>
+

@@ -37,6 +37,10 @@ app.config(['$sceProvider', '$locationProvider', '$routeProvider', '$httpProvide
             template: '<add-items></add-items>'
         }).when('/settings/', {
             template: '<settings></settings>'
+        }).when('/playlist/', {
+            template: '<playlist-list></playlist-list>'
+        }).when('/playlist/:playlistId', {
+            template: '<playlist-detail></playlist-detail>'
         }).otherwise('/'), {
             template: '<br><br><br><br><h1> This is temp index</h1>'
 

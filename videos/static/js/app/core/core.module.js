@@ -5,4 +5,6 @@ angular.module('core', [
     'core.sceneTag',
     'core.actorAlias',
     'core.dbFolder',
-    'core.website']);
+    'core.website',
+    'core.playlist'
+]);

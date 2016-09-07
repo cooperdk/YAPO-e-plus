@@ -46,7 +46,7 @@
 
                 <label class="switch"
                        uib-popover-html="'Toggle Runner Up.'"
-                       popover-trigger="mouseenter" popover-placement="right">
+                       popover-trigger="mouseenter" popover-placement="top">
                 <input type="checkbox" ng-model="scene.is_runner_up" ng-change="$ctrl.sceneRunnerUpToggle(scene)">
                 <div class="slider round"></div>
                 </label>
@@ -68,6 +68,39 @@
                           popover-trigger="mouseenter">
 
                     </span>
+                        <button
+
+                                class="btn btn-success btn-xs"
+                                popover-trigger="outsideClick"
+                                uib-popover-template="'static/partials/popover-templates/popover-playlist.template.html'"
+                                popover-append-to-body="true"
+                                popover-placement="top"
+                                type="button" class="btn btn-success">
+                                    <span
+                                            popover-trigger="mouseenter"
+                                            uib-popover-html="'Add Scene to a playlist.'"
+                                            popover-append-to-body="true"
+                                            popover-placement="top"
+
+                                            class="glyphicon glyphicon-plus"></span>
+                        </button>
+
+                        <span ng-click="$ctrl.removeSceneFromPlaylist(scene)">
+                            <button
+                                    ng-if="$ctrl.playlistLoaded"
+
+                                    class="btn btn-danger btn-xs"
+                                    popover-trigger="mouseenter"
+                                    uib-popover-html="'Remove Scene From current playlist.'"
+                                    popover-append-to-body="true"
+                                    popover-placement="top"
+                                    type="button" class="btn btn-danger">
+                                    <span
+
+                                            class="glyphicon glyphicon-minus"></span>
+
+                        </button>
+                        </span>
 
 
                     </h4>

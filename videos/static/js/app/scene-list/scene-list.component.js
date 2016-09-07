@@ -24,6 +24,7 @@ angular.module('sceneList').component('sceneList', {
             var websiteLoaded = false;
             var folderLoaded = false;
             var didSectionListWrapperLoad = false;
+            self.playlistLoaded = false;
 
             self.sceneArray = [];
 
@@ -150,10 +151,9 @@ angular.module('sceneList').component('sceneList', {
                     searchField: self.searchField,
                     sortBy: self.sortBy,
                     isRunnerUp: self.runnerUp,
-                    recursive: self.recursive
+                    recursive: self.recursive,
+                    playlist: self.playlist
                 };
-
-                self.scrollBusy = true;
 
 
                 self.actorsToadd = pagerService.getNextPage(input
@@ -213,6 +213,7 @@ angular.module('sceneList').component('sceneList', {
                     self.sortBy = sortOrder['sortBy'];
 
                     if (sortOrder.mainPage == undefined || sortOrder.mainPage == true) {
+
                         self.nextPage(0);
                     }
                     didSectionListWrapperLoad = true;
@@ -237,6 +238,19 @@ angular.module('sceneList').component('sceneList', {
 
             if (!actorLoaded) {
                 scopeWatchService.didActorLoad("a");
+            }
+
+            $scope.$on("playlistLoaded", function (event, playlist) {
+
+                self.playlist = playlist;
+                self.nextPage(0);
+
+
+                self.playlistLoaded = true;
+            });
+
+            if (!self.playlistLoaded) {
+                scopeWatchService.didPlaylistLoad("a");
             }
 
 
@@ -280,12 +294,22 @@ angular.module('sceneList').component('sceneList', {
             var findIndexOfSceneInList = function (sceneToFind) {
                 var found = false;
                 var ans = null;
-                for (var i = 0; i < self.scenes.length && !found; i++) {
-                    if (sceneToFind == self.scenes[i].id) {
-                        found = true;
-                        ans = i
+                if (typeof sceneToFind === 'object') {
+                    for (var i = 0; i < self.scenes.length && !found; i++) {
+                        if (sceneToFind.id == self.scenes[i].id) {
+                            found = true;
+                            ans = i
+                        }
+                    }
+                } else {
+                    for (var i = 0; i < self.scenes.length && !found; i++) {
+                        if (sceneToFind == self.scenes[i].id) {
+                            found = true;
+                            ans = i
+                        }
                     }
                 }
+
                 return ans;
 
             };
@@ -416,9 +440,7 @@ angular.module('sceneList').component('sceneList', {
 
                 // if the type of item to add does not exist in the scene (EX: The websites array does not exist)
                 // create empty one.
-                if (self.scenes[sceneIndex][typeOfItemToAdd] == undefined) {
-                    self.scenes[sceneIndex][typeOfItemToAdd] = [];
-                }
+
 
                 // id '-1' signifies that the item in question does not exist in the database yet and needs to be
                 // created.
@@ -432,7 +454,7 @@ angular.module('sceneList').component('sceneList', {
 
                         updateScenesOnPageOnAdd(itemToAdd, typeOfItemToAdd);
 
-                        $rootScope.patchEntity('scene',scene.id, typeOfItemToAdd, patchData, 'add', true, false, self.selectedScenes);
+                        $rootScope.patchEntity('scene', scene.id, typeOfItemToAdd, patchData, 'add', true, false, self.selectedScenes);
                     } else {
                         updateSceneOnPageOnAdd(sceneIndex, typeOfItemToAdd, itemToAdd);
 
@@ -557,6 +579,17 @@ angular.module('sceneList').component('sceneList', {
 
             });
 
+            $scope.$on("playlistSelected", function (event, object) {
+
+                var selectedPlaylist = object['selectedObject'];
+                var scene = object['originalObject'];
+
+
+                self.addItem(scene, selectedPlaylist, 'playlists');
+
+
+            });
+
 
             $scope.$on("searchTermChanged", function (event, searchTerm) {
 
@@ -584,16 +617,15 @@ angular.module('sceneList').component('sceneList', {
             self.sceneRunnerUpToggle = function (scene) {
 
                 $rootScope.patchEntity('scene', scene.id, 'is_runner_up', scene.is_runner_up, 'add', false, false, self.selectedScenes);
-                
+
 
             };
 
 
             self.sceneRatingPatch = function (scene) {
-                
+
                 $rootScope.patchEntity('scene', scene.id, 'rating', scene.rating, 'add', false, false, self.selectedScenes);
 
-                
 
             };
 
@@ -618,6 +650,7 @@ angular.module('sceneList').component('sceneList', {
                 var sceneTagId = -6;
                 var websiteId = -6;
                 var folderId = -6;
+                var playlistId = -6;
 
 
                 if (self.actor != undefined) {
@@ -635,6 +668,11 @@ angular.module('sceneList').component('sceneList', {
                 if (self.folder != undefined) {
                     folderId = self.folder.id
                 }
+                
+                if (self.playlist != undefined){
+                    playlistId = self.playlist.id
+                }
+                
 
 
                 return $http.get('play-scene/', {
@@ -642,7 +680,8 @@ angular.module('sceneList').component('sceneList', {
                         actor: actorId,
                         sceneTag: sceneTagId,
                         website: websiteId,
-                        folder: folderId
+                        folder: folderId,
+                        playlist: playlistId
                     }
                 })
             };
@@ -659,6 +698,29 @@ angular.module('sceneList').component('sceneList', {
 
 
             };
+
+            self.removeSceneFromPlaylist = function (sceneToRemove) {
+                var sceneIndex = findIndexOfSceneInList(sceneToRemove);
+                var patchData = [];
+                patchData.push(self.playlist.id);
+
+                if (self.selectedScenes.length > 0 && checkIfSceneSelected(sceneToRemove)) {
+
+
+                    $rootScope.patchEntity('scene', self.scenes[sceneIndex].id, 'playlists', patchData, 'remove', true, false, self.selectedScenes);
+                    for (var i = 0; i < self.selectedScenes.length; i++) {
+                        self.removeSceneFromList(self.selectedScenes[i])
+                    }
+
+
+                } else {
+
+                    $rootScope.patchEntity('scene', self.scenes[sceneIndex].id, 'playlists', patchData, 'remove', false, false, self.selectedScenes);
+                    self.removeSceneFromList(sceneToRemove);
+                }
+
+
+            }
 
 
         }

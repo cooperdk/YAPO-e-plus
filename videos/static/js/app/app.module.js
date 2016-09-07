@@ -33,7 +33,9 @@ var app = angular.module('yapoApp', [
     // 'mgcrea.ngStrap',
     'core',
     'addItems',
-    'settings'
+    'settings',
+    'playlistList',
+    'playlistDetail'
 
 
 ]);
