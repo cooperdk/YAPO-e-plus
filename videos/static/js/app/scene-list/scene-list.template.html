@@ -55,16 +55,16 @@
 
                     <span ng-click="$ctrl.confirmRemove(scene,scene,'delete',false)"
                           class="glyphicon glyphicon-trash on-hover-red-cursor-pointer"
-                          uib-popover-html="'<strong>Delete</strong> scene from database!'"
+                          uib-popover-html="'<strong>Remove</strong> scene(s) from the database!'"
                           popover-trigger="mouseenter">
 
                             </span>
 
-                    <span ng-if="$ctrl.tagMultiple" ng-click="$ctrl.removeItem(scene,scene,'delete',true)"
+                    <span ng-if="$ctrl.tagMultiple" ng-click="$ctrl.confirmRemove(scene,scene,'delete',true)"
                           class="glyphicon glyphicon-fire on-hover-red-cursor-pointer"
-                          uib-popover-html="'<h2><font color=&quot;red&quot;>CAUTION!</h2></font><strong>Will Delete
-                          files on disk</strong> without asking for confirmation! <i> Will only work if at least one
-                          item is checked this is to avoid accidental deletion.'"
+                          uib-popover-html="'<h2><font color=&quot;red&quot;>CAUTION!</h2></font><strong>Will delete
+                           the scene(s) files from disk!</strong><i> Will only work if at least one
+                          item is checked, this is to avoid accidental deletion.'"
                           popover-trigger="mouseenter">
 
                     </span>

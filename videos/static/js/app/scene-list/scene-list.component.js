@@ -358,11 +358,14 @@ angular.module('sceneList').component('sceneList', {
 
             self.confirmRemove = function (originalScene, originalItemToRemove, originalTypeOfItemToRemove, originalPermDelete) {
 
-                if (confirm('Are you sure you want to remove ' + originalScene.name + ' from the DB?')) {
-                    self.removeItem(originalScene, originalItemToRemove, originalTypeOfItemToRemove, originalPermDelete);
-                } else {
+                var message = "";
 
-                }
+                if (originalPermDelete){    //If delete from disk
+                           message = "Are you really sure you want to delete the selected scene(s) from DISK?";
+                 } else {
+                          message = "Are you sure you want to remove the selected scene(s) from the DB?";
+                 }
+                if (confirm(message)) self.removeItem(originalScene, originalItemToRemove, originalTypeOfItemToRemove, originalPermDelete);
 
             };
 
