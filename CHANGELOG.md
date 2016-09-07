@@ -1,6 +1,24 @@
 # Changelog
 
 
+## 0.1.2 (2016-09-07)
+
+### New
+
+* Added 'playlist' category. Scenes can now be added to custom lists, multiple scenes can be added in one go. Also same scene can be in multiple lists. Random play works with playlists. In addition to help keep track of randomly played scenes [Issue #43] every time the random play button is used, the played scene is added to an auto generated playlist called 'random plays'. [Curt Wagner]
+
+### Changes
+
+* Added missing confirmation to delete scene(s) from disk function. [Shaun Clayton]
+
+  Delete scenes from disk function now has secondary reminder confirmation for added prevention of accidental file deletion.
+
+### Fix
+
+* [Issue #31] Fixed bug where incorrect input params were fed to the removeItem function in scene-list.component.js. [Curt Wagner]
+
+
+
 ## 0.1.1 (2016-09-05)
 
 ### New
