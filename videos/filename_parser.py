@@ -330,22 +330,27 @@ def parse_actors_in_scene(scene_to_parse, scene_path, actors, actors_alias):
                 if actor.actor_tags.count() > 0:
                     for actor_tag in actor.actor_tags.all():
                         current_tag = actor_tag.scene_tags.first()
+                        if not current_tag:
+                            if not SceneTag.objects.filter(name=actor_tag.name):
+                                current_tag = SceneTag(name=actor_tag.name)
+                                current_tag.save()
+                            else:
+                                current_tag = SceneTag.objects.filter(name=actor_tag.name).first()
+                                actor_tag.scene_tags.add(current_tag)
                         if not scene_to_parse.scene_tags.filter(id=current_tag.id):
                             print("Adding SceneTag '{}' to the scene {}".format(current_tag.name, scene_to_parse.name))
                             scene_to_parse.scene_tags.add(current_tag)
 
-                # regex_search_term = get_regex_search_term(actor.name, ' ')
-                #
-                # if re.search(regex_search_term, scene_path, re.IGNORECASE) is not None:
-                #     # print (actor.name + " is in " + scene_path + "\n")
-                #     # scene_path = scene_path.replace(actor.name.lower(), '')
-                #     scene_path = re.sub(regex_search_term, '', scene_path, flags=re.IGNORECASE)
-                #     # print ("Trimmed scene path is: " + scene_path + "\n")
-                #     add_actor_to_scene(actor, scene_to_parse)
-                #     # else:
-                #     # print (actor.name + " is one word name")
-
-
+                            # regex_search_term = get_regex_search_term(actor.name, ' ')
+                            #
+                            # if re.search(regex_search_term, scene_path, re.IGNORECASE) is not None:
+                            #     # print (actor.name + " is in " + scene_path + "\n")
+                            #     # scene_path = scene_path.replace(actor.name.lower(), '')
+                            #     scene_path = re.sub(regex_search_term, '', scene_path, flags=re.IGNORECASE)
+                            #     # print ("Trimmed scene path is: " + scene_path + "\n")
+                            #     add_actor_to_scene(actor, scene_to_parse)
+                            #     # else:
+                            #     # print (actor.name + " is one word name")
 
     for alias in actors_alias:
         # print("             Checking alias {}".format(alias.name))
@@ -450,7 +455,7 @@ def parse_website_in_scenes(scene, scene_path, websites):
                         print("Adding SceneTag '{}' to the scene {}".format(website.name, scene.name))
                         scene.scene_tags.add(scene_tag)
 
-                #         check website alias
+                        #         check website alias
         if website.website_alias != "":
             for website_alias in website.website_alias.split(','):
                 website_alias_stripped = website_alias.strip()
@@ -461,8 +466,6 @@ def parse_website_in_scenes(scene, scene_path, websites):
                     if not scene.websites.filter(name=website.name):
                         print("Adding Website: '{}' to the scene {}".format(website.name, scene.name))
                         scene.websites.add(website)
-
-
 
     return scene_path
 
