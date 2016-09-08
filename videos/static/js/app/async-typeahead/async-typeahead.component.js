@@ -68,7 +68,9 @@ angular.module('asyncTypeahead').component('asyncTypeahead', {
                     var found = false;
                     for (var i = 0; i < a.length; i++) {
                         // console.log("Res to check:" + angular.toJson(a[i]));
-                        for (var j = 0; j < self.object.length && !found; j++) {
+
+                        if (self.object != undefined){
+                            for (var j = 0; j < self.object.length && !found; j++) {
                             // console.log("To check against:" + angular.toJson(self.object[j]));
                             if (a[i].id == self.object[j]) {
                                 console.log("Match found: " + angular.toJson(a[i]) + " Matches: " + angular.toJson(self.object[j]));
@@ -77,6 +79,8 @@ angular.module('asyncTypeahead').component('asyncTypeahead', {
 
                             }
                         }
+                        }
+
 
                         if (!found) {
                             // console.log("Res to push:" + angular.toJson(a[i]));

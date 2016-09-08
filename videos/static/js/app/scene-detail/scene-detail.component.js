@@ -365,6 +365,18 @@ angular.module('sceneDetail').component('sceneDetail', {
                     alert("Something went wrong!");
                 });
             };
+            
+            
+            $scope.$on("playlistSelected", function (event, object) {
+
+                var selectedPlaylist = object['selectedObject'];
+                var scene = object['originalObject'];
+
+
+                self.addItem(selectedPlaylist, 'playlists');
+
+
+            });
 
 
         }

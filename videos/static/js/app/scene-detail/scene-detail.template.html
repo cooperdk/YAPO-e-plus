@@ -37,6 +37,23 @@
         <span class="glyphicon glyphicon-facetime-video"></span> Generate Sample Video
     </button>
 
+    <button
+
+                                class="btn btn-default btn-sm"
+                                popover-trigger="outsideClick"
+                                uib-popover-template="'static/partials/popover-templates/popover-playlist.template.html'"
+                                popover-append-to-body="true"
+                                popover-placement="top"
+                                type="button">
+                                    <span
+                                            popover-trigger="mouseenter"
+                                            uib-popover-html="'Add Scene to a playlist.'"
+                                            popover-append-to-body="true"
+                                            popover-placement="top"
+
+                                            class="glyphicon glyphicon-plus"></span>
+                        </button>
+
     <a href="#!/scene/{{ $ctrl.next }}"><span
             uib-popover-html="'Next Scene in list.'"
             popover-trigger="mouseenter" popover-placement="bottom"
