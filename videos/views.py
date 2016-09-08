@@ -746,12 +746,13 @@ class AddItems(views.APIView):
             folders_to_add_path = request.query_params['folderToAddPath']
 
             for folder_to_add_path in folders_to_add_path.split(','):
-                if os.path.isdir(folder_to_add_path):
+                folder_to_add_path_stripped = folder_to_add_path.strip()
+                if os.path.isdir(folder_to_add_path_stripped):
                     # if the second argument is true - tries to make a sample video when inserting scene to db.
                     if request.query_params['createSampleVideo'] == 'true':
-                        videos.addScenes.get_files(folder_to_add_path, True)
+                        videos.addScenes.get_files(folder_to_add_path_stripped, True)
                     else:
-                        videos.addScenes.get_files(folder_to_add_path, False)
+                        videos.addScenes.get_files(folder_to_add_path_stripped, False)
                 else:
                     content = {'Path does not exist!': "Can't find path!"}
                     return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
