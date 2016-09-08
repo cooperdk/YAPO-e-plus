@@ -366,7 +366,7 @@ def permenatly_delete_scene_and_remove_from_db(scene):
         success_delete_file = True
     except OSError as e:
         if e.errno == errno.ENOENT:
-            print("File already deleted!")
+            print("File {} already deleted! [Err No:{}, Err File:{} Err:{}]".format(scene.path_to_file,e.errno,e.filename,e.strerror))
             success_delete_file = True
         else:
             print("Got OSError while trying to delete {} : Error number:{} Error Filename:{} Error:{}".format(
@@ -380,7 +380,7 @@ def permenatly_delete_scene_and_remove_from_db(scene):
         success_delete_media_path = True
     except OSError as e:
         if e.errno == errno.ENOENT:
-            print("Directory \'{}\' already deleted".format(media_path))
+            print("Directory '{}' already deleted".format(media_path))
             success_delete_media_path = True
         else:
             print("Got OSError while trying to delete {} : Error number:{} Error Filename:{} Error:{}".format(
