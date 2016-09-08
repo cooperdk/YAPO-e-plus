@@ -6,20 +6,29 @@ angular.module('addItems').component('addItems', {
 
             var self = this;
 
-            self.pathToFolderToAdd = "";
+            //Input areas:
+            self.textareaInputContent = "";
+            self.folderInputContent = "";
 
-            self.actorsToAdd = "";
-            
+            var foldersToAdd = "";
+
+            var actorsToAdd = "";
+
+            var sceneTagsToAdd = "";
+
+            var websitesToAdd = "";
+
             self.createSampleVideo = false;
-            
-            self.addFolderClicked = function () {
 
+            var httpRequest = function () {
                 return $http.get('add-items/', {
                     params: {
-                        actorsToAdd: self.actorsToAdd,
-                        folderToAddPath: self.pathToFolderToAdd,
+                        actorsToAdd: actorsToAdd,
+                        sceneTagsToAdd: sceneTagsToAdd,
+                        websitesToAdd:  websitesToAdd,
+                        folderToAddPath: foldersToAdd,
                         createSampleVideo: self.createSampleVideo
-                        
+
                     }
                 }).then(function (response) {
                     // alert(angular.toJson(response))
@@ -27,25 +36,44 @@ angular.module('addItems').component('addItems', {
                 }, function errorCallback(response) {
                     alert("Something went wrong!");
                 });
+            };
 
+            var clearFields = function () {
+                foldersToAdd = "";
+
+                actorsToAdd = "";
+
+                sceneTagsToAdd = "";
+
+                websitesToAdd = "";
+
+            };
+
+            self.addFolderClicked = function () {
+                clearFields();
+                foldersToAdd = self.folderInputContent;
+                httpRequest();
 
             };
 
             self.addActorsClicked = function () {
-
-                return $http.get('add-items/', {
-                    params: {
-                        actorsToAdd: self.actorsToAdd,
-                        folderToAddPath: self.pathToFolderToAdd
-                    }
-                }).then(function (response) {
-                    // alert(angular.toJson(response))
-                    alert("Finished adding actors successfully...");
-                }, function errorCallback(response) {
-                    alert("Something went wrong!");
-                });
+                clearFields();
+                actorsToAdd = self.textareaInputContent;
+                httpRequest();
 
             };
+            
+            self.addSceneTagsClicked = function () {
+                clearFields();
+                sceneTagsToAdd = self.textareaInputContent;
+                httpRequest();
+            };
+            
+            self.websitesToAddClicked = function () {
+                clearFields();
+                websitesToAdd = self.textareaInputContent;
+                httpRequest();
+            } 
         }
     ]
 });

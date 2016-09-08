@@ -366,7 +366,8 @@ def permenatly_delete_scene_and_remove_from_db(scene):
         success_delete_file = True
     except OSError as e:
         if e.errno == errno.ENOENT:
-            print("File {} already deleted! [Err No:{}, Err File:{} Err:{}]".format(scene.path_to_file,e.errno,e.filename,e.strerror))
+            print("File {} already deleted! [Err No:{}, Err File:{} Err:{}]".format(scene.path_to_file, e.errno,
+                                                                                    e.filename, e.strerror))
             success_delete_file = True
         else:
             print("Got OSError while trying to delete {} : Error number:{} Error Filename:{} Error:{}".format(
@@ -739,6 +740,34 @@ def ffmpeg(request):
                     return Response(status=500)
 
 
+def add_comma_seperated_items_to_db(string_of_comma_seperated_items, type_of_item):
+    for x in string_of_comma_seperated_items.split(','):
+
+        if type_of_item == 'actor':
+            object_to_insert = Actor()
+            object_to_insert.thumbnail = const.UNKNOWN_PERSON_IMAGE_PATH
+        elif type_of_item == 'scene tag':
+            object_to_insert = SceneTag()
+        elif type_of_item == 'website':
+            object_to_insert = Website()
+
+        object_to_insert.strip = x.strip()
+        object_to_insert.name = object_to_insert.strip
+
+        try:
+            if type_of_item == 'actor':
+                if not ActorAlias.objects.filter(name=object_to_insert.name):
+                    object_to_insert.save()
+                    print("Added {} {} To db".format(type_of_item, object_to_insert.name))
+            else:
+                object_to_insert.save()
+                print("Added {} {} To db".format(type_of_item, object_to_insert.name))
+        except django.db.IntegrityError as e:
+            # content = {'something whent wrong': e}
+            print("{} while trying to add {} {}".format(e, type_of_item, object_to_insert.name))
+            # return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 class AddItems(views.APIView):
     def get(self, request, format=None):
 
@@ -756,26 +785,17 @@ class AddItems(views.APIView):
                 else:
                     content = {'Path does not exist!': "Can't find path!"}
                     return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            return Response(status=200)
 
         if request.query_params['actorsToAdd'] != "":
-            actors_to_add = request.query_params['actorsToAdd']
+            add_comma_seperated_items_to_db(request.query_params['actorsToAdd'], 'actor')
 
-            for x in actors_to_add.split(','):
-                actor_to_insert = Actor()
-                actor_to_insert.strip = x.strip()
-                actor_to_insert.name = actor_to_insert.strip
-                actor_to_insert.thumbnail = const.UNKNOWN_PERSON_IMAGE_PATH
-                try:
-                    if not ActorAlias.objects.filter(name=actor_to_insert.name):
-                        actor_to_insert.save()
-                        print("Added {} To db".format(actor_to_insert.name))
-                except django.db.IntegrityError as e:
-                    # content = {'something whent wrong': e}
-                    print("{} while trying to add {}".format(e, actor_to_insert.name))
-                    # return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        if request.query_params['sceneTagsToAdd'] != "":
+            add_comma_seperated_items_to_db(request.query_params['sceneTagsToAdd'], 'scene tag')
 
-            return Response(status=200)
+        if request.query_params['websitesToAdd'] != "":
+            add_comma_seperated_items_to_db(request.query_params['websitesToAdd'], 'website')
+
+        return Response(status=200)
 
 
 def play_scene_vlc(scene, random):
