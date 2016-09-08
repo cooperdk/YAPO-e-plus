@@ -232,6 +232,15 @@ body {
     overflow-y: scroll;
 }
 
+/* The square +/- buttons */
+.btn-xs {
+    padding: 1px 5px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 3px;
+    margin-bottom: 0.5em;
+}
+
 /*toggle button*/
 /* The switch - the box around the slider */
 .switch {
@@ -240,8 +249,8 @@ body {
     width: 30px;
     height: 17px;
     /*left: 1em;*/
-    /*bottom: 0em;*/
-    margin-left: 1em;
+    bottom: -0.3em;
+    margin-left: 0em;
 
 
 
