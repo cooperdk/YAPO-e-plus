@@ -1,63 +1,100 @@
 <div class="container-fluid">
 
     <label>Path to VLC player:</label><input class="form-control" id="inputdefault" type="text"
-                                         ng-model="$ctrl.pathToVLC">
-<button type="button" ng-click="$ctrl.updateVlcPath()" class="btn btn-default btn-sm"
-        uib-popover-html="'Sets YAPO\'s VLC path to the path in the text input.'"
-        popover-trigger="mouseenter" popover-placement="right-top"
->
-    <span class="glyphicon glyphicon-cog"></span> Set VLC Path
-</button>
+                                             ng-model="$ctrl.pathToVLC">
+    <button type="button" ng-click="$ctrl.updateVlcPath()" class="btn btn-default btn-sm"
+            uib-popover-html="'Sets YAPO\'s VLC path to the path in the text input.'"
+            popover-trigger="mouseenter" popover-placement="right-top"
+    >
+        <span class="glyphicon glyphicon-cog"></span> Set VLC Path
+    </button>
 
-<br>
-<button type="button" ng-click="$ctrl.scrapAllActors()" class="btn btn-default btn-sm"
-        uib-popover-html="'Scrapes <strong>all</strong> previously unscraped actors with the TMDb and Freeones scrapers.'"
-        popover-trigger="mouseenter"  popover-placement="right-top"
->
+    <br>
+    <button type="button" ng-click="$ctrl.scrapAllActors()" class="btn btn-default btn-sm"
+            uib-popover-html="'Scrapes <strong>all</strong> previously unscraped actors with the TMDb and Freeones scrapers.'"
+            popover-trigger="mouseenter" popover-placement="right-top"
+    >
     <span class="glyphicon glyphicon-user"
 
     ></span> Scrape All Actors
-</button>
+    </button>
 
-<button type="button" ng-click="$ctrl.tagAllScenes()" class="btn btn-default btn-sm"
-        uib-popover-html="'Checks all scenes in the database against all known Tags, Websites and Actors and tags them with the correct information.'"
-        popover-trigger="mouseenter"  popover-placement="right-top"
->
+    <button type="button" ng-click="$ctrl.tagAllScenes()" class="btn btn-default btn-sm"
+            uib-popover-html="'Checks all scenes in the database against all known Tags, Websites and Actors and tags them with the correct information.'"
+            popover-trigger="mouseenter" popover-placement="right-top"
+    >
     <span class="glyphicon glyphicon-user"
 
     ></span> Tag All Scenes
-</button>
+    </button>
     <label
-    uib-popover-html="'If checked, will ignore the last <b>Tag All Scenes</b> lookup date and will search for all Tags, Actors and Websites in all the scenes
+            uib-popover-html="'If checked, will ignore the last <b>Tag All Scenes</b> lookup date and will search for all Tags, Actors and Websites in all the scenes
     as though they were never searched before.'"
-        popover-trigger="mouseenter"  popover-placement="right-top"
+            popover-trigger="mouseenter" popover-placement="right-top"
     >
         Ignore Last Lookup?
 
-    <input type="checkbox" ng-model="$ctrl.ignore_last_lookup">
+        <input type="checkbox" ng-model="$ctrl.ignore_last_lookup">
     </label>
 
 
     <button type="button" ng-click="$ctrl.cleanDatabase()" class="btn btn-default btn-sm"
-        uib-popover-html="'Checks all scenes and if a scene has been removed or if the file for the scene no longer exists on disk, deletes the scene from the database 
+            uib-popover-html="'Checks all scenes and if a scene has been removed or if the file for the scene no longer exists on disk, deletes the scene from the database
         (and also deletes screenshots and video samples for the scene). As well, also cleans up actors no longer in the database and removes aliases without association with actors.)'"
-        popover-trigger="mouseenter"  popover-placement="right-top"
->
+            popover-trigger="mouseenter" popover-placement="right-top"
+    >
     <span class="glyphicon glyphicon-flash"
 
     ></span> Clean Database
-</button>
+    </button>
 
 
     <label>Items Per page:</label>
     <select ng-model="$ctrl.itemsPerPage" ng-change="$ctrl.changeNumberOfItemsPerPage()">
-        <option> 25 </option>
-        <option> 50 </option>
-        <option> 100 </option>
-        <option> 150 </option>
-        <option> 200 </option>
-        <option> 250 </option>
-        <option> 500 </option>
+        <option> 25</option>
+        <option> 50</option>
+        <option> 100</option>
+        <option> 150</option>
+        <option> 200</option>
+        <option> 250</option>
+        <option> 500</option>
     </select>
 </div>
+
+<h4><strong>Current Root Media Paths:</strong>
+<button
+                ng-click="$ctrl.rescanFolders('')"
+                class="btn btn-success btn-sm"
+                popover-trigger="mouseenter"
+                uib-popover-html="'Rescan all folders in list for new scenes.'"
+                popover-append-to-body="true"
+                popover-placement="top"
+                type="button">
+                                    <span class="glyphicon glyphicon-repeat"></span>
+        </button>
+</h4>
+<ul>
+    <li ng-repeat="folder in $ctrl.mediaRootFolders | orderBy : 'name'">{{ folder.name }}
+        <button
+                ng-click="$ctrl.rescanFolders(folder)"
+                class="btn btn-success btn-xs"
+                popover-trigger="mouseenter"
+                uib-popover-html="'Rescan this folder for new scenes.'"
+                popover-append-to-body="true"
+                popover-placement="top"
+                type="button">
+                                    <span class="glyphicon glyphicon-repeat"></span>
+        </button>
+        <button
+                ng-click="$ctrl.removeFolderFromList(folder)"
+                class="btn btn-danger btn-xs"
+                popover-trigger="mouseenter"
+                uib-popover-html="'Remove Folder from this list. Applies to this list only, doesnt do anything else except removing the folder entry from this list.'"
+                popover-append-to-body="true"
+                popover-placement="top"
+                type="button">
+                                    <span class="glyphicon glyphicon-remove"></span>
+        </button>
+    </li>
+</ul>
 

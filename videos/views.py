@@ -713,6 +713,15 @@ def settings(request):
                 print("Cleaning scene dirs that are no longer in database...")
                 clean_dir('scenes')
 
+        if 'folderToScan' in request.query_params:
+            if request.query_params['folderToScan'] != "":
+                local_folder = LocalSceneFolders.objects.get(id=int(request.query_params['folderToScan']))
+                videos.addScenes.get_files(local_folder.name, False)
+            else:
+                all_folders = LocalSceneFolders.objects.all()
+                for folder in all_folders:
+                    videos.addScenes.get_files(folder.name, False)
+
         return Response(status=200)
 
 
@@ -784,8 +793,11 @@ class AddItems(views.APIView):
                         videos.addScenes.get_files(folder_to_add_path_stripped, False)
 
                     temp = os.path.abspath(folder_to_add_path_stripped)
-                    local_scene_folder = LocalSceneFolders(name=temp)
-                    local_scene_folder.save()
+                    try:
+                        local_scene_folder = LocalSceneFolders(name=temp)
+                        local_scene_folder.save()
+                    except django.db.IntegrityError as e:
+                        print("{} while trying to add {} to folder list".format(e, local_scene_folder.name))
                     print("Added folder {} to folder list...".format(local_scene_folder.name))
                 else:
                     content = {'Path does not exist!': "Can't find path!"}
