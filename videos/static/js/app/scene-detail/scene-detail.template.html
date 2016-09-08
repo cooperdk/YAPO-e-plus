@@ -46,19 +46,19 @@
 </h2>
 
 <ul>
-    <li><span>Favorite
+    <li><span>Favorite:
         <!-- Rounded switch -->
-        <label class="switch">
-  <input type="checkbox" ng-model="$ctrl.scene.is_fav"
+        <label class="switch-header">
+  <input type="checkbox" class="hidden-box" ng-model="$ctrl.scene.is_fav"
          ng-change="$root.patchEntity('scene', $ctrl.scene.id, 'is_fav', $ctrl.scene.is_fav, 'add',
                                               false, false, null)">
   <div class="slider round"></div></span>
         </label>
 
     </li>
-    <li>Runner up
-        <label class="switch">
-            <input type="checkbox" ng-model="$ctrl.scene.is_runner_up"
+    <li>Runner up:
+        <label class="switch-header">
+            <input type="checkbox" class="hidden-box" ng-model="$ctrl.scene.is_runner_up"
                    ng-change="$root.patchEntity('scene', $ctrl.scene.id, 'is_runner_up', $ctrl.scene.is_runner_up, 'add',
                                               false, false, null)">
             <div class="slider round"></div>

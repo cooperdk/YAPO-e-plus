@@ -251,13 +251,24 @@ body {
     /*left: 1em;*/
     bottom: -0.3em;
     margin-left: 0em;
+}
 
-
-
+.switch-header {
+    position: relative;
+    display: inline-block;
+    width: 30px;
+    height: 17px;
+    /*left: 1em;*/
+    bottom: -0.55em;
+    margin-left: 0em;
 }
 
 /* Hide default HTML checkbox */
 .switch input {
+    display: none;
+}
+
+.hidden-box {
     display: none;
 }
 
