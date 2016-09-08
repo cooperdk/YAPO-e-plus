@@ -1,7 +1,7 @@
 <div class="container-fluid" xmlns:C="http://www.w3.org/1999/xhtml">
     <label>Path to folder to add</label>(Supports multiple folders separated by commas EX:c:\folder1,d:\folder2):
 <input class="form-control" id="inputdefault" type="text"
-                                             ng-model="$ctrl.pathToFolderToAdd">
+                                             ng-model="$ctrl.folderInputContent">
 <button type="button" ng-click="$ctrl.addFolderClicked()" class="btn btn-default btn-sm"
  uib-popover-html="'Add selected path and all supported videos in it to the YAPO database (for now the path needs to be added manually Ex: C:\\myVideos\\).'"
         popover-trigger="mouseenter" popover-placement="right-top"
@@ -19,13 +19,28 @@ The samples are stored in media/scenes/(sceneId)/sample'"
 <br>
 <br>
 
-<label>Actors names seperated by commas: </label><textarea class="form-control" rows="5" id="comment"
-                                                           ng-model="$ctrl.actorsToAdd"></textarea>
+<label>Item names separated by commas: </label>(Can be a single item)<textarea class="form-control" rows="5" id="comment"
+                                                           ng-model="$ctrl.textareaInputContent"></textarea>
+
 <button type="button" ng-click="$ctrl.addActorsClicked()" class="btn btn-default btn-sm"
-uib-popover-html="'Adds actors to the database. Actors should be seperated by commas EX: Adriana Nicole,Stoya,James Deen'"
+uib-popover-html="'Adds <strong>actors</strong> to the database. Actors should be separated by commas EX: Adriana Nicole,Stoya,James Deen'"
         popover-trigger="mouseenter" popover-placement="right-top"
 >
     <span class="glyphicon glyphicon-plus"></span> Add Actors
+</button>
+
+    <button type="button" ng-click="$ctrl.addSceneTagsClicked()" class="btn btn-default btn-sm"
+uib-popover-html="'Adds <strong>scene tags</strong> to the database. Scene tags should be separated by commas EX: Outfit.Nurse,Outfit.Police,Dirty.Talk  '"
+        popover-trigger="mouseenter" popover-placement="right-top"
+>
+    <span class="glyphicon glyphicon-plus"></span> Add Scene Tags
+</button>
+
+    <button type="button" ng-click="$ctrl.websitesToAddClicked()" class="btn btn-default btn-sm"
+uib-popover-html="'Adds <strong>websites</strong> to the database. Websites should be separated by commas EX: Clips.4.Sale,Mofos,Legal.Porno'"
+        popover-trigger="mouseenter" popover-placement="right-top"
+>
+    <span class="glyphicon glyphicon-plus"></span> Add Websites
 </button>
 
 </div>
