@@ -180,6 +180,7 @@ class Folder(MPTTModel):
 
 class LocalSceneFolders(models.Model):
     name = models.CharField(max_length=500, unique=True)
+    date_added = models.DateTimeField(auto_now_add=True)
 
 
 class Playlist(models.Model):

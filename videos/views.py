@@ -782,6 +782,11 @@ class AddItems(views.APIView):
                         videos.addScenes.get_files(folder_to_add_path_stripped, True)
                     else:
                         videos.addScenes.get_files(folder_to_add_path_stripped, False)
+
+                    temp = os.path.abspath(folder_to_add_path_stripped)
+                    local_scene_folder = LocalSceneFolders(name=temp)
+                    local_scene_folder.save()
+                    print("Added folder {} to folder list...".format(local_scene_folder.name))
                 else:
                     content = {'Path does not exist!': "Can't find path!"}
                     return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

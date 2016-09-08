@@ -265,7 +265,12 @@ class PlaylistListSerializer(serializers.ModelSerializer):
 
 
 class PlaylistSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Playlist
+        fields = '__all__'
+
+
+class LocalSceneFolderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LocalSceneFolders
         fields = '__all__'
