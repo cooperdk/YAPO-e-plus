@@ -22,18 +22,18 @@
 </h2>
 
 <ul>
-    <li><span>Favorite
-        <label class="switch">
-  <input type="checkbox" ng-model="$ctrl.actor.is_fav"
+    <li><span>Favorite:
+        <label class="switch-header">
+  <input type="checkbox" class="hidden-box" ng-model="$ctrl.actor.is_fav"
          ng-change="$root.patchEntity('actor', $ctrl.actor.id, 'is_fav', $ctrl.actor.is_fav, 'add',
                                               false, false, null)">
   <div class="slider round"></div></span>
         </label>
 
     </li>
-    <li>Runner up
-        <label class="switch">
-            <input type="checkbox" ng-model="$ctrl.actor.is_runner_up"
+    <li>Runner up:
+        <label class="switch-header">
+            <input type="checkbox" class="hidden-box" ng-model="$ctrl.actor.is_runner_up"
                    ng-change="$root.patchEntity('actor', $ctrl.actor.id, 'is_runner_up', $ctrl.actor.is_runner_up, 'add',
                                               false, false, null)">
             <div class="slider round"></div>
@@ -41,11 +41,11 @@
 
     </li>
     <li>Allow one word name when auto-tagging:
-        <label class="switch" uib-popover-html="'By default actors with a one word name (Ex: &quot;Stoya&quot; )
+        <label class="switch-header" uib-popover-html="'By default actors with a one word name (Ex: &quot;Stoya&quot; )
             are ignored when autotagging scenes. If checked this will allow this actor to be autotagged even though
             their name consists of one word only. <i>Use only on actors whose names are unique as not to cause incorrect tagging.</i>'"
                popover-trigger="mouseenter" popover-placement="right-top">
-            <input type="checkbox" ng-model="$ctrl.actor.is_exempt_from_one_word_search"
+            <input type="checkbox" class="hidden-box" ng-model="$ctrl.actor.is_exempt_from_one_word_search"
                    ng-change="$root.patchEntity('actor', $ctrl.actor.id, 'is_exempt_from_one_word_search', $ctrl.actor.is_exempt_from_one_word_search, 'add',
                                               false, false, null)">
             <div class="slider round"

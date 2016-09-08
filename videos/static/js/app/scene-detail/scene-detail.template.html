@@ -45,90 +45,37 @@
 
 </h2>
 
-<ul>
-    <li><span>Favorite
+
+<div class="row">
+
+    <div class="col-md-6 pull-left">
+        <span><video class="video-box" ng-if="$ctrl.updatedSample" poster="{{ $ctrl.scene.thumbnail }}" ng-src="{{ $ctrl.samplePath }}"
+               width="640" height="360" controls></video>
+        </span>
+    </div>
+    <div class="col-md-6">
+         <ul>
+    <li><span>Favorite:
         <!-- Rounded switch -->
-        <label class="switch">
-  <input type="checkbox" ng-model="$ctrl.scene.is_fav"
+        <label class="switch-header">
+  <input type="checkbox" class="hidden-box" ng-model="$ctrl.scene.is_fav"
          ng-change="$root.patchEntity('scene', $ctrl.scene.id, 'is_fav', $ctrl.scene.is_fav, 'add',
                                               false, false, null)">
   <div class="slider round"></div></span>
         </label>
 
     </li>
-    <li>Runner up
-        <label class="switch">
-            <input type="checkbox" ng-model="$ctrl.scene.is_runner_up"
+    <li>Runner up:
+        <label class="switch-header">
+            <input type="checkbox" class="hidden-box" ng-model="$ctrl.scene.is_runner_up"
                    ng-change="$root.patchEntity('scene', $ctrl.scene.id, 'is_runner_up', $ctrl.scene.is_runner_up, 'add',
                                               false, false, null)">
             <div class="slider round"></div>
         </label>
 
     </li>
-</ul>
 
 
-<div class="row ">
-
-    <div class="col-md-4 pull-right">
-        <video ng-if="$ctrl.updatedSample" poster="{{ $ctrl.scene.thumbnail }}" ng-src="{{ $ctrl.samplePath }}"
-               width="640" height="360" controls></video>
-
-        <div id="actor-list-row">
-            <ul>
-                <li ng-repeat="actor in $ctrl.scene.actors | orderBy:actor.name"
-
-
-                >
-
-                    <a href="/#!/actor/{{ actor.id }}">
-
-                        <img ng-src="{{ actor.thumbnail }}"
-                             alt="{{ actor.name }}"
-                             style="width: 150px;"/>
-                    </a>
-                    <div id="actor-name-text">
-                        <h4><a href="/#!/actor/{{ actor.id }}">[{{$index + 1}}) {{ actor.name }}</a>
-                            <span
-                                    ng-click="$ctrl.removeItem(actor,'actors')"
-                                    class="glyphicon glyphicon-remove"
-                                    uib-popover="Remove Actor from current scene." popover-trigger="mouseenter">
-
-                            </span>
-                        </h4>
-                    </div>
-
-
-                </li>
-            </ul>
-        </div>
-
-
-        <ul align="left">
-            File info:
-            <li>
-                Video bitrate: {{ $ctrl.scene.bit_rate / 1000 }} Kb\s
-            </li>
-            <li>
-                Video size: {{ $ctrl.scene.size / 1000000 }} MB
-            </li>
-            <li>
-                Video resolution: {{ $ctrl.scene.width}}x{{ $ctrl.scene.height}}
-            </li>
-            <li>
-                Video codec name: {{ $ctrl.scene.codec_name }}
-            </li>
-            <li>
-                Video framerate: {{ $ctrl.scene.framerate }}
-            </li>
-            <li>
-                Video druation: {{ $ctrl.scene.duration / 60 }} Minutes
-            </li>
-        </ul>
-    </div>
-
-    <div class="col-md-4">
-        <ul>
             <li>Tags:
 
                 <async-typeahead object="$ctrl.scene.scene_tags"
@@ -183,7 +130,67 @@
             </li>
 
         </ul>
+
     </div>
+<div class="row">
+    <div class="col-md-3">
+            <ul>
+            <br>
+            <b>File Info:</b><hr>
+            <li>
+                Video Bitrate: {{ $ctrl.scene.bit_rate / 1000 }} kbps
+            </li>
+            <li>
+                Video Size: {{ $ctrl.scene.size / 1000000 }} MB
+            </li>
+            <li>
+                Video Resolution: {{ $ctrl.scene.width}}x{{ $ctrl.scene.height}}
+            </li>
+            <li>
+                Video Codec: {{ $ctrl.scene.codec_name }}
+            </li>
+            <li>
+                Video Framerate: {{ $ctrl.scene.framerate }}
+            </li>
+            <li>
+                Video Duration: {{ $ctrl.scene.duration / 60 }} Minutes
+            </li>
+        </ul>
+    </div>
+
+    <div class="col-md-8 col-md-offset-1">
+        <div id="actor-list-row">
+            <ul>
+                <li ng-repeat="actor in $ctrl.scene.actors | orderBy:actor.name"
+
+
+                >
+
+                    <a href="/#!/actor/{{ actor.id }}">
+
+                        <img ng-src="{{ actor.thumbnail }}"
+                             alt="{{ actor.name }}"
+                             style="width: 150px;"/>
+                    </a>
+                    <div id="actor-name-text">
+                        <h4><a href="/#!/actor/{{ actor.id }}">[{{$index + 1}}) {{ actor.name }}</a>
+                            <span
+                                    ng-click="$ctrl.removeItem(actor,'actors')"
+                                    class="glyphicon glyphicon-remove"
+                                    uib-popover="Remove Actor from current scene." popover-trigger="mouseenter">
+
+                            </span>
+                        </h4>
+                    </div>
+
+
+                </li>
+            </ul>
+
+        </div>
+    </div>
+
+</div>
 
     <!--
     <div class="col-md-4">
@@ -280,9 +287,6 @@
     </div>
         <div class="col-md-6" style="float: right">
     -->
-
-
-</div>
 
 <!--
 <actor-list mainPage="false" scene-detail="true" scene="$ctrl.scene"></actor-list>

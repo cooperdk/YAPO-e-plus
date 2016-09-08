@@ -12,7 +12,8 @@ body {
     white-space: nowrap;
     list-style: none;
     align-content: center;
-    overflow-y: scroll;
+    overflow-y: visible;
+    float: left;
 }
 #actor-list-row li{
     display: inline-block;
@@ -232,6 +233,15 @@ body {
     overflow-y: scroll;
 }
 
+/* The square +/- buttons */
+.btn-xs {
+    padding: 1px 5px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 3px;
+    margin-bottom: 0.5em;
+}
+
 /*toggle button*/
 /* The switch - the box around the slider */
 .switch {
@@ -240,15 +250,26 @@ body {
     width: 30px;
     height: 17px;
     /*left: 1em;*/
-    /*bottom: 0em;*/
-    margin-left: 1em;
+    bottom: -0.3em;
+    margin-left: 0em;
+}
 
-
-
+.switch-header {
+    position: relative;
+    display: inline-block;
+    width: 30px;
+    height: 17px;
+    /*left: 1em;*/
+    bottom: -0.55em;
+    margin-left: 0em;
 }
 
 /* Hide default HTML checkbox */
 .switch input {
+    display: none;
+}
+
+.hidden-box {
     display: none;
 }
 
@@ -300,3 +321,6 @@ input:checked + .slider:before {
     border-radius: 50%;
 }
 
+.video-box {
+    float: right;
+}
