@@ -370,7 +370,7 @@ def permenatly_delete_scene_and_remove_from_db(scene):
             success_delete_file = True
         else:
             print("Got OSError while trying to delete {} : Error number:{} Error Filename:{} Error:{}".format(
-                scene.path_to_file, OSError.errno, OSError.filename, OSError.strerror))
+                scene.path_to_file, e.errno, e.filename, e.strerror))
 
     media_path = os.path.relpath(os.path.join(const.MEDIA_PATH, 'scenes', str(scene.id)))
     print(os.path.dirname(os.path.abspath(__file__)))
@@ -384,7 +384,7 @@ def permenatly_delete_scene_and_remove_from_db(scene):
             success_delete_media_path = True
         else:
             print("Got OSError while trying to delete {} : Error number:{} Error Filename:{} Error:{}".format(
-                scene.path_to_file, OSError.errno, OSError.filename, OSError.strerror))
+                scene.path_to_file, e.errno, e.filename, e.strerror))
 
     if success_delete_file and success_delete_media_path:
         scene.delete()
