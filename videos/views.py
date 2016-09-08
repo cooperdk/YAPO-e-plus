@@ -369,7 +369,8 @@ def permenatly_delete_scene_and_remove_from_db(scene):
             print("File already deleted!")
             success_delete_file = True
         else:
-            print("Got OSError while trying to delete {} : {}".format(scene.path_to_file, OSError.errno))
+            print("Got OSError while trying to delete {} : Error number:{} Error Filename:{} Error:{}".format(
+                scene.path_to_file, OSError.errno, OSError.filename, OSError.strerror))
 
     media_path = os.path.relpath(os.path.join(const.MEDIA_PATH, 'scenes', str(scene.id)))
     print(os.path.dirname(os.path.abspath(__file__)))
@@ -382,7 +383,8 @@ def permenatly_delete_scene_and_remove_from_db(scene):
             print("Directory \'{}\' already deleted".format(media_path))
             success_delete_media_path = True
         else:
-            print("Got OSError while trying to delete {} : {}".format(media_path, OSError))
+            print("Got OSError while trying to delete {} : Error number:{} Error Filename:{} Error:{}".format(
+                scene.path_to_file, OSError.errno, OSError.filename, OSError.strerror))
 
     if success_delete_file and success_delete_media_path:
         scene.delete()
@@ -813,7 +815,6 @@ def play_scene_vlc(scene, random):
             print("Added scene '{}' to Random Plays playlist.".format(scene.name))
         else:
             print("Scene '{}' already in playlist Random Plays.".format(scene.name))
-
 
 
 @api_view(['GET', 'POST'])
