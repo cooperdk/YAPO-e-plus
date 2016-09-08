@@ -12,7 +12,8 @@ body {
     white-space: nowrap;
     list-style: none;
     align-content: center;
-    overflow-y: scroll;
+    overflow-y: visible;
+    float: left;
 }
 #actor-list-row li{
     display: inline-block;
@@ -320,3 +321,6 @@ input:checked + .slider:before {
     border-radius: 50%;
 }
 
+.video-box {
+    float: right;
+}
