@@ -83,10 +83,10 @@ angular.module('actorDetail').component('actorDetail', {
             self.hideDetailClick = function () {
                 if (self.hideDetail) {
                     self.hideDetail = false;
-                    self.hideDetailButtomLable = "Show Detail"
+                    self.hideDetailButtomLable = "Hide Detail"
                 } else {
                     self.hideDetail = true;
-                    self.hideDetailButtomLable = "Hide Detail"
+                    self.hideDetailButtomLable = "Show Detail"
                 }
             };
 
@@ -441,21 +441,8 @@ angular.module('actorDetail').component('actorDetail', {
 
             };
 
-            // self.heightConvertFeet = function (val) {
-            //
-            //     var heightMetric = self.actor.height;
-            //
-            //     var totalInches = Math.round(heightMetric / 2.54);
-            //     var inches = totalInches % 12;
-            //     var Feet = (totalInches - inches) / 12;
-            //
-            //     return (Feet)
-            //
-            // };
-
             self.heightConvertInches = function (val) {
 
-                // var heightMetric = self.actor.height;
                 var totalInches = Math.round(val / 2.54);
 
                 var inches = totalInches % 12;
@@ -463,14 +450,11 @@ angular.module('actorDetail').component('actorDetail', {
 
                 var ans = {'inches': inches, 'feet': feet};
 
-
                 return (ans)
 
             };
 
             self.weightConvertPounds = function (val) {
-
-                // var weightMetric = self.actor.weight; redundant  because already got metric weight in 'val' variable.
 
                 var pounds = Math.round(val * 2.2);
 

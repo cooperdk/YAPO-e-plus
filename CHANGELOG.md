@@ -1,6 +1,20 @@
 # Changelog
 
 
+## 0.1.3 (2016-09-09)
+
+### New
+
+* Folders added to Yapo in the 'add' menu are now logged and can be rescanned for new files in the 'settings' menu. This is not retroactive so folders added before this update will not be present in the settings menu. They will if one was to re-add them. [Curt Wagner]
+
+* Added option to bulk add comma separated websites and scene tags in the add page. [Curt Wagner]
+
+### Changes
+
+* New experimental layout for Scene Detail page. [Shaun Clayton]
+
+
+
 ## 0.1.2 (2016-09-07)
 
 ### New
@@ -133,5 +147,4 @@
 * Added &quot;is_exempt_from_one_word_search&quot; to actor details. [Curt Wagner]
 
 * Added unknown person image. [Curt Wagner]
-
 
