@@ -25,7 +25,6 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 
 # MEDIA_PATH = "videos\\media"
 
-
 def search_freeones(actor_to_search, alias, force):
     success = False
     if Actor.objects.get(name=actor_to_search.name):
