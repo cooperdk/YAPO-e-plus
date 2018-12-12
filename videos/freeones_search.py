@@ -32,7 +32,7 @@ def search_freeones(actor_to_search, alias, force):
         actor_to_search = Actor.objects.get(name=actor_to_search.name)
     name = actor_to_search.name
 
-    # http://www.iafd.com/results.asp?searchtype=comprehensive&searchstring=isis+love
+    # https://www.iafd.com/results.asp?searchtype=comprehensive&searchstring=isis+love
     if alias:
         name_with_plus = alias.name.replace(' ', '+')
         print("Searching Freeones for: " + actor_to_search.name + " alias: " + alias.name)
@@ -40,8 +40,9 @@ def search_freeones(actor_to_search, alias, force):
     else:
         name_with_plus = name.replace(' ', '+')
         print("Searching Freeones for: " + actor_to_search.name)
-    r = requests.get("http://www.freeones.com/search/?t=1&q=" + name_with_plus)
-    soup = BeautifulSoup(r.content, "html.parser")
+    r = requests.get("https://www.freeones.com/search/?t=1&q=" + name_with_plus)
+    soup = BeautifulSoup(r.content, "html5lib")
+
 
     # link = soup.find_all("a", {"text": "Isis Love"})
 
@@ -77,10 +78,10 @@ def search_freeones(actor_to_search, alias, force):
         print(actor_to_search.name + " was found on Freeones!")
         actor_to_search.gender = 'F'
         actor_to_search.save()
-        actor_page = urllib_parse.urljoin("http://www.freeones.com/", href_found)
+        actor_page = urllib_parse.urljoin("https://www.freeones.com/", href_found)
         r = requests.get(actor_page)
 
-        soup = BeautifulSoup(r.content)
+        soup = BeautifulSoup(r.content, "html5lib")
         soup_links = soup.find_all("a")
         href_found = match_text_in_link_to_query(soup_links, "Biography")
 
@@ -103,14 +104,16 @@ def search_freeones(actor_to_search, alias, force):
             has_image = True
         except KeyError:
             print("No image on Freeones!")
+            
 
-        biography_page = urllib_parse.urljoin("http://www.freeones.com/", href_found)
+        biography_page = urllib_parse.urljoin("https://www.freeones.com/", href_found)
 
         if has_image:
             images_page = profile_thumb_parent['href']
 
             r = requests.get(images_page)
-            soup = BeautifulSoup(r.content)
+            #print("images page is " + images_page + "\n ^ That is all.")
+            soup = BeautifulSoup(r.content, "html5lib")
 
             if actor_to_search.thumbnail == const.UNKNOWN_PERSON_IMAGE_PATH or force:
                 if soup.find("div", {'id': 'PictureList'}):
@@ -119,16 +122,26 @@ def search_freeones(actor_to_search, alias, force):
 
                     if picture_list.find("a"):
                         first_picture = picture_list.find("a")
-
+                        #print(str(picture_list) + "is first_picture")
+                            
                         if first_picture['href']:
-                            first_picture_link = first_picture['href']
-
-                            print(first_picture_link)
-                            aux.save_actor_profile_image_from_web(first_picture_link, actor_to_search,force)
+                            if re.match(r'^\/\/', first_picture['href']):
+                                    first_picture_link = "https:" + first_picture['href']
+                                    print(first_picture_link)
+                                    aux.save_actor_profile_image_from_web(first_picture_link, actor_to_search,force)
+                                    print("Image Saved!")
+                            elif re.match(r'^.*jpg$', first_picture['href']):
+                                    first_picture_link = first_picture['href']
+                                    print(first_picture_link)
+                                    aux.save_actor_profile_image_from_web(first_picture_link, actor_to_search,force)
+                                    print("Image Saved!")
+                            else:
+                                    print("No picture found!")
+                                    
 
         r = requests.get(biography_page)
 
-        soup = BeautifulSoup(r.content)
+        soup = BeautifulSoup(r.content, "html5lib")
 
         soup_links = soup.find_all("td", {'class': 'paramname'})
         for link in soup_links:
@@ -224,6 +237,7 @@ def search_freeones(actor_to_search, alias, force):
     else:
         actor_to_search.last_lookup = datetime.datetime.now()
         actor_to_search.save()
+        
 
     return success
 
