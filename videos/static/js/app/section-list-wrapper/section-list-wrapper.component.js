@@ -299,6 +299,51 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                         'sortBy': self.sortBy,
                         'mainPage': self.mainPage
                     });
+                 if (self.sectionType == 'ActorList') {
+                    self.orderFields = actorOrderFields;
+                    self.searchInFields = actorSearchInFields;
+                    $rootScope.title = "Actors";
+                    self.sortBy = getSortBy('ActorList');
+                    
+
+
+                } else if (self.sectionType == 'SceneList') {
+                    self.orderFields = sceneOrderFields;
+                    self.searchInFields = sceneSearchInFields;
+                    $rootScope.title = "Scenes";
+                    self.sortBy = getSortBy('SceneList');
+                    
+
+                } else if (self.sectionType == 'WebsiteList') {
+                    self.orderFields = websiteOrderFields;
+                    self.searchInFields = websiteSearchInFields;
+                    $rootScope.title = "Websites";
+                    self.sortBy = getSortBy('WebsiteList');
+                    
+
+                } else if (self.sectionType == 'ActorTagList') {
+                    self.orderFields = actorTagOrderFields;
+                    self.searchInFields = actorTagSearchInFields;
+                    $rootScope.title = "Actor Tags";
+                    self.sortBy = getSortBy('ActorTagList');
+                    
+
+                } else if (self.sectionType == 'SceneTagList') {
+                    self.orderFields = sceneTagOrderFields;
+                    self.searchInFields = sceneTagSearchInFields;
+                    $rootScope.title = "Scene Tags";
+                    self.sortBy = getSortBy('SceneTagList');
+                    
+
+                } else if (self.sectionType == 'DbFolder') {
+                    self.orderFields = dbFolderOrderFields;
+                    self.searchInFields = dbFolderSearchInFields;
+                    $rootScope.title = "Folders";
+                    self.sortBy = getSortBy('DbFolder');
+                    
+
+
+                }
                 };
 
 
