@@ -145,6 +145,13 @@
                 </span>
 
             </li>
+            <li>
+                <strong>Description:</strong> <br> <a href="#" editable-text="$ctrl.scene.description"
+       onaftersave="$root.patchEntity('scene', $ctrl.scene.id, 'description', $ctrl.scene.description, 'add',
+                                              false, false, null)" style="cursor:text">
+        {{ $ctrl.scene.description || 'NA' }}
+    </a>
+            </li>
 
         </ul>
 
