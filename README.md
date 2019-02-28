@@ -29,7 +29,11 @@ This will look over the new code and take note of the adjustments that needs to 
 "python manage.py migrate"
 This will actually make the adjustments to the database it took note of in the previous step.
 
-========================================================================================================
+If you get this error when you're done:
+"You are trying to add a non-nullable field **'date_added'** to folder without a default; we can't do that (the database needs  something to populate existing rows)."
+When asked to select a fix, select option 1 and type in "datetime.datetime.now()" (without quotes) and press enter.
+
+================================================================================
 
 # YAPO
 YAPO - Yet Another Porn Organizer
