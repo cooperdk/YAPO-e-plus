@@ -1,7 +1,35 @@
-# YAPOredux
-Yapo - Yet Another Porn Organizer (redux)
+# YAPO e+
+Yapo  e+ - Yet Another Porn Organizer
 
-#### This is an unoffical branch of the original YAPO, on which I'm trying to make some improvements. original README below:
+#### This is an unoffical branch of the original YAPO, on which I'making improvements. Find the original readme at the bottom (delimited with a line of "=" signs).
+#### There is a setup available for an easy install.
+#### There is also a copy of the setup with pre-registered actors, websites and tags (thousands of them). It will be available on Patreon shortly.
+
+NEW FEATURES:
+
+- There was a field in the actor table for tattoos. This now works, and tatto information shows up in the actor view.
+- A field has been added to register information about piercings. In addition, typical types of piercings are now sent to the actor tags.
+- YAPO e+ scrapes actor information from IMDB first (best biographies), then from TMDB (best profile pictures) and then from Freeones (best all-round information). If there's a photo in the system and it's taken from TMDB or added by the user, the system no longer downloads a new one if forced to update the actor.
+- YAPO e+ hashes all scenes (don't worry, it's FAST!) and adds the hash checksum to the scenes table. It already informs (CLI) about duplicate scenes, but in the future, there will be a menu to check for dupes and delete one of them.
+
+PLANNED:
+
+- Photo gallery section
+- DVD section
+- Additional actor photos (up to 5)
+- Function to move of all videos belonging to a websiteso that they reside in the same folder and an ability to set this automatically
+
+WHAT TO DO IF YOU'RE INSTALLING A NEW COPY OR UPGRADING YOUR EXISTING COPY OF ANOTHER YAPO INSTALLATION?
+
+Since the database has changed a bit, it is necessary to migrate (it is, even if it's a new install, because that's how the database is generated).
+
+Execute: "python manage.py makemigrations"
+This will look over the new code and take note of the adjustments that needs to be made to the database.
+
+"python manage.py migrate"
+This will actually make the adjustments to the database it took note of in the previous step.
+
+========================================================================================================
 
 # YAPO
 YAPO - Yet Another Porn Organizer
