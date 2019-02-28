@@ -374,10 +374,13 @@ angular.module('actorDetail').component('actorDetail', {
 
             self.actorNameDelimiter = function (delimiter, imageSearch) {
                 if (gotPromise) {
-                    var newName = self.actor.name.replace(/ /g, delimiter);
+                    var newName = self.actor.name;
+                    newName = newName.replace("+", "");
+                    newName = newName.trim();
+                    newName = newName.replace(/ /g, delimiter);
                     // console.log("Name with delimeter " + delimiter + " is " + newName);
                     if (imageSearch) {
-                        newName = newName + delimiter + "pornstar";
+                        newName = "%22" + newName + "%22" + delimiter + "pornstar";
                     }
 
                     console.log("Name with delimiter is:" + newName);
@@ -386,16 +389,24 @@ angular.module('actorDetail').component('actorDetail', {
 
             };
 
+            self.StrSplit = function (nts) {
+                if (gotPromise) {
+				var arr = self.actor.official_pages.split(',');
+				return (arr[nts]);
+                }
+				
+            };
+
             self.isNotEmpty = function (fieldToCheck) {
                 if (gotPromise) {
 
                     var ans = false;
                     // console.log("Actor-detail: isEmpty: fieldToCheck is" + fieldToCheck + "self.actor.fieldToCheck != undefined  is" + self.actor.fieldToCheck != undefined  )
-                    if (self.actor.fieldToCheck != undefined || self.actor.fieldToCheck != null) {
+                //    if (self.actor.fieldToCheck != undefined || self.actor.fieldToCheck != null) {
                         if (self.actor.fieldToCheck.length > 0) {
                             ans = true;
                         }
-                    }
+               //     }
                     return ans;
                 }
 

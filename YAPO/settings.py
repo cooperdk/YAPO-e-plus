@@ -27,7 +27,7 @@ SECRET_KEY = '0px^lshd1lsf6uq#%90lre3$iqkz9=i7a0ko2_83b$n@=&(*d5'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
+SILENCED_SYSTEM_CHECKS = ["fields.W340"]
 ALLOWED_HOSTS = []
 
 # Application definition

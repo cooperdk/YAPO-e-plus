@@ -129,11 +129,15 @@ def find_duplicates():
 
             if not scene_1.pk == scene_2.pk:
                 if scene_2.path_to_file == scene_1.path_to_file:
-                    print("Found duplicate scene: " +
+                    print("Found duplicate scene (exact path): " +
                           scene_1.id + " - " + scene_1.name + "\nFile path: " + scene_1.path_to_file +
                           "\nis duplicate of " +
                           scene_2.id + " - " + scene_2.name + "\nFile path: " + scene_2.path_to_file)
-
+                elif scene_2.hash == scene_1.hash:
+                    print("Found duplicate scene (by hash) : " +
+                          scene_1.id + " - " + scene_1.name + "\nFile path: " + scene_1.path_to_file +
+                          "\nis duplicate of " +
+                          scene_2.id + " - " + scene_2.name + "\nFile path: " + scene_2.path_to_file)
 
 def add_scene_to_folder_view(scene_to_add):
     # scene_path = os.path.normpath(scene_to_add.path_to_dir)
@@ -180,7 +184,7 @@ def recursive_add_folders(parent, folders, scene_to_add, path_with_ids):
                 path_with_ids.append({'name': parent.last_folder_name_only,
                                       'id': parent.id})
                 # print ("Parent Name is {}, Path with Id's are {}".format(parent.name, path_with_ids.encode('utf-8')))
-                print(json.dumps(path_with_ids))
+                #print(json.dumps(path_with_ids))
                 if parent.path_with_ids is None:
                     parent.path_with_ids = json.dumps(path_with_ids)
                     parent.save()
@@ -192,7 +196,7 @@ def recursive_add_folders(parent, folders, scene_to_add, path_with_ids):
                 path_with_ids.append({'name': parent.last_folder_name_only,
                                       'id': parent.id})
                 # print ("Parent Name is {}, Path with Id's are {}".format(parent.name, path_with_ids.encode('utf-8')))
-                print(json.dumps(path_with_ids))
+                #print(json.dumps(path_with_ids))
                 if parent.path_with_ids is None:
                     parent.path_with_ids = json.dumps(path_with_ids)
                     parent.save()
@@ -225,7 +229,7 @@ def recursive_add_folders(parent, folders, scene_to_add, path_with_ids):
                                   'id': parent.id})
             # print ("Parent Name is {}, Path with Id's are {}".format(parent.name.encode('utf-8'),
             #                                                          path_with_ids))
-            print(json.dumps(path_with_ids))
+            #print(json.dumps(path_with_ids))
             if parent.path_with_ids is None:
                 parent.path_with_ids = json.dumps(path_with_ids)
                 parent.save()

@@ -33,6 +33,7 @@ def search_person(actor_in_question, alias, force):
         if s['adult']:
             sucesss = True
             # save image locally
+			
             # urllib.urlretrieve("https://image.tmdb.org/t/p/original/" +
             #                  s['profile_path'], person_name + "Profile.jpg")
 
@@ -40,11 +41,23 @@ def search_person(actor_in_question, alias, force):
                 actor_in_question.save()
             person = tmdb.People(str(s['id']))
             person_info = person.info()
+### This is just for image downloading.
+            if person_info['profile_path'] is not None:
+                picture_link = "https://image.tmdb.org/t/p/original/" + person_info['profile_path']
+                if aux.url_is_alive(picture_link):
+                    #if actor_in_question.thumbnail == const.UNKNOWN_PERSON_IMAGE_PATH or force:
+                    print("Trying to get image from TMDB: " + picture_link)
+                    if aux.url_is_alive(picture_link):
+                        aux.save_actor_profile_image_from_web(picture_link,actor_in_question,force)
+                    else:
+                        print("Seems as there's no photo at this link.")
+
 
             person_aka = person_info['also_known_as']
             if person_info['biography'] is not None:
-                actor_in_question.description = person_info['biography']
-                print("Added Description to: " + actor_in_question.name)
+                if not (actor_in_question.description) or (len(actor_in_question.description)<48):
+                    actor_in_question.description = person_info['biography']
+                print("There's no description or it's too short, so added it from TMDB.")
             else:
                 actor_in_question.description = ""
             if not person_info['birthday'] == "":
@@ -67,25 +80,12 @@ def search_person(actor_in_question, alias, force):
 
             if actor_in_question.thumbnail == const.UNKNOWN_PERSON_IMAGE_PATH or force:
                 if person_info['profile_path'] is not None:
-
                     picture_link = "https://image.tmdb.org/t/p/original/" + person_info['profile_path']
-
-                    aux.save_actor_profile_image_from_web(picture_link,actor_in_question,force)
-
-                    # save_path = os.path.join(MEDIA_PATH,
-                    #                          'actor/' + actor_in_question.name + '/profile/')
-                    # if not os.path.exists(save_path):
-                    #     os.makedirs(save_path)
-                    #
-                    # save_file_name = os.path.join(save_path, 'profile.jpg')
-                    # if not os.path.isfile(save_file_name):
-                    #     urllib.urlretrieve(picture_link, save_file_name)
-                    #
-                    #     rel_path = os.path.relpath(save_file_name, start='videos')
-                    #     as_uri = urllib.pathname2url(rel_path)
-                    #
-                    #     actor_in_question.thumbnail = as_uri
-
+                    print("Trying to get image from TMDB: " + picture_link)
+                    if aux.url_is_alive(picture_link):
+                        aux.save_actor_profile_image_from_web(picture_link,actor_in_question,force)
+                    else:
+                        print("Seems as there's no photo at this link.")
             for aka in person_aka:
                 aka = aka.lstrip()
                 aka = aka.rstrip()
@@ -99,7 +99,8 @@ def search_person(actor_in_question, alias, force):
                     except django.db.IntegrityError as e:
                         print(e)
 
-            actor_in_question.save()
+            #actor_in_question.save()
+ 
             actor_in_question.last_lookup = datetime.now()
             actor_in_question.save()
             break

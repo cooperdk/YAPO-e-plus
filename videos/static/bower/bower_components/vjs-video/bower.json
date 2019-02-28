@@ -1,0 +1,37 @@
+{
+  "name": "vjs-video",
+  "version": "0.1.11",
+  "description": "An angular js directive for video.js",
+  "main": "dist/vjs-video.min.js",
+  "authors": [
+    { "name": "Lonny Gomes" }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LonnyGomes/vjs-video.git"
+  },
+  "dependencies": {
+    "angular": "^1.3.0",
+    "video.js": "4.12.13 - 5"
+  },
+  "devDependencies": {
+    "video.js": "~4.12.13",
+    "jquery": "~2.1.4",
+    "angular-mocks": "^1.3.0",
+    "sinonjs": "~1.14.1",
+    "bootstrap-css": "~3.3.4",
+    "angular-gist": "~1.0.0"
+  },
+  "appPath": "app",
+  "moduleName": "vjsVideoApp",
+  "ignore": [],
+  "license": "MIT",
+  "keywords": [
+    "angular",
+    "angular.js",
+    "video",
+    "video.js",
+    "vjs",
+    "directive"
+  ]
+}

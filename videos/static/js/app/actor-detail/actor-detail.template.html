@@ -56,20 +56,11 @@
     </li>
 </ul>
 
-<!--
-<div class="col-md-8">
-            <div class="scene-list">
-                <h3>Scenes:</h3>
-                <scene-list pk="$ctrl.actor.scenes"></scene-list>
-            </div>
-        </div>
--->
-
 
 <div class="row">
     <div ng-if="$ctrl.hideDetail" class="col-md-12 ">
 
-        <h3>{{ $ctrl.actor.name }} has {{ $ctrl.actor.scenes.length }} scenes: </h3>
+        <h3>{{ $ctrl.actor.scenes.length }} scene(s) with {{ $ctrl.actor.name }}: </h3>
 
         <section-list-wrapper main-page="false" section-type="'SceneList'"></section-list-wrapper>
 
@@ -77,31 +68,37 @@
     </div>
     <div ng-if="!$ctrl.hideDetail" class="col-md-10 ">
 
-        <h3>{{ $ctrl.actor.name }} has {{ $ctrl.actor.scenes.length }} scenes: </h3>
+        <h3>{{ $ctrl.actor.scenes.length }} scene(s) with {{ $ctrl.actor.name }}: </h3>
 
         <section-list-wrapper main-page="false" section-type="'SceneList'"></section-list-wrapper>
 
 
     </div>
-    <div ng-if="!$ctrl.hideDetail" class="col-md-1 pull-right">
+    <div ng-if="!$ctrl.hideDetail" class="col-md-1 pull-right" style="position: relative; top: -135px;">
 
-        <table class="actor-detail">
+        <table valign="top" class="actor-detail" >
             <tr>
                 <td colspan="2">
 
 
-                    <div class="alcenter">
+                    <div class="alcenter">Scrape from:<br>
+<p align="right">
+                        <button type="button" ng-click="$ctrl.scrapeActor('IMDB')" class="btn btn-default btn-sm">
+                            <span class="glyphicon glyphicon-plus"></span><small> IMDB</small>
+                        </button>
+
                         <button type="button" ng-click="$ctrl.scrapeActor('TMDb')" class="btn btn-default btn-sm">
-                            <span class="glyphicon glyphicon-plus"></span> Scrape TMDb
+                            <span class="glyphicon glyphicon-plus"></span><small> TMDb</small>
                         </button>
 
                         <button type="button" ng-click="$ctrl.scrapeActor('Freeones')"
                                 class="btn btn-default btn-sm">
-                            <span class="glyphicon glyphicon-plus"></span> Scrape Freeones
+                            <span class="glyphicon glyphicon-plus"></span><small> Freeones</small>
                         </button>
-                        <input type="checkbox" ng-model="$ctrl.forceScrape"
+</p>
+<p align="right"><input type="checkbox" ng-model="$ctrl.forceScrape"
                                uib-popover-html="'Override existing values while scraping with selected scraper'"
-                               popover-trigger="mouseenter" popover-placement="top">
+                               popover-trigger="mouseenter" popover-placement="top"> Force</p>
 
                     </div>
                     <detail-profile-image ng-if="$ctrl.updateImage" actor="$ctrl.actor"></detail-profile-image>
@@ -124,12 +121,9 @@
             </tr>
 
             <tr>
-                <td>
-                    Date of Birth:
-                </td>
-                <td class="alright">
-                    <div>
-                        <p class="input-group">
+                <td colspan="1">
+                    Date of Birth:<br>
+                                    <p class="input-group">
                             <input type="text" class="form-control" uib-datepicker-popup="dd.MM.yyyy"
                                    ng-model="$ctrl.birthdate"
                                    is-open="popup1.opened" datepicker-options="dateOptions" ng-required="true"
@@ -141,18 +135,16 @@
                             </span>
                         </p>
 
-                        <br>
+
+                </td>
+                <td align="right" valign="middle">
                         <span ng-if="$ctrl.actor != undefined && $ctrl.actor.date_of_birth != undefined">
-                            ({{ $ctrl.howOld($ctrl.actor.date_of_birth)}} Years Old)
+                            ({{ $ctrl.howOld($ctrl.actor.date_of_birth)}} years old)
                         </span>
-
-                    </div>
-
-
                 </td>
             </tr>
             <tr>
-                <td>
+                <td valign="top">
                     Ethnicity:
                 </td>
                 <td class="alright">
@@ -202,7 +194,7 @@
                 </td>
             </tr>
             <tr>
-                <td>
+                <td valign="top">
                     Height:
 
                 </td>
@@ -227,7 +219,7 @@
 
 
             <tr>
-                <td>
+                <td valign="top">
                     Weight:
 
                 </td>
@@ -251,7 +243,7 @@
             </tr>
 
             <tr>
-                <td>
+                <td valign="top">
                     Measurements:
 
                 </td>
@@ -267,7 +259,7 @@
             </tr>
 
             <tr>
-                <td>
+                <td valign="top">
                     Gender:
 
                 </td>
@@ -284,7 +276,7 @@
             </tr>
 
             <tr>
-                <td>
+                <td valign="top">
                     Country Of Birth:
 
                 </td>
@@ -299,49 +291,93 @@
                     </span>
                 </td>
             </tr>
+
             <tr>
-                <td>
-                    {{ $ctrl.actor.name }} on the web:
+                <td valign="top">
+                    Tattoos:
+
                 </td>
-                <td>
+                <td class="alright">
+                    <span>
+                       <a href="#" editable-text="$ctrl.actor.tattoos"
+                          onaftersave="$root.patchEntity('actor', $ctrl.actor.id, 'tattoos', $ctrl.actor.tattoos, 'add',
+                                              false, false, null)">
+                           {{ $ctrl.actor.tattoos || 'NA' }}
+                       </a>
+
+                    </span>
+                </td>
+            </tr>
+
+            <tr>
+                <td valign="top">
+                    Piercings:
+
+                </td>
+                <td class="alright">
+                    <span>
+                       <a href="#" editable-text="$ctrl.actor.piercings"
+                          onaftersave="$root.patchEntity('actor', $ctrl.actor.id, 'piercings', $ctrl.actor.piercings, 'add',
+                                              false, false, null)">
+                           {{ $ctrl.actor.piercings || 'NA' }}
+                       </a>
+
+                    </span>
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="2" valign="top">
+                    Websites:
                     <ul>
 
-                        <li ng-if="$ctrl.isNotEmpty('official_pages')"><a
-                                href="{{ $ctrl.actor.official_pages }}"
-                                target="_blank"> {{ actor.name }} official page</a></li>
-
-
-                        <li ng-if="$ctrl.isNotEmpty('tmdb_id')"><a
+                        <li ng-if="$ctrl.StrSplit(0)">Official:<br> 
+                        <span ng-if="$ctrl.StrSplit(0)"><b><a
+                                href="{{ $ctrl.StrSplit(0) }}"
+                                target="_blank">1</a></b></span>
+                        <span ng-if="$ctrl.StrSplit(1)"> | <b><a
+                                href="{{ $ctrl.StrSplit(1) }}"
+                                target="_blank">2</a></b></span>
+                        <span ng-if="$ctrl.StrSplit(2)"> | <b><a
+                                href="{{ $ctrl.StrSplit(2) }}"
+                                target="_blank">3</a></b></span>
+                        <span ng-if="$ctrl.StrSplit(3)"> | <b><a
+                                href="{{ $ctrl.StrSplit(3) }}"
+                                target="_blank">4</a></b></span>
+                        <span ng-if="$ctrl.StrSplit(4)"> | <b><a
+                                href="{{ $ctrl.StrSplit(4) }}"
+                                target="_blank">5</a></b></span>
+                        <hr>
+                        </li>
+                        <li ng-if="$ctrl.actor.tmdb_id"><a
                                 href="https://www.themoviedb.org/person/{{ $ctrl.actor.tmdb_id }}"
-                                target="_blank"> {{ actor.name }} at
-                            TMDb</a></li>
+                                target="_blank">TMDB Page</a></li>
 
-                        <li ng-if="$ctrl.isNotEmpty('imdb_id')"><a
+                        <li ng-if="$ctrl.actor.imdb_id"><a
                                 href="http://www.imdb.com/name/{{ $ctrl.actor.imdb_id }}"
-                                target="_blank"> {{ actor.name }} at
-                            IMDb</a>
+                                target="_blank">IMDB Page</a>
                         </li>
 
                         <li><a href="http://www.pornhub.com/pornstar/{{ $ctrl.actorNameDelimiter('-',false) }}"
-                               target="_blank">{{ actor.name }} at Pornhub</a></li>
-
-                        <li><a href="http://www.empornium.me/torrents.php?taglist=
-                                {{  $ctrl.actorNameDelimiter('.',false) }}"
-                               target="_blank">{{ actor.name }} at Empornium</a></li>
+                               target="_blank">Pornhub Page</a></li>
 
                         <li><a href="http://www.xvideos.com/?k={{ $ctrl.actorNameDelimiter('.',false) }}"
-                               target="_blank">{{ actor.name }} at XVIDEOS </a></li>
+                               target="_blank">XVIDEOS Page</a></li>
 
-                        <li><a href="https://duckduckgo.com/?q=
-                            {{$ctrl.actorNameDelimiter('&#43;',true)}}&iax=1&ia=images&iaf=size%3Al"
-                               target="_blank">{{ actor.name }} at DuckDuckGo Image Search </a></li>
+                        <li><a href="https://unblockedrarbg.org/torrents.php?search=%22{{  $ctrl.actorNameDelimiter('+',false) }}%22&category=4"
+                               target="_blank">RarBG Torrent Search</a></li>
+
+                        <li><a href="http://www.empornium.me/torrents.php?taglist={{  $ctrl.actorNameDelimiter('.',false) }}"
+                               target="_blank">Empornium Torrent Search</a></li>
+
+                        <li><a href="https://duckduckgo.com/?q={{$ctrl.actorNameDelimiter('&#43;',true)}}&iax=1&ia=images&iaf=size%3Al"
+                               target="_blank">DuckDuckGo Image Search</a></li>
 
 
                         <li><a
-                                href="https://www.google.com/search?as_st=y&tbm=isch&as_q=
-                                        {{  $ctrl.actorNameDelimiter('&#43;',true) }}&as_epq=&as_oq=&as_eq=&cr=&as_sitesearch=&safe=images&tbs=isz:l,iar:t
+                                href="https://www.google.com/search?as_st=y&tbm=isch&as_q={{  $ctrl.actorNameDelimiter('&#43;',true) }}&as_epq=&as_oq=&as_eq=&cr=&as_sitesearch=&safe=images&tbs=isz:l,iar:t
                             "
-                                target="_blank">{{ actor.name }} at Google Image Search </a></li>
+                                target="_blank">Google Image Search</a></li>
 
 
                     </ul>

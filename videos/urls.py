@@ -86,7 +86,11 @@ urlpatterns = [
     # url(r'^scrape/tmdb/(?P<pk>[0-9]+)/$', views.scrape_actor_tmdb,
     #     name='scrape-actor-tmdb'),
     #
-    # # /scrape/freeones/<actor id> scrape actor with tmdb
+    # # /scrape/imdb/<actor id> scrape actor with tmdb
+    # url(r'^scrape/imdb/(?P<pk>[0-9]+)/$', views.scrape_actor_imdb,
+    #     name='scrape-actor-imdb'),
+    #
+    # # /scrape/freeones/<actor id> scrape actor with freeones
     # url(r'^scrape/freeones/(?P<pk>[0-9]+)/$', views.scrape_actor_freeones,
     #     name='scrape-actor-freeones'),
     #

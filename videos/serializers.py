@@ -169,7 +169,7 @@ class ActorSerializer(serializers.ModelSerializer):
         # depth = 2
         fields = ['id', 'name', 'date_added', 'date_fav', 'date_runner_up', 'date_of_birth', 'play_count', 'is_fav',
                   'is_runner_up', 'rating', 'description', 'thumbnail', 'gender', 'imdb_id', 'tmdb_id',
-                  'official_pages', 'actor_tags', 'ethnicity', 'weight', 'country_of_origin', 'tattoos', 'height',
+                  'official_pages', 'actor_tags', 'ethnicity', 'weight', 'country_of_origin', 'tattoos', 'piercings', 'height',
                   'measurements', 'extra_text', 'last_lookup', 'is_exempt_from_one_word_search', 'actor_aliases',
                   'scenes']
 
@@ -214,10 +214,10 @@ class SceneListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Scene
         # depth = 1
-        # fields = ['id', 'name', 'path_to_file', 'path_to_dir', 'date_added', 'date_fav', 'date_runner_up', 'play_count',
+        # fields = ['id', 'name', 'path_to_file', 'path_to_dir', 'hash', 'date_added', 'date_fav', 'date_runner_up', 'play_count',
         #           'is_fav', 'is_runner_up', 'rating', 'description', 'thumbnail', 'scene_tags', 'actors', 'websites' ]
         fields = ['id', 'name', 'actors', 'scene_tags', 'websites', 'thumbnail', 'folders_in_tree', 'is_runner_up',
-                  'rating', 'path_to_file']
+                  'rating', 'path_to_file', 'hash']
 
         # fields = ['id', 'name']
 
@@ -235,10 +235,10 @@ class SceneSerializer(serializers.ModelSerializer):
         #           'websites', 'width', 'height', 'bit_rate', 'duration', 'size', 'codec_name', 'framerate',
         #           'folders_in_tree']
 
-        fields = ['id', 'name', 'path_to_file', 'path_to_dir', 'date_added', 'date_fav', 'date_runner_up', 'play_count',
+        fields = ['id', 'name', 'path_to_file', 'path_to_dir', 'hash', 'date_added', 'date_fav', 'date_runner_up', 'play_count',
                   'is_fav', 'is_runner_up', 'rating', 'thumbnail', 'scene_tags', 'actors', 'websites', 'width',
                   'height',
-                  'bit_rate', 'duration', 'size', 'codec_name', 'framerate', 'folders_in_tree', 'date_last_played']
+                  'bit_rate', 'duration', 'size', 'codec_name', 'framerate', 'description', 'folders_in_tree', 'date_last_played']
 
 
 class ActorTagSerializer(serializers.ModelSerializer):

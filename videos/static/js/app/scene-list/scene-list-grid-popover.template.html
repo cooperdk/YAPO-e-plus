@@ -1,7 +1,7 @@
-<h5>
+<h6>
     {{ scene.name }}
-</h5>
-
+</h6>
+<small>
 <span ng-if="scene.websites.length > 0 ">Websites:
     <span ng-repeat="site in scene.websites"> <strong>{{ site.name }}{{$last ? '' : ', '}}</strong></span>
     <br>
@@ -13,6 +13,11 @@
     <br>
 </span>
 
+<span ng-if="scene.hash.length > 0">Hash:
+    <span> <strong>{{ scene.hash }}</strong></span>
+    <br>
+</span>
+
 <span ng-if="scene.actors.length > 0">Actors:
     <span ng-repeat="actor in scene.actors"> <strong>{{ actor.name }}{{$last ? '' : ', '}}</strong></span>
     <br>
@@ -20,3 +25,4 @@
 
 <span>Path: {{ scene.path_to_file }}
 </span>
+</small>

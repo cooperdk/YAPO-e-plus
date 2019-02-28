@@ -10,6 +10,7 @@ import json
 import videos.addScenes
 import videos.filename_parser as filename_parser
 import videos.freeones_search
+import videos.imdb_search
 import videos.tmdb_search
 from videos import ffmpeg_process
 import urllib.request
@@ -255,9 +256,12 @@ def scrape_all_actors(force):
                 print("Searching in TMDb")
                 videos.tmdb_search.search_person_with_force_flag(actor, False)
                 print("Finished TMDb search")
+                print("Searching IMDB...")
+                videos.imdb_search.search_imdb_with_force_flag(actor, False)
+                print("Finished IMDB Search")
                 if actor.gender != 'M':
                     print("Searching in Freeones")
-                    videos.freeones_search.search_freeones_with_force_flag(actor, False)
+                    videos.freeones_search.search_freeones_with_force_flag(actor, True)
                     print("Finished Freeones search")
             else:
                 print("{} was already searched...".format(actor.name))
@@ -265,6 +269,9 @@ def scrape_all_actors(force):
             print("Searching in TMDb")
             videos.tmdb_search.search_person_with_force_flag(actor, True)
             print("Finished TMDb search")
+            print("Searching IMDB...")
+            videos.imdb_search.search_imdb_with_force_flag(actor, True)
+            print("Finished IMDB Search")
             if actor.gender != 'M':
                 print("Searching in Freeones")
                 videos.freeones_search.search_freeones_with_force_flag(actor, True)
@@ -356,6 +363,20 @@ class ScrapeActor(views.APIView):
             else:
                 return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
 
+        elif search_site == 'IMDB':
+
+            actor_to_search = Actor.objects.get(pk=actor_id)
+            success = False
+            if force:
+                success = videos.imdb_search.search_imdb_with_force_flag(actor_to_search, True)
+            else:
+                success = videos.imdb_search.search_imdb_with_force_flag(actor_to_search, False)
+
+            if success:
+                return Response(status=200)
+
+            else:
+                return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
 
 def permenatly_delete_scene_and_remove_from_db(scene):
     success_delete_file = False
@@ -685,14 +706,14 @@ def settings(request):
                 scenes = Scene.objects.all()
                 count = scenes.count()
                 counter = 1
-                # print("Cleaning Scenes...")
-                # for scene in scenes:
-                #     print("Checking scene {} out of {}".format(counter, count))
-                #     if not os.path.isfile(scene.path_to_file):
-                #         print("File for scene {} does not exist in path {}".format(scene.name, scene.path_to_file))
-                #         permenatly_delete_scene_and_remove_from_db(scene)
-                #     counter += 1
-                # print("Finished cleaning scenes...")
+                print("Cleaning Scenes...")  # CooperDK This was enabled
+                for scene in scenes:
+                    print("Checking scene {} out of {}".format(counter, count))
+                    if not os.path.isfile(scene.path_to_file):
+                        print("File for scene {} does not exist in path {}".format(scene.name, scene.path_to_file))
+                        permenatly_delete_scene_and_remove_from_db(scene)
+                    counter += 1
+                print("Finished cleaning scenes...")
 
                 print("Cleaning Aliases...")
 

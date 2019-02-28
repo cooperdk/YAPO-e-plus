@@ -1,4 +1,3 @@
-// Register `phoneList` component, along with its associated controller and template
 angular.module('sectionListWrapper').component('sectionListWrapper', {
         // Note: The URL is relative to our `index.html` file
         templateUrl: 'static/js/app/section-list-wrapper/section-wrapper.template.html',
@@ -80,27 +79,27 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                 var actorOrderFields = {
 
                     "name": "Name Asc",
-                    "-name": "Name Dsc",
+                    "-name": "Name Desc",
                     "rating": "Rating Asc",
-                    "-rating": "Rating Dsc",
+                    "-rating": "Rating Desc",
                     "height": "Height Asc",
-                    "-height": "Height Dsc",
+                    "-height": "Height Desc",
                     "ethnicity": "Ethnicity Asc ",
                     "-ethnicity": "Ethnicity Dsc ",
                     "weight": "Weight Asc",
-                    "-weight": "Weight Dsc",
+                    "-weight": "Weight Desc",
                     "country_of_origin": "Country Of Origin Asc",
-                    "-country_of_origin": "Country Of Origin Dsc",
+                    "-country_of_origin": "Country Of Origin Desc",
                     "date_added": "Date Added Asc",
-                    "-date_added": "Date Added Dsc",
+                    "-date_added": "Date Added Desc",
                     "date_of_birth": "Date Of Birth Asc",
-                    "-date_of_birth": "Date Of Birth Dsc",
+                    "-date_of_birth": "Date Of Birth Desc",
                     "measurements": "Measurements Asc",
-                    "-measurements": "Measurements Dsc",
+                    "-measurements": "Measurements Desc",
                     "usage_count": "Usage Count Asc",
-                    "-usage_count": "Usage Count Dsc",
+                    "-usage_count": "Usage Count Desc",
                     "play_count": "Play Count Asc",
-                    "-play_count": "Play Count Dsc",
+                    "-play_count": "Play Count Desc",
                     "random": "Random"
 
 
@@ -120,25 +119,27 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                 var sceneOrderFields = {
 
                     "name": "Name Asc",
-                    "-name": "Name Dsc",
+                    "-name": "Name Desc",
                     "rating": "Rating Asc",
-                    "-rating": "Rating Dsc",
+                    "-rating": "Rating Desc",
                     "path_to_dir": "Path Asc",
-                    "-path_to_dir": "Path Dsc",
+                    "-path_to_dir": "Path Desc",
                     "date_added": "Date Added Asc",
-                    "-date_added": "Date Added Dsc",
+                    "-date_added": "Date Added Desc",
                     "date_last_played": "Date Last Played Asc",
-                    "-date_last_played": "Date Last Played Dsc",
+                    "-date_last_played": "Date Last Played Desc",
                     "play_count": "Play Count Asc",
-                    "-play_count": "Play Count Dsc",
+                    "-play_count": "Play Count Desc",
                     "height": "Resolution Height Asc",
-                    "-height": "Resolution Height Dsc",
+                    "-height": "Resolution Height Desc",
                     "duration": "Duration Asc",
-                    "-duration": "Duration Dsc",
+                    "-duration": "Duration Desc",
                     "size": "Size Asc",
-                    "-size": "Size Dsc",
+                    "-size": "Size Desc",
                     "framerate": "Framerate Asc",
-                    "-framerate": "Framerate Dsc",
+                    "-framerate": "Framerate Desc",
+                    "hash": "Hash Asc",
+                    "-hash": "Hash Desc",
                     "random": "Random"
                 };
 
@@ -151,8 +152,8 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                     "size": "Size",
                     "framerate": "Framerate",
                     "height": "Resolution Height",
-                    "play_count": "Play Count"
-
+                    "play_count": "Play Count",
+                    "hash": "Hash"
 
                 };
 
@@ -160,15 +161,15 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                 var websiteOrderFields = {
 
                     "name": "Name Asc",
-                    "-name": "Name Dsc",
+                    "-name": "Name Desc",
                     "rating": "Rating Asc",
-                    "-rating": "Rating Dsc",
+                    "-rating": "Rating Desc",
                     "date_added": "Date Added Asc",
-                    "-date_added": "Date Added Dsc",
+                    "-date_added": "Date Added Desc",
                     "usage_count": "Usage Count Asc",
-                    "-usage_count": "Usage Count Dsc",
+                    "-usage_count": "Usage Count Desc",
                     "play_count": "Play Count Asc",
-                    "-play_count": "Play Count Dsc",
+                    "-play_count": "Play Count Desc",
                     "random": "Random"
 
 
@@ -184,13 +185,13 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                 var actorTagOrderFields = {
 
                     "name": "Name Asc",
-                    "-name": "Name Dsc",
+                    "-name": "Name Desc",
                     "rating": "Rating Asc",
-                    "-rating": "Rating Dsc",
+                    "-rating": "Rating Desc",
                     "date_added": "Date Added Asc",
-                    "-date_added": "Date Added Dsc",
+                    "-date_added": "Date Added Desc",
                     "usage_count": "Usage Count Asc",
-                    "-usage_count": "Usage Count Dsc",
+                    "-usage_count": "Usage Count Desc",
                     "random": "Random"
 
 
@@ -207,15 +208,15 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                 var sceneTagOrderFields = {
 
                     "name": "Name Asc",
-                    "-name": "Name Dsc",
+                    "-name": "Name Desc",
                     "rating": "Rating Asc",
-                    "-rating": "Rating Dsc",
+                    "-rating": "Rating Desc",
                     "date_added": "Date Added Asc",
-                    "-date_added": "Date Added Dsc",
+                    "-date_added": "Date Added Desc",
                     "usage_count": "Usage Count Asc",
-                    "-usage_count": "Usage Count Dsc",
+                    "-usage_count": "Usage Count Desc",
                     "play_count": "Play Count Asc",
-                    "-play_count": "Play Count Dsc",
+                    "-play_count": "Play Count Desc",
                     "random": "Random"
 
 
@@ -232,11 +233,11 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                 var dbFolderOrderFields = {
 
                     "name": "Path Asc",
-                    "-name": "Path Dsc",
+                    "-name": "Path Desc",
                     "last_folder_name_only": "Last Folder Name Asc",
-                    "-last_folder_name_only": "Last Folder Name Dsc",
+                    "-last_folder_name_only": "Last Folder Name Desc",
                     "date_added": "Date Added Asc",
-                    "-date_added": "Date Added Dsc",
+                    "-date_added": "Date Added Desc",
                     "random": "Random"
 
 
