@@ -2,6 +2,7 @@ import os
 import re
 import datetime
 import django
+import hashlib
 from django.utils import timezone
 from videos import const
 import json
@@ -13,6 +14,19 @@ django.setup()
 from videos.models import Actor, Scene, ActorAlias, SceneTag, Website
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
+
+def get_hash(name):
+    readsize = 64 * 1024
+    try:
+        with open(name, 'rb') as f:
+            size = os.path.getsize(name)
+            data = f.read(readsize)
+            f.seek(-readsize, os.SEEK_END)
+            data += f.read(readsize)
+            return hashlib.md5(data).hexdigest()
+    except:
+        print ("File was not found, cannot hash")
+        return "Error"
 
 
 def filter_alias(actor_alias):
@@ -99,7 +113,10 @@ def parse_all_scenes(ignore_last_lookup):
             c = if_new_tags()
             if c[0]:
                 scene_tags = c[1]
+#sorted(tags, key=len, reverse=true)  # sort list by length
+#tags.sort(reverse=True) # sort list alphanumeric
                 scene_tags.sort(key=lambda x: len(x.name), reverse=True)
+#                scene_tags=sorted(scene_tags, reverse=True)  # NEW to handle alpha-sorting reverse
             else:
                 scene_tags = list()
 
@@ -184,10 +201,13 @@ def parse_scene_all_metadata(scene, actors, actors_alias, scene_tags, websites):
     print("Looking for scene tags...")
     scene_path = parse_scene_tags_in_scene(scene, scene_path, scene_tags)
 
+    print("Hashing scene...")
+    scene.hash = get_hash(scene.path_to_file)  # NEW HASHER
+    print("Hashed scene, ID " + scene.hash)	
+
     scene.last_filename_tag_lookup = datetime.datetime.now()
 
-    print("Finished parsing scene: {}'s path... setting Last lookup to {}".format(scene.name,
-                                                                                  scene.last_filename_tag_lookup))
+    print("Finished parsing scene: {}'s path... setting Last lookup to {}".format(scene.name, scene.last_filename_tag_lookup))
 
     scene.save()
 

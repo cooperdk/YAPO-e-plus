@@ -7,19 +7,24 @@ import re
 import time
 
 import urllib.parse as urllib_parse
-
+import videos.const
 import urllib.request as urllib_req
 import django
 import requests
 import videos.aux_functions as aux
+import videos.updatepiercings as updatepiercings
 from bs4 import BeautifulSoup
 from dateutil.parser import parse
 import videos.const as const
 from django.utils import timezone
 
+import requests.packages.urllib3
+requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
+
 django.setup()
 
 from videos.models import Actor, ActorAlias, ActorTag
+
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 
@@ -30,6 +35,14 @@ def search_freeones(actor_to_search, alias, force):
     if Actor.objects.get(name=actor_to_search.name):
         actor_to_search = Actor.objects.get(name=actor_to_search.name)
     name = actor_to_search.name
+#    actor_to_search.last_lookup = datetime.datetime.now()
+#    actor_to_search.save()
+#    save_path = os.path.join(videos.const.MEDIA_PATH, 'actor/' + str(actor_to_search.id) + '/profile/')
+#    save_file_name = os.path.join(save_path, 'profile.jpg')
+#    print(save_file_name)
+#    if os.path.isfile(save_file_name):
+#        print("Skipping, as there's already a photo for the profile.")
+#        return
 
     # https://www.iafd.com/results.asp?searchtype=comprehensive&searchstring=isis+love
     if alias:
@@ -39,7 +52,7 @@ def search_freeones(actor_to_search, alias, force):
     else:
         name_with_plus = name.replace(' ', '+')
         print("Searching Freeones for: " + actor_to_search.name)
-    r = requests.get("https://www.freeones.com/search/?t=1&q=" + name_with_plus)
+    r = requests.get("https://www.freeones.com/search/?t=1&q=" + name_with_plus, verify=False)
     soup = BeautifulSoup(r.content, "html5lib")
 
 
@@ -78,7 +91,7 @@ def search_freeones(actor_to_search, alias, force):
         actor_to_search.gender = 'F'
         actor_to_search.save()
         actor_page = urllib_parse.urljoin("https://www.freeones.com/", href_found)
-        r = requests.get(actor_page)
+        r = requests.get(actor_page, verify=False)
 
         soup = BeautifulSoup(r.content, "html5lib")
         soup_links = soup.find_all("a")
@@ -95,11 +108,11 @@ def search_freeones(actor_to_search, alias, force):
         profile_thumb = soup.find("img", {'class': 'middle bordered babeinfoblock-thumb'})
         profile_thumb_parent = profile_thumb.parent
 
-        print(profile_thumb_parent)
+        #print(profile_thumb_parent)
         has_image = False
 
         try:
-            print(profile_thumb_parent['href'])
+            #print(profile_thumb_parent['href'])
             has_image = True
         except KeyError:
             print("No image on Freeones!")
@@ -110,7 +123,7 @@ def search_freeones(actor_to_search, alias, force):
         if has_image:
             images_page = profile_thumb_parent['href']
 
-            r = requests.get(images_page)
+            r = requests.get(images_page, verify=False)
             #print("images page is " + images_page + "\n ^ That is all.")
             soup = BeautifulSoup(r.content, "html5lib")
 
@@ -122,23 +135,34 @@ def search_freeones(actor_to_search, alias, force):
                     if picture_list.find("a"):
                         first_picture = picture_list.find("a")
                         #print(str(picture_list) + "is first_picture")
-                            
-                        if first_picture['href']:
-                            if re.match(r'^\/\/', first_picture['href']):
-                                    first_picture_link = "https:" + first_picture['href']
-                                    print(first_picture_link)
-                                    aux.save_actor_profile_image_from_web(first_picture_link, actor_to_search,force)
-                                    print("Image Saved!")
-                            elif re.match(r'^.*jpg$', first_picture['href']):
-                                    first_picture_link = first_picture['href']
-                                    print(first_picture_link)
-                                    aux.save_actor_profile_image_from_web(first_picture_link, actor_to_search,force)
-                                    print("Image Saved!")
-                            else:
-                                    print("No picture found!")
-                                    
+                        save_path = os.path.join(videos.const.MEDIA_PATH, 'actor/' + str(actor_to_search.id) + '/profile/')
+                        print("Profile pic path: " + save_path)
+                        save_file_name = os.path.join(save_path, 'profile.jpg')
+                        if not os.path.isfile(save_file_name):
+#        print("Skipping, as there's already a photo for the profile.")
+                        #if not os.path.isfile(save_path):
+                            if first_picture['href']:
+                                if re.match(r'^\/\/', first_picture['href']):
+                                        first_picture_link = "https:" + first_picture['href']
+                                        print(first_picture_link)
+                                        aux.save_actor_profile_image_from_web(first_picture_link, actor_to_search,force)
+                                        print("Image Saved!")
+                                elif re.match(r'^.*jpg$', first_picture['href']):
+                                        first_picture_link = first_picture['href']
+                                        print(first_picture_link)
+                                        aux.save_actor_profile_image_from_web(first_picture_link, actor_to_search,force)
+                                        print("Image Saved!")
+                                else:
+                                        print("No picture found!")
+                        else:
+                            print("Skipping photo download, as there's already a photo for the profile.\nIt's probably from TMDB, therefore a better one.")
+        #remember to remark:
+        #actor_to_search.last_lookup = datetime.datetime.now()
+        #actor_to_search.save()
+        #return success
+                                   
 
-        r = requests.get(biography_page)
+        r = requests.get(biography_page, verify=False)
 
         soup = BeautifulSoup(r.content, "html5lib")
 
@@ -189,46 +213,76 @@ def search_freeones(actor_to_search, alias, force):
                     actor_to_search.measurements = next_td_tag.text.strip("'/\n/\t")
             elif link_text == 'Tattoos:':
                 if not actor_to_search.tattoos:
-                    actor_to_search.tattoos = next_td_tag.text.strip("'/\n/\t")
+                    tattoos = next_td_tag.text.strip("'/\n/\t")
+                    actor_to_search.tattoos = tattoos
+                    print ("Tattoos: " + tattoos)
+            elif link_text == 'Piercings:':
+                if not actor_to_search.piercings:
+                    piercings = next_td_tag.text.strip("'/\n/\t")
+                    actor_to_search.piercings = piercings
+                    print ("Piercings: " + piercings)
             elif link_text == 'Extra text:':
                 if not actor_to_search.extra_text:
                     actor_to_search.extra_text = next_td_tag.text.strip("'/\n/\t")
             elif link_text == 'Fake boobs:':
                 fake_boobs = next_td_tag.text.strip("',/\n/\t")
                 if "Yes" in fake_boobs:
-                    insert_actor_tag(actor_to_search, "Fake.Breasts")
+                    insert_actor_tag(actor_to_search, "Fake breasts")
                 else:
-                    insert_actor_tag(actor_to_search, "Natural.Breasts")
+                    insert_actor_tag(actor_to_search, "Natural breasts")
             elif link_text == 'Eye Color:':
                 eye_color = next_td_tag.text.strip("',/\n/\t")
-                eye_color = "Eye.Color." + eye_color.title()
+                eye_color = eye_color.title() + " eyes"
 
-                insert_actor_tag(actor_to_search, eye_color)
+                if eye_color:
+                    insert_actor_tag(actor_to_search, eye_color)
             elif link_text == 'Hair Color:':
                 hair_color = next_td_tag.text.strip("',/\n/\t")
-                hair_color = "Hair.Color." + hair_color.title()
-                insert_actor_tag(actor_to_search, hair_color)
+                hair_color = hair_color.title() + ' hair'
+                if hair_color:
+                    insert_actor_tag(actor_to_search, hair_color)
             elif link_text == 'Social Network Links:':
                 social = next_td_tag  # ul id="socialmedia
-                all_social = social.find_all("li")
-
+                all_social = social.find_all("a") #was: li
+                actor_to_search.official_pages = ""
                 for social_link in all_social:
                     try:
                         href = social_link['href']
                         if href not in actor_to_search.official_pages:
-                            actor_to_search.official_pages = actor_to_search.official_pages + "," + social_link['href']
+                            actor_to_search.official_pages = actor_to_search.official_pages + social_link['href'] + ","  
+                            print ("Social Network Link added: " + social_link['href'])
                     except:
                         pass
 
-        if not actor_to_search.description:
+        if not (actor_to_search.description) or (len(actor_to_search.description)<72):
             actor_to_search.description = free_ones_biography
+            print("There's no description or it's too short, so added it from Freeones.")
 
         if "Black" in ethnicity:
-            insert_actor_tag(actor_to_search, "Black.Female")
+            insert_actor_tag(actor_to_search, "Black")
+            print ("Adding Ethnicity: Black")
         elif "Asian" in ethnicity:
-            insert_actor_tag(actor_to_search, "Asian.Female")
+            insert_actor_tag(actor_to_search, "Asian")
+            print ("Adding Ethnicity: Asian")
         elif "Latin" in ethnicity:
-            insert_actor_tag(actor_to_search, "Latin.Female")
+            insert_actor_tag(actor_to_search, "Latin")
+            print ("Adding Ethnicity: Latin")
+        elif "Caucasian" in ethnicity:
+            insert_actor_tag(actor_to_search, "Caucasian")
+            print ("Adding Ethnicity: Caucasian")
+        elif "Middle Eastern" in ethnicity:
+            insert_actor_tag(actor_to_search, "Middle Eastern")
+            print ("Adding Ethnicity: Middle Eastern")
+        elif "Arabic" in ethnicity:
+            insert_actor_tag(actor_to_search, "Arabic")
+            print ("Adding Ethnicity: Arabic")
+        elif "Inuit" in ethnicity:
+            insert_actor_tag(actor_to_search, "Inuit")
+            print ("Adding Ethnicity: Inuit")
+
+        aux.send_piercings_to_actortag(actor_to_search)
+    #    updatepiercings.sendAllPiercings()
+    #    use the above whenever you want to update all piercings in db
 
         actor_to_search.last_lookup = datetime.datetime.now()
         actor_to_search.save()
@@ -240,14 +294,13 @@ def search_freeones(actor_to_search, alias, force):
 
     return success
 
-
 def strip_bad_chars(name):
     bad_chars = {" "}
     for char in bad_chars:
         if char in name:
-            print("Before: " + name)
+            #print("Before: " + name)
             name = name.replace(char, "")
-            print("After: " + name)
+            print("Adding Data: " + name)
     return name
 
 
@@ -286,7 +339,7 @@ def match_text_in_link_to_query(soup_links, text_to_find):
     ans = None
     for link in soup_links:
         if link.text.lower() == text_to_find.lower():
-            print(link.text, link.get("href"))
+            #print(link.text, link.get("href"))
             ans = link.get("href")
             break
     return ans

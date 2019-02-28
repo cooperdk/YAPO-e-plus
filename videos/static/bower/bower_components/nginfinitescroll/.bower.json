@@ -1,0 +1,15 @@
+{
+  "name": "nginfinitescroll",
+  "homepage": "https://github.com/BinaryMuse/ngInfiniteScroll",
+  "version": "1.3.4",
+  "_release": "1.3.4",
+  "_resolution": {
+    "type": "version",
+    "tag": "1.3.4",
+    "commit": "2f5f9273945c59978d7965f92a198effcc47babd"
+  },
+  "_source": "https://github.com/BinaryMuse/ngInfiniteScroll.git",
+  "_target": "^1.3.4",
+  "_originalSource": "nginfinitescroll",
+  "_direct": true
+}

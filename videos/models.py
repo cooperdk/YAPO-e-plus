@@ -89,6 +89,7 @@ class Actor(models.Model):
     weight = models.CharField(max_length=30, null=True, blank=True)
     country_of_origin = models.CharField(max_length=30, null=True, blank=True)
     tattoos = models.CharField(max_length=600, null=True, blank=True)
+    piercings = models.CharField(max_length=600, null=True, blank=True)
     height = models.CharField(max_length=30, null=True, blank=True)
     measurements = models.CharField(max_length=30, null=True, blank=True)
     extra_text = models.TextField(default="", blank=True)
@@ -115,12 +116,12 @@ class Website(models.Model):
     date_added = models.DateTimeField(auto_now_add=True)
     play_count = models.IntegerField(default=0)
     date_fav = models.DateTimeField(null=True, blank=True)
-    date_runner_up = models.DateTimeField(null=True, blank=True)
+    date_runner_up = models.DateTimeField(null=True,blank=True) 
     is_fav = models.BooleanField(default=False)
     is_runner_up = models.BooleanField(default=False)
     rating = models.IntegerField(default=0)
-    thumbnail = models.CharField(max_length=500, null=True, blank=True)
-    scene_tags = models.ManyToManyField(SceneTag, null=True, blank=True, related_name='websites')
+    thumbnail = models.CharField(max_length=500,  null=True, blank=True) 
+    scene_tags = models.ManyToManyField(SceneTag, blank=True, null=True, related_name='websites')
     website_alias = models.TextField(default="", blank=True)
     modified_date = models.DateTimeField(auto_now=True)
 
@@ -130,6 +131,7 @@ class Website(models.Model):
 
 class Scene(models.Model):
     name = models.CharField(max_length=500)
+    hash = models.CharField(max_length=32)
     path_to_file = models.CharField(max_length=500, unique=True)
     path_to_dir = models.CharField(max_length=500)
     date_added = models.DateTimeField(auto_now_add=True)

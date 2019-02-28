@@ -27,6 +27,7 @@
                              alt="{{ scene.name }}"
                         />
                     </a>
+                    <center><br><span style="font-family: verdana; font-size: 7pt;">{{ scene.hash }}</span></center>
                 </td>
                 <td>
                     <h4>
@@ -104,11 +105,6 @@
 
 
                     </h4>
-
-
-
-
-
 
                         <span>
                             <uib-rating ng-model="scene.rating" max="10" read-only="isReadonly"
@@ -194,9 +190,8 @@
                         ng-src="{{ scene.thumbnail }}"
                         alt="{{ scene.name }}"
                         style="width: 360px;"/>
-
-
             </a>
+
         </div>
     </div>
 </div>

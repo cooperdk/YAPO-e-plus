@@ -96,14 +96,14 @@ def ffmpeg_take_screenshot(screenshot_time, filename):
                                                          FFMPEG_SCREENSHOT_ARGUMENTS,
                                                          SCREENSHOT_OUTPUT_PATH, )
 
-    print(command_call)
+    print("Taking screenshot of video...")# (command_call)
 
     return execute_subprocess(command_call, 'ffmpeg')
 
 
 def ffprobe(filename):
     command_call = "{} {} \"{}\"".format(FFPROBE_BIN, FFPROBE_JSON_ARGUMENTS, filename)
-    print("ffprobe command call: {}".format(command_call))
+    #print("Calling ffprobe...")# command call: {}".format(command_call))
 
     return execute_subprocess(command_call, 'ffprobe')
 
@@ -113,13 +113,13 @@ def get_length(filename):
     #                           stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
     command_call = "{} \"{}\"".format(FFPROBE_BIN, filename)
-    print(command_call)
+    print("Getting video length...")# (command_call)
 
     result = subprocess.Popen(command_call, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
     a = result.communicate()
-    print(result.returncode)
+    print("Video is " + result.returncode + " in length")
 
-    print(a[0])
+    #print(a[0])
 
     if result.returncode == 0:
         ans = a[0]
@@ -139,9 +139,10 @@ def get_length(filename):
 # ffmpeg -i input.flv -vf fps=1 out%d.png
 def make_screenshots(fps_of_screenshots, filename):
     input_argument = "-i \"{}\"".format(filename)
-    video_filters = "-vf fps={},scale=320:trunc(ow/a/2)*2".format(fps_of_screenshots)
+    video_filters = "-vf fps={},scale=640:trunc(ow/a/2)*2".format(fps_of_screenshots)
 
-    print("{} {} {} {}".format(FFMPEG_BIN, input_argument, video_filters, FFMPEG_TEMP_OUTPUT_IMAGES))
+    print("Taking screenshots...")
+    #print("{} {} {} {}".format(FFMPEG_BIN, input_argument, video_filters, FFMPEG_TEMP_OUTPUT_IMAGES))
 
 
 # ffmpeg -framerate 1/5 -i img%03d.png -c:v libx264 -r 30 -pix_fmt yuv420p out.mp4
@@ -154,7 +155,7 @@ def make_video_from_screenshots(framerate):
     output_video = OUTPUT_VIDEO_NAME
     command_call = "{} {} {} {} {}".format(FFMPEG_BIN, framerate_argument, input_argument, other_arguments,
                                            output_video)
-    print("Making video from frames... using ffmpeg command: \n{}".format(command_call))
+    print("Making video from frames...")# using ffmpeg command: \n{}".format(command_call))
     execute_subprocess(command_call, 'ffmpeg')
     # p = subprocess.Popen(command_call, shell=True)
     # p.wait()
@@ -242,7 +243,7 @@ def extract_frames_in_given_time(filename, seek_time, frames_per_segment, start_
     command_call = "{} {} {} {} {} {} {}".format(FFMPEG_BIN, seek_argument, input_argument, number_of_frames_argument,
                                                  scale_argument,
                                                  start_number_argument, FFMPEG_TEMP_OUTPUT_IMAGES)
-    print("Extracting frames from scene... using ffmpeg command: \n{}".format(command_call))
+    print("Extracting frames from scene...")# using ffmpeg command: \n{}".format(command_call))
 
     p = subprocess.Popen(command_call, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
     a = p.communicate()
@@ -439,7 +440,7 @@ def ffmpeg_take_scene_screenshot_without_save(scene):
     # if the video duration is half an hour the screenshot will be taken at 74 seconds
     # x=24.0468 y=0.584145
 
-    x = 24.0468
+    x = 3.0468  ## was 24!
     y = 0.584145
 
     screenshot_time = seconds_to_string(int(scene.duration / x + y))
@@ -447,7 +448,7 @@ def ffmpeg_take_scene_screenshot_without_save(scene):
     a = ffmpeg_take_screenshot(screenshot_time, scene.path_to_file)
 
     if a['success']:
-        # print("Screenshot Taken")
+        print("Screenshot Taken")
         dest_path = os.path.join(MEDIA_PATH, "scenes", str(scene.id), "thumb")
         z = move_sample_movie_to_correct_dir(scene, True, "thumb.jpg", dest_path,
                                              SCREENSHOT_OUTPUT_PATH, 'image')
