@@ -20,6 +20,10 @@ Yapo  e+ - Yet Another Porn Organizer
 
 - A lot of uninteresting console log text has been silenced.
 
+#### COMING NEXT:
+
+- Just like the automatic piercing tags, the system will register bra cup size, height groups, etc.
+
 #### PLANNED:
 
 - Photo gallery section
