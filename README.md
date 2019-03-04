@@ -10,7 +10,8 @@ Yapo  e+ - Yet Another Porn Organizer (extended plus)
 #### Requirements: FFMPEG, VLC and Python 3.6+ installed. Or use the installer which will even run from a USB stick.
 ####
 #### Installer location: http://yapo-eplus.sex-galleri.dk/yapo-eplus.exe
-
+####
+#### Discord: https://discord.gg/ad5hjsA
 
 #### NEW FEATURES:
 
