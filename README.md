@@ -5,6 +5,8 @@ Yapo  e+ - Yet Another Porn Organizer (extended plus)
 #### There is a setup available for an easy install.
 #### There is also a copy of the setup with pre-registered actors, websites and tags (thousands of them). It will be available on Patreon shortly.
 ####
+#### ATTENTION - The program directory MUST be renamed to "YAPO" (upper case) as some functions depend on this! 
+####
 #### Requirements: FFMPEG, VLC and Python 3.6+ installed. Or use the installer which will even run from a USB stick.
 ####
 #### Installer location: http://yapo-eplus.sex-galleri.dk/yapo-eplus.exe
