@@ -35,6 +35,7 @@ Yapo  e+ - Yet Another Porn Organizer (extended plus)
 - DVD section
 - Additional actor photos (up to 5)
 - Function to move of all videos belonging to a websiteso that they reside in the same folder and an ability to set this automatically
+- An API for videohashes, tags and actors to avoid hundreds of people re-inventing the wheel
 
 #### WHAT TO DO IF YOU'RE INSTALLING A NEW COPY OR UPGRADING YOUR EXISTING COPY OF ANOTHER YAPO INSTALLATION?
 

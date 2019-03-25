@@ -227,9 +227,9 @@ def search_freeones(actor_to_search, alias, force):
             elif link_text == 'Fake boobs:':
                 fake_boobs = next_td_tag.text.strip("',/\n/\t")
                 if "Yes" in fake_boobs:
-                    insert_actor_tag(actor_to_search, "Fake breasts")
+                    insert_actor_tag(actor_to_search, "Fake tits")
                 else:
-                    insert_actor_tag(actor_to_search, "Natural breasts")
+                    insert_actor_tag(actor_to_search, "Natural tits")
             elif link_text == 'Eye Color:':
                 eye_color = next_td_tag.text.strip("',/\n/\t")
                 eye_color = eye_color.title() + " eyes"
