@@ -66,6 +66,8 @@ def send_piercings_to_actortag(actor):
             insert_actor_tag (actor, "Pierced right ear")
         if "chest" in piercings.lower():
             insert_actor_tag (actor, "Pierced dermal on chest")
+        if "none" in piercings.lower():
+            insert_actor_tag (actor, "No piercings")
 
 
 def insert_actor_tag(actor_to_insert, actor_tag_name):
