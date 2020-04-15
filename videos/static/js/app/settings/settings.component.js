@@ -57,13 +57,16 @@ angular.module('settings').component('settings', {
                 };
 
 
-                self.checkDupe = function () {
-                     $http.get('settings/', {
+            self.checkDupe = function () {
+ 
+            if (confirm("Are you sure?"))		{
+                        $http.get('settings/', {
                         params: {
                             checkDupes: 'True'
                         }
 
-                    }).then(function (response) {
+			        }).then(function (response) {
+
                         // alert(angular.toJson(response));
                         // self.response = response.data.vlc_path;
                         // self.pathToVLC = response.data.vlc_path;
@@ -72,6 +75,7 @@ angular.module('settings').component('settings', {
                     }, function errorCallback(response) {
                         alert("Something went wrong!");
                     });
+			}
                 };
                 
                 self.scrapAllActor = function () {
