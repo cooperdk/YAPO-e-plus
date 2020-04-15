@@ -301,6 +301,8 @@ def tag_all_scenes(ignore_last_lookup):
 
     return Response(status=200)
 
+
+
     # scenes = Scene.objects.all()
     # scene_count = scenes.count()
     # counter = 1
@@ -411,6 +413,14 @@ def permenatly_delete_scene_and_remove_from_db(scene):
     if success_delete_file and success_delete_media_path:
         scene.delete()
         print("Removed \'{}\' from database".format(scene.name))
+
+def checkDupeHash(hash):
+    from django.db import connection
+    cursor = connection.cursor()
+    cursor.execute('SELECT count(*) from videos_scene WHERE hash = %s', [hash])
+    dupecount = cursor.fetchone()
+    #print ("Checked " + hash + " - " + str(dupecount[0]) + "\n")
+    return dupecount[0]
 
 
 @api_view(['GET', 'POST'])
@@ -682,8 +692,8 @@ def settings(request):
 
                     return Response(status=500)
 
-        if 'scrapAllActor' in request.query_params:
-            if request.query_params['scrapAllActor'] == "True":
+        if 'scrapAllActors' in request.query_params:
+            if request.query_params['scrapAllActors'] == "True":
                 threading.Thread(target=scrape_all_actors,
                                  args=(False,)
                                  ).start()
@@ -700,6 +710,36 @@ def settings(request):
                                      args=(False,)).start()
                     # _thread.start_new_thread(tag_all_scenes, (), )
                 return Response(status=200)
+
+        if 'checkDupes' in request.query_params:
+            if request.query_params['checkDupes'] == "True":
+                print("Checking database for duplicates by hash...")
+                anumber = 0
+                for scene_1 in Scene.objects.all():
+                    anumber += 1
+                    #if not anumber % 100:
+                    #print("Checked " + str(anumber) + "...\n")
+                    if checkDupeHash(scene_1.hash)>1:
+                        print("Scene " + str(scene_1.id) + " has at least one dupe, running the dupe scanner...\n")
+                        for scene_2 in Scene.objects.all():
+                            if not scene_1.pk == scene_2.pk:
+                            #if scene_2.path_to_file == scene_1.path_to_file:
+                            #    print("!!! Found duplicate scene (exact path): " +
+                            #    str(scene_1.id) + " - " + scene_1.name + "\nFile path: " + scene_1.path_to_file +
+                            #    "\nis duplicate of " +
+                            #    str(scene_2.id) + " - " + scene_2.name + "\nFile path: " + scene_2.path_to_file)
+                                if scene_2.hash == scene_1.hash:
+                                    print("Confirmed! Duplicate scene info:\n " +
+                                    str(scene_2.id) + " - " + scene_2.path_to_file + "\nHash: " + scene_2.hash)
+                                    #print("Passing ID " + str(scene_2.id) + " to delete function...")
+                                    permenatly_delete_scene_and_remove_from_db(scene_2)
+                return Response(status=200)
+        # populate_last_folder_name_in_virtual_folders()
+    #    write_actors_to_file()
+    #    clean_empty_folders()
+        # os.environ.setdefault("DJANGO_SETTINGS_MODULE", "myproject.settings")
+
+        # get_files(TEST_PATH)
 
         if 'cleanDatabase' in request.query_params:
             if request.query_params['cleanDatabase']:

@@ -123,21 +123,7 @@ def create_scene(scene_path, make_sample_video):
 
 
 
-def find_duplicates():
-    for scene_1 in Scene.objects.all():
-        for scene_2 in Scene.objects.all():
 
-            if not scene_1.pk == scene_2.pk:
-                if scene_2.path_to_file == scene_1.path_to_file:
-                    print("Found duplicate scene (exact path): " +
-                          scene_1.id + " - " + scene_1.name + "\nFile path: " + scene_1.path_to_file +
-                          "\nis duplicate of " +
-                          scene_2.id + " - " + scene_2.name + "\nFile path: " + scene_2.path_to_file)
-                elif scene_2.hash == scene_1.hash:
-                    print("Found duplicate scene (by hash) : " +
-                          scene_1.id + " - " + scene_1.name + "\nFile path: " + scene_1.path_to_file +
-                          "\nis duplicate of " +
-                          scene_2.id + " - " + scene_2.name + "\nFile path: " + scene_2.path_to_file)
 
 def add_scene_to_folder_view(scene_to_add):
     # scene_path = os.path.normpath(scene_to_add.path_to_dir)
@@ -310,12 +296,12 @@ def main():
         add_scene_to_folder_view(scene)
 
         # populate_last_folder_name_in_virtual_folders()
-        # write_actors_to_file()
-        # clean_empty_folders()
+        #write_actors_to_file()
+        #clean_empty_folders()
         # os.environ.setdefault("DJANGO_SETTINGS_MODULE", "myproject.settings")
 
         # get_files(TEST_PATH)
-        # find_duplicates()
+        #find_duplicates()
         # scenes_virtual_folder = Scene.objects.all()
         # for s in scenes_virtual_folder:
         #     add_scene_to_folder_view(s)

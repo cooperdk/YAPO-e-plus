@@ -10,7 +10,7 @@
     </button>
 
     <br>
-    <button type="button" ng-click="$ctrl.scrapAllActors()" class="btn btn-default btn-sm"
+    <button type="button" ng-click="$ctrl.scrapAllActor()" class="btn btn-default btn-sm"
             uib-popover-html="'Scrapes <strong>all</strong> previously unscraped actors with the TMDb and Freeones scrapers.'"
             popover-trigger="mouseenter" popover-placement="right-top"
     >
@@ -24,7 +24,6 @@
             popover-trigger="mouseenter" popover-placement="right-top"
     >
     <span class="glyphicon glyphicon-user"
-
     ></span> Tag All Scenes
     </button>
     <label
@@ -37,6 +36,11 @@
         <input type="checkbox" ng-model="$ctrl.ignore_last_lookup">
     </label>
 
+    <button type="button" ng-click="$ctrl.checkDupe()" class="btn btn-default btn-sm"
+            uib-popover-html="'Checks for duplicate files (filename as well as hashes). THIS TAKES TIME. Check the console for output.'"
+            popover-trigger="mouseenter" popover-placement="right-top">
+    <span class="glyphicon glyphicon-user"></span> Check Duplicates
+    </button>
 
     <button type="button" ng-click="$ctrl.cleanDatabase()" class="btn btn-default btn-sm"
             uib-popover-html="'Checks all scenes and if a scene has been removed or if the file for the scene no longer exists on disk, deletes the scene from the database

@@ -41,16 +41,33 @@ def fix_profile_images(actors):
             actor.save()
 
 
+
+
+
 def main():
     print ("hello")
     #
     # actor_tags = ActorTag.objects.all()
     # strip_char(actor_tags, )
     actors = Actor.objects.all()
+    scenes = Scene.objects.all()
+    for scene in scenes:
+        add_scene_to_folder_view(scene)
+
+        # populate_last_folder_name_in_virtual_folders()
+        write_actors_to_file()
+        clean_empty_folders()
+        # os.environ.setdefault("DJANGO_SETTINGS_MODULE", "myproject.settings")
+
+        # get_files(TEST_PATH)
+
+
+
 
     fix_profile_images(actors)
 
-
+print ("name?")
 if __name__ == "__main__":
     # clean_taling_spaces()
     main()
+print("name.")

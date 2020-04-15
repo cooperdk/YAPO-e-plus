@@ -55,11 +55,29 @@ angular.module('settings').component('settings', {
                         alert("Something went wrong!");
                     });
                 };
-                
-                self.scrapAllActors = function () {
+
+
+                self.checkDupe = function () {
                      $http.get('settings/', {
                         params: {
-                            scrapAllActor: 'True'
+                            checkDupes: 'True'
+                        }
+
+                    }).then(function (response) {
+                        // alert(angular.toJson(response));
+                        // self.response = response.data.vlc_path;
+                        // self.pathToVLC = response.data.vlc_path;
+                        // alert("Got response from server: " + self.pathToFolderToAdd);
+						alert("Done checking for dupes, check the console.");
+                    }, function errorCallback(response) {
+                        alert("Something went wrong!");
+                    });
+                };
+                
+                self.scrapAllActor = function () {
+                     $http.get('settings/', {
+                        params: {
+                            scrapAllActors: 'True'
                         }
 
                     }).then(function (response) {
@@ -76,7 +94,7 @@ angular.module('settings').component('settings', {
                 self.tagAllScenes = function () {
                     $http.get('settings/', {
                         params: {
-                            tagAllScenes: 'true',
+                            tagAllScenes: 'True',
                             ignoreLastLookup: self.ignore_last_lookup
                         }
 
@@ -91,12 +109,11 @@ angular.module('settings').component('settings', {
                     
                 };
                 
-                
+				
                 self.cleanDatabase = function () {
                     $http.get('settings/', {
                         params: {
                             cleanDatabase: true
-                            
                         }
 
                     }).then(function (response) {
