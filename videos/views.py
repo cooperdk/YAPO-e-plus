@@ -701,8 +701,8 @@ def settings(request):
             return Response(status=200)
 
         if 'tagAllScenes' in request.query_params:
-            if request.query_params['tagAllScenes'] == "true":
-                if request.query_params['ignoreLastLookup'] == "true":
+            if request.query_params['tagAllScenes'] == "True":
+                if request.query_params['ignoreLastLookup'] == "True":
                     threading.Thread(target=tag_all_scenes,
                                      args=(True,)).start()
                 else:
