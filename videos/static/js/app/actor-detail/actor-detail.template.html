@@ -349,35 +349,53 @@
                                 target="_blank">5</a></b></span>
                         <hr>
                         </li>
+						
+
+						
+						
+						<li><b>PROFILE PAGES</b></li>
                         <li ng-if="$ctrl.actor.tmdb_id"><a
                                 href="https://www.themoviedb.org/person/{{ $ctrl.actor.tmdb_id }}"
                                 target="_blank">TMDB Page</a></li>
-
+                        </li>
                         <li ng-if="$ctrl.actor.imdb_id"><a
                                 href="http://www.imdb.com/name/{{ $ctrl.actor.imdb_id }}"
                                 target="_blank">IMDB Page</a>
                         </li>
-
-                        <li><a href="http://www.pornhub.com/pornstar/{{ $ctrl.actorNameDelimiter('-',false) }}"
+						<li><a
+                            title="Shows traxxx.me profile page, if it exists" href="https://www.traxxx.me/actor/{{ $ctrl.actorNameDelimiter('-',false) }}"
+                            target="_blank">Traxxx.me Page</a>
+                        </li>
+						<li><a
+                            title="Shows metadataapi.net profile page, if it exists" href="https://www.metadataapi.net/performer/{{ $ctrl.actorNameDelimiter('-',false) }}"
+                            target="_blank">ThePornDB Page (metadataapi.net)</a>
+                        </li>
+						<br />
+                        <li><b>STREAMING VIDEO SEARCHING</b></li>
+                        <li><a title="Search Pornhub for streaming video clips with this actor" href="http://www.pornhub.com/pornstar/{{ $ctrl.actorNameDelimiter('-',false) }}"
                                target="_blank">Pornhub Page</a></li>
 
-                        <li><a href="http://www.xvideos.com/?k={{ $ctrl.actorNameDelimiter('.',false) }}"
+                        <li><a title="Search XVIDEOS for streaming video clips with this actor" href="http://www.xvideos.com/?k={{ $ctrl.actorNameDelimiter('.',false) }}"
                                target="_blank">XVIDEOS Page</a></li>
-
-                        <li><a href="https://unblockedrarbg.org/torrents.php?search=%22{{  $ctrl.actorNameDelimiter('+',false) }}%22&category=4"
+					    <br />
+                        <li><b>TORRENT SEARCHING</b></li>
+                        <li><a title="Search RarBG for torrents with this actor" href="https://unblockedrarbg.org/torrents.php?search=%22{{  $ctrl.actorNameDelimiter('+',false) }}%22&category=4"
                                target="_blank">RarBG Torrent Search</a></li>
 
-                        <li><a href="http://www.empornium.me/torrents.php?taglist={{  $ctrl.actorNameDelimiter('.',false) }}"
+                        <li><a title="Search Empornium for torrents with this actor"href="http://www.empornium.me/torrents.php?taglist={{  $ctrl.actorNameDelimiter('.',false) }}"
                                target="_blank">Empornium Torrent Search</a></li>
 
-                        <li><a href="https://duckduckgo.com/?q={{$ctrl.actorNameDelimiter('&#43;',true)}}&iax=1&ia=images&iaf=size%3Al"
-                               target="_blank">DuckDuckGo Image Search</a></li>
+                        <li><a title="Search PornMD for information about this actor, videos and photos (assumes the actor is straight)"href="https://www.pornmd.com/straight/{{  $ctrl.actorNameDelimiter('+',false) }}"
+                               target="_blank">PornMD info + Photo Search</a></li>
+                        <br />
+
+                        <li><b>PROFILE PICTURES ETC.</b></li>
+                        <li><a title="Search QWant for photos of this actor (disable adult filter for better results)" href="https://qwant.com/?q={{$ctrl.actorNameDelimiter('%20',true)}}&t=images"
+                               target="_blank">QWant Photo Search</a></li>
 
 
-                        <li><a
-                                href="https://www.google.com/search?as_st=y&tbm=isch&as_q={{  $ctrl.actorNameDelimiter('&#43;',true) }}&as_epq=&as_oq=&as_eq=&cr=&as_sitesearch=&safe=images&tbs=isz:l,iar:t
-                            "
-                                target="_blank">Google Image Search</a></li>
+                        <li><a title="Search Google for photos of this actor" href="https://www.google.com/search?as_st=y&tbm=isch&as_q={{  $ctrl.actorNameDelimiter('&#43;',true) }}&as_epq=&as_oq=&as_eq=&cr=&as_sitesearch=&safe=images&tbs=isz:l,iar:t"
+                               target="_blank">Google Photo Search</a></li>
 
 
                     </ul>

@@ -380,7 +380,7 @@ angular.module('actorDetail').component('actorDetail', {
                     newName = newName.replace(/ /g, delimiter);
                     // console.log("Name with delimeter " + delimiter + " is " + newName);
                     if (imageSearch) {
-                        newName = "%22" + newName + "%22" + delimiter + "pornstar";
+                        newName = "%22" + newName + "%22" + delimiter + "XXX";
                     }
 
                     console.log("Name with delimiter is:" + newName);

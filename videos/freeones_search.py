@@ -18,6 +18,7 @@ from dateutil.parser import parse
 import videos.const as const
 from django.utils import timezone
 
+
 import requests.packages.urllib3
 requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
 
@@ -29,6 +30,8 @@ from videos.models import Actor, ActorAlias, ActorTag
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 
 # MEDIA_PATH = "videos\\media"
+
+
 
 def search_freeones(actor_to_search, alias, force):
     success = False
@@ -105,18 +108,36 @@ def search_freeones(actor_to_search, alias, force):
 
         # print (free_ones_biography, free_ones_career_status)
         # img class="middle bordered babeinfoblock-thumb"
-        profile_thumb = soup.find("img", {'class': 'middle bordered babeinfoblock-thumb'})
-        profile_thumb_parent = profile_thumb.parent
+        try:
+            profile_thumb = soup.find("img", {'class': 'middle bordered babeinfoblock-thumb'})
+            profile_thumb_parent = profile_thumb.parent
 
         #print(profile_thumb_parent)
-        has_image = False
+            has_image = False
 
-        try:
+        
             #print(profile_thumb_parent['href'])
-            has_image = True
-        except KeyError:
-            print("No image on Freeones!")
-            
+            if len(profile_thumb_parent['href'])>3:     
+                has_image = True
+        except:
+            print("Parsing Error - not getting any image.")
+            pass
+        
+ #       except RequestException:
+ #           print("No image fetched from Freeones!")      
+ #       except KeyError:
+ #           print("No image fetched from Freeones!")
+ #       except ConnectionError:
+ #           print("No image fetched from Freeones (Connection error in BeautifulSoup module)")
+ #       except BaseException:
+ #           print("No image fetched from Freeones  - Exception error in BeautifulSoup module")
+ #       except StandardError:
+ #           print("No image fetched from Freeones  - Standard error in BeautifulSoup module")
+ #       except IOError:
+ #           print("No image fetched from Freeones - I/O Error")
+ #       except EnvironmentError:
+ #           print("No image fetched from Freeones  - Environment error in BeautifulSoup module")
+
 
         biography_page = urllib_parse.urljoin("https://www.freeones.com/", href_found)
 
