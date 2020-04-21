@@ -3,7 +3,7 @@ Django==1.9.6
 django-autocomplete-light==3.1.6
 django-extensions==2.1.5
 django-mptt==0.8.5
-djangorestframework==3.4.1
+djangorestframework==3.9.1
 pypiwin32==223
 python-dateutil==2.5.3
 pywin32==224
