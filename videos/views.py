@@ -45,6 +45,12 @@ import threading
 
 # Aux Functions
 
+
+def getSizeAll():
+    #queryset.aggregate(Sum('column')).get('column__sum')
+    total = Scene.objects.aggregate(total=Sum('size'))['total']
+    return total
+
 def get_scenes_in_folder_recursive(folder, scene_list):
     scenes = list(folder.scenes.all())
     scene_list = list(chain(scene_list, scenes))
@@ -129,6 +135,7 @@ def search_in_get_queryset(original_queryset, request):
 
     if 'recursive' in request.query_params and request.query_params['recursive'] == 'true':
         print("Recursive is TRUE!!!!")
+        print(request.query_params['folders_in_tree'])
         folder = Folder.objects.get(pk=int(request.query_params['folders_in_tree']))
         qs_list = get_scenes_in_folder_recursive(folder, qs_list)
         print(qs_list)
@@ -1131,8 +1138,8 @@ class SceneTagViewSet(viewsets.ModelViewSet):
 
     queryset = SceneTag.objects.all()
     serializer_class = SceneTagSerializer
-
-
+    
+    
 class SceneViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Scene.objects.all()

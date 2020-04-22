@@ -180,6 +180,7 @@ class Folder(MPTTModel):
         order_insertion_by = ['name']
 
 
+
 class LocalSceneFolders(models.Model):
     name = models.CharField(max_length=500, unique=True)
     date_added = models.DateTimeField(auto_now_add=True)
