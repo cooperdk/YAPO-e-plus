@@ -45,7 +45,7 @@ def fix_profile_images(actors):
 
 
 def main():
-    print ("hello")
+    print ("Hello")
     #
     # actor_tags = ActorTag.objects.all()
     # strip_char(actor_tags, )
@@ -67,7 +67,7 @@ def main():
     fix_profile_images(actors)
 
 print ("name?")
-if __name__ == "__main__":
+if __name__ = "__main__":
     # clean_taling_spaces()
     main()
 print("name.")

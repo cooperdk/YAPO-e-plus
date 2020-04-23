@@ -31,13 +31,20 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 
 # MEDIA_PATH = "videos\\media"
 
-
+def onlyChars(input):
+    valids = ""
+    for character in input:
+        if character.isalpha():
+            valids += character
+    return valids
 
 def search_freeones(actor_to_search, alias, force):
     success = False
     if Actor.objects.get(name=actor_to_search.name):
         actor_to_search = Actor.objects.get(name=actor_to_search.name)
     name = actor_to_search.name
+    
+
 #    actor_to_search.last_lookup = datetime.datetime.now()
 #    actor_to_search.save()
 #    save_path = os.path.join(videos.const.MEDIA_PATH, 'actor/' + str(actor_to_search.id) + '/profile/')
@@ -229,9 +236,78 @@ def search_freeones(actor_to_search, alias, force):
                     weight = re.search(r'weightkg = \"(\d+)\"', weight)
                     weight = weight.group(1)
                     actor_to_search.weight = weight
+                    
             elif link_text == 'Measurements:':
                 if not actor_to_search.measurements:
                     actor_to_search.measurements = next_td_tag.text.strip("'/\n/\t")
+                if str(actor_to_search.measurements) != "None":
+                    cupSize = onlyChars(actor_to_search.measurements)
+                    print("Measurements added: " + actor_to_search.measurements)
+                else:
+                    cupSize = ""
+                if len(cupSize)>0:
+                    insert_actor_tag(actor_to_search, cupSize + " Cup")
+                    print("Stripped measurements for cup size - this actor has a "+cupSize+" cup.")                
+                    accepted_stringsTiny = {'A'}
+                    accepted_stringsSmall = {'B'}
+                    accepted_stringsReg = {'C'}       
+                    accepted_stringsBig = {'D', 'E', 'F'}
+                    accepted_stringsVBig = {'G', 'H', 'I'}
+                    accepted_stringsHuge = {'J', 'K', 'L', 'M'}
+                    accepted_stringsMassive = {'N', 'O', 'P', 'Q', 'R', 'S'}
+                    accepted_stringsExtreme = {'T', 'U', 'V', 'W', 'X', 'Y', 'Z'}
+                    cupSizePart=[cupSize]
+        
+                    try:
+                        success=True
+                        done=False
+                        actor_to_search.last_lookup = datetime.datetime.now()
+                        while not done:
+                            for cupSizePart in cupSize:
+                                if (cupSizePart in accepted_stringsTiny):
+                                    insert_actor_tag(actor_to_search, "Tiny tits")
+                                    print("Added tag: Tiny tits")
+                                    done=True
+
+                                if (cupSizePart in accepted_stringsSmall):
+                                    insert_actor_tag(actor_to_search, "Small tits")
+                                    print("Added tag: Small tits")
+                                    done=True
+
+                                if (cupSizePart in accepted_stringsReg):
+                                    insert_actor_tag(actor_to_search, "Medium tits")
+                                    print("Added tag: Medium tits")
+                                    done=True
+                        
+                                elif (cupSizePart in accepted_stringsBig):
+                                    insert_actor_tag(actor_to_search, "Big tits")
+                                    print("Added tag: Big tits")
+                                    done=True
+
+                                elif (cupSizePart in accepted_stringsVBig):
+                                    insert_actor_tag(actor_to_search, "Very big tits")                  
+                                    print("Added tag: Very big tits")
+                                    done=True
+
+                                elif (cupSizePart in accepted_stringsHuge):
+                                    insert_actor_tag(actor_to_search, "Huge tits")    
+                                    print("Added tag: Huge tits")
+                                    done=True
+
+                                elif (cupSizePart in accepted_stringsMassive):
+                                    insert_actor_tag(actor_to_search, "Massively huge tits")     
+                                    print("Added tag: Massively huge tits")
+                                    done=True
+
+                                elif (cupSizePart in accepted_stringsExtreme):
+                                    insert_actor_tag(actor_to_search, "Extremely huge tits")                            
+                                    print("Added tag: Extremely huge tits")
+                                    done=True
+                    
+                                if done: break
+                            if done: break
+                    except: pass
+
             elif link_text == 'Tattoos:':
                 if not actor_to_search.tattoos:
                     tattoos = next_td_tag.text.strip("'/\n/\t")
@@ -249,11 +325,14 @@ def search_freeones(actor_to_search, alias, force):
                 fake_boobs = next_td_tag.text.strip("',/\n/\t")
                 if "Yes" in fake_boobs:
                     insert_actor_tag(actor_to_search, "Fake tits")
+                    print("Her tits are fake, added that tag")
                 else:
                     insert_actor_tag(actor_to_search, "Natural tits")
+                    print("Her tits are natural, added that tag")
             elif link_text == 'Eye Color:':
                 eye_color = next_td_tag.text.strip("',/\n/\t")
                 eye_color = eye_color.title() + " eyes"
+
 
                 if eye_color:
                     insert_actor_tag(actor_to_search, eye_color)
@@ -277,7 +356,7 @@ def search_freeones(actor_to_search, alias, force):
 
         if not (actor_to_search.description) or (len(actor_to_search.description)<72):
             actor_to_search.description = free_ones_biography
-            print("There's no description or it's too short, so added it from Freeones.")
+            print("There's no description or it's too short, so it's added from Freeones.")
 
         if "Black" in ethnicity:
             insert_actor_tag(actor_to_search, "Black")
@@ -413,6 +492,7 @@ def main():
         # actor = Actor()
         # actor.name = "Daisy Marie"
         # search_freeones(actor)
+
 
 
 if __name__ == "__main__":

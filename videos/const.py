@@ -1,6 +1,6 @@
 
 
-UNKNOWN_PERSON_IMAGE_PATH = 'media/actor/Unknown/profile/profile.jpg'
+UNKNOWN_PERSON_IMAGE_PATH = 'media/images/actor/Unknown/profile/profile.jpg'
 MEDIA_PATH = 'videos/media/'
 TEMP_PATH = 'videos/ffmpeg/temp/'
 VLC_PATH = ""
