@@ -9,32 +9,40 @@ Yapo  e+ - Yet Another Porn Organizer (extended plus)
 ####
 #### Requirements: FFMPEG, VLC and Python 3.6+ installed. Or use the installer which will even run from a USB stick.
 ####
-#### Installer location: http://yapo-eplus.sex-galleri.dk/yapo-eplus.exe
+#### If you don't want to mess with Python and all the dependencies, there is an installer (Windows only) located here: http://yapo-eplus.sex-galleri.dk/yapo-eplus.exe
 ####
-#### Discord: https://discord.gg/ad5hjsA
+#### Discuss and share on Discord: https://discord.gg/ad5hjsA
 
 #### NEW FEATURES:
 
-- There was a field in the actor table for tattoos. This now works, and tatto information shows up in the actor view.
+- New Python module requirements, remember to do "pip install --upgrade -r requirements.txt". If necessary, also "python manage.py makemigrations" and "python manage.py migrate"
+
+- On startup, the total disk usage for the video collection is reported.
+
+- YAPO e+ will now strip the measurements field for a bra cup size, tag the actor with the cup size, and also tag with a breast size grouping (fx large or huge).
+
+- There was a field in the actor table for tattoos. This now works, and tatto information shows up in the actor details.
 
 - A field has been added to register information about piercings. In addition, typical types of piercings are now sent to the actor tags.
 
 - YAPO e+ scrapes actor information from IMDB first (best biographies), then from TMDB (best profile pictures) and then from Freeones (best all-round information). If there's a photo in the system and it's taken from TMDB or added by the user, the system no longer downloads a new one if forced to update the actor.
+  This also ensures that your manually added photos won't be overwritten.
 
-- YAPO e+ hashes all scenes (don't worry, it's FAST!) and adds the hash checksum to the scenes table. It already informs (CLI) about duplicate scenes, but in the future, there will be a menu to check for dupes and delete one of them.
+- YAPO e+ hashes all scenes (don't worry, it's FAST!) and adds the hash checksum to the scenes table.
+  When requested in settings, it will perform a dupe check after confirmation, and delete all duplicates so only one copy remains.
 
 - A lot of uninteresting console log text has been silenced.
 
 #### COMING NEXT:
 
-- Just like the automatic piercing tags, the system will register bra cup size, height groups, etc.
+- Height groups still missing.
 
 #### PLANNED:
 
 - Photo gallery section
 - DVD section
 - Additional actor photos (up to 5)
-- Function to move of all videos belonging to a websiteso that they reside in the same folder and an ability to set this automatically
+- Function to move all videos belonging to a website or actor so that they reside in the same folder and an ability to set this automatically
 - An API for videohashes, tags and actors to avoid hundreds of people re-inventing the wheel
 
 #### WHAT TO DO IF YOU'RE INSTALLING A NEW COPY OR UPGRADING YOUR EXISTING COPY OF ANOTHER YAPO INSTALLATION?
@@ -179,12 +187,12 @@ YAPO's dependencies are:
 (Watch the video above for a walkthrough of the installation.)
 
 1. Create a virtual environment for YAPO's installation.
-2. With the virtual environment activated, create a folder for YAPO and pull it from Git: `C:\yapo\YAPO\> git clone https://github.com/curtwagner1984/YAPO.git`
+2. With the virtual environment activated, create a folder for YAPO and pull it from Git: `C:\YAPO\> git clone https://github.com/cooperdk/YAPO-e-plus.git`
 3. Install YAPO dependencies: `pip install -r requirements.txt`
-4. Navigate to `C:\yapo\YAPO\videos\static\bower` and install JS dependencies by running: `bower install`
+4. Navigate to `C:\YAPO\videos\static\bower` and install JS dependencies by running: `bower install`
 5. Create YAPO database from `C:\yapo\YAPO` run: `python manage.py migrate`
-6. (On Windows) Place ffmpeg.exe and ffprobe.exe in the `C:\yapo\YAPO\videos\ffmpeg folder`
-7. Start the server from `C:\yapo\YAPO` run: `python manage.py runserver 127.0.0.1:8000`
+6. (On Windows) Place ffmpeg.exe and ffprobe.exe in the `C:\YAPO\videos\ffmpeg folder`
+7. Start the server from `C:\YAPO` run: `python manage.py runserver 127.0.0.1:8000`
 
 
 
@@ -197,15 +205,15 @@ I would be very happy if people running Linux or Mac would test it out and repor
 #### Update instructions:
 YAPO is a WIP (work in progress) and as such the code will change often, to sync with the latest changes on Git this is what you have to do:
 
-`(py3virtualenv) C:\yapo\YAPO\> git pull` This will pull the latest updates for YAPO from the Git repository.
+`(py3virtualenv) C:\YAPO\> git pull` This will pull the latest updates for YAPO from the Git repository.
 
-`(py3virtualenv) C:\yapo\YAPO\> python manage.py makemigrations`
+`(py3virtualenv) C:\YAPO\> python manage.py makemigrations`
 This will look over the new code and take note of the adjustments that needs to be made to the database.
 
-`(py3virtualenv) C:\yapo\YAPO\> python manage.py migrate`
+`(py3virtualenv) C:\YAPO\> python manage.py migrate`
 This will actually make the adjustments to the database it took note of in the previous step.
 
-(In this case py3virtualenv is the name of **your** virtual environment and C:\yapo\YAPO is **your** YAPO install dir )
+(In this case py3virtualenv is the name of **your** virtual environment and C:\YAPO is **your** YAPO install dir )
 
 #### Notes:
 

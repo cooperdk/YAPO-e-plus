@@ -1,6 +1,10 @@
 # Changelog
 
 
+## 0.2.0 
+
+A report of changes will be added at a later date.
+
 ## 0.1.3 (2016-09-09)
 
 ### New
