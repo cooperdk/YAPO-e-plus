@@ -44,7 +44,7 @@ def search_freeones(actor_to_search, alias, force):
         actor_to_search = Actor.objects.get(name=actor_to_search.name)
     name = actor_to_search.name
     
-
+#    actor_to_search.last_lookup = datetime.datetime.now()
 #    actor_to_search.last_lookup = datetime.datetime.now()
 #    actor_to_search.save()
 #    save_path = os.path.join(videos.const.MEDIA_PATH, 'actor/' + str(actor_to_search.id) + '/profile/')
@@ -229,7 +229,32 @@ def search_freeones(actor_to_search, alias, force):
                     height = re.search(r'heightcm = \"(\d+)\"', height)
                     height = height.group(1)
                     actor_to_search.height = height
-
+                height=int(actor_to_search.height)
+                done=False
+                if not done and height is not None:
+                    if height > 110:
+                        if  height < 148:
+                            insert_actor_tag(actor_to_search, "Extremely tiny actor")
+                            print("Added tag: Extremely tiny actor")
+                            done=True
+                        if 148 < height < 152:
+                            insert_actor_tag(actor_to_search, "Tiny actor")
+                            print("Added tag: Tiny actor")
+                            done=True
+                        if 152 < height < 161:
+                            insert_actor_tag(actor_to_search, "Petite actor")
+                            print("Added tag: Petite actor")
+                            done=True
+                        if 178 < height < 186:
+                            insert_actor_tag(actor_to_search, "Tall actor")
+                            print("Added tag: Tall actor")
+                            done=True
+                        if 186 < height < 220:
+                            insert_actor_tag(actor_to_search, "Extremely tall actor")
+                            print("Added tag: Extremely tall actor")
+                            done=True
+                        
+                
             elif link_text == 'Weight:':
                 if not actor_to_search.weight:
                     weight = next_td_tag.text.strip("'/\n/\t")

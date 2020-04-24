@@ -260,6 +260,7 @@ def scrape_all_actors(force):
 
     for actor in actors:
 
+
         if not force:
             if actor.last_lookup is None:
                 print("Searching in TMDb")
@@ -275,17 +276,18 @@ def scrape_all_actors(force):
             else:
                 print("{} was already searched...".format(actor.name))
         else:
+           
             print("Searching in TMDb")
             videos.tmdb_search.search_person_with_force_flag(actor, True)
             print("Finished TMDb search")
             print("Searching IMDB...")
             videos.imdb_search.search_imdb_with_force_flag(actor, True)
             print("Finished IMDB Search")
+            
             if actor.gender != 'M':
                 print("Searching in Freeones")
                 videos.freeones_search.search_freeones_with_force_flag(actor, True)
                 print("Finished Freeones search")
-
 
 def tag_all_scenes(ignore_last_lookup):
     f = open('../YAPO/settings.json', 'r')
