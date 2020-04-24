@@ -7,15 +7,19 @@ Yapo  e+ - Yet Another Porn Organizer (extended plus)
 ####
 #### ATTENTION - The program directory MUST be renamed to "YAPO" (upper case) as some functions depend on this! 
 ####
-#### Requirements: FFMPEG, VLC and Python 3.6+ installed. Or use the installer which will even run from a USB stick.
+#### There are a **set of logos** available for websites, thanks to @GernBlanston#0168 from Porn Organizing (https://discord.gg/6TvpGA) - get them here: http://yapo-eplus.sex-galleri.dk/websitelogos.zip - they should be unpacked to your YAPO root. YAPO simply matches the website name in your installation with a PNG image in videos/media/logos and if there's a name match, the logo will be shown on the website view. Currently, the filename MUST match the  website name (not case-sensitive).
 ####
-#### If you don't want to mess with Python and all the dependencies, there is an installer (Windows only) located here: http://yapo-eplus.sex-galleri.dk/yapo-eplus.exe
+#### Requirements: FFMPEG, VLC and Python 3.6+ installed. Or use the installer which will even run from a USB stick, should you want to do that.
+####
+#### If you don't want to mess with Python and all the dependencies, there is an (old) installer (Windows only) located here: http://yapo-eplus.sex-galleri.dk/yapo-eplus.exe - this will be updated ASAP.
 ####
 #### Discuss and share on Discord: https://discord.gg/ad5hjsA
 
 #### NEW FEATURES:
 
-- New Python module requirements, remember to do "pip install --upgrade -r requirements.txt". If necessary, also "python manage.py makemigrations" and "python manage.py migrate"
+- As mentioned, we now offer website/producer logos in the website view, if the logo exists in videos/media/logos. Thanks to GernBlanston for sharing them.
+
+- New Python module requirements, it will be necessary to do "pip install --upgrade -r requirements.txt". If necessary, also "python manage.py makemigrations" and "python manage.py migrate"
 
 - On startup, the total disk usage for the video collection is reported.
 

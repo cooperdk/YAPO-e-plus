@@ -5,13 +5,17 @@ body {
 #actor-list-row{
     white-space: nowrap;
     list-style: none;
-
+    vertical-align: middle;
 }
+
+.actor-thumb { border-radius: 16px; }
+
 
 #actor-list-row ul{
     white-space: nowrap;
     list-style: none;
     align-content: center;
+	vertical-align: middle;
     overflow-y: visible;
     float: left;
 }
@@ -19,6 +23,7 @@ body {
     display: inline-block;
     list-style: none;
     margin: 1em;
+	vertical-align: middle;
 
 
 }
@@ -90,9 +95,14 @@ body {
 
 .actors li {
     clear: both;
-    height: 150px;
+    height: 114px;
     padding-top: 15px;
+	vertical-align: middle;
 }
+
+.actor-list-row img { border-radius: 8x; }
+.col-md-2 img { border-radius: 12px; }
+.col-md-2 h4 { text-align: center; -ms-transform: translateX(-18px); transform: translateX(-18px);}
 
 .scenes {
     list-style: none;
@@ -119,7 +129,7 @@ body {
 .actor-thumb {
     /*background-color: white;*/
     border: 2px solid black;
-
+    border-radius: 16px;
     /*height: 400px;*/
     margin: auto;
     /*margin-bottom: 2em;*/
@@ -179,6 +189,12 @@ body {
     width: 100px;
 }
 
+.thumb img {
+	border-radius: 6px;
+    border: 1px solid black;
+	vertical-align: middle;
+}
+
 .thumb-wide {
     float: left;
     /*height: 240px;*/
@@ -189,6 +205,11 @@ body {
     border: 0.2em solid black;
 }
 
+.sceneactorthumb {
+	border-radius: 8px;
+    border: 1px solid black;
+	vertical-align: middle;
+}
 
 .on-hover-red-cursor-pointer:hover {
     color: red;

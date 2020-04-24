@@ -1,6 +1,7 @@
 <span>
 <pagination page-type="'Scene'"></pagination>
 </span>
+
 <div ng-if="!$ctrl.gridView">
     <button type="button" ng-click="$ctrl.multiTag()" class="btn btn-default btn-sm">
         Tag/Delete Multiple Scenes
@@ -16,7 +17,6 @@
     <button type="button" ng-if="$ctrl.tagMultiple" ng-click="$ctrl.selectNone()" class="btn btn-default btn-sm">
         Select None
     </button>
-
 
     <div id=big-scroll-item>
         <table>

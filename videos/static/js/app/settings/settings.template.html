@@ -2,21 +2,17 @@
 
     <label>Path to VLC player:</label><input class="form-control" id="inputdefault" type="text"
                                              ng-model="$ctrl.pathToVLC">
-    <button type="button" ng-click="$ctrl.updateVlcPath()" class="btn btn-default btn-sm"
+    <button style="background-color: #33ccff;" type="button" ng-click="$ctrl.updateVlcPath()" class="btn btn-default btn-sm"
             uib-popover-html="'Sets YAPO\'s VLC path to the path in the text input.'"
             popover-trigger="mouseenter" popover-placement="right-top"
-    >
-        <span class="glyphicon glyphicon-cog"></span> Set VLC Path
+    
+        <span style="width:10%" class="glyphicon glyphicon-cog"></span> Set VLC Path
     </button>
-
-    <br>
+    <div style="height: 10px; width: 100%";></div>
     <button type="button" ng-click="$ctrl.scrapAllActor()" class="btn btn-default btn-sm"
             uib-popover-html="'Scrapes <strong>all</strong> previously unscraped actors with the TMDb and Freeones scrapers.'"
-            popover-trigger="mouseenter" popover-placement="right-top"
-    >
-    <span class="glyphicon glyphicon-user"
-
-    ></span> Scrape All Actors
+            popover-trigger="mouseenter" popover-placement="right-top">
+    <span class="glyphicon glyphicon-user"></span> Scrape All Actors
     </button>
 
     <button type="button" ng-click="$ctrl.tagAllScenes()" class="btn btn-default btn-sm"
@@ -35,11 +31,11 @@
 
         <input type="checkbox" ng-model="$ctrl.ignore_last_lookup">
     </label>
-
+	<span style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>
     <button type="button" ng-click="$ctrl.checkDupe()" class="btn btn-default btn-sm"
             uib-popover-html="'Checks for duplicate files (filename as well as hashes). THIS TAKES TIME. Check the console for output.'"
             popover-trigger="mouseenter" popover-placement="right-top">
-    <span class="glyphicon glyphicon-user"></span> Check Duplicates
+    <span class="glyphicon glyphicon-flash"></span> Check Duplicates
     </button>
 
     <button type="button" ng-click="$ctrl.cleanDatabase()" class="btn btn-default btn-sm"

@@ -5,6 +5,7 @@ from videos.models import Actor, Scene, ActorTag
 import videos.views
 
 
+        
 def send_piercings_to_actortag(actor):
     piercings = actor.piercings
     if piercings:
@@ -188,5 +189,6 @@ def actor_folder_from_name_to_id():
     return True
 
 
+        
 if __name__ == "__main__":
     print("this is main")

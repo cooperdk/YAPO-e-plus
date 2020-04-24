@@ -64,7 +64,12 @@ angular.module('sceneList').component('sceneList', {
                 checkGridOption()
             });
 
+            self.getSizeAll = function () {
 
+            getSizeAll(self);
+
+            };
+            
             self.selectAll = function () {
 
                 self.selectedScenes = [];

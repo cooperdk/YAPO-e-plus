@@ -1,6 +1,7 @@
 angular.module('websiteDetail').component('websiteDetail', {
     templateUrl: 'static/js/app/website-detail/website-detail.template.html',
     controller: ['$routeParams', 'Website', 'scopeWatchService', '$rootScope', '$scope', 'helperService',
+    
         function WebsiteDetailController($routeParams, Website, scopeWatchService, $rootScope, $scope, helperService) {
             var self = this;
             var gotPromise = false;
@@ -12,6 +13,17 @@ angular.module('websiteDetail').component('websiteDetail', {
                 $rootScope.title = res.name;
                 gotPromise = true;
             });
+
+app.directive('onError', function() {  
+  return {
+    restrict:'A',
+    link: function(scope, element, attr) {
+      element.on('error', function() {
+        element.attr('src', attr.onError);
+      })
+    }
+  }
+})
 
             $scope.$on("didWebsiteLoad", function (event, website) {
                 if (gotPromise) {

@@ -45,8 +45,6 @@ from django.db import connection
 # Aux Functions
 
 
-
-
 def get_scenes_in_folder_recursive(folder, scene_list):
     scenes = list(folder.scenes.all())
     scene_list = list(chain(scene_list, scenes))
@@ -60,25 +58,7 @@ def get_scenes_in_folder_recursive(folder, scene_list):
 
         return scene_list
 
-def getSizeAll():
-    #queryset.aggregate(Sum('size')).get('column__sum')
-    #cursor = connection.cursor()
-    #cursor.execute("SELECT SUM(size) AS total FROM videos_scene")[0]
-    #row = cursor.fetchall()
-    row=Scene.objects.raw("SELECT SUM(size) AS total, id FROM videos_scene") #cursor.fetchone()
-    return sizeFormat(row[0].total)
 
-def sizeFormat(b):
-    if b < 1000:
-              return '%i' % b + 'B'
-    elif 1000 <= b < 1000000:
-        return '%.1f' % float(b/1000) + 'KB'
-    elif 1000000 <= b < 1000000000:
-        return '%.1f' % float(b/1000000) + 'MB'
-    elif 1000000000 <= b < 1000000000000:
-        return '%.1f' % float(b/1000000000) + 'GB'
-    elif 1000000000000 <= b:
-        return '%.1f' % float(b/1000000000000) + 'TB'
 
 def onlyChars(input):
     valids = ""
@@ -1249,13 +1229,5 @@ class ActorViewSet(viewsets.ModelViewSet):
     queryset = Actor.objects.all()
     # serializer_class = ActorSerializer
 
-class ready():
 
-
-    def getStarted():
-        size = getSizeAll()
-        print("\nThe videos registered currently take up "+size+" in total.\n\n")
-
-    if not(os.environ.get('SKIP_STARTUP')):
-        getStarted()
 

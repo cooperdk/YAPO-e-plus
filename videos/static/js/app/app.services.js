@@ -67,7 +67,7 @@ angular.module('helper', []).factory('helperService', function ($rootScope, $loc
         data = angular.fromJson(data);
 
 
-        // console.log("This is headers: " + angular.toJson(headers()));
+        //console.log("This is headers: " + angular.toJson(headers()));
         //
         // console.log("Data length: " + data.length);
 

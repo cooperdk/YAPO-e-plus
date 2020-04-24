@@ -35,17 +35,19 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     # 'dal',
     # 'dal_select2',
-    'django.contrib.admin',
+    'django.contrib.admin.apps.SimpleAdminConfig', #was 'django.contrib.admin'
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'django_extensions',
     # 'selectable',
     'videos.apps.VideosConfig',
     'mptt',
-    'rest_framework'
+    'rest_framework',
+
 ]
 
 MIDDLEWARE_CLASSES = [

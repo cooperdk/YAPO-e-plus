@@ -1,8 +1,8 @@
-<h1 align="center">
-    <a href="#" editable-text="$ctrl.website.name"
+    <center><h1 align="center"><a href="#" editable-text="$ctrl.website.name"
        onaftersave="$ctrl.update()" style="cursor:text">
-        {{ $ctrl.website.name || 'NA' }}
-    </a>
+        {{ $ctrl.website.name || 'NA' }}</a>
+		<br><img style="width: 320px; cursor:default; border-style: none; border-bottom: none;" ng-src="media/logos/{{$ctrl.website.name | lowercase}}.png" onError=null;this.src="media/images/blank.png";this.style="width:0px;"> <!--{{$ctrl.website.thumbnail}}-->
+<div ng-if="image.is404">Uh oh!  Image 404'd.</div></center>
 </h1>
 <div align="center">
     <h2>
@@ -44,7 +44,3 @@
 </div>
 
 <section-list-wrapper main-page="false" section-type="'SceneList'"></section-list-wrapper>
-
-
-
-

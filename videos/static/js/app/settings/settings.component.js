@@ -59,7 +59,7 @@ angular.module('settings').component('settings', {
 
             self.checkDupe = function () {
  
-            if (confirm("Are you sure?"))		{
+            if (confirm("Are you sure? Any identical copies of your videos will be removed, leaving only one copy."))		{
                         $http.get('settings/', {
                         params: {
                             checkDupes: 'True'

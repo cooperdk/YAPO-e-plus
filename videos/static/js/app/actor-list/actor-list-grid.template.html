@@ -3,16 +3,10 @@
 <div class="row-fluid" id="actor-list-grid">
     <div class="col-md-2" ng-repeat="actor in $ctrl.actors">
         <a href="/#!/actor/{{ actor.id }}">
-            <img
-                 uib-popover-template="'static/js/app/actor-list/actor-list-grid-popover.template.html'"
-                                        popover-append-to-body="true"
-                 popover-trigger="mouseenter" popover-placement="bottom"
-
-                 ng-src="{{ actor.thumbnail }}"
+            <img  uib-popover-template="'static/js/app/actor-list/actor-list-grid-popover.template.html'" popover-append-to-body="true" popover-trigger="mouseenter" popover-placement="bottom" ng-src="{{ actor.thumbnail }}"
                  alt="{{ actor.name }}"
                  style="width: 200px; height: 300px"/>
-
-            <h4>{{ actor.name }}</h4>
+            <center><h4>{{ actor.name }}</h4></center>
         </a>
     </div>
 </div>
