@@ -25,6 +25,8 @@ Yapo  e+ - Yet Another Porn Organizer (extended plus)
 
 - YAPO e+ will now strip the measurements field for a bra cup size, tag the actor with the cup size, and also tag with a breast size grouping (fx large or huge).
 
+- YAPO e+ will also tag an actor based on height. Actors of normal height (161-178 cm) won't be tagged.
+
 - There was a field in the actor table for tattoos. This now works, and tatto information shows up in the actor details.
 
 - A field has been added to register information about piercings. In addition, typical types of piercings are now sent to the actor tags.
