@@ -72,7 +72,7 @@ for them there, if you're running Windows. If you're running Linux, install FFMP
 
 4. Enjoy!
 
-====================================================================================================
+===================================================================================
 
 # YAPO
 YAPO - Yet Another Porn Organizer
