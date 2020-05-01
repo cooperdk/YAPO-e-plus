@@ -111,19 +111,18 @@ def search_freeones(actor_to_search, alias, force):
         free_ones_career_status_search = soup.findAll("p", {"class": "dashboard-bio-career-status-text"})
 
         free_ones_biography = "From freeones.com: " + free_ones_bio_search[0].text
-        # free_ones_career_status = "From freeones.com: " + free_ones_career_status_search[0].text
 
-        # print (free_ones_biography, free_ones_career_status)
-        # img class="middle bordered babeinfoblock-thumb"
+        print("Looking for image")
         try:
+            #print("Scanning...")
             profile_thumb = soup.find("img", {'class': 'middle bordered babeinfoblock-thumb'})
+            #print("Find it...")
             profile_thumb_parent = profile_thumb.parent
-
-        #print(profile_thumb_parent)
+            #print("Getting parent...")
+            #print(profile_thumb_parent['href'])
             has_image = False
 
-        
-            #print(profile_thumb_parent['href'])
+           
             if len(profile_thumb_parent['href'])>3:     
                 has_image = True
         except:
@@ -151,18 +150,20 @@ def search_freeones(actor_to_search, alias, force):
         if has_image:
             images_page = profile_thumb_parent['href']
 
-            r = requests.get(images_page, verify=False)
-            #print("images page is " + images_page + "\n ^ That is all.")
-            soup = BeautifulSoup(r.content, "html5lib")
+            if ("freeones.com" in images_page.lower()):
+                r = requests.get(images_page, verify=False)
+                #print("There is at least one picture on Freeones.\nURL: " + images_page + ".")
+                soup = BeautifulSoup(r.content, "html5lib")
 
             if actor_to_search.thumbnail == const.UNKNOWN_PERSON_IMAGE_PATH or force:
-                if soup.find("div", {'id': 'PictureList'}):
-
+                if not("freeones.com" in images_page.lower()): print("There is a picture link, but it's not on Freeones, so not going there.")
+                elif soup.find("div", {'id': 'PictureList'}):
+                    print("There is a picture link, and it is on Freeones, so going there.")
                     picture_list = soup.find("div", {'id': 'PictureList'})
 
                     if picture_list.find("a"):
                         first_picture = picture_list.find("a")
-                        #print(str(picture_list) + "is first_picture")
+                        print("Found a picture that might be usable, I'm saving that...")
                         save_path = os.path.join(videos.const.MEDIA_PATH, 'actor/' + str(actor_to_search.id) + '/profile/')
                         print("Profile pic path: " + save_path)
                         save_file_name = os.path.join(save_path, 'profile.jpg')
@@ -172,18 +173,17 @@ def search_freeones(actor_to_search, alias, force):
                             if first_picture['href']:
                                 if re.match(r'^\/\/', first_picture['href']):
                                         first_picture_link = "https:" + first_picture['href']
-                                        print(first_picture_link)
                                         aux.save_actor_profile_image_from_web(first_picture_link, actor_to_search,force)
-                                        print("Image Saved!")
+                                        print(first_picture_link+" - Image Saved!")
                                 elif re.match(r'^.*jpg$', first_picture['href']):
                                         first_picture_link = first_picture['href']
-                                        print(first_picture_link)
                                         aux.save_actor_profile_image_from_web(first_picture_link, actor_to_search,force)
-                                        print("Image Saved!")
+                                        print(first_picture_link+" - Image Saved!")
                                 else:
                                         print("No picture found!")
                         else:
-                            print("Skipping photo download, as there's already a photo for the profile.\nIt's probably from TMDB, therefore a better one.")
+                            print("Skipping photo download, as there's already a photo for the profile.")
+
         #remember to remark:
         #actor_to_search.last_lookup = datetime.datetime.now()
         #actor_to_search.save()
@@ -230,29 +230,29 @@ def search_freeones(actor_to_search, alias, force):
                     height = height.group(1)
                     actor_to_search.height = height
                 height=int(actor_to_search.height)
-                done=False
-                if not done and height is not None:
+                doneX=False
+                if not doneX and height is not None:
                     if height > 110:
                         if  height < 148:
                             insert_actor_tag(actor_to_search, "Extremely tiny actor")
                             print("Added tag: Extremely tiny actor")
-                            done=True
+                            doneX=True
                         if 148 < height < 152:
                             insert_actor_tag(actor_to_search, "Tiny actor")
                             print("Added tag: Tiny actor")
-                            done=True
+                            doneX=True
                         if 152 < height < 161:
                             insert_actor_tag(actor_to_search, "Petite actor")
                             print("Added tag: Petite actor")
-                            done=True
+                            doneX=True
                         if 178 < height < 186:
                             insert_actor_tag(actor_to_search, "Tall actor")
                             print("Added tag: Tall actor")
-                            done=True
+                            doneX=True
                         if 186 < height < 220:
                             insert_actor_tag(actor_to_search, "Extremely tall actor")
                             print("Added tag: Extremely tall actor")
-                            done=True
+                            doneX=True
                         
                 
             elif link_text == 'Weight:':
@@ -284,50 +284,49 @@ def search_freeones(actor_to_search, alias, force):
                     cupSizePart=[cupSize]
         
                     try:
-                        success=True
-                        done=False
+                        doneY=False
                         actor_to_search.last_lookup = datetime.datetime.now()
-                        while not done:
+                        while not doneY:
                             for cupSizePart in cupSize:
                                 if (cupSizePart in accepted_stringsTiny):
                                     insert_actor_tag(actor_to_search, "Tiny tits")
                                     print("Added tag: Tiny tits")
-                                    done=True
+                                    doneY=True
 
                                 if (cupSizePart in accepted_stringsSmall):
                                     insert_actor_tag(actor_to_search, "Small tits")
                                     print("Added tag: Small tits")
-                                    done=True
+                                    doneY=True
 
                                 if (cupSizePart in accepted_stringsReg):
                                     insert_actor_tag(actor_to_search, "Medium tits")
                                     print("Added tag: Medium tits")
-                                    done=True
+                                    doneY=True
                         
                                 elif (cupSizePart in accepted_stringsBig):
                                     insert_actor_tag(actor_to_search, "Big tits")
                                     print("Added tag: Big tits")
-                                    done=True
+                                    doneY=True
 
                                 elif (cupSizePart in accepted_stringsVBig):
                                     insert_actor_tag(actor_to_search, "Very big tits")                  
                                     print("Added tag: Very big tits")
-                                    done=True
+                                    doneY=True
 
                                 elif (cupSizePart in accepted_stringsHuge):
                                     insert_actor_tag(actor_to_search, "Huge tits")    
                                     print("Added tag: Huge tits")
-                                    done=True
+                                    doneY=True
 
                                 elif (cupSizePart in accepted_stringsMassive):
                                     insert_actor_tag(actor_to_search, "Massively huge tits")     
                                     print("Added tag: Massively huge tits")
-                                    done=True
+                                    doneY=True
 
                                 elif (cupSizePart in accepted_stringsExtreme):
                                     insert_actor_tag(actor_to_search, "Extremely huge tits")                            
                                     print("Added tag: Extremely huge tits")
-                                    done=True
+                                    doneY=True
                     
                                 if done: break
                             if done: break

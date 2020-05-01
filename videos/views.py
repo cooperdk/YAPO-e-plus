@@ -9,9 +9,9 @@ from django.shortcuts import render
 import json
 import videos.addScenes
 import videos.filename_parser as filename_parser
-import videos.freeones_search
-import videos.imdb_search
-import videos.tmdb_search
+import videos.scrapers.freeones as scraper_freeones
+import videos.scrapers.imdb as scraper_imdb
+import videos.scrapers.tmdb as scraper_tmdb
 from videos import ffmpeg_process
 import urllib.request
 # For REST framework
@@ -40,7 +40,7 @@ from django.utils.datastructures import MultiValueDictKeyError
 import threading
 from django.db import connection
 # import pathlib
-
+from videos import sizecheck
 
 # Aux Functions
 
@@ -264,29 +264,29 @@ def scrape_all_actors(force):
         if not force:
             if actor.last_lookup is None:
                 print("Searching in TMDb")
-                videos.tmdb_search.search_person_with_force_flag(actor, False)
+                scraper_tmdb.search_person_with_force_flag(actor, False)
                 print("Finished TMDb search")
                 print("Searching IMDB...")
-                videos.imdb_search.search_imdb_with_force_flag(actor, False)
+                scraper_imdb.search_imdb_with_force_flag(actor, False)
                 print("Finished IMDB Search")
                 if actor.gender != 'M':
                     print("Searching in Freeones")
-                    videos.freeones_search.search_freeones_with_force_flag(actor, True)
+                    scraper_freeones.search_freeones_with_force_flag(actor, True)
                     print("Finished Freeones search")
             else:
                 print("{} was already searched...".format(actor.name))
         else:
            
             print("Searching in TMDb")
-            videos.tmdb_search.search_person_with_force_flag(actor, True)
+            scraper_tmdb.search_person_with_force_flag(actor, True)
             print("Finished TMDb search")
             print("Searching IMDB...")
-            videos.imdb_search.search_imdb_with_force_flag(actor, True)
+            scraper_imdb.search_imdb_with_force_flag(actor, True)
             print("Finished IMDB Search")
             
             if actor.gender != 'M':
                 print("Searching in Freeones")
-                videos.freeones_search.search_freeones_with_force_flag(actor, True)
+                scraper_freeones.search_freeones_with_force_flag(actor, True)
                 print("Finished Freeones search")
 
 def tag_all_scenes(ignore_last_lookup):
@@ -352,9 +352,9 @@ class ScrapeActor(views.APIView):
             actor_to_search = Actor.objects.get(pk=actor_id)
             success = False
             if force:
-                success = videos.tmdb_search.search_person_with_force_flag(actor_to_search, True)
+                success = scraper_tmdb.search_person_with_force_flag(actor_to_search, True)
             else:
-                success = videos.tmdb_search.search_person_with_force_flag(actor_to_search, False)
+                success = scraper_tmdb.search_person_with_force_flag(actor_to_search, False)
             if success:
                 return Response(status=200)
 
@@ -366,9 +366,9 @@ class ScrapeActor(views.APIView):
             actor_to_search = Actor.objects.get(pk=actor_id)
             success = False
             if force:
-                success = videos.freeones_search.search_freeones_with_force_flag(actor_to_search, True)
+                success = scraper_freeones.search_freeones_with_force_flag(actor_to_search, True)
             else:
-                success = videos.freeones_search.search_freeones_with_force_flag(actor_to_search, False)
+                success = scraper_freeones.search_freeones_with_force_flag(actor_to_search, False)
 
             if success:
                 return Response(status=200)
@@ -381,9 +381,9 @@ class ScrapeActor(views.APIView):
             actor_to_search = Actor.objects.get(pk=actor_id)
             success = False
             if force:
-                success = videos.imdb_search.search_imdb_with_force_flag(actor_to_search, True)
+                success = scraper_imdb.search_imdb_with_force_flag(actor_to_search, True)
             else:
-                success = videos.imdb_search.search_imdb_with_force_flag(actor_to_search, False)
+                success = scraper_imdb.search_imdb_with_force_flag(actor_to_search, False)
 
             if success:
                 return Response(status=200)

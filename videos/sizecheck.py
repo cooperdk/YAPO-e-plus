@@ -1,7 +1,7 @@
 import os
 import videos.const
 import urllib.request
-from videos.models import Scene
+from videos.models import Scene, Actor, Website, ActorTag, SceneTag
 import videos.views
 
 def getSizeAll():
@@ -30,9 +30,25 @@ def sizeFormat(b):
 
 def getStarted():
     size = getSizeAll()
-    print("\nThe videos registered totally take up "+str(size)+".\n\n")
+    row=Actor.objects.raw("SELECT COUNT(*) AS total, id FROM videos_actor") #cursor.fetchone()
+    if row[0].total is not None:
+        act=str(row[0].total)
+    row=Scene.objects.raw("SELECT COUNT(*) AS total, id FROM videos_scene") #cursor.fetchone()
+    if row[0].total is not None:
+        sce=str(row[0].total)
+    row=ActorTag.objects.raw("SELECT COUNT(*) AS total, id FROM videos_actortag") #cursor.fetchone()
+    if row[0].total is not None:
+        acttag=str(row[0].total)
+    row=SceneTag.objects.raw("SELECT COUNT(*) AS total, id FROM videos_scenetag") #cursor.fetchone()
+    if row[0].total is not None:
+        sctag=str(row[0].total)        
+    print("\nCurrently, there are "+sce+" videos registered in YAPO e+.\nThey take up "+str(size)+" of disk space.")
+    print("There are "+sctag+" tags available for video clips.")
+    print("\nThere are " +act+" actors in the database.\nThese actors have "+acttag+" usable tags.")
 
 
+
+    print("\n")
 class ready():
 
 
