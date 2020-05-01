@@ -1,7 +1,7 @@
 # YAPO e+
 Yapo  e+ - Yet Another Porn Organizer (extended plus)
 
-#### This is an unoffical branch of the original YAPO, on which I'making improvements. Find the original readme at the bottom (delimited with a line of "=" signs).
+#### This is a branch of the original YAPO on which I'making improvements. Find the original readme at the bottom (delimited with a line of "=" signs).
 #### There is a setup available for an easy install.
 #### There is also a copy of the setup with pre-registered actors, websites and tags (thousands of them). It will be available on Patreon shortly.
 ####
@@ -72,7 +72,7 @@ for them there, if you're running Windows. If you're running Linux, install FFMP
 
 4. Enjoy!
 
-================================================================================
+===================================================================================
 
 # YAPO
 YAPO - Yet Another Porn Organizer
