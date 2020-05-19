@@ -306,13 +306,34 @@ def tag_all_scenes(ignore_last_lookup):
             scene_tag_to_add = SceneTag.objects.get(name=actorTag.name)
             actorTag.scene_tags.add(scene_tag_to_add)
             print(
-                "Added scene tag {} ot actor tag {}".format(SceneTag.objects.filter(name=actorTag.name), actorTag.name))
+                "Added scene tag {} to actor tag {}".format(SceneTag.objects.filter(name=actorTag.name), actorTag.name))
 
-    filename_parser.parse_all_scenes(ignore_last_lookup)
+    filename_parser.parse_all_scenes(False)
 
     return Response(status=200)
 
+def tag_all_scenes_ignore_last_lookup(ignore_last_lookup):
+    f = open('../YAPO/settings.json', 'r')
+    x = f.read()
 
+    settings_content = json.loads(x)
+    f.close()
+
+    current_setting_version = int(settings_content['settings_version'])
+    if current_setting_version < 3:
+
+        for actorTag in ActorTag.objects.all():
+            if not SceneTag.objects.filter(name=actorTag.name):
+                SceneTag.objects.create(name=actorTag.name)
+
+            scene_tag_to_add = SceneTag.objects.get(name=actorTag.name)
+            actorTag.scene_tags.add(scene_tag_to_add)
+            print(
+                "Added scene tag {} to actor tag {}".format(SceneTag.objects.filter(name=actorTag.name), actorTag.name))
+
+    filename_parser.parse_all_scenes(True)
+
+    return Response(status=200)
 
     # scenes = Scene.objects.all()
     # scene_count = scenes.count()
@@ -711,16 +732,22 @@ def settings(request):
 
             return Response(status=200)
 
-        if 'tagAllScenes' in request.query_params:
-            if request.query_params['tagAllScenes'] == "True":
-                if request.query_params['ignoreLastLookup'] == "True":
-                    threading.Thread(target=tag_all_scenes,
-                                     args=(True,)).start()
-                else:
-                    threading.Thread(target=tag_all_scenes,
-                                     args=(False,)).start()
+
+        if 'tagAllScenesIgnore' in request.query_params:
+            
+            threading.Thread(target=tag_all_scenes_ignore_last_lookup,
+                args=(True,)).start()
+                    # _thread.start_new_thread(tag_all_scenes_ignore_last_lookup, (), )
+            return Response(status=200)
+
+        elif 'tagAllScenes' in request.query_params:
+            
+            threading.Thread(target=tag_all_scenes,
+                args=(False,)).start()
                     # _thread.start_new_thread(tag_all_scenes, (), )
-                return Response(status=200)
+            return Response(status=200)
+
+
 
         if 'checkDupes' in request.query_params:
             if request.query_params['checkDupes'] == "True":

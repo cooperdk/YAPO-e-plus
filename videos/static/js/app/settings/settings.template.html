@@ -14,15 +14,15 @@
             popover-trigger="mouseenter" popover-placement="right-top">
     <span class="glyphicon glyphicon-user"></span> Scrape All Actors
     </button>
-
+	<span style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>
     <button type="button" ng-click="$ctrl.tagAllScenes()" class="btn btn-default btn-sm"
-            uib-popover-html="'Checks all scenes in the database against all known Tags, Websites and Actors and tags them with the correct information.'"
+            uib-popover-html="'Checks all scenes in the database against all known Tags, Websites and Actors and adds any new tags to the scenes.'"
             popover-trigger="mouseenter" popover-placement="right-top"
     >
-    <span class="glyphicon glyphicon-user"
-    ></span> Tag All Scenes
+    <span class="glyphicon glyphicon-tag"
+    ></span> Tag New Scenes
     </button>
-    <label
+    <!--<label
             uib-popover-html="'If checked, will ignore the last <b>Tag All Scenes</b> lookup date and will search for all Tags, Actors and Websites in all the scenes
     as though they were never searched before.'"
             popover-trigger="mouseenter" popover-placement="right-top"
@@ -30,7 +30,17 @@
         Ignore Last Lookup?
 
         <input type="checkbox" ng-model="$ctrl.ignore_last_lookup">
-    </label>
+    </label>-->
+	
+	    <button type="button" ng-click="$ctrl.tagAllScenesIgnore()" class="btn btn-default btn-sm"
+            uib-popover-html="'Checks all scenes in the database against all known Tags, Websites and Actors and adds all tags.<br>Will search for all  <b>Tag All Scenes</b>  Tags, Actors and Websites in all the scenes
+    as though they were never searched before.'"
+            popover-trigger="mouseenter" popover-placement="right-top"
+    >
+    <span class="glyphicon glyphicon-tag"
+    ></span> Force Retag All Scenes
+    </button>
+	
 	<span style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>
     <button type="button" ng-click="$ctrl.checkDupe()" class="btn btn-default btn-sm"
             uib-popover-html="'Checks for duplicate files (filename as well as hashes). THIS TAKES TIME. Check the console for output.'"
@@ -48,8 +58,9 @@
     ></span> Clean Database
     </button>
 
+	<span style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>
 
-    <label>Items Per page:</label>
+    <label>Set Items Per page:</label>
     <select ng-model="$ctrl.itemsPerPage" ng-change="$ctrl.changeNumberOfItemsPerPage()">
         <option> 25</option>
         <option> 50</option>

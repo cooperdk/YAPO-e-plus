@@ -5,9 +5,11 @@ import django
 import hashlib
 from django.utils import timezone
 from videos import const
+from videos.scrapers import filenames
 import json
 from multiprocessing import Pool, Lock
 import fnmatch
+import time
 
 django.setup()
 
@@ -71,6 +73,7 @@ def if_new_websites():
 
 
 def parse_all_scenes(ignore_last_lookup):
+
     actors = list(Actor.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
     actors_alias = list(ActorAlias.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
     scene_tags = list(SceneTag.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
@@ -82,7 +85,9 @@ def parse_all_scenes(ignore_last_lookup):
 
     if ignore_last_lookup:
         for scene in scenes:
-            print("Scene {} out of {}".format(counter, scene_count))
+            percent=(counter/scene_count)*100
+            os.system('cls' if os.name == 'nt' else 'clear')
+            print("{}% done - scene {} out of {} - ignoring last lookup".format(int(percent), counter, scene_count))
 
             filtered_alias = filter_alias(actors_alias)
 
@@ -128,7 +133,9 @@ def parse_all_scenes(ignore_last_lookup):
                 websites = list()
 
             for scene in scenes:
-                print("Scene {} out of {}".format(counter, scene_count))
+                percent=(counter/scene_count)*100
+                os.system('cls' if os.name == 'nt' else 'clear')
+                print("{}% done - scene {} out of {} - not ignoring last lookup".format(int(percent), counter, scene_count))
 
                 if (a[0]) or (b[0]) or (c[0]) or (d[0]):
                     parse_scene_all_metadata(scene, actors, actors_alias, scene_tags,
@@ -184,7 +191,7 @@ def parse_all_scenes(ignore_last_lookup):
 
 
 def parse_scene_all_metadata(scene, actors, actors_alias, scene_tags, websites):
-    print("Parsing scene path: {} for actors, tags, and websites...".format(scene.path_to_file))
+    print("Parsing scene path:\r\n{}\r\n\r\n".format(scene.path_to_file))
 
     scene_path = scene.path_to_file.lower()
 
@@ -201,13 +208,25 @@ def parse_scene_all_metadata(scene, actors, actors_alias, scene_tags, websites):
     print("Looking for scene tags...")
     scene_path = parse_scene_tags_in_scene(scene, scene_path, scene_tags)
 
-    print("Hashing scene...")
-    scene.hash = get_hash(scene.path_to_file)  # NEW HASHER
-    print("Hashed scene, ID " + scene.hash)	
+    print("\r\nMatching scene name to studio releases... ",end="")
+    site = filenames.parse(scene.name)
+    if site != "None":
+        print(site)
+    else:
+        print("")
 
+
+    if not (scene.hash):
+        print("\r\nHashing scene... ",end="")
+        scene.hash = get_hash(scene.path_to_file)  # NEW HASHER
+        print("ID: " + scene.hash)	
+    else:
+        print("Scene already hashed ("+scene.hash+")")
     scene.last_filename_tag_lookup = datetime.datetime.now()
 
-    print("Finished parsing scene: {}'s path... setting Last lookup to {}".format(scene.name, scene.last_filename_tag_lookup))
+
+
+    print("\r\nFinished parsing scene, touching last lookup")
 
     scene.save()
 

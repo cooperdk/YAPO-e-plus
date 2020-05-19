@@ -48,77 +48,38 @@ def search_freeones(actor_to_search, alias, force):
         actor_to_search = Actor.objects.get(name=actor_to_search.name)
     name = actor_to_search.name
     
-#    actor_to_search.last_lookup = datetime.datetime.now()
-#    actor_to_search.last_lookup = datetime.datetime.now()
-#    actor_to_search.save()
-#    save_path = os.path.join(videos.const.MEDIA_PATH, 'actor/' + str(actor_to_search.id) + '/profile/')
-#    save_file_name = os.path.join(save_path, 'profile.jpg')
-#    print(save_file_name)
-#    if os.path.isfile(save_file_name):
-#        print("Skipping, as there's already a photo for the profile.")
-#        return
-
-    # https://www.iafd.com/results.asp?searchtype=comprehensive&searchstring=isis+love
     if alias:
         name_with_plus = alias.name.replace(' ', '+')
         name_with_dash = alias.name.replace(' ', '-')        
-        print("Searching Freeones for: " + actor_to_search.name + " alias: " + alias.name+"...",end="")
+        print("searching AKA: " + alias.name+"... ",end="")
         name = alias.name
     else:
         name_with_plus = name.replace(' ', '+')
         name_with_dash = name.replace(' ', '-')
-        print("Searching Freeones for: " + actor_to_search.name + " as " + name+"...",end="")
+        print("Searching Freeones for: " + actor_to_search.name + "... ",end="")
     r = requests.get("https://www.freeones.com/babes?q=" + name_with_dash, verify=False)
-    #print("Working with " + "https://www.freeones.com/babes?q=" + name_with_dash + "...")
+
     soup = BeautifulSoup(r.content, "html5lib")
 
-
-    # link = soup.find_all("a", {"text": "Isis Love"})
-
     soup_links = soup.find_all("a")
-    #print (soup_links)
+
     href_found = match_link_to_query(soup_links, name_with_dash)
-    # if not href_found:
-    #     table = soup.find("div", {"class": "ContentBlockBody Block3"})
-    #     tr_list = table.find_all("tr")
-    #     first_line = tr_list[1]
-    #     for tr in tr_list:
-    #         td_list = tr.find_all("td")
-    #         for td in td_list:
-    #             if "100%" in td.text:
-    #                 correct_td = td
-    #                 print (correct_td)
-    #
-    #                 tr_links = tr.find_all("a")
-    #                 for tr_link in tr_links:
-    #                     if tr_link.has_attr('onmouseover'):
-    #                         print (tr_link['href'])
-    #
-    #     relevance = first_line("td", {"class": "right top"})
-    #     if relevance.text.strip("',/\n/\t") == "100%":
-    #         tr_in_first_line = first_line.find_all("tr")
-    #         temp = tr_in_first_line[4]
-    #         link_in_first_line = temp.find("a")
-    #         actual_link = link_in_first_line['href']
-    #         href_found = actual_link
+
 
     if href_found:
         success = True
-        print("Found.")
+        print("\nI found " + actor_to_search.name + ", so I am looking for information on her profile page.")
         actor_to_search.gender = 'F'
         actor_to_search.save()
         actor_page = urllib_parse.urljoin("https://www.freeones.com/", href_found)
         r = requests.get(actor_page, verify=False)
-        #print (actor_page)
+
         soup = BeautifulSoup(r.content, "html5lib")
         soup_links = soup.find_all("a")
-        #print(soup_links)
         href_found = "/"+name_with_dash + "/profile" #match_text_in_link_to_query(soup_links, "Profile")
-        #print("Found Profile text: " + href_found)
         free_ones_bio_search = soup.find_all("div", {"class": "js-read-more-text read-more-text-ellipsis"})
-        #print(free_ones_bio_search)
         free_ones_career_status_search = soup.find_all("p", {"class": "dashboard-bio-career-status-text"})
-        free_ones_biography = free_ones_bio_search[0].text.strip()
+        free_ones_biography = free_ones_bio_search[0].get_text(strip=True)
         free_ones_country_search = soup.find_all("p", {"class": "color-text-dark font-size-xs font-weight-bold mb-1"})
         for link in free_ones_country_search:
             next_td_tag = link.findNext('p')
@@ -132,18 +93,16 @@ def search_freeones(actor_to_search, alias, force):
         #print("Bio: " + free_ones_biography)
         #print("Looking for a profile image... ", end = "")
         has_image=False
+        print("11%",end="\r",flush=True)
         try:
-            #print("Scanning...")
             profile_thumb = soup.find("img", {'class': 'img-fluid'})
-            #print("Find it...")
             profile_thumb_parent = profile_thumb.parent
-            #print("Getting parent...")
             href=profile_thumb_parent['href']
             if href[0]=="/": href = "https://www.freeones.com" + href
-            #print(href)
             has_image = False
             if len(href)>3:     
                 has_image = True
+                print("12%",end="\r",flush=True)
         except:
             #print("Parse Error - not getting any image.")
             pass
@@ -201,45 +160,49 @@ def search_freeones(actor_to_search, alias, force):
 
         soup_links = soup.find_all("p", {'class': ['heading', 'mb1']})
         #print (soup_links)
-        num = 1
+        num = 0
         for link in soup_links:
             #print (link)
             next_td_tag = link.findNext('p')
             link_text = link.text.strip("',/\n/\t")  #link.get_text(strip=True)  #.strip("',/\r\n/\t")   #link.text.strip("',/\n/\t") get_text()
             #print (str(num) + ": " + link_text)
-            num=+1
+            num+=1
+
             if link_text == 'Ethnicity':
                 print("60%",end="\r",flush=True)
-                #print("E: ",end="")
-                next_td_tag = link.findNext('p')
-                next_td_tag = link.findNext('p')
-                ethnicity = next_td_tag.get_text(strip=True)  #next_td_tag.text.strip("',/\n/\t")
-                #print(ethnicity)
                 if not actor_to_search.ethnicity:
+                    #print("E: ",end="")
+                    next_td_tag = link.findNext('p')
+                    next_td_tag = link.findNext('p')
+                    ethnicity = next_td_tag.get_text(strip=True)  #next_td_tag.text.strip("',/\n/\t")
+                    #print(ethnicity)
                     actor_to_search.ethnicity = ethnicity
+                #else:
+                    #ethnicity = actor_to_search.ethnicity 
+
             elif link_text == 'Personal Information':
                 print("40%",end="\r",flush=True)
-                #print(next_td_tag.text)
-                if next_td_tag.text.strip("',/\n/\t"):
-                    
-                    free_ones_date_of_birth = next_td_tag.get_text(strip=True) #.strip("',/\n/\t")
-                    free_ones_date_of_birth = free_ones_date_of_birth.replace("Born On ", "")
-                    #print("DOB - " + free_ones_date_of_birth )
-                    if re.search(r'(\w+ \d{1,2}, \d{4})', free_ones_date_of_birth):
-                        parse_date_time = re.search(r'(\w+ \d{1,2}, \d{4})', free_ones_date_of_birth)
-                        if parse_date_time.group(0):
-                            parse_date_time = parse_date_time.group(0)
-                            parse_date_time = parse(parse_date_time.encode('utf-8'), fuzzy=True, ignoretz=True)
-                            actor_to_search.date_of_birth = parse_date_time
-                            print("45%",end="\r",flush=True)
-
+                if not actor_to_search.date_of_birth:
+                    #print(next_td_tag.text)
+                    if next_td_tag.text.strip("',/\n/\t"):
+                        free_ones_date_of_birth = next_td_tag.get_text(strip=True) #.strip("',/\n/\t")
+                        free_ones_date_of_birth = free_ones_date_of_birth.replace("Born On ", "")
+                        #print("DOB - " + free_ones_date_of_birth )
+                        if re.search(r'(\w+ \d{1,2}, \d{4})', free_ones_date_of_birth):
+                            parse_date_time = re.search(r'(\w+ \d{1,2}, \d{4})', free_ones_date_of_birth)
+                            if parse_date_time.group(0):
+                                parse_date_time = parse_date_time.group(0)
+                                parse_date_time = parse(parse_date_time.encode('utf-8'), fuzzy=True, ignoretz=True)
+                                actor_to_search.date_of_birth = parse_date_time
+                                print("45%",end="\r",flush=True)
 
             elif link_text == 'Aliases':
                 print("50%",end="\r",flush=True)
                 try:
                     actor_aliases = next_td_tag.text.strip("'/\n/\t")
-                    actor_aliases = actor_aliases.replace(", ", ",")
-                    insert_aliases(actor_to_search, actor_aliases)
+                    if not("Unknown" in actor_aliases):
+                        actor_aliases = actor_aliases.replace(", ", ",")
+                        insert_aliases(actor_to_search, actor_aliases)
                 except:
                     pass
             elif link_text == 'Height':
@@ -393,11 +356,12 @@ def search_freeones(actor_to_search, alias, force):
                     piercings = next_td_tag.get_text(strip=True)  #text.strip("'/\n/\t")
                     actor_to_search.piercings = piercings
                     #print ("Piercings: " + piercings)
+ 
             elif link_text == 'Additional Information':
-
                 if not actor_to_search.extra_text:
                     actor_to_search.extra_text = next_td_tag.get_text(strip=True)   #text.strip("'/\n/\t")
                     #print("Additional information saved.")
+
             elif link_text == 'Fake Boobs':
                 print("98%",end="\r",flush=True)
                 fake_boobs = next_td_tag.get_text(strip=True) #.strip("',/\n/\t")
@@ -407,18 +371,20 @@ def search_freeones(actor_to_search, alias, force):
                 else:
                     insert_actor_tag(actor_to_search, "Natural tits")
                     #print("Her tits are natural, added that tag")
+
             elif link_text == 'Eye Color':
                 print("70%",end="\r",flush=True)
                 eye_color = next_td_tag.get_text(strip=True) #text.strip("',/\n/\t")
                 eye_color = eye_color.title() + " eyes"
-                if eye_color:
+                if eye_color and len(eye_color)>7:
                     insert_actor_tag(actor_to_search, eye_color)
                     #print (eye_color)
+
             elif link_text == 'Hair Color':
                 print("72%",end="\r",flush=True)
                 hair_color = next_td_tag.get_text(strip=True) #text.strip("',/\n/\t")
                 hair_color = hair_color.title() + ' hair'
-                if hair_color:
+                if hair_color and len(hair_color)>7:
                     insert_actor_tag(actor_to_search, hair_color)
                     #print (hair_color)
                     
@@ -458,28 +424,32 @@ def search_freeones(actor_to_search, alias, force):
             actor_to_search.description = free_ones_biography
             #print("There's no description or it's too short, so it's added from Freeones.")
         print("99%",end="\r",flush=True)
-        if "Black" in ethnicity:
-            insert_actor_tag(actor_to_search, "Black")
-            #print ("Adding Ethnicity: Black")
-        elif "Asian" in ethnicity:
-            insert_actor_tag(actor_to_search, "Asian")
-            #print ("Adding Ethnicity: Asian")
-        elif "Latin" in ethnicity:
-            insert_actor_tag(actor_to_search, "Latin")
-            #print ("Adding Ethnicity: Latin")
-        elif "Caucasian" in ethnicity:
-            insert_actor_tag(actor_to_search, "Caucasian")
-            #print ("Adding Ethnicity: Caucasian")
-        elif "Middle Eastern" in ethnicity:
-            insert_actor_tag(actor_to_search, "Middle Eastern")
-            #print ("Adding Ethnicity: Middle Eastern")
-        elif "Arabic" in ethnicity:
-            insert_actor_tag(actor_to_search, "Arabic")
-            #print ("Adding Ethnicity: Arabic")
-        elif "Inuit" in ethnicity:
-            insert_actor_tag(actor_to_search, "Inuit")
-            #print ("Adding Ethnicity: Inuit")
-
+        try:
+            if ethnicity is not None:
+                if "Black" in ethnicity:
+                    insert_actor_tag(actor_to_search, "Black")
+                    #print ("Adding Ethnicity: Black")
+                elif "Asian" in ethnicity:
+                    insert_actor_tag(actor_to_search, "Asian")
+                    #print ("Adding Ethnicity: Asian")
+                elif "Latin" in ethnicity:
+                    insert_actor_tag(actor_to_search, "Latin")
+                    #print ("Adding Ethnicity: Latin")
+                elif "Caucasian" in ethnicity:
+                    insert_actor_tag(actor_to_search, "Caucasian")
+                    #print ("Adding Ethnicity: Caucasian")
+                elif "Middle Eastern" in ethnicity:
+                    insert_actor_tag(actor_to_search, "Middle Eastern")
+                    #print ("Adding Ethnicity: Middle Eastern")
+                elif "Arabic" in ethnicity:
+                    insert_actor_tag(actor_to_search, "Arabic")
+                    #print ("Adding Ethnicity: Arabic")
+                elif "Inuit" in ethnicity:
+                    insert_actor_tag(actor_to_search, "Inuit")
+                    #print ("Adding Ethnicity: Inuit")
+        except:
+            pass
+            
         print("100%",end="\r",flush=True)
         aux.send_piercings_to_actortag(actor_to_search)
     #    updatepiercings.sendAllPiercings()
@@ -492,17 +462,23 @@ def search_freeones(actor_to_search, alias, force):
         actor_to_search.last_lookup = datetime.datetime.now()
         actor_to_search.save()
 
-    #try:
+    try:
         #print("Inserted extra additional information:")
-        #if ethnicity is not None: print("Ethnicity: " + ethnicity)
-        #if ctry is not None: print("Country: " + ctry)
-        #if parse_date_time is not None: print("DOB: " + str(parse_date_time))
-        #if actor_aliases is not None: print("Aliases: " + actor_aliases)
-        #if height is not None: print("Height: " + str(height))
-        #if weight is not None: print("Weight: " + str(weight))
-        #if eye_color is not None: print("Eye color: " + eye_color)
-        #if hair_color is not None: print("Hair color: " + hair_color)
-    #except: pass
+        if ethnicity is not None: print("Ethnicity: " + ethnicity + " was added")
+        if ctry is not None: print("Country: " + ctry + " was added")
+        if parse_date_time is not None: print("Date of birth: " + str(parse_date_time + " was added"))
+        if actor_aliases is not None: print("Aliases: " + actor_aliases + " were added")
+        if height is not None: print("Height: " + str(height) + " was added")
+        if weight is not None: print("Weight: " + str(weight) + " was added")
+        if eye_color is not None: print("Eye color: " + eye_color + " was added")
+        if hair_color is not None: print("Hair color: " + hair_color + " was added")
+    except: pass
+    
+    try:
+        print("Traversed " + str(num) + " text tags from the Freeone profile page, and I am done with " + actor_to_search.name + ".")
+    except:
+        pass
+
     return success
 
 def strip_bad_chars(name):
@@ -551,10 +527,11 @@ def match_link_to_query(soup_links, text_to_find):
     for link in soup_links:
         try:
             if link.get("href").replace('/', '').lower() == text_to_find.lower():
-                print(link.get("href"))
+            #    print(link.get("href"))
                 ans = link.get("href")
                 break
-        except: print("Error")
+        except:
+            pass #print("Error")
     return ans
 
 def match_text_in_link_to_query(soup_links, text_to_find):
@@ -562,9 +539,9 @@ def match_text_in_link_to_query(soup_links, text_to_find):
     ct = 0
     for link in soup_links:
         if ct < 2: print (link.text.lower().strip())
-        ct=+1
+        ct+=1
         if link.text.lower() == text_to_find.lower():
-            print(link.text, link.get("href"))
+        #    print(link.text, link.get("href"))
             ans = link.get("href")
             break
     return ans

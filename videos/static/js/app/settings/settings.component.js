@@ -6,7 +6,7 @@ angular.module('settings').component('settings', {
 
                 var self = this;
                 self.response = "";
-                self.ignore_last_lookup = false;
+                //self.ignore_last_lookup = true;
 
                 // self.pathToVLC = "";
 
@@ -99,7 +99,7 @@ angular.module('settings').component('settings', {
                     $http.get('settings/', {
                         params: {
                             tagAllScenes: 'True',
-                            ignoreLastLookup: self.ignore_last_lookup
+                            ignore_last_lookup: 'False'
                         }
 
                     }).then(function (response) {
@@ -113,6 +113,24 @@ angular.module('settings').component('settings', {
                     
                 };
                 
+                self.tagAllScenesIgnore = function () {
+			    if (confirm("Are you sure? This may take a long time."))		{
+                    $http.get('settings/', {
+                        params: {
+                            tagAllScenesIgnore: 'True',
+                            ignore_last_lookup: 'True'
+                        }
+
+                    }).then(function (response) {
+                        // alert(angular.toJson(response));
+                        // self.response = response.data.vlc_path;
+                        // self.pathToVLC = response.data.vlc_path;
+                        // alert("Got response from server: " + self.pathToFolderToAdd);
+                    }, function errorCallback(response) {
+                        alert("Something went wrong!");
+                    });
+                }  
+                };
 				
                 self.cleanDatabase = function () {
                     $http.get('settings/', {
