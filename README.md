@@ -17,6 +17,8 @@ Yapo  e+ - Yet Another Porn Organizer (extended plus)
 
 #### NEW FEATURES:
 
+- Now supports the new Freeones site layout. The scraper now shows a 0-100% completion for each actor scrape.
+
 - As mentioned, we now offer website/producer logos in the website view, if the logo exists in videos/media/logos. Thanks to GernBlanston for sharing them.
 
 - New Python module requirements, it will be necessary to do "pip install --upgrade -r requirements.txt". If necessary, also "python manage.py makemigrations" and "python manage.py migrate"
@@ -41,7 +43,9 @@ Yapo  e+ - Yet Another Porn Organizer (extended plus)
 
 #### COMING NEXT:
 
-- Height groups still missing.
+- Soon: Automated importing of Trizkat's actor photo library
+- More scrapers
+- Experimental scene scraping
 
 #### PLANNED:
 
