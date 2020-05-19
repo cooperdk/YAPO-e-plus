@@ -17,7 +17,9 @@ Yapo  e+ - Yet Another Porn Organizer (extended plus)
 
 #### NEW FEATURES:
 
-- Now supports the new Freeones site layout. The scraper now shows a 0-100% completion for each actor scrape.
+- YAPO now supports the new Freeones site layout. The scraper now shows a 0-100% completion for each actor scrape.
+
+- YAPO will let you know if there's a new version on Github.
 
 - As mentioned, we now offer website/producer logos in the website view, if the logo exists in videos/media/logos. Thanks to GernBlanston for sharing them.
 
