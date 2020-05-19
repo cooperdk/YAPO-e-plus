@@ -47,11 +47,9 @@ def send_piercings_to_actortag(actor):
             insert_actor_tag (actor, "Pierced hip")
         elif "hips" in piercings.lower():
             insert_actor_tag (actor, "Pierced hips")
-        elif "labia" in piercings.lower():
+        if "labia" in piercings.lower():
             insert_actor_tag (actor, "Pierced labia")
-        elif "hips" in piercings.lower():
-            insert_actor_tag (actor, "Pierced hips")
-        elif "back dimples" in piercings.lower():
+        if "back dimples" in piercings.lower():
             insert_actor_tag (actor, "Pierced back dimples")
         if ("right brow" or "right eyebrow") in piercings.lower():
             insert_actor_tag (actor, "Pierced right eyebrow")
