@@ -1,5 +1,5 @@
 # YAPO e+
-###Yapo  e+ - Yet Another Porn Organizer (extended plus)
+##Yapo  e+ - Yet Another Porn Organizer (extended plus)
 
 #### This is a branch of the original YAPO on which I'making improvements. Find the original readme at the bottom (delimited with a line of "=" signs).
 There is a setup available for an easy install.
