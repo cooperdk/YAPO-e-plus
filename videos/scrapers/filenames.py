@@ -17,7 +17,7 @@ from bs4 import BeautifulSoup
 from dateutil.parser import parse
 import videos.const as const
 from django.utils import timezone
-from videos.scrapers import bangbros
+
 
 import requests.packages.urllib3
 requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
