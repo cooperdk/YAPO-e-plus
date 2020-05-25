@@ -1,9 +1,9 @@
     <center><h1 align="center"><a href="#" editable-text="$ctrl.website.name"
        onaftersave="$ctrl.update()" style="cursor:text">
-        {{ $ctrl.website.name || 'NA' }}</a>
-		<br><img style="width: 320px; cursor:default; border-style: none; border-bottom: none;" ng-src="media/logos/{{$ctrl.website.name | lowercase}}.png" onError=null;this.src="media/images/blank.png";this.style="width:0px;"> <!--{{$ctrl.website.thumbnail}}-->
+        {{ $ctrl.website.name || 'NA' }}</a></h1>
+		<div align="center"><img style="width: 320px; cursor:default; border-style: none; border-bottom: none;" ng-src="media/logos/{{$ctrl.website.name | lowercase}}.png" onError=null;this.src="media/images/blank.png";this.style="width:0px;"> <!--{{$ctrl.website.thumbnail}}--></div>
 <div ng-if="image.is404">Uh oh!  Image 404'd.</div></center>
-</h1>
+
 <div align="center">
     <h2>
         <uib-rating ng-model="$ctrl.website.rating" max="10" read-only="isReadonly" on-hover="hoveringOver(value)"
@@ -13,7 +13,7 @@
         <h3>This website is used {{$ctrl.website.scenes.length}} times </h3>
 
     </h2>
-    <label
+    <small><label
             uib-popover-html="'Aliases that will be used when auto-tagging scenes. You can specify multiple aliases by separating them with a comma.
             Also &quot;.&quot; is used to represent any character so an alias such as &quot;P.O.V&quot; will match &quot;pov&quot;,&quot;p1o2v&quot;,&quot;po?v&quot; etc...'"
             popover-trigger="mouseenter" popover-placement="right">
@@ -23,7 +23,17 @@
             {{ $ctrl.website.website_alias || 'no alias' }}
         </a>
     </label>
-    <br>
+	<br>
+	    	    <label
+            uib-popover-html="'The exclusions list prevent any words to trigger the website being tagged to a scene (fx the website Stepsiblings will be connected to every video on the website Stepsiblings Caught.<br>Using this field, you can enter &quot;stepsiblings&quot on the exclusion field for &quot;Stepsiblings Caught&quot; to avoid this. You can specify multiple exclusions by separating them with a comma.'"
+            popover-trigger="mouseenter" popover-placement="right">
+    Website Exclusions:
+    <a href="#" editable-textarea="$ctrl.website.exclusions" e-rows="5" e-cols="100"
+       onaftersave="$ctrl.update()">
+        {{ $ctrl.website.exclusions || 'no exclusions' }}
+    </a>
+    </label>
+    <br></small>
     <label>
         Website Scene Tags:
     </label>

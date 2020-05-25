@@ -43,7 +43,8 @@ def write_actors_to_file():
     file = open("actors.txt", "w")
 
     file.write(actors_string)
-    print(f'For backup purposes, we just wrote {numactors} actors in alphabetical form to actors.txt.\nThis can be imported by going to Add>Item Names and clicking "Add Actors".' )
+    print('For backup purposes, we just wrote all actors in alphabetical form to actors.txt.\r\nThis can be imported by going to Add>Item Names and clicking "Add Actors".' )
+    print("For successful recovery on a new setup, you must remove the actor photos\r\nin video/media/actors and re-scrape, as the actor IDs will have changed.\r\n")
     file.close()
 
 def getStarted():
@@ -71,18 +72,23 @@ def getStarted():
     write_actors_to_file()
 
     print("\n")
-    
+
     update = "././VERSION.md"
     if path.isfile(update):
         verfile  = open(update, "r") 
         ver = verfile.read()
         ver = str(ver).strip()
-        print("Version on disk: "+ver+", ",end="")
-        remoteVer = requests.get("https://raw.githubusercontent.com/cooperdk/YAPO-e-plus/master/VERSION.md").text
-        remoteVer = remoteVer.strip()
-        print("Github version: "+str(remoteVer))
+        print("--- Version on disk: "+ver)
+        try:
+            remoteVer = requests.get("https://raw.githubusercontent.com/cooperdk/YAPO-e-plus/master/VERSION.md").text
+            remoteVer = remoteVer.strip()
+        except:
+            remoteVer = "?REQUEST ERROR"
+            pass
+
+        #print("Github version: "+str(remoteVer))
         if str(ver)!=str(remoteVer):
-            print("*** A new version of YAPO e+ is available!")
+            print(chr(9608)+chr(9608)+chr(9608)+f' A new version of YAPO e+ is available ({remoteVer})! '+chr(9608)+chr(9608)+chr(9608))
         print("\r\n")
 
 

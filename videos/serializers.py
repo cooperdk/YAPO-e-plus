@@ -73,7 +73,7 @@ class WebsiteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Website
         fields = ['id', 'name', 'date_added', 'play_count', 'date_fav', 'date_runner_up', 'is_fav', 'is_runner_up',
-                  'rating', 'thumbnail', 'scenes', 'website_alias', 'scene_tags', 'scene_tags_with_names']
+                  'rating', 'thumbnail', 'scenes', 'website_alias', 'exclusions', 'scene_tags', 'scene_tags_with_names']
 
 
 class WebsiteIdNameSerailzier(serializers.ModelSerializer):
@@ -94,7 +94,7 @@ class SceneTagSerializer(serializers.ModelSerializer):
     class Meta:
         model = SceneTag
         fields = ['id', 'name', 'date_added', 'play_count', 'date_fav', 'date_runner_up', 'is_fav', 'is_runner_up',
-                  'rating', 'thumbnail', 'websites', 'scenes', 'scene_tag_alias']
+                  'rating', 'thumbnail', 'websites', 'scenes', 'scene_tag_alias', 'exclusions']
 
 
 class ActorAliasSerializer(serializers.ModelSerializer):
@@ -250,7 +250,7 @@ class ActorTagSerializer(serializers.ModelSerializer):
         model = ActorTag
         # depth = 1
         fields = ['id', 'name', 'date_added', 'date_fav', 'date_runner_up', 'play_count', 'is_fav', 'is_runner_up',
-                  'rating', 'thumbnail', 'actors', 'scene_tags']
+                  'rating', 'thumbnail', 'actors', 'scene_tags', 'exclusions']
 
 
 class PlaylistListSerializer(serializers.ModelSerializer):

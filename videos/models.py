@@ -34,6 +34,7 @@ class SceneTag(models.Model):
     rating = models.IntegerField(default=0)
     thumbnail = models.CharField(max_length=500, null=True, blank=True)
     scene_tag_alias = models.TextField(default="", blank=True)
+    exclusions = models.TextField(default="", null=True, blank=True)
     modified_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -51,6 +52,7 @@ class ActorTag(models.Model):
     rating = models.IntegerField(default=0)
     thumbnail = models.CharField(max_length=500, null=True, blank=True)
     actor_tag_alias = models.TextField(default="", blank=True)
+    exclusions = models.TextField(default="", null=True, blank=True)
     scene_tags = models.ManyToManyField(SceneTag, null=True, blank=True, related_name='actor_tags')
     modified_date = models.DateTimeField(auto_now=True)
 
@@ -123,6 +125,7 @@ class Website(models.Model):
     thumbnail = models.CharField(max_length=500,  null=True, blank=True) 
     scene_tags = models.ManyToManyField(SceneTag, blank=True, null=True, related_name='websites')
     website_alias = models.TextField(default="", blank=True)
+    exclusions = models.TextField(default="", null=True, blank=True)
     modified_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):

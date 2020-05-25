@@ -13,7 +13,15 @@
    <h3>This tag is used {{$ctrl.actorTag.actors.length}} times </h3>
 
     </h2>
-    
+    	    <label
+            uib-popover-html="'The exclusions list prevent any words to be auto-tagged. You can specify multiple exclusions by separating them with a comma.'"
+            popover-trigger="mouseenter" popover-placement="right">
+    Scene Tag Exclusions:
+    <a href="#" editable-textarea="$ctrl.actorTag.exclusions" e-rows="5" e-cols="100"
+       onaftersave="$ctrl.update()">
+        {{ $ctrl.actorTag.exclusions || 'no exclusions' }}
+    </a>
+    </label>
 </div>
 
 

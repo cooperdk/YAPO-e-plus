@@ -1,5 +1,5 @@
 <div class="container-fluid" xmlns:C="http://www.w3.org/1999/xhtml">
-    <label>Path to folder(s) to add</label>(supports multiple folders separated by commas EX: C:\folder1, D:\folder2) Folder added here can be rescanned under the "settings" menue <b>:</b>
+    <label>Folder path(s) to add</label> (supports multiple folders separated by commas EX: C:\folder1, D:\folder2) Folder added here can be rescanned under the "settings" menu:
 <input class="form-control" id="inputdefault" type="text"
                                              ng-model="$ctrl.folderInputContent">
 <button type="button" ng-click="$ctrl.addFolderClicked()" class="btn btn-default btn-sm"
@@ -19,7 +19,8 @@ The samples are stored in media/scenes/(sceneId)/sample'"
 <br>
 <br>
 
-<label>Item names separated by commas: </label>(Can be a single item)<textarea class="form-control" rows="5" id="comment"
+<label>Item names to add, separated by commas </label>(Can be a single item):
+<textarea class="form-control" rows="5" id="comment"
                                                            ng-model="$ctrl.textareaInputContent"></textarea>
 
 <button type="button" ng-click="$ctrl.addActorsClicked()" class="btn btn-default btn-sm"

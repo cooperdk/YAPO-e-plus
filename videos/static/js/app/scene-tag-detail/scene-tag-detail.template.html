@@ -22,6 +22,15 @@
        onaftersave="$ctrl.update()">
         {{ $ctrl.sceneTag.scene_tag_alias || 'no alias' }}
     </a>
+    </label><br>
+	    <label
+            uib-popover-html="'The exclusions list prevent any words to be auto-tagged. You can specify multiple exclusions by separating them with a comma.'"
+            popover-trigger="mouseenter" popover-placement="right">
+    Scene Tag Exclusions:
+    <a href="#" editable-textarea="$ctrl.sceneTag.exclusions" e-rows="5" e-cols="100"
+       onaftersave="$ctrl.update()">
+        {{ $ctrl.sceneTag.exclusions || 'no exclusions' }}
+    </a>
     </label>
 </div>
 

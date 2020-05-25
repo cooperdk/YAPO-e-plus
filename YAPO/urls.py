@@ -30,6 +30,9 @@ import videos.const
 import videos.aux_functions
 import YAPO.settings
 
+#from django.contrib import admin
+#admin.autodiscover()
+
 # actor_alias_list = ActorAliasViewSet.as_view({
 #     'get': 'list',
 #     'post': 'create'
@@ -84,6 +87,7 @@ urlpatterns = [
                   url(r'^settings/', views.settings),
                   url(r'^ffmpeg/', views.ffmpeg),
                   url(r'^tag-multiple-items/', views.tag_multiple_items),
+                  #url(r'^admin/', admin.site.urls, name='admin')
 
 
 

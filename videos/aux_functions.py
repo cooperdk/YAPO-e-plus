@@ -77,11 +77,11 @@ def insert_actor_tag(actor_to_insert, actor_tag_name):
         actor_tag.name = actor_tag_name
         actor_tag.save()
         actor_to_insert.actor_tags.add(actor_tag)
-        print("Added new tag: " + actor_tag_name + " for " + actor_to_insert.name)
+        #print("Added new tag: " + actor_tag_name + " for " + actor_to_insert.name)
     else:
         actor_tag = ActorTag.objects.get(name=actor_tag_name)
         actor_to_insert.actor_tags.add(actor_tag)
-        print("Added tag: " + actor_tag_name + " for " + actor_to_insert.name)
+        #print("Added tag: " + actor_tag_name + " for " + actor_to_insert.name)
         actor_tag.save()
 
 def url_is_alive(url):

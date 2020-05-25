@@ -5,7 +5,7 @@ import django
 import hashlib
 from django.utils import timezone
 from videos import const
-from videos.scrapers import filenames
+import videos.scrapers.filenames as filenames
 import json
 from multiprocessing import Pool, Lock
 import fnmatch
@@ -369,6 +369,7 @@ def parse_actors_in_scene(scene_to_parse, scene_path, actors, actors_alias):
                 if actor.actor_tags.count() > 0:
                     for actor_tag in actor.actor_tags.all():
                         current_tag = actor_tag.scene_tags.first()
+                        exclude = False
                         if not current_tag:
                             if not SceneTag.objects.filter(name=actor_tag.name):
                                 current_tag = SceneTag(name=actor_tag.name)
@@ -376,9 +377,31 @@ def parse_actors_in_scene(scene_to_parse, scene_path, actors, actors_alias):
                             else:
                                 current_tag = SceneTag.objects.filter(name=actor_tag.name).first()
                                 actor_tag.scene_tags.add(current_tag)
-                        if not scene_to_parse.scene_tags.filter(id=current_tag.id):
-                            print("Adding SceneTag '{}' to the scene {}".format(current_tag.name, scene_to_parse.name))
-                            scene_to_parse.scene_tags.add(current_tag)
+                                
+                            if not scene_to_parse.scene_tags.filter(id=current_tag.id):
+                            
+                                for excl in current_tag.exclusions.split(','):
+                                    excl = excl.strip().lower()
+                                    if len(excl) > 2:
+                                        regex_search_term = get_regex_search_term(excl, '.')
+                                        print(f"Testing exclude word: {excl}, scene: {scene_to_parse.name}")
+                                        if excl in scene_to_parse.name.lower():
+                                            exclude = True
+                                            print(f"Not inserting actor tag [{current_tag}] due to an exclusion.")
+                                            break
+
+
+                                if exclude == False:
+                                    print("Adding Tag: {} to the scene {}".format(current_tag, scene_to_parse.name))
+                                    scene_to_parse.scene_tags.add(current_tag)
+
+                            else:
+                                print("Tag: {} is already in {}".format(current_tag, scene_to_parse.name))
+                            
+                            
+                            
+                            #print("Adding SceneTag '{}' to the scene {}".format(current_tag, scene_to_parse.name))
+                            #scene_to_parse.scene_tags.add(current_tag)
 
                             # regex_search_term = get_regex_search_term(actor.name, ' ')
                             #
@@ -454,41 +477,87 @@ def get_regex_search_term(name, delimiter):
 
 def parse_scene_tags_in_scene(scene, scene_path, scene_tags):
     for scene_tag in scene_tags:
+        exclude = False
         regex_search_term = get_regex_search_term(scene_tag.name, '.')
-
         if re.search(regex_search_term, scene_path, re.IGNORECASE) is not None:
             scene_path = re.sub(regex_search_term, '', scene_path, flags=re.IGNORECASE)
+            #print("Testing tag: {}".format(scene_tag))
             if not scene.scene_tags.filter(name=scene_tag.name):
-                print("Adding Tag: {} to the scene {}".format(scene_tag.name, scene.name))
-                # print("Adding " + scene_tag.name + " to scene" + scene.name + "\n")
-                scene.scene_tags.add(scene_tag)
+
+                for excl in scene_tag.exclusions.split(','):
+                    excl = excl.strip().lower()
+                    if len(excl) > 2:
+                        regex_search_term = get_regex_search_term(excl, '.')
+                        print(f"Testing exclude word: {excl}, scene: {scene.name}")
+                        if excl in scene.name.lower():
+                            exclude = True
+                            print(f"Not inserting tag [{scene_tag.name}] due to an exclusion.")
+                            break
+
+
+                if exclude == False:
+                    print("Adding Tag: {} to the scene {}".format(scene_tag.name, scene.name))
+                    scene.scene_tags.add(scene_tag)
+
             else:
                 print("Tag: {} is already in {}".format(scene_tag.name, scene.name))
 
         if scene_tag.scene_tag_alias != "":
             for scene_tag_alias in scene_tag.scene_tag_alias.split(','):
+                exclude = False
                 scene_tag_alias_stripped = scene_tag_alias.strip()
                 regex_search_term = get_regex_search_term(scene_tag_alias_stripped, '.')
-
+                #print("Testing tag alias: {}".format(scene_tag_alias_stripped))
                 if re.search(regex_search_term, scene_path, re.IGNORECASE) is not None:
                     scene_path = re.sub(regex_search_term, '', scene_path, flags=re.IGNORECASE)
                     if not scene.scene_tags.filter(name=scene_tag.name):
-                        print("Adding Tag: '{}' to the scene {}".format(scene_tag.name, scene.name))
-                        scene.scene_tags.add(scene_tag)
+                        for excl in scene_tag.exclusions.split(','):
+                            excl = excl.strip().lower()
+                            if len(excl) > 2:
+                         
+                                regex_search_term = get_regex_search_term(excl, '.')
+                                print(f"Testing exclude word: {excl}, scene: {scene.name}")
+                                if excl in scene.name.lower():
+                                    exclude = True
+                                    print(f"Not inserting tag [{scene_tag.name}] due to an exclusion.")
+                                    break
+
+
+                        if exclude == False:
+                            print("Adding Tag: {} to the scene {}".format(scene_tag.name, scene.name))
+                            scene.scene_tags.add(scene_tag)
     return scene_path
 
 
 def parse_website_in_scenes(scene, scene_path, websites):
     for website in websites:
+        exclude = False
         regex_search_term = get_regex_search_term(website.name, '.')
-
         if re.search(regex_search_term, scene_path, re.IGNORECASE) is not None:
             scene_path = re.sub(regex_search_term, '', scene_path, flags=re.IGNORECASE)
             if not scene.websites.filter(name=website.name):
-                print("Adding Website: '{}' to the scene {}".format(website.name, scene.name))
-                scene.websites.add(website)
+                for excl in website.exclusions.split(','):
+                    excl = excl.strip().lower()
+                    if len(excl) > 2:
+                        
+                        regex_search_term = get_regex_search_term(excl, '.')
+                        print(f"Testing exclude word: {excl}, scene: {scene.name}")
+                        if excl in scene.name.lower() and not (website.name.lower() in scene.name.lower()):
+                            exclude = True
+                            print(f"Not registering website [{website}] due to an exclusion.")
+                            break
 
-            if website.scene_tags.count() > 0:
+
+                if exclude == False:
+                    print(f"Adding website: {website.name} to the scene {scene.name}")
+                    scene.websites.add(website)
+
+
+
+                #print("Adding Website: '{}' to the scene {}".format(website.name, scene.name))
+                #scene.websites.add(website)
+
+            if exclude != False and website.scene_tags.count() > 0:
                 for scene_tag in website.scene_tags.all():
                     if not scene.scene_tags.filter(id=scene_tag.id):
                         print("Adding SceneTag '{}' to the scene {}".format(website.name, scene.name))
@@ -496,6 +565,7 @@ def parse_website_in_scenes(scene, scene_path, websites):
 
                         #         check website alias
         if website.website_alias != "":
+            exclude = False
             for website_alias in website.website_alias.split(','):
                 website_alias_stripped = website_alias.strip()
                 regex_search_term = get_regex_search_term(website_alias_stripped, '.')
@@ -503,8 +573,28 @@ def parse_website_in_scenes(scene, scene_path, websites):
                 if re.search(regex_search_term, scene_path, re.IGNORECASE) is not None:
                     scene_path = re.sub(regex_search_term, '', scene_path, flags=re.IGNORECASE)
                     if not scene.websites.filter(name=website.name):
-                        print("Adding Website: '{}' to the scene {}".format(website.name, scene.name))
+                    
+                        for excl in website.exclusions.split(','):
+                            excl = excl.strip().lower()
+                            if len(excl) > 2:
+                        
+                                regex_search_term = get_regex_search_term(excl, '.')
+                                print(f"Testing exclude word: {excl}, scene: {scene.name}")
+                                if excl in scene.name.lower() and not (website_alias_stripped.lower() in scene.name.lower()):
+                                    exclude = True
+                                    print(f"Not registering website [{website}] due to an exclusion.")
+                                    break
+
+
+                    if exclude == False:
+                        print(f"Adding website: {website.name} to the scene {scene.name}")
                         scene.websites.add(website)
+                    
+                    
+                    
+                    
+                        #print("Adding Website: '{}' to the scene {}".format(website.name, scene.name))
+                        #scene.websites.add(website)
 
     return scene_path
 

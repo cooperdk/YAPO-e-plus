@@ -3,8 +3,23 @@ import os
 import sys
 from videos import *
 import YAPO.settings
-import os
+import os, platform
 x=0
+#os.system('mode con: cols=100 lines=4096')
+os.system('cls' if os.name == 'nt' else 'clear')
+if platform.system() == "Windows":
+
+    from ctypes import windll, byref
+    import ctypes.wintypes as wintypes
+
+    STDOUT = -11
+
+    hdl = windll.kernel32.GetStdHandle(STDOUT)
+    rect = wintypes.SMALL_RECT(0, 0, 98, 55) # (left, top, right, bottom)
+    windll.kernel32.SetConsoleWindowInfo(hdl, True, byref(rect))
+    bufsize = wintypes._COORD(120, 4096) # rows, columns
+    windll.kernel32.SetConsoleScreenBufferSize(hdl, bufsize)
+    
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 
@@ -13,7 +28,6 @@ if __name__ == "__main__":
 
     a = apps
     a = pagination
-    os.system('cls' if os.name == 'nt' else 'clear')
     if x == 0:
         print("")
         print("____    ____  ___       ______     ______         _______        ")
@@ -26,8 +40,8 @@ if __name__ == "__main__":
         print("    For changes to the main branch, please consult the guide.")
         print("=================================================================")
         print("")
-        print("Static files dir is: {}".format(YAPO.settings.STATIC_ROOT))
-        print("Media files dir is: {}".format(YAPO.settings.MEDIA_ROOT))
+        #print("Static files dir is: {}".format(YAPO.settings.STATIC_ROOT))
+        print("Media files are located in {}".format(YAPO.settings.MEDIA_ROOT))
 
     from django.core.management import execute_from_command_line
     x = x + 1

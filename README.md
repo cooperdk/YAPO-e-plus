@@ -1,25 +1,23 @@
 # YAPO e+
-Yapo  e+ - Yet Another Porn Organizer (extended plus)
+###Yapo  e+ - Yet Another Porn Organizer (extended plus)
 
 #### This is a branch of the original YAPO on which I'making improvements. Find the original readme at the bottom (delimited with a line of "=" signs).
-#### There is a setup available for an easy install.
-#### There is also a copy of the setup with pre-registered actors, websites and tags (thousands of them). It will be available on Patreon shortly.
-####
-#### ATTENTION - The program directory MUST be renamed to "YAPO" (upper case) as some functions depend on this! 
-####
-#### There are a **set of logos** available for websites, thanks to @GernBlanston#0168 from Porn Organizing (https://discord.gg/6TvpGA) - get them here: http://yapo-eplus.sex-galleri.dk/websitelogos.zip - they should be unpacked to your YAPO root. YAPO simply matches the website name in your installation with a PNG image in videos/media/logos and if there's a name match, the logo will be shown on the website view. Currently, the filename MUST match the  website name (not case-sensitive).
-####
-#### Requirements: FFMPEG, VLC and Python 3.6+ installed. Or use the installer which will even run from a USB stick, should you want to do that.
-####
-#### If you don't want to mess with Python and all the dependencies, there is an (old) installer (Windows only) located here: http://yapo-eplus.sex-galleri.dk/yapo-eplus.exe - this will be updated ASAP.
-####
+There is a setup available for an easy install.
+There is also a copy of the setup with pre-registered actors, websites and tags (thousands of them). It will be available on Patreon shortly.
+
+ATTENTION - The program directory MUST be renamed to "YAPO" (upper case) as some functions depend on this! 
+
+There are a **set of logos** available for websites, thanks to @GernBlanston#0168 from Porn Organizing (https://discord.gg/6TvpGA) - get them here: http://yapo-eplus.sex-galleri.dk/websitelogos.zip - they should be unpacked to your YAPO root. YAPO simply matches the website name in your installation with a PNG image in videos/media/logos and if there's a name match, the logo will be shown on the website view. Currently, the filename MUST match the  website name (not case-sensitive).
+
+Requirements: FFMPEG, VLC and Python 3.6+ installed. Or use the installer which will even run from a USB stick, should you want to do that.
+
+If you don't want to mess with Python and all the dependencies, there is an (old) installer (Windows only) located here: http://yapo-eplus.sex-galleri.dk/yapo-eplus.exe - this will be updated ASAP.
+
 #### Discuss and share on Discord: https://discord.gg/ad5hjsA
 
 #### NEW FEATURES:
 
-- YAPO now supports the new Freeones site layout. The scraper now shows a 0-100% completion for each actor scrape.
-
-- YAPO will let you know if there's a new version on Github.
+- Now supports the new Freeones site layout. The scraper now shows a 0-100% completion for each actor scrape.
 
 - As mentioned, we now offer website/producer logos in the website view, if the logo exists in videos/media/logos. Thanks to GernBlanston for sharing them.
 
@@ -73,12 +71,17 @@ for them there, if you're running Windows. If you're running Linux, install FFMP
    This will actually make the adjustments to the database it took note of in the previous step.
 
    If you get this error when you're done:
+   
    "You are trying to add a non-nullable field **'date_added'** to folder without a default; we can't do that (the database needs  something to populate existing rows)."
+   
    When asked to select a fix, select option 1 and type in "datetime.datetime.now()" (without quotes) and press enter.
+   
+   If you need more help installing the software, first look towards the end of this document, there's a section named "Installation".
+   Only if you really have difficulties, register an issue on Github. I will offer installation help, by mail or through Teamviewer, for a coffee donation.
 
 4. Enjoy!
 
-===================================================================================
+================================================================================
 
 # YAPO
 YAPO - Yet Another Porn Organizer

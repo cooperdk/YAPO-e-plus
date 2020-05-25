@@ -41,9 +41,10 @@ def get_files(walk_dir, make_video_sample):
             filename_extension = os.path.splitext(file_path)[1]
             for filename_extension_to_test in ACCEPTED_VIDEO_EXTENSIONS:
                 if filename_extension_to_test == filename_extension:
-                    output_string = "Filename is %s and the extension is %s" % (file_path, filename_extension,)
-                    print(output_string.encode('utf-8'))
+                    print(f"Filename is {file_path} and the extension is {filename_extension}\n")
+
                     create_scene(file_path, make_video_sample)
+                    print("\n------------------------------------------------------------------------------\n")
                     break
 
 
@@ -291,7 +292,7 @@ def populate_last_folder_name_in_virtual_folders():
 
 
 def main():
-    scenes = Scene.objects.all()
+    #scenes = Scene.objects.all()
     for scene in scenes:
         add_scene_to_folder_view(scene)
 
