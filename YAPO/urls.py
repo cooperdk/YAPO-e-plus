@@ -140,13 +140,13 @@ try:
                 x = f.read()
                 settings_content = json.loads(x)
 
-        print(settings_content['vlc_path'])
+        print("VLC location: " + settings_content['vlc_path'])
         videos.const.VLC_PATH = settings_content['vlc_path']
         if settings_content['last_all_scene_tag'] != "":
             # 2016-08-14 18:03:10.153443
             videos.const.LAST_ALL_SCENE_TAG = datetime.strptime(settings_content['last_all_scene_tag'],
                                                                 "%Y-%m-%d %H:%M:%S")
-            print("Last full scene tagging : {}".format(videos.const.LAST_ALL_SCENE_TAG))
+            print("The last full scene tagging was done {}\n".format(videos.const.LAST_ALL_SCENE_TAG))
 
     f.close()
 
