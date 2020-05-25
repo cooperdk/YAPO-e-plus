@@ -2,6 +2,7 @@
 ## Yet Another Porn Organizer (extended plus)
 
 #### This is a branch of the original YAPO on which I'making improvements. Find the original readme at the bottom (delimited with a line of "=" signs).
+
 There is a setup available for an easy install.
 There is also a copy of the setup with pre-registered actors, websites and tags (thousands of them). It will be available on Patreon shortly.
 
@@ -16,6 +17,13 @@ If you don't want to mess with Python and all the dependencies, there is an (old
 #### Discuss and share on Discord: https://discord.gg/ad5hjsA
 
 #### NEW FEATURES:
+
+- Exclusions now available for scene tags, actor tags and websites.
+  You can now enter any words that shouldn't trigger a website or actor tag, a website or it's aliases.
+  For example, the word "floral" in the filename would trigger a tag named "oral" - by excluding "floral" you can prevent this).
+  Another example is the fact that there is a website named "Stepsiblings Caught" and another one just named "Stepsiblings".
+  By adding "Stepsiblings" in the exclusion list for "Stepsiblings Caught", the system will not incorrectly register the website "Stepsiblings" for a file that should only be registered to "Stepsiblings Caught".
+
 
 - Now supports the new Freeones site layout. The scraper now shows a 0-100% completion for each actor scrape.
 
