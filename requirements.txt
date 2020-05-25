@@ -10,4 +10,3 @@ pywin32>=227
 pywin32-ctypes==0.2.0
 requests==2.20.0
 tmdbsimple==2.2.0
-waitress>=1.4.3
