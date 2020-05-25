@@ -12,11 +12,14 @@ THIS REQUIRES A DATABASE MIGRATION BEFORE RUNNING YAPO.
 
 In a command shell from the YAPO main directory, run these two commands:
 
+
 `python manage.py makemigrations
 
 python manage.py migrate`
 
+
 Then run YAPO.
+
 
 `python manage.py runserver ip:port (ex. 127.0.0.1:8000)`
 
