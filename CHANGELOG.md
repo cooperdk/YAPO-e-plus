@@ -26,6 +26,7 @@ Then run YAPO.
 
 Check README.md for more information, if needed.
 
+
 * Update notification
 * Website logos will be displayed in the website view, if the logo exists in videos/media/logos. Thanks to GernBlanston for sharing them.
 * Disk space report and number of actors will be reported on launch. Also, a file named actors.txt will be exported at launch for backup and sharing purposes.
