@@ -8,15 +8,24 @@
 For example, the word "floral" in the filename would trigger a tag named "oral" - by excluding "floral" you can prevent this).
 Another example is the fact that there is a website named "Stepsiblings Caught" and another one just named "Stepsiblings". By adding "Stepsiblings" in the exclusion list for "Stepsiblings Caught", the system will not incorrectly register the website "Stepsiblings" for a file that should only be registered to "Stepsiblings Caught".
 
-** THIS REQUIRES A DATABASE MIGRATION BEFORE RUNNING YAPO.
+THIS REQUIRES A DATABASE MIGRATION BEFORE RUNNING YAPO.
 
 In a command shell from the YAPO main directory, run these two commands:
 
-python manage.py makemigrations
-python manage.py migrate
+
+`python manage.py makemigrations`
+
+`python manage.py migrate`
+
 
 Then run YAPO.
+
+
+`python manage.py runserver ip:port (ex. 127.0.0.1:8000)`
+
+
 Check README.md for more information, if needed.
+
 
 * Update notification
 * Website logos will be displayed in the website view, if the logo exists in videos/media/logos. Thanks to GernBlanston for sharing them.
