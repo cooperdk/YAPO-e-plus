@@ -1,5 +1,24 @@
+html {
+  font-family: "Source Sans Pro", Calibri, Candara, Arial, sans-serif;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  font-size: 10px;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
 body {
     padding-top: 20px;
+	font-family: "Source Sans Pro", Calibri, Candara, Arial, sans-serif;
+  font-size: 15px;
+}
+
+h1, h2, h3, h4, h5, a {
+    font-family: "Source Sans Pro", Calibri, Candara, Arial, sans-serif;
+
+}
+
+div.a, td.a, li.a, a {
+	text-color: sea blue;
 }
 
 #actor-list-row{
@@ -29,13 +48,13 @@ body {
 }
 
 #actor-list-grid img{
-    border: solid black 2px;
+    border: solid #333337 2px;
 
 
 }
 
 #scene-list-grid img{
-    border: solid black 2px;
+    border: solid #333337 2px;
     margin: 0.5em;
 
 
@@ -50,13 +69,16 @@ body {
     clear: both;
     border-spacing: 0.2em;
     float: right;
-    width: 40%;
-    margin: 2em;
-    background: whitesmoke;
+    #width: 40%;
+    margin: 8px;
+    #background: #333337;
 
 }
 
-
+.actor-detail a {
+    text-color: sea blue;
+	
+}
 
 .actor-detail li {
     text-align: right;
@@ -101,7 +123,7 @@ body {
 }
 
 .actor-list-row img { border-radius: 8x; }
-.col-md-2 img { border-radius: 12px; }
+.col-md-2 img { border-radius: 12px; border: 2px solid black;}
 .col-md-2 h4 { text-align: center; -ms-transform: translateX(-18px); transform: translateX(-18px);}
 
 .scenes {
@@ -144,7 +166,7 @@ body {
 .dbFolders {
     border: 1px solid black;
     padding: 1em;
-    background-color: #b2dba1;
+    background-color: #333337;
 }
 
 .scene-list {
@@ -207,7 +229,7 @@ body {
 
 .sceneactorthumb {
 	border-radius: 8px;
-    border: 1px solid black;
+    border: 2px solid black;
 	vertical-align: middle;
 }
 
@@ -218,7 +240,7 @@ body {
 
 .on-hover-red-cursor-pointer a {
     /*text-decoration: none;*/
-    color: black;
+    color: 333337;
 }
 
 .on-hover-red-cursor-pointer a:link {
@@ -302,7 +324,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #ccc;
+    background-color: #8a8a8a;
     -webkit-transition: .4s;
     transition: .4s;
 }
@@ -314,17 +336,17 @@ body {
     width: 12px;
     left: 2px;
     bottom: 2.5px;
-    background-color: white;
+    background-color: #666666;
     -webkit-transition: .4s;
     transition: .4s;
 }
 
 input:checked + .slider {
-    background-color: #2196F3;
+    background-color: #aaaaaa;
 }
 
 input:focus + .slider {
-    box-shadow: 0 0 1px #2196F3;
+    box-shadow: 0 0 1px #555555;
 }
 
 input:checked + .slider:before {

@@ -1,14 +1,16 @@
-<div class="modal-header">
+<div align="center" class="modal-header">
     <h3 class="modal-title">Profile Image - {{ modelContent.name }}</h3>
 </div>
-<div class="modal-body">
+
+
+<div align="center" class="modal-body">
     <img ng-src="{{ modelContent.thumbnail }}" width="400px" class="img-responsive center-block"/>
 
 
-    <div ng-controller="ImageCropperCtrl as ctrl">
+    <div align="center" ng-controller="ImageCropperCtrl as ctrl">
 
 
-        <div>
+        <div align="center" >
             <canvas width="400" height="600" id="canvas" image-cropper image="cropper.sourceImage"
                     cropped-image="cropper.croppedImage" crop-width="200" crop-height="300" keep-aspect="true"
                     touch-radius="30" crop-area-bounds="bounds"></canvas>
@@ -16,9 +18,9 @@
 
         <div ng-show="cropper.croppedImage!=null"><img ng-src="{{ cropper.croppedImage }}"/></div>
 
-
     </div>
 </div>
+
 
 <div ng-controller="myCtrl" class="modal-footer">
 
@@ -26,7 +28,7 @@
         <input type="file" img-cropper-fileread image="cropper.sourceImage" style="display: none;"/> Browse..
     </label>
     <button ng-click="edit()" class="btn btn-primary" type="button">Edit</button>
-    <button class="btn btn-primary" type="button" ng-click="ok('Actor')">OK</button>
-    <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-primary" type="button" ng-click="ok('Actor')">Save</button>
+	<button class="btn btn-primary" type="button" ng-click="cancel()">Close (don't save)</button>
 
 </div>

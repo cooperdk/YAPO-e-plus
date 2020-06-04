@@ -12,6 +12,7 @@ import videos.filename_parser as filename_parser
 import videos.scrapers.freeones as scraper_freeones
 import videos.scrapers.imdb as scraper_imdb
 import videos.scrapers.tmdb as scraper_tmdb
+import videos.scrapers.googleimages as scraper_images
 from videos import ffmpeg_process
 import urllib.request
 # For REST framework
@@ -40,7 +41,7 @@ from django.utils.datastructures import MultiValueDictKeyError
 import threading
 from django.db import connection
 # import pathlib
-from videos import sizecheck
+from videos import startup
 
 # Aux Functions
 

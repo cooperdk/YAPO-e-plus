@@ -14,9 +14,28 @@ Requirements: FFMPEG, VLC and Python 3.6+ installed. Or use the installer which 
 
 If you don't want to mess with Python and all the dependencies, there is an (old) installer (Windows only) located here: http://yapo-eplus.sex-galleri.dk/yapo-eplus.exe - this will be updated ASAP.
 
+If something is not working, it is generally enough to make sure all dependencies are installed. From the YAPO main dir, run:
+`pip install -r requirements.txt`
+
+or updating the database, if you're already using YAPO and updating it - this is also run from the YAPO main dir:
+
+`python manage.py makemigrations`
+
+`python manage.py migrate`
+
+
+
 #### Discuss and share on Discord: https://discord.gg/ad5hjsA
 
 #### NEW FEATURES:
+
+- Contact sheets.
+  For now, they are in each scene's folder under videos/media/scenes. They will be displayed on the scene detail view in the next update.
+
+- Layout change.
+  An update to Bootstrap and a new, darker design for YAPO.
+  
+- Ready for focused actor photo searching (Google)
 
 - Exclusions now available for scene tags, actor tags and websites.
   You can now enter any words that shouldn't trigger a website or actor tag, a website or it's aliases.

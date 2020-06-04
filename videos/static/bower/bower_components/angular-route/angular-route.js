@@ -1,5 +1,5 @@
 /**
- * @license AngularJS v1.7.2
+ * @license AngularJS v1.7.9
  * (c) 2010-2018 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -32,6 +32,52 @@ function shallowCopy(src, dst) {
   return dst || src;
 }
 
+/* global routeToRegExp: true */
+
+/**
+ * @param {string} path - The path to parse. (It is assumed to have query and hash stripped off.)
+ * @param {Object} opts - Options.
+ * @return {Object} - An object containing an array of path parameter names (`keys`) and a regular
+ *     expression (`regexp`) that can be used to identify a matching URL and extract the path
+ *     parameter values.
+ *
+ * @description
+ * Parses the given path, extracting path parameter names and a regular expression to match URLs.
+ *
+ * Originally inspired by `pathRexp` in `visionmedia/express/lib/utils.js`.
+ */
+function routeToRegExp(path, opts) {
+  var keys = [];
+
+  var pattern = path
+    .replace(/([().])/g, '\\$1')
+    .replace(/(\/)?:(\w+)(\*\?|[?*])?/g, function(_, slash, key, option) {
+      var optional = option === '?' || option === '*?';
+      var star = option === '*' || option === '*?';
+      keys.push({name: key, optional: optional});
+      slash = slash || '';
+      return (
+        (optional ? '(?:' + slash : slash + '(?:') +
+        (star ? '(.+?)' : '([^/]+)') +
+        (optional ? '?)?' : ')')
+      );
+    })
+    .replace(/([/$*])/g, '\\$1');
+
+  if (opts.ignoreTrailingSlashes) {
+    pattern = pattern.replace(/\/+$/, '') + '/*';
+  }
+
+  return {
+    keys: keys,
+    regexp: new RegExp(
+      '^' + pattern + '(?:[?#]|$)',
+      opts.caseInsensitiveMatch ? 'i' : ''
+    )
+  };
+}
+
+/* global routeToRegExp: false */
 /* global shallowCopy: false */
 
 // `isArray` and `isObject` are necessary for `shallowCopy()` (included via `src/shallowCopy.js`).
@@ -55,7 +101,7 @@ var noop;
 /* global -ngRouteModule */
 var ngRouteModule = angular.
   module('ngRoute', []).
-  info({ angularVersion: '1.7.2' }).
+  info({ angularVersion: '1.7.9' }).
   provider('$route', $RouteProvider).
   // Ensure `$route` will be instantiated in time to capture the initial `$locationChangeSuccess`
   // event (unless explicitly disabled). This is necessary in case `ngView` is included in an
@@ -216,7 +262,7 @@ function $RouteProvider() {
    *      route definition, will cause the latter to be ignored.
    *
    *    - `[reloadOnUrl=true]` - `{boolean=}` - reload route when any part of the URL changes
-   *      (inluding the path) even if the new URL maps to the same route.
+   *      (including the path) even if the new URL maps to the same route.
    *
    *      If the option is set to `false` and the URL in the browser changes, but the new URL maps
    *      to the same route, then a `$routeUpdate` event is broadcasted on the root scope (without
@@ -256,7 +302,8 @@ function $RouteProvider() {
     }
     routes[path] = angular.extend(
       routeCopy,
-      path && pathRegExp(path, routeCopy)
+      {originalPath: path},
+      path && routeToRegExp(path, routeCopy)
     );
 
     // create redirection for trailing slashes
@@ -266,8 +313,8 @@ function $RouteProvider() {
             : path + '/';
 
       routes[redirectPath] = angular.extend(
-        {redirectTo: path},
-        pathRegExp(redirectPath, routeCopy)
+        {originalPath: path, redirectTo: path},
+        routeToRegExp(redirectPath, routeCopy)
       );
     }
 
@@ -284,47 +331,6 @@ function $RouteProvider() {
    * algorithm. Defaults to `false`.
    */
   this.caseInsensitiveMatch = false;
-
-   /**
-    * @param path {string} path
-    * @param opts {Object} options
-    * @return {?Object}
-    *
-    * @description
-    * Normalizes the given path, returning a regular expression
-    * and the original path.
-    *
-    * Inspired by pathRexp in visionmedia/express/lib/utils.js.
-    */
-  function pathRegExp(path, opts) {
-    var insensitive = opts.caseInsensitiveMatch,
-        ret = {
-          originalPath: path,
-          regexp: path
-        },
-        keys = ret.keys = [];
-
-    path = path
-      .replace(/([().])/g, '\\$1')
-      .replace(/(\/)?:(\w+)(\*\?|[?*])?/g, function(_, slash, key, option) {
-        var optional = (option === '?' || option === '*?') ? '?' : null;
-        var star = (option === '*' || option === '*?') ? '*' : null;
-        keys.push({ name: key, optional: !!optional });
-        slash = slash || '';
-        return ''
-          + (optional ? '' : slash)
-          + '(?:'
-          + (optional ? slash : '')
-          + (star && '(.+?)' || '([^/]+)')
-          + (optional || '')
-          + ')'
-          + (optional || '');
-      })
-      .replace(/([/$*])/g, '\\$1');
-
-    ret.regexp = new RegExp('^' + path + '$', insensitive ? 'i' : '');
-    return ret;
-  }
 
   /**
    * @ngdoc method
@@ -725,7 +731,7 @@ function $RouteProvider() {
 
         var nextRoutePromise = $q.resolve(nextRoute);
 
-        $browser.$$incOutstandingRequestCount();
+        $browser.$$incOutstandingRequestCount('$route');
 
         nextRoutePromise.
           then(getRedirectionData).
@@ -753,7 +759,7 @@ function $RouteProvider() {
             // `outstandingRequestCount` to hit zero.  This is important in case we are redirecting
             // to a new route which also requires some asynchronous work.
 
-            $browser.$$completeOutstandingRequest(noop);
+            $browser.$$completeOutstandingRequest(noop, '$route');
           });
       }
     }

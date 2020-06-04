@@ -28,7 +28,7 @@ ul.enlarge span {
 /***Note: This styling will apply to both the thumbnail and popup image, unless you override these styles in step five***/
 ul.enlarge img {
     /*give the thumbnails a frame*/
-    background-color: #eae9d4; /*frame colour*/
+    background-color: #333337; /*frame colour*/
     padding: 6px; /*frame size*/
     /*add a drop shadow to the frame*/
     -webkit-box-shadow: 0 0 6px rgba(132, 132, 132, .75);
@@ -61,14 +61,14 @@ ul.enlarge li:hover {
 /***Override the styling of images set in step 3 to make the frame smaller and the background darker***/
 ul.enlarge span img {
     padding: 2px; /*size of the frame*/
-    background: #ccc; /*colour of the frame*/
+    background: #333337; /*colour of the frame*/
 }
 
 /***Style the <span> containing the framed images and the caption***/
 ul.enlarge span {
     /**Style the frame**/
     padding: 10px; /*size of the frame*/
-    background: #eae9d4; /*colour of the frame*/
+    background: #333337; /*colour of the frame*/
     /*add a drop shadow to the frame*/
     -webkit-box-shadow: 0 0 20px rgba(0, 0, 0, .75);
     -moz-box-shadow: 0 0 20px rgba(0, 0, 0, .75);

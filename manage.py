@@ -37,11 +37,11 @@ if __name__ == "__main__":
         print("    |  |  /  _____  \  |  |      |  `--'  |      |  |____   |_|  ")
         print("    |__| /__/     \__\ | _|       \______/       |_______|       ")
         print("")
-        print("    For changes to the main branch, please consult the guide.")
+        print("    For changes to the main branch, please consult README.md.")
         print("=================================================================")
         print("")
         #print("Static files dir is: {}".format(YAPO.settings.STATIC_ROOT))
-        print("Media files are located in {}".format(YAPO.settings.MEDIA_ROOT))
+        print(f"Media files are located in {YAPO.settings.MEDIA_ROOT},\nyou may want to consider backing them up.\n")
 
     from django.core.management import execute_from_command_line
     x = x + 1

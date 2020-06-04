@@ -1,5 +1,6 @@
 import json
-import os
+import os, sys
+import subprocess
 from videos import ffmpeg_process
 import django
 from videos import filename_parser
@@ -80,9 +81,26 @@ def create_scene(scene_path, make_sample_video):
 
                 ffmpeg_process.ffmpeg_take_scene_screenshot_without_save(scene_in_db)
 
-                print("Screenshot of scene {} taken...".format(
-                    scene_in_db.name))
-
+                print("Screenshot of scene {} taken...".format(scene_in_db.name))
+        sheet_path = os.path.abspath(os.path.join(const.MEDIA_PATH, 'scenes', str(scene_in_db.id), 'sheet.jpg'))
+        if os.path.exists(sheet_path):
+            print("Contact Sheet already exists, skipping...")
+        else:
+            file_path = os.path.abspath(current_scene.path_to_file)
+            #sheetExec = sys.executable + " " + os.path.abspath(os.path.join(const.VIDEO_ROOT, 'videosheet.py'))
+            #print("Executing " + sys.executable + " " + os.path.abspath(os.path.join(const.VIDEO_ROOT, 'videosheet.py')) + " " + file_path + " -t -w 1024 -g 5x6 --quality 75 -f jpg -o " + os.path.abspath(sheet_path))
+            print("Generating Contact Sheet (1024 px wide, 4x4 grid)...")
+            try:
+                p = subprocess.run([sys.executable, os.path.abspath(os.path.join(const.SHEET_ROOT, 'videosheet.py')),
+                    file_path, "-t","-w","1024","-g","4x4","--quality","75","--timestamp-format","{H}:{M}:{S}",
+                    "--template",os.path.abspath(os.path.join(const.SHEET_ROOT, 'yapo.template')),"--timestamp-border-mode",
+                    "--timestamp-font-size","15",                    
+                    "--start-delay-percent","1","--start-delay-percent","0","-f","jpg","-o", os.path.abspath(sheet_path)])
+                #print("Watermarking: " + sys.executable + " " + os.path.abspath(os.path.join(const.SHEET_ROOT, 'mark.py')) + " " + os.path.abspath(sheet_path))
+                p = subprocess.run([sys.executable, os.path.abspath(os.path.join(const.SHEET_ROOT, 'mark.py')), os.path.abspath(sheet_path)])
+                print("Contact Sheet saved to " + os.path.abspath(sheet_path))
+            except:
+                print("Error creating contact sheet!")
         if make_sample_video:
             video_filename_path = os.path.join(const.MEDIA_PATH, 'scenes', str(scene_in_db.id), 'sample',
                                                'sample.mp4')

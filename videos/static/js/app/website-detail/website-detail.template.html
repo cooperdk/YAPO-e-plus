@@ -1,8 +1,9 @@
+		<div align="left" style="position: absolute; z-index: 9; overflow; left: 64; top: 32;"><img style="max-width: 520px; max-height: 240px; height: auto; width: auto; cursor:default; border-style: none; border-bottom: none;" ng-src="media/logos/{{$ctrl.website.name | lowercase}}.png" onError=null;this.src="media/images/blank.png";this.style="width:0px;"> <!--{{$ctrl.website.thumbnail}}--></div>
+<div ng-if="image.is404">Uh oh!  Image 404'd.</div></center>
+
     <center><h1 align="center"><a href="#" editable-text="$ctrl.website.name"
        onaftersave="$ctrl.update()" style="cursor:text">
         {{ $ctrl.website.name || 'NA' }}</a></h1>
-		<div align="center"><img style="width: 320px; cursor:default; border-style: none; border-bottom: none;" ng-src="media/logos/{{$ctrl.website.name | lowercase}}.png" onError=null;this.src="media/images/blank.png";this.style="width:0px;"> <!--{{$ctrl.website.thumbnail}}--></div>
-<div ng-if="image.is404">Uh oh!  Image 404'd.</div></center>
 
 <div align="center">
     <h2>

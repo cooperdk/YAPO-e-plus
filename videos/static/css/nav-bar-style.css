@@ -3,7 +3,7 @@
             margin: 0;
             padding: 0;
             overflow: hidden;
-            background-color: #333;
+            background-color: #333337;
         }
 
         li#nav-bar-list-item {
@@ -12,7 +12,7 @@
 
         li#nav-bar-list-item a, .dropbtn {
             display: inline-block;
-            color: white;
+            color: #3333aa;
             text-align: center;
             padding: 14px 16px;
             text-decoration: none;
@@ -29,7 +29,7 @@
         .dropdown-content {
             display: none;
             position: absolute;
-            background-color: #f9f9f9;
+            background-color: #333337;
             min-width: 160px;
             box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
         }
@@ -43,7 +43,7 @@
         }
 
         .dropdown-content a:hover {
-            background-color: #f1f1f1
+            background-color: #333340
         }
 
         .dropdown:hover .dropdown-content {

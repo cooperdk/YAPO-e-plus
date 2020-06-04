@@ -139,7 +139,7 @@ def get_length(filename):
 # ffmpeg -i input.flv -vf fps=1 out%d.png
 def make_screenshots(fps_of_screenshots, filename):
     input_argument = "-i \"{}\"".format(filename)
-    video_filters = "-vf fps={},scale=640:trunc(ow/a/2)*2".format(fps_of_screenshots)
+    video_filters = "-vf fps={},scale=640:-2".format(fps_of_screenshots)
 
     print("Taking screenshots...")
     #print("{} {} {} {}".format(FFMPEG_BIN, input_argument, video_filters, FFMPEG_TEMP_OUTPUT_IMAGES))
@@ -151,7 +151,7 @@ def make_screenshots(fps_of_screenshots, filename):
 def make_video_from_screenshots(framerate):
     framerate_argument = "-framerate {}".format(framerate)
     input_argument = "-i {}".format(FFMPEG_TEMP_OUTPUT_IMAGES)
-    other_arguments = "-c:v libx264 -pix_fmt yuv420p"
+    other_arguments = "-c:v libx264 -pix_fmt yuv420p -preset ultrafast"
     output_video = OUTPUT_VIDEO_NAME
     command_call = "{} {} {} {} {}".format(FFMPEG_BIN, framerate_argument, input_argument, other_arguments,
                                            output_video)
@@ -305,101 +305,6 @@ def delete_temp_files():
     files = glob.glob(os.path.join(TEMP_PATH,'*'))
     for f in files:
         os.remove(f)
-
-
-# def old_main():
-#     # test_file = os.path.normpath(
-#     #     "F:\\torrent\\pr\\Ivana Sugar\\Ivana Sugar - WoodmanCastingX.12.09.21.Ivana.Sugar.Hardcore.XXX.1080p.mov")
-#
-#     scenes = Scene.objects.all().order_by('-date_added')
-#
-#     for scene in scenes:
-#         # scene = Scene.objects.get(pk=8308)
-#         test_file = scene.path_to_file
-#         current_path = os.path.dirname(__file__)
-#
-#         # path_to_check = os.path.join('media/scenes/{}/sample'.format(scene.pk), 'sample.mp4')
-#
-#         # path_to_check = os.path.join('media/scenes/{}/sample'.format(scene.pk), 'sample.mp4')
-#
-#         joined_path = os.path.normpath(os.path.join(current_path, path_to_check))
-#
-#         ffprobe(scene.path_to_file.encode('utf-8'))
-#
-#         if os.path.isfile(path_to_check):
-#             print("Sample Already Exists")
-#         else:
-#             test_file = test_file.encode('utf-8')
-#             # test_file = test_file.encode('utf-8')
-#             probe_output = get_length(test_file)
-#             if probe_output != -1:
-#                 length = re.search(r'Duration: (\d\d):(\d\d):(\d\d)', probe_output)
-#                 fps = re.search(r'(\d{0,2}\.{0,1}\d{0,2}) fps', probe_output)
-#                 resolution = re.search(r'(\d{3,4})x(\d{3,4})', probe_output)
-#                 if not fps:
-#                     fps = 30
-#                 else:
-#                     fps = fps.group(1)
-#
-#                 if not resolution:
-#                     resolution_width = 320
-#                 else:
-#                     resolution_width = resolution.group(1)
-#                     resolution_height = resolution.group(2)
-#
-#                 if length:
-#
-#                     length_string = length.group(0)
-#                     length_hours = length.group(1)
-#                     length_minutes = length.group(2)
-#                     length_seconds = length.group(3)
-#
-#                     total_seconds = int(length_seconds) + 60 * int(length_minutes) + 3600 * int(length_hours)
-#                     error = False
-#                     if total_seconds < 1200:
-#                         error = make_sample_video(test_file, total_seconds, 60, 15, fps, 60, 10, 640, resolution_width)
-#                     elif total_seconds < 1800:
-#                         error = make_sample_video(test_file, total_seconds, 90, 24, fps, 60, 30, 640, resolution_width)
-#                     elif total_seconds < 3600:
-#                         error = make_sample_video(test_file, total_seconds, 90, 24, fps, 60, 30, 640, resolution_width)
-#                     else:
-#                         error = make_sample_video(test_file, total_seconds, 120, 24, fps, 60, 30, 640, resolution_width)
-#
-#                     if not error:
-#                         time.sleep(5)
-#                         make_video_from_screenshots(fps)
-#                         time.sleep(5)
-#
-#                     dest_path = os.path.join(MEDIA_PATH, "scenes", scene.id, "sample")
-#
-#                     move_sample_movie_to_correct_dir(scene, error, "sample.mp4", dest_path,
-#                                                      'ffmpeg/temp/out.mp4', 'video')
-#
-#                     # marks_dict = time_markers(total_seconds, first_minute, minute_before_end, 12)
-#                     #
-#                     # for key, value in marks_dict.iteritems():
-#                     #     print (value)
-#                     #
-#                     # print (seconds_to_string(first_minute))
-#                     #
-#                     # length_in_day_time = datetime.datetime.strptime(length_string, "%H:%M:%S").time()
-#                     # time_zero = datetime.datetime.strptime("00:00:00", "%H:%M:%S").time()
-#                     #
-#                     # print (length.group(0))
-#                     # fps = 1.0 / ((38 * 60) / 300)
-#                     # print(fps)
-#
-#                     # make_screenshots(fps, test_file)
-
-
-# def try_get_field_from_json_output(field):
-#     try:
-#         ans = field
-#     except KeyError:
-#         print(KeyError.message)
-#
-#     return ans
-
 
 def parse_ffprobe_data(ffprobe_json_output):
     ans = dict()

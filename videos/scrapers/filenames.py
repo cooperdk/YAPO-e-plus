@@ -12,7 +12,6 @@ import urllib.request as urllib_req
 import django
 import requests
 import videos.aux_functions as aux
-import videos.updatepiercings as updatepiercings
 from bs4 import BeautifulSoup
 from dateutil.parser import parse
 import videos.const as const

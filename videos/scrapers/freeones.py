@@ -5,14 +5,12 @@ import datetime
 import os
 import re
 import time
-
 import urllib.parse as urllib_parse
 import videos.const
 import urllib.request as urllib_req
 import django
 import requests
 import videos.aux_functions as aux
-import videos.updatepiercings as updatepiercings
 from bs4 import BeautifulSoup
 from dateutil.parser import parse
 import videos.const as const
@@ -41,6 +39,11 @@ def onlyChars(input):
 def inchtocm(input):
     if cm.isdigit(): cm=int(cm)*2.54
     return cm
+
+def sendAllPiercings():
+    actors = Actor.objects.all()
+    for actor in actors:
+        aux.send_piercings_to_actortag(actor)
 
 def search_freeones(actor_to_search, alias, force):
     success = False
@@ -222,24 +225,24 @@ def search_freeones(actor_to_search, alias, force):
                 if not doneX and height is not None:
                     if height > 110:
                         if  height < 148:
-                            insert_actor_tag(actor_to_search, "Extremely tiny actor")
-                            #print("Added tag: Extremely tiny actor")
+                            insert_actor_tag(actor_to_search, "Extremely tiny")
+                            #print("Added tag: Extremely tiny")
                             doneX=True
                         if 148 < height < 152:
-                            insert_actor_tag(actor_to_search, "Tiny actor")
-                            #print("Added tag: Tiny actor")
+                            insert_actor_tag(actor_to_search, "Tiny")
+                            #print("Added tag: Tiny")
                             doneX=True
                         if 152 < height < 161:
-                            insert_actor_tag(actor_to_search, "Petite actor")
-                            #print("Added tag: Petite actor")
+                            insert_actor_tag(actor_to_search, "Petite")
+                            #print("Added tag: Petite")
                             doneX=True
                         if 178 < height < 186:
-                            insert_actor_tag(actor_to_search, "Tall actor")
-                            #print("Added tag: Tall actor")
+                            insert_actor_tag(actor_to_search, "Tall")
+                            #print("Added tag: Tall")
                             doneX=True
                         if 186 < height < 220:
-                            insert_actor_tag(actor_to_search, "Extremely tall actor")
-                            #print("Added tag: Extremely tall actor")
+                            insert_actor_tag(actor_to_search, "Extremely tall")
+                            #print("Added tag: Extremely tall")
                             doneX=True
                         print("77%",end="\r",flush=True)
                 
@@ -452,7 +455,7 @@ def search_freeones(actor_to_search, alias, force):
             
         print("100%",end="\r",flush=True)
         aux.send_piercings_to_actortag(actor_to_search)
-    #    updatepiercings.sendAllPiercings()
+    #    sendAllPiercings()
     #    use the above whenever you want to update all piercings in db
 
         actor_to_search.last_lookup = datetime.datetime.now()

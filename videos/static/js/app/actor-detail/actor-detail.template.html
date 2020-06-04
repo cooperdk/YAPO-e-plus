@@ -66,7 +66,7 @@
 
 
     </div>
-    <div ng-if="!$ctrl.hideDetail" class="col-md-10 ">
+    <div ng-if="!$ctrl.hideDetail" style="width: 70%;" class="col-md-10 ">
 
         <h3>{{ $ctrl.actor.scenes.length }} scene(s) with {{ $ctrl.actor.name }}: </h3>
 
@@ -74,15 +74,15 @@
 
 
     </div>
-    <div ng-if="!$ctrl.hideDetail" class="col-md-1 pull-right" style="position: relative; top: -135px;">
+    <div ng-if="!$ctrl.hideDetail" class="col-md-1 pull-right" style="z-index: 2; relative: absolute; width: 30%; left: -20px; right: 20px; top: -260px;"> <!--135px-->
 
         <table valign="top" class="actor-detail" >
             <tr>
                 <td colspan="2">
 
 
-                    <div class="alcenter">Scrape from:<br>
-<p align="right">
+                    <div class="alcenter">Scrape info from:<br>
+<p>
                         <button type="button" ng-click="$ctrl.scrapeActor('IMDB')" class="btn btn-default btn-sm">
                             <span class="glyphicon glyphicon-plus"></span><small> IMDB</small>
                         </button>
@@ -95,8 +95,7 @@
                                 class="btn btn-default btn-sm">
                             <span class="glyphicon glyphicon-plus"></span><small> Freeones</small>
                         </button>
-</p>
-<p align="right"><input type="checkbox" ng-model="$ctrl.forceScrape"
+						<input type="checkbox" ng-model="$ctrl.forceScrape"
                                uib-popover-html="'Override existing values while scraping with selected scraper'"
                                popover-trigger="mouseenter" popover-placement="top"> Force</p>
 
@@ -353,7 +352,7 @@
 
 						
 						
-						<li><b>PROFILE PAGES</b></li>
+						<li><b><big>PROFILE PAGES</big></b></li>
                         <li ng-if="$ctrl.actor.tmdb_id"><a
                                 href="https://www.themoviedb.org/person/{{ $ctrl.actor.tmdb_id }}"
                                 target="_blank">TMDB Page</a></li>
@@ -375,14 +374,14 @@
                             target="_blank">ThePornDB Page (metadataapi.net)</a>
                         </li>
 						<br />
-                        <li><b>STREAMING VIDEO SEARCHING</b></li>
+                        <li><b><big>STREAMING VIDEO SEARCHING</big></b></li>
                         <li><a title="Search Pornhub for streaming video clips with this actor" href="http://www.pornhub.com/pornstar/{{ $ctrl.actorNameDelimiter('-',false) }}"
                                target="_blank">Pornhub Page</a></li>
 
                         <li><a title="Search XVIDEOS for streaming video clips with this actor" href="http://www.xvideos.com/?k={{ $ctrl.actorNameDelimiter('.',false) }}"
                                target="_blank">XVIDEOS Page</a></li>
 					    <br />
-                        <li><b>TORRENT SEARCHING</b></li>
+                        <li><b><big>TORRENT SEARCHING</big></b></li>
                         <li><a title="Search RarBG for torrents with this actor" href="https://unblockedrarbg.org/torrents.php?search=%22{{  $ctrl.actorNameDelimiter('+',false) }}%22&category=4"
                                target="_blank">RarBG Torrent Search</a></li>
 
@@ -393,7 +392,7 @@
                                target="_blank">PornMD info + Photo Search</a></li>
                         <br />
 
-                        <li><b>PROFILE PICTURES ETC.</b></li>
+                        <li><b><big>PROFILE PICTURES ETC.</big></b></li>
                         <li><a title="Search QWant for photos of this actor (disable adult filter for better results)" href="https://qwant.com/?q={{$ctrl.actorNameDelimiter('%20',true)}}&t=images"
                                target="_blank">QWant Photo Search</a></li>
 

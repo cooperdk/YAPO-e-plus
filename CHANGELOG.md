@@ -1,5 +1,19 @@
 # Changelog
 
+## 20200605-0035
+
+### New
+
+* Now creating video contact sheets of all videos. In the next update, this sheet will be displayed in the scene detail view. For now, they are in each scene's scene folder under "video/media/scenes".
+* Layout change. YAPO is now in dark mode, Bootstrap is updated and I have made a nicer layout. Be aware that some dropdown boxes are hard to make out, this will be changed soon.
+* Now prepared for more focused actor photo searching. In a soon-to-come update, YAPO will download two additional profile shots and three action shots (that is, two portrait mode photos and three landscape photos).
+
+REQUIRES A PIP INSTALL OF NEW REQUIREMENTS:
+
+From the YAPO main dir, execute:
+`pip install --r requirements.txt`
+
+
 ## 20200525-0210
 
 ### New
@@ -7,6 +21,7 @@
 * Reworked the database to handle various exclusions. You can now enter any words that shouldn't trigger a website or actor tag, a website or it's aliases.
 For example, the word "floral" in the filename would trigger a tag named "oral" - by excluding "floral" you can prevent this).
 Another example is the fact that there is a website named "Stepsiblings Caught" and another one just named "Stepsiblings". By adding "Stepsiblings" in the exclusion list for "Stepsiblings Caught", the system will not incorrectly register the website "Stepsiblings" for a file that should only be registered to "Stepsiblings Caught".
+
 
 THIS REQUIRES A DATABASE MIGRATION BEFORE RUNNING YAPO.
 
