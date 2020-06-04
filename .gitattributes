@@ -12,6 +12,9 @@ videos/static/* linguist-vendored
 *.py3   text diff=python
 *.pyw   text diff=python
 *.pyx    text diff=python
+*.js    text diff=javascript
+bower.*     text diff=bower
+angular-*.*    text diff=angular
 
 # Binary files
 # ============
