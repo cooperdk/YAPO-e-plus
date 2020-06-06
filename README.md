@@ -1,6 +1,8 @@
 # YAPO e+
 ## Yet Another Porn Organizer (extended plus)
 
+IMPORTANT! YAPO does not currently work on Django 3.x. It currently depends on Django 2.2.
+
 #### This is a branch of the original YAPO on which I'making improvements. Find the original readme at the bottom (delimited with a line of "=" signs).
 
 There is a setup available for an easy install.
