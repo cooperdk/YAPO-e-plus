@@ -1,4 +1,5 @@
 // Register `phoneList` component, along with its associated controller and template
+
 angular.module('actorList').component('actorList', {
     // Note: The URL is relative to our `index.html` file
     bindings: {

@@ -90,10 +90,11 @@ angular.module('sceneDetail').component('sceneDetail', {
                     console.log("scene-detail: current id is " + angular.toJson(self.currentScene));
                     self.scene = res;
                     gotPromise = true;
+					self.scene.framerate = self.scene.framerate.toFixed(2);
 
                     self.samplePath = '/media/scenes/' + res.id + '/sample/sample.mp4';
                     $rootScope.title = res.name;
-
+                    self.sheetPath = '/media/scenes/' + res.id + '/sheet.jpg';
 
                     scopeWatchService.sceneLoaded(res);
 

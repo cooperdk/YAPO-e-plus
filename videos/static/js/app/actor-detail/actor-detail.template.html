@@ -108,7 +108,7 @@
             <tr>
                 <td colspan="2">
                     <div class="actor-bio">
-                        <a href="#" editable-textarea="$ctrl.actor.description" e-rows="5" e-cols="100"
+                        <a href="#" editable-textarea="$ctrl.actor.description" e-rows="6" e-cols="64"
                            onaftersave="$root.patchEntity('actor', $ctrl.actor.id, 'description', $ctrl.actor.description, 'add',
                                               false, false, null)">
                             {{ $ctrl.actor.description || 'no description' }}
@@ -146,13 +146,14 @@
                 <td valign="top">
                     Ethnicity:
                 </td>
-                <td class="alright">
+				                <td class="alright">
                     <a href="#" editable-text="$ctrl.actor.ethnicity"
                        onaftersave="$root.patchEntity('actor', $ctrl.actor.id, 'ethnicity', $ctrl.actor.ethnicity, 'add',
                                               false, false, null)">
                         {{ $ctrl.actor.ethnicity || 'NA' }}
                     </a>
                 </td>
+
             </tr>
             <tr>
                 <td>
