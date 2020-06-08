@@ -4,13 +4,13 @@ django-autocomplete-light==3.1.6
 django-extensions==2.1.5
 django-mptt==0.9.1
 djangorestframework==3.9.1
-#pypiwin32>=223
+pypiwin32>=223; platform_system == "Windows"
 python-dateutil==2.5.3
-#pywin32>=227
-#pywin32-ctypes==0.2.0
+pywin32>=227; platform_system == "Windows"
+pywin32-ctypes==0.2.0; platform_system == "Windows"
 requests==2.20.0
 tmdbsimple==2.2.0
-numpy>=1.18.4
+numpy>=1.14.4
 Pillow>=7.1.2
 Pillow-PIL>=0.1.dev0
 jinja2>=2.11.2

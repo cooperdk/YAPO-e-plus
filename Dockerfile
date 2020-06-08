@@ -1,8 +1,14 @@
-FROM python:alpine3.7
-RUN apk add --update ffmpeg
-RUN apk add --update ffmpeg-libs
-RUN apk add --update ffmpeg-dev
-RUN apk add --update chromium-chromedriver
+FROM python:3.7.7-slim
+RUN apt-get update -y
+RUN apt-get upgrade -y
+RUN apt-get install ffmpeg -y
+RUN apt-get install libavcodec58 -y
+RUN apt-get install libavformat58 -y
+RUN apt-get install libavresample4 -y
+RUN apt-get install libavutil56 -y
+RUN apt-get install gcc -y
+RUN apt-get install python-numpy -y
+RUN apt-get install chromium-driver -y
 COPY . /YAPO
 WORKDIR /YAPO
 RUN pip install --upgrade pip
