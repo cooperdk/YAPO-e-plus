@@ -5,6 +5,7 @@ RUN apk add --update ffmpeg-libs
 RUN apk add --update ffmpeg-dev
 COPY . /YAPO
 WORKDIR /YAPO
+pip install --upgrade pip
 RUN pip install -r requirements.txt
 EXPOSE 8000
 CMD python manage.py makemigrations
