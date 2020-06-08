@@ -16,4 +16,4 @@ Pillow-PIL>=0.1dev
 jinja2>=2.11.2
 texttable>=1.6.2
 parsedatetime>=2.6
-selenium=>3.141.0
+selenium>=3.141.0
