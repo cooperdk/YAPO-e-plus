@@ -10,3 +10,10 @@ pywin32>=227
 pywin32-ctypes==0.2.0
 requests==2.20.0
 tmdbsimple==2.2.0
+numpy>=1.18.4
+Pillow>=7.1.2
+Pillow-PIL>=0.1dev
+jinja2>=2.11.2
+texttable>=1.6.2
+parsedatetime>=2.6
+selenium=>3.141.0
