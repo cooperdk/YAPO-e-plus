@@ -1,11 +1,9 @@
 FROM python:alpine3.7
 RUN apk add --update ffmpeg
-#RUN apk add --update libavcodec-extra
 RUN apk add --update ffmpeg-libs
 RUN apk add --update ffmpeg-dev
 RUN apk add --update chromium-chromedriver
 COPY . /YAPO
-COPY /usr/bin/chromedriver /YAPO/chromedriver/
 WORKDIR /YAPO
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
