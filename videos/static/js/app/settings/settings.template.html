@@ -72,7 +72,7 @@
     </select>
 </div>
 
-<h4><strong>Current Root Media Paths:</strong>
+<h4><strong>Rescan all root media paths:</strong>
 <button
                 ng-click="$ctrl.rescanFolders('')"
                 class="btn btn-success btn-sm"
@@ -81,31 +81,42 @@
                 popover-append-to-body="true"
                 popover-placement="top"
                 type="button">
-                                    <span class="glyphicon glyphicon-repeat"></span>
+                                    <span class="glyphicon glyphicon-refresh"></span>
         </button>
 </h4>
-<ul>
-    <li ng-repeat="folder in $ctrl.mediaRootFolders | orderBy : 'name'">{{ folder.name }}
-        <button
-                ng-click="$ctrl.rescanFolders(folder)"
-                class="btn btn-success btn-xs"
-                popover-trigger="mouseenter"
-                uib-popover-html="'Rescan this folder for new scenes.'"
-                popover-append-to-body="true"
-                popover-placement="top"
-                type="button">
-                                    <span class="glyphicon glyphicon-repeat"></span>
-        </button>
-        <button
-                ng-click="$ctrl.removeFolderFromList(folder)"
-                class="btn btn-danger btn-xs"
-                popover-trigger="mouseenter"
-                uib-popover-html="'Remove Folder from this list. Applies to this list only, doesnt do anything else except removing the folder entry from this list.'"
-                popover-append-to-body="true"
-                popover-placement="top"
-                type="button">
-                                    <span class="glyphicon glyphicon-remove"></span>
-        </button>
-    </li>
-</ul>
-
+<h4><strong>Rescan specific root media path:</strong></h4>
+<div style="position: relative; left: 16px; line-height: 0.5 !important;">
+<table class="table-striped table-hover thin" style="line-height: 0.5 !important;">
+<tbody class="">
+	<tr ng-repeat="folder in $ctrl.mediaRootFolders | orderBy : 'name'">
+		<td>
+			{{ folder.name }}
+		</td>
+		<td>
+		    <button
+            ng-click="$ctrl.rescanFolders(folder)"
+            class="btn btn-success btn-xs vertically-centered"
+            popover-trigger="mouseenter"
+            uib-popover-html="'Rescan this folder for new scenes.'"
+            popover-append-to-body="true"
+            popover-placement="top"
+            type="button">
+                <span class="glyphicon glyphicon-refresh"></span>
+			</button>
+		</td>
+		<td>
+		    <button
+            ng-click="$ctrl.removeFolderFromList(folder)"
+            class="btn btn-danger btn-xs vertically-centered"
+            popover-trigger="mouseenter"
+            uib-popover-html="'Remove Folder from this list. Applies to this list only, doesnt do anything else except removing the folder entry from this list.'"
+            popover-append-to-body="true"
+            popover-placement="top"
+            type="button">
+				<span class="glyphicon glyphicon-remove"></span>
+			</button>
+		</td>
+	</tr>
+</tbody>
+</table>
+</div>

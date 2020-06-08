@@ -39,8 +39,8 @@ angular.module('actorDetail').component('actorDetail', {
 
             self.addItem = function (actor, itemToAdd, typeOfItemToAdd) {
 
-               var patchData = [];
-               
+                var patchData = [];
+
 
                 if (itemToAdd.id != '-1') {
                     patchData.push(itemToAdd.id);
@@ -58,15 +58,13 @@ angular.module('actorDetail').component('actorDetail', {
                 }
 
             };
-            
-             self.removeItem = function (itemToRemove, typeOfItemToRemove) {
+
+            self.removeItem = function (itemToRemove, typeOfItemToRemove) {
                 var patchData = [];
                 patchData.push(itemToRemove.id);
-                self.actor = $rootScope.removeItemFromScene(self.actor,itemToRemove,typeOfItemToRemove);
-                $rootScope.patchEntity('actor',self.actor.id,typeOfItemToRemove,patchData,'remove',false,false,null)
+                self.actor = $rootScope.removeItemFromScene(self.actor, itemToRemove, typeOfItemToRemove);
+                $rootScope.patchEntity('actor', self.actor.id, typeOfItemToRemove, patchData, 'remove', false, false, null)
             };
-            
-            
 
 
             self.hideDetail = false;
@@ -123,7 +121,7 @@ angular.module('actorDetail').component('actorDetail', {
 
             $scope.$on("actorTagSelected", function (event, actorTag) {
                 // alert(angular.toJson(actorTag));
-                self.addItem(self.actor,actorTag,'actor_tags');
+                self.addItem(self.actor, actorTag, 'actor_tags');
                 self.actorTagSelect(actorTag);
 
 
@@ -202,7 +200,7 @@ angular.module('actorDetail').component('actorDetail', {
                 actor.date_of_birth = yyyy + '-' + mm + '-' + dd;
 
                 $rootScope.patchEntity('actor', self.actor.id, 'date_of_birth', $ctrl.actor.date_of_birth, 'add',
-                                              false, false, null)
+                    false, false, null)
 
             };
 
@@ -391,10 +389,10 @@ angular.module('actorDetail').component('actorDetail', {
 
             self.StrSplit = function (nts) {
                 if (gotPromise) {
-				var arr = self.actor.official_pages.split(',');
-				return (arr[nts]);
+                    var arr = self.actor.official_pages.split(',');
+                    return (arr[nts]);
                 }
-				
+
             };
 
             self.isNotEmpty = function (fieldToCheck) {
@@ -402,11 +400,11 @@ angular.module('actorDetail').component('actorDetail', {
 
                     var ans = false;
                     // console.log("Actor-detail: isEmpty: fieldToCheck is" + fieldToCheck + "self.actor.fieldToCheck != undefined  is" + self.actor.fieldToCheck != undefined  )
-                //    if (self.actor.fieldToCheck != undefined || self.actor.fieldToCheck != null) {
-                        if (self.actor.fieldToCheck.length > 0) {
-                            ans = true;
-                        }
-               //     }
+                    //    if (self.actor.fieldToCheck != undefined || self.actor.fieldToCheck != null) {
+                    if (self.actor.fieldToCheck.length > 0) {
+                        ans = true;
+                    }
+                    //     }
                     return ans;
                 }
 

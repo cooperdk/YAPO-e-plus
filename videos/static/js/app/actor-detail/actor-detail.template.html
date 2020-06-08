@@ -1,5 +1,6 @@
 <uib-alert ng-repeat="alert in $ctrl.alerts" class="enter" type="{{ alert.type }}" close="$ctrl.closeAlert($index)"
-           dismiss-on-timeout="{{ alert.timeout }}">{{ alert.msg }}</uib-alert>
+           dismiss-on-timeout="{{ alert.timeout }}">{{ alert.msg }}
+</uib-alert>
 <h1 align="center">
     <a href="#" editable-text="$ctrl.actor.name"
        onaftersave="$root.patchEntity('actor', $ctrl.actor.id, 'name', $ctrl.actor.name, 'add',
@@ -74,30 +75,32 @@
 
 
     </div>
-    <div ng-if="!$ctrl.hideDetail" class="col-md-1 pull-right" style="z-index: 2; relative: absolute; width: 30%; left: -20px; right: 20px; top: -260px;"> <!--135px-->
+    <div ng-if="!$ctrl.hideDetail" class="col-md-1 pull-right"
+         style="z-index: 2; relative: absolute; width: 30%; left: -20px; right: 20px; top: -260px;"> <!--135px-->
 
-        <table valign="top" class="actor-detail" >
+        <table valign="top" class="actor-detail">
             <tr>
                 <td colspan="2">
 
 
                     <div class="alcenter">Scrape info from:<br>
-<p>
-                        <button type="button" ng-click="$ctrl.scrapeActor('IMDB')" class="btn btn-default btn-sm">
-                            <span class="glyphicon glyphicon-plus"></span><small> IMDB</small>
-                        </button>
+                        <p>
+                            <button type="button" ng-click="$ctrl.scrapeActor('IMDB')" class="btn btn-default btn-sm">
+                                <span class="glyphicon glyphicon-plus"></span><small> IMDB</small>
+                            </button>
 
-                        <button type="button" ng-click="$ctrl.scrapeActor('TMDb')" class="btn btn-default btn-sm">
-                            <span class="glyphicon glyphicon-plus"></span><small> TMDb</small>
-                        </button>
+                            <button type="button" ng-click="$ctrl.scrapeActor('TMDb')" class="btn btn-default btn-sm">
+                                <span class="glyphicon glyphicon-plus"></span><small> TMDb</small>
+                            </button>
 
-                        <button type="button" ng-click="$ctrl.scrapeActor('Freeones')"
-                                class="btn btn-default btn-sm">
-                            <span class="glyphicon glyphicon-plus"></span><small> Freeones</small>
-                        </button>
-						<input type="checkbox" ng-model="$ctrl.forceScrape"
-                               uib-popover-html="'Override existing values while scraping with selected scraper'"
-                               popover-trigger="mouseenter" popover-placement="top"> Force</p>
+                            <button type="button" ng-click="$ctrl.scrapeActor('Freeones')"
+                                    class="btn btn-default btn-sm">
+                                <span class="glyphicon glyphicon-plus"></span><small> Freeones</small>
+                            </button>
+                            <input type="checkbox" ng-model="$ctrl.forceScrape"
+                                   uib-popover-html="'Override existing values while scraping with selected scraper'"
+                                   popover-trigger="mouseenter" popover-placement="top"> Force
+                        </p>
 
                     </div>
                     <detail-profile-image ng-if="$ctrl.updateImage" actor="$ctrl.actor"></detail-profile-image>
@@ -122,17 +125,17 @@
             <tr>
                 <td colspan="1">
                     Date of Birth:<br>
-                                    <p class="input-group">
-                            <input type="text" class="form-control" uib-datepicker-popup="dd.MM.yyyy"
-                                   ng-model="$ctrl.birthdate"
-                                   is-open="popup1.opened" datepicker-options="dateOptions" ng-required="true"
-                                   close-text="Close" alt-input-formats="altInputFormats"
-                                   ng-change="$ctrl.updateBirthday($ctrl.actor)"/>
-                            <span class="input-group-btn">
+                    <p class="input-group">
+                        <input type="text" class="form-control" uib-datepicker-popup="dd.MM.yyyy"
+                               ng-model="$ctrl.birthdate"
+                               is-open="popup1.opened" datepicker-options="dateOptions" ng-required="true"
+                               close-text="Close" alt-input-formats="altInputFormats"
+                               ng-change="$ctrl.updateBirthday($ctrl.actor)"/>
+                        <span class="input-group-btn">
                             <button type="button" class="btn btn-default" ng-click="open1()"><i
                                     class="glyphicon glyphicon-calendar"></i></button>
                             </span>
-                        </p>
+                    </p>
 
 
                 </td>
@@ -146,7 +149,7 @@
                 <td valign="top">
                     Ethnicity:
                 </td>
-				                <td class="alright">
+                <td class="alright">
                     <a href="#" editable-text="$ctrl.actor.ethnicity"
                        onaftersave="$root.patchEntity('actor', $ctrl.actor.id, 'ethnicity', $ctrl.actor.ethnicity, 'add',
                                               false, false, null)">
@@ -186,7 +189,6 @@
                             <a href="/#!/actor-tag/{{ tag.id }}">{{ tag.name }} [{{ tag.usage_count }}]</a> <span
                                 ng-click="$ctrl.removeItem(tag,'actor_tags')"
                                 class="glyphicon glyphicon-remove"></span>
-
 
 
                         </li>
@@ -331,29 +333,27 @@
                     Websites:
                     <ul>
 
-                        <li ng-if="$ctrl.StrSplit(0)">Official:<br> 
-                        <span ng-if="$ctrl.StrSplit(0)"><b><a
-                                href="{{ $ctrl.StrSplit(0) }}"
-                                target="_blank">1</a></b></span>
-                        <span ng-if="$ctrl.StrSplit(1)"> | <b><a
-                                href="{{ $ctrl.StrSplit(1) }}"
-                                target="_blank">2</a></b></span>
-                        <span ng-if="$ctrl.StrSplit(2)"> | <b><a
-                                href="{{ $ctrl.StrSplit(2) }}"
-                                target="_blank">3</a></b></span>
-                        <span ng-if="$ctrl.StrSplit(3)"> | <b><a
-                                href="{{ $ctrl.StrSplit(3) }}"
-                                target="_blank">4</a></b></span>
-                        <span ng-if="$ctrl.StrSplit(4)"> | <b><a
-                                href="{{ $ctrl.StrSplit(4) }}"
-                                target="_blank">5</a></b></span>
-                        <hr>
+                        <li ng-if="$ctrl.StrSplit(0)">Official:<br>
+                            <span ng-if="$ctrl.StrSplit(0)"><b><a
+                                    href="{{ $ctrl.StrSplit(0) }}"
+                                    target="_blank">1</a></b></span>
+                            <span ng-if="$ctrl.StrSplit(1)"> | <b><a
+                                    href="{{ $ctrl.StrSplit(1) }}"
+                                    target="_blank">2</a></b></span>
+                            <span ng-if="$ctrl.StrSplit(2)"> | <b><a
+                                    href="{{ $ctrl.StrSplit(2) }}"
+                                    target="_blank">3</a></b></span>
+                            <span ng-if="$ctrl.StrSplit(3)"> | <b><a
+                                    href="{{ $ctrl.StrSplit(3) }}"
+                                    target="_blank">4</a></b></span>
+                            <span ng-if="$ctrl.StrSplit(4)"> | <b><a
+                                    href="{{ $ctrl.StrSplit(4) }}"
+                                    target="_blank">5</a></b></span>
+                            <hr>
                         </li>
-						
 
-						
-						
-						<li><b><big>PROFILE PAGES</big></b></li>
+
+                        <li><b><big>PROFILE PAGES</big></b></li>
                         <li ng-if="$ctrl.actor.tmdb_id"><a
                                 href="https://www.themoviedb.org/person/{{ $ctrl.actor.tmdb_id }}"
                                 target="_blank">TMDB Page</a></li>
@@ -362,43 +362,54 @@
                                 href="http://www.imdb.com/name/{{ $ctrl.actor.imdb_id }}"
                                 target="_blank">IMDB Page</a>
                         </li>
-						<li><a
-                            title="Shows Lord of Porn profile page, if it exists" href="https://thelordofporn.com/pornstars/{{ $ctrl.actorNameDelimiter('-',false) }}"
-                            target="_blank">Lord of Porn Page</a>
-                        </li>						
-						<li><a
-                            title="Shows traxxx.me profile page, if it exists" href="https://www.traxxx.me/actor/{{ $ctrl.actorNameDelimiter('-',false) }}"
-                            target="_blank">Traxxx.me Page</a>
+                        <li><a
+                                title="Shows Lord of Porn profile page, if it exists"
+                                href="https://thelordofporn.com/pornstars/{{ $ctrl.actorNameDelimiter('-',false) }}"
+                                target="_blank">Lord of Porn Page</a>
                         </li>
-						<li><a
-                            title="Shows metadataapi.net profile page, if it exists" href="https://www.metadataapi.net/performer/{{ $ctrl.actorNameDelimiter('-',false) }}"
-                            target="_blank">ThePornDB Page (metadataapi.net)</a>
+                        <li><a
+                                title="Shows traxxx.me profile page, if it exists"
+                                href="https://www.traxxx.me/actor/{{ $ctrl.actorNameDelimiter('-',false) }}"
+                                target="_blank">Traxxx.me Page</a>
                         </li>
-						<br />
+                        <li><a
+                                title="Shows metadataapi.net profile page, if it exists"
+                                href="https://www.metadataapi.net/performer/{{ $ctrl.actorNameDelimiter('-',false) }}"
+                                target="_blank">ThePornDB Page (metadataapi.net)</a>
+                        </li>
+                        <br/>
                         <li><b><big>STREAMING VIDEO SEARCHING</big></b></li>
-                        <li><a title="Search Pornhub for streaming video clips with this actor" href="http://www.pornhub.com/pornstar/{{ $ctrl.actorNameDelimiter('-',false) }}"
+                        <li><a title="Search Pornhub for streaming video clips with this actor"
+                               href="http://www.pornhub.com/pornstar/{{ $ctrl.actorNameDelimiter('-',false) }}"
                                target="_blank">Pornhub Page</a></li>
 
-                        <li><a title="Search XVIDEOS for streaming video clips with this actor" href="http://www.xvideos.com/?k={{ $ctrl.actorNameDelimiter('.',false) }}"
+                        <li><a title="Search XVIDEOS for streaming video clips with this actor"
+                               href="http://www.xvideos.com/?k={{ $ctrl.actorNameDelimiter('.',false) }}"
                                target="_blank">XVIDEOS Page</a></li>
-					    <br />
+                        <br/>
                         <li><b><big>TORRENT SEARCHING</big></b></li>
-                        <li><a title="Search RarBG for torrents with this actor" href="https://unblockedrarbg.org/torrents.php?search=%22{{  $ctrl.actorNameDelimiter('+',false) }}%22&category=4"
+                        <li><a title="Search RarBG for torrents with this actor"
+                               href="https://unblockedrarbg.org/torrents.php?search=%22{{  $ctrl.actorNameDelimiter('+',false) }}%22&category=4"
                                target="_blank">RarBG Torrent Search</a></li>
 
-                        <li><a title="Search Empornium for torrents with this actor"href="http://www.empornium.me/torrents.php?taglist={{  $ctrl.actorNameDelimiter('.',false) }}"
+                        <li><a title="Search Empornium for torrents with this actor"
+                               href="http://www.empornium.me/torrents.php?taglist={{  $ctrl.actorNameDelimiter('.',false) }}"
                                target="_blank">Empornium Torrent Search</a></li>
 
-                        <li><a title="Search PornMD for information about this actor, videos and photos (assumes the actor is straight)"href="https://www.pornmd.com/straight/{{  $ctrl.actorNameDelimiter('+',false) }}"
+                        <li>
+                            <a title="Search PornMD for information about this actor, videos and photos (assumes the actor is straight)"
+                               href="https://www.pornmd.com/straight/{{  $ctrl.actorNameDelimiter('+',false) }}"
                                target="_blank">PornMD info + Photo Search</a></li>
-                        <br />
+                        <br/>
 
                         <li><b><big>PROFILE PICTURES ETC.</big></b></li>
-                        <li><a title="Search QWant for photos of this actor (disable adult filter for better results)" href="https://qwant.com/?q={{$ctrl.actorNameDelimiter('%20',true)}}&t=images"
+                        <li><a title="Search QWant for photos of this actor (disable adult filter for better results)"
+                               href="https://qwant.com/?q={{$ctrl.actorNameDelimiter('%20',true)}}&t=images"
                                target="_blank">QWant Photo Search</a></li>
 
 
-                        <li><a title="Search Google for photos of this actor" href="https://www.google.com/search?as_st=y&tbm=isch&as_q={{  $ctrl.actorNameDelimiter('&#43;',true) }}&as_epq=&as_oq=&as_eq=&cr=&as_sitesearch=&safe=images&tbs=isz:l,iar:t"
+                        <li><a title="Search Google for photos of this actor"
+                               href="https://www.google.com/search?as_st=y&tbm=isch&as_q={{  $ctrl.actorNameDelimiter('&#43;',true) }}&as_epq=&as_oq=&as_eq=&cr=&as_sitesearch=&safe=images&tbs=isz:l,iar:t"
                                target="_blank">Google Photo Search</a></li>
 
 

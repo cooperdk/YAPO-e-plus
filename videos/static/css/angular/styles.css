@@ -12,6 +12,17 @@ body {
   font-size: 15px;
 }
 
+table.thin tr td{
+   height: 20px;
+   padding: 4px;
+}
+
+.vertically-centered {
+    position: relative;
+    top:50%;
+    transform: translateY(-15%);
+}
+
 h1, h2, h3, h4, h5, a {
     font-family: "Source Sans Pro", Calibri, Candara, Arial, sans-serif;
 
@@ -59,10 +70,6 @@ div.a, td.a, li.a, a {
 
 
 }
-
-
-
-
 
 .actor-detail {
 

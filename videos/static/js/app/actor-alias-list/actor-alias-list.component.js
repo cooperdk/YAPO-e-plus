@@ -5,15 +5,12 @@ angular.module('actorAliasList').component('actorAliasList', {
     bindings: {
         pk: '='
     },
-    controller: ['$scope', 'ActorAlias', 'pagerService', 'scopeWatchService','helperService',
+    controller: ['$scope', 'ActorAlias', 'pagerService', 'scopeWatchService', 'helperService',
         function ActorAliasListController($scope, ActorAlias, pagerService, scopeWatchService, helperService) {
             var self = this;
             var counter = 0;
             // self.aliases = [];
             self.pageType = 'ActorAlias';
-
-
-
 
 
             self.nextPage = function (currentPage) {
@@ -30,7 +27,7 @@ angular.module('actorAliasList').component('actorAliasList', {
                 self.actorsToadd = pagerService.getNextPage(input);
                 if (self.actorsToadd != undefined) {
                     self.actorsToadd.$promise.then(function (res) {
-                        
+
                         // self.actorsToadd = res[0];
 
                         var paginationInfo = {
@@ -41,8 +38,8 @@ angular.module('actorAliasList').component('actorAliasList', {
                         scopeWatchService.paginationInit(paginationInfo);
 
                         self.aliases = helperService.resourceToArray(res[0]);
- 
-                        
+
+
                     });
                 }
 
@@ -57,7 +54,7 @@ angular.module('actorAliasList').component('actorAliasList', {
             });
 
             $scope.$on("paginationChange", function (event, pageInfo) {
-                if (pageInfo.pageType == self.pageType){
+                if (pageInfo.pageType == self.pageType) {
                     self.nextPage(pageInfo.page)
                 }
 
@@ -81,12 +78,11 @@ angular.module('actorAliasList').component('actorAliasList', {
                 var resId = [];
                 var resObjects = [];
 
-                for (var i = 0 ; i < self.aliases.length; i++) {
+                for (var i = 0; i < self.aliases.length; i++) {
                     if (self.aliases[i].id != aliasToDelete.id) {
 
-                            resId.push(self.aliases[i].id);
-                            resObjects.push(self.aliases[i]);
-
+                        resId.push(self.aliases[i].id);
+                        resObjects.push(self.aliases[i]);
 
 
                     }
@@ -97,11 +93,11 @@ angular.module('actorAliasList').component('actorAliasList', {
 
             };
             self.isOneWord = function (alias) {
-                
+
                 return !(alias.name.indexOf(' ') > -1)
-                
+
             };
-            
+
             self.updateActorAlias = function (object) {
 
                 //
