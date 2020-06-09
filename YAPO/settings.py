@@ -20,7 +20,7 @@ SECRET_KEY = "0px^lshd1lsf6uq#%90lre3$iqkz9=i7a0ko2_83b$n@=&(*d5"
 DEBUG = True
 SILENCED_SYSTEM_CHECKS = ["fields.W340"]
 ALLOWED_HOSTS = ['*']
-DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000.
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000
 
 # Application definition
 
