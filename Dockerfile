@@ -16,4 +16,4 @@ RUN pip install -r requirements.txt
 EXPOSE 8000
 RUN python -u manage.py makemigrations
 RUN python -u manage.py migrate
-ENTRYPOINT python -u manage.py runserver 127.0.0.1:8000
+ENTRYPOINT python -u manage.py runserver 0.0.0.0:8000
