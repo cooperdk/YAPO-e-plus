@@ -19,7 +19,7 @@ SECRET_KEY = "0px^lshd1lsf6uq#%90lre3$iqkz9=i7a0ko2_83b$n@=&(*d5"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 SILENCED_SYSTEM_CHECKS = ["fields.W340"]
-ALLOWED_HOSTS = ['127.0.0.1','localhost','[::1]','172.17.0.1','192.168.99.100','0.0.0.0']
+ALLOWED_HOSTS = ['*']
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000.
 
 # Application definition
