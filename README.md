@@ -1,7 +1,7 @@
 # YAPO e+
 ## Yet Another Porn Organizer (extended plus)
 
-IMPORTANT! YAPO does not currently work on Django 2.x or 3.x. It currently depends on Django 1.11.29.
+If you don't want to mess with Python and all the dependencies, there is an installer (Windows 10 64-bit) located here: https://github.com/cooperdk/YAPO-e-plus/releases.
 
 #### This is a branch of the original YAPO on which I'making improvements. Find the original readme at the bottom (delimited with a line of "=" signs).
 
@@ -13,8 +13,6 @@ ATTENTION - The program directory MUST be renamed to "YAPO" (upper case) as some
 There are a **set of logos** available for websites, thanks to @GernBlanston#0168 from Porn Organizing (https://discord.gg/6TvpGA) - get them here: http://yapo-eplus.sex-galleri.dk/websitelogos.zip - they should be unpacked to your YAPO root. YAPO simply matches the website name in your installation with a PNG image in videos/media/logos and if there's a name match, the logo will be shown on the website view. Currently, the filename MUST match the  website name (not case-sensitive).
 
 Requirements: FFMPEG, VLC and Python 3.7.7+ installed. Or use the installer which will even run from a USB stick, should you want to do that.
-
-If you don't want to mess with Python and all the dependencies, there is an (old) installer (Windows only) located here: http://yapo-eplus.sex-galleri.dk/yapo-eplus.exe - this will be updated ASAP.
 
 If something is not working, it is generally enough to make sure all dependencies are installed. From the YAPO main dir, run:
 `pip install -r requirements.txt`
