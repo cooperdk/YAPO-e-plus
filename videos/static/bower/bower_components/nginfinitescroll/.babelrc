@@ -1,3 +1,0 @@
-{
-  "presets": ["modern-node/6.3", "es2016", "stage-1"]
-}
