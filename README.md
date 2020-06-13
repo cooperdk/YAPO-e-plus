@@ -15,13 +15,17 @@ There are a **set of logos** available for websites, thanks to @GernBlanston#016
 Requirements: FFMPEG, VLC and Python 3.7.7+ installed. Or use the installer which will even run from a USB stick, should you want to do that.
 
 If something is not working, it is generally enough to make sure all dependencies are installed. From the YAPO main dir, run:
-`pip install -r requirements.txt`
+
+```bash
+pip install -r requirements.txt
+```
 
 or updating the database, if you're already using YAPO and updating it - this is also run from the YAPO main dir:
 
-`python manage.py makemigrations`
-
-`python manage.py migrate`
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
 
 
 
@@ -84,29 +88,38 @@ or updating the database, if you're already using YAPO and updating it - this is
 
 #### WHAT TO DO IF YOU'RE INSTALLING A NEW COPY OR UPGRADING YOUR EXISTING COPY OF ANOTHER YAPO INSTALLATION?
 
-1. Download FFMPEG from https://ffmpeg.zeranoe.com/builds/ and move the files in the archive's bin/ folder to the subfolder videos/ffmpeg in the YAPO e+ root folder. The program looks
+1. Download FFMPEG from https://ffmpeg.zeranoe.com/builds/ and move the files in the archive's `bin/` folder to the subfolder `videos/ffmpeg` in the YAPO e+ root folder. The program looks
 for them there, if you're running Windows. If you're running Linux, install FFMPEG using your package manager.
 
-2. Install all dependencies by executing: pip install -R requirements.txt from the main YAPO e+ folder. This installs Django and any other libraries in their minimum required versions.
+1. Install all dependencies by executing: `pip install -R requirements.txt` from the main YAPO e+ folder. This installs Django and any other libraries in their minimum required versions.
 
-3. Since the database has changed a bit, it is necessary to migrate (it is, even if it's a new install, because that's how the database is generated).
+1. Since the database has changed a bit, it is necessary to migrate (it is, even if it's a new install, because that's how the database is generated).
 
-   Execute: "python manage.py makemigrations"
-   This will look over the new code and take note of the adjustments that needs to be made to the database.
+    1. Prepare database migration:
+        ```bash
+        python manage.py makemigrations
+        ```
+    
+        This will look over the new code and take note of the adjustments that needs to be made to the database.
 
-   "python manage.py migrate"
-   This will actually make the adjustments to the database it took note of in the previous step.
+    1. Execute database migration
+        ```bash
+        python manage.py migrate
+        ```
+        
+        This will actually make the adjustments to the database it took note of in the previous step.
 
-   If you get this error when you're done:
+    1. If you get this error when you're done:
+        ```bash
+        You are trying to add a non-nullable field **'date_added'** to folder without a default; we can't do that (the database needs  something to populate existing rows).
+        ```
    
-   "You are trying to add a non-nullable field **'date_added'** to folder without a default; we can't do that (the database needs  something to populate existing rows)."
+        When asked to select a fix, select option 1 and type in `datetime.datetime.now()` and press enter.
    
-   When asked to select a fix, select option 1 and type in "datetime.datetime.now()" (without quotes) and press enter.
-   
-   If you need more help installing the software, first look towards the end of this document, there's a section named "Installation".
-   Only if you really have difficulties, register an issue on Github. I will offer installation help, by mail or through Teamviewer, for a coffee donation.
+        If you need more help installing the software, first look towards the end of this document, there's a section named "Installation".
+        Only if you really have difficulties, register an issue on Github. I will offer installation help, by mail or through Teamviewer, for a coffee donation.
 
-4. Enjoy!
+1. Enjoy!
 
 ================================================================================
 
@@ -229,12 +242,15 @@ YAPO's dependencies are:
 (Watch the video above for a walkthrough of the installation.)
 
 1. Create a virtual environment for YAPO's installation.
-2. With the virtual environment activated, create a folder for YAPO and pull it from Git: `C:\YAPO\> git clone https://github.com/cooperdk/YAPO-e-plus.git`
-3. Install YAPO dependencies: `pip install -r requirements.txt`
-4. Navigate to `C:\YAPO\videos\static\bower` and install JS dependencies by running: `bower install`
-5. Create YAPO database from `C:\yapo\YAPO` run: `python manage.py migrate`
-6. (On Windows) Place ffmpeg.exe and ffprobe.exe in the `C:\YAPO\videos\ffmpeg folder`
-7. Start the server from `C:\YAPO` run: `python manage.py runserver 127.0.0.1:8000`
+1. With the virtual environment activated, create a folder for YAPO and pull it from Git: `C:\YAPO\> git clone https://github.com/cooperdk/YAPO-e-plus.git`
+1. Install YAPO dependencies: `pip install -r requirements.txt`
+1. Install [Node.js & npm](https://nodejs.org/en/download/) and use it to install bower: `npm install -g bower`
+1. Navigate to `C:\YAPO\videos\static\bower` and install JS dependencies by running: `bower install`
+1. Create YAPO database from `C:\yapo\YAPO` run: `python manage.py migrate`
+1. Prepare ffmpeg
+    1. (On Windows) Place ffmpeg.exe and ffprobe.exe in the `C:\YAPO\videos\ffmpeg folder`
+    1. (On Debian-based Linux distros) Install ffmpeg using package manager: `sudo apt update && sudo apt install ffmpeg`
+1. Start the server from `C:\YAPO` run: `python manage.py runserver 127.0.0.1:8000`
 
 
 
@@ -261,12 +277,14 @@ This will actually make the adjustments to the database it took note of in the p
 
 When updating YAPO, if you get the following error: 
 
+```
 > You are trying to add a non-nullable field **'date_added'** to folder without a default; we can't do that (the database needs  something to populate existing rows).
 
 > Please select a fix:
  1) Provide a one-off default now (will be set on all existing rows)
  2) Quit, and let me add a default in models.py
  Select an option:
+```
 
 You should select option 1 and type in `datetime.datetime.now()` and press enter.
 
