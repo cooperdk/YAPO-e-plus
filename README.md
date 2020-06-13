@@ -91,12 +91,14 @@ for them there, if you're running Windows. If you're running Linux, install FFMP
 
 1. Install Node.js & npm from here: https://nodejs.org/en/download/ and use it to install bower:
 
-```npm install -g bower
+```bash
+npm install -g bower
 ```
 
 Navigate to <drive>\YAPO\videos\static\bower and install JS dependencies by running:
   
-```bower install
+```bash
+bower install
 ```
 
 1. Install all dependencies by executing: `pip install -R requirements.txt` from the main YAPO e+ folder. This installs Django and any other libraries in their minimum required versions.
