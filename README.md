@@ -27,8 +27,6 @@ python manage.py makemigrations
 python manage.py migrate
 ```
 
-
-
 #### Discuss and share on Discord: https://discord.gg/zdm7Mdg
 
 #### NEW FEATURES:
@@ -90,6 +88,16 @@ python manage.py migrate
 
 1. Download FFMPEG from https://ffmpeg.zeranoe.com/builds/ and move the files in the archive's `bin/` folder to the subfolder `videos/ffmpeg` in the YAPO e+ root folder. The program looks
 for them there, if you're running Windows. If you're running Linux, install FFMPEG using your package manager.
+
+1. Install Node.js & npm from here: https://nodejs.org/en/download/ and use it to install bower:
+
+```npm install -g bower
+```
+
+Navigate to <drive>\YAPO\videos\static\bower and install JS dependencies by running:
+  
+```bower install
+```
 
 1. Install all dependencies by executing: `pip install -R requirements.txt` from the main YAPO e+ folder. This installs Django and any other libraries in their minimum required versions.
 
