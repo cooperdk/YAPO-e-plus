@@ -25,7 +25,7 @@ or updating the database, if you're already using YAPO and updating it - this is
 
 
 
-#### Discuss and share on Discord: https://discord.gg/ad5hjsA
+#### Discuss and share on Discord: https://discord.gg/zdm7Mdg
 
 #### NEW FEATURES:
 
