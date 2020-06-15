@@ -3,7 +3,7 @@
 
 If you don't want to mess with Python and all the dependencies, there is an installer (Windows 10 64-bit) located here: https://github.com/cooperdk/YAPO-e-plus/releases.
 
-#### This is a branch of the original YAPO on which I'making improvements. Find the original readme at the bottom (delimited with a line of "=" signs).
+#### This is a branch of the original YAPO on which I'm making improvements, such as in-browser playback, file matching and more scraping options. Find the original readme at the bottom (delimited with a line of "=" signs).
 
 There is a setup available for an easy install.
 There is also a copy of the setup with pre-registered actors, websites and tags (thousands of them). It will be available on Patreon shortly.
@@ -30,6 +30,8 @@ python manage.py migrate
 #### Discuss and share on Discord: https://discord.gg/zdm7Mdg
 
 #### NEW FEATURES:
+
+- Streaming scene playback from within YAPO e+ (with working seek bar). This will be pushed in the next update, around 17th June 2020.
 
 - Contact sheets.
   For now, they are in each scene's folder under videos/media/scenes. They will be displayed on the scene detail view in the next update.
