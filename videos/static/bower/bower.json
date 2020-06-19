@@ -1,12 +1,12 @@
 {
   "name": "yapo",
-  "homepage": "https://github.com/curtwagner1984/YAPO",
+  "homepage": "https://github.com/cooperdk/YAPO-e-plus",
   "authors": [
-    "Curt Wagner <curtwagner1984@gmail.com>"
+    "CooperDK <no@mail.here>"
   ],
-  "description": "Yet Another Porn Organizer",
+  "description": "Yet Another Porn Organizer - extended",
   "main": "app.config.js",
-  "license": "MIT",
+  "license": "GPL-3.0",
   "private": true,
   "ignore": [
     "**/.*",
