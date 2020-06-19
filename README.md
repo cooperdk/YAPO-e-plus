@@ -1,14 +1,14 @@
 # YAPO e+
 ## Yet Another Porn Organizer (extended plus)
 
-If you don't want to mess with Python and all the dependencies, there is an installer (Windows 10 64-bit) located here: https://github.com/cooperdk/YAPO-e-plus/releases.
+If you don't want to mess with Python and all the dependencies, there is an installer (Windows 10 64-bit) located [here](https://github.com/cooperdk/YAPO-e-plus/releases).
 
 #### This is a branch of the original YAPO on which I'm making improvements, such as in-browser playback, file matching and more scraping options. Find the original readme at the bottom (delimited with a line of "=" signs).
 
-There is a setup available for an easy install.
+There is a setup available for an easy install. Or read the installation instructions in this document under "What to do if you're installing a new copy or upgrading your existing copy of YAPO?".
 There is also a copy of the setup with pre-registered actors, websites and tags (thousands of them). It will be available on Patreon shortly.
 
-ATTENTION - The program directory MUST be renamed to "YAPO" (upper case) as some functions depend on this! 
+ATTENTION - The program directory should be renamed to "YAPO" (upper case) as some functions might depend on this. 
 
 There are a **set of logos** available for websites, thanks to @GernBlanston#0168 from Porn Organizing (https://discord.gg/6TvpGA) - get them here: http://yapo-eplus.sex-galleri.dk/websitelogos.zip - they should be unpacked to your YAPO root. YAPO simply matches the website name in your installation with a PNG image in videos/media/logos and if there's a name match, the logo will be shown on the website view. Currently, the filename MUST match the  website name (not case-sensitive).
 
@@ -20,14 +20,16 @@ If something is not working, it is generally enough to make sure all dependencie
 pip install -r requirements.txt
 ```
 
-or updating the database, if you're already using YAPO and updating it - this is also run from the YAPO main dir:
+It might also be necessary to update the database, if you're already using YAPO - this is also run from the YAPO main dir:
 
 ```bash
 python manage.py makemigrations
 python manage.py migrate
 ```
 
-#### Discuss and share on Discord: https://discord.gg/zdm7Mdg
+##### Discuss and share on Discord: https://discord.gg/zdm7Mdg
+
+
 
 #### NEW FEATURES:
 
@@ -86,7 +88,7 @@ python manage.py migrate
 - Function to move all videos belonging to a website or actor so that they reside in the same folder and an ability to set this automatically
 - An API for videohashes, tags and actors to avoid hundreds of people re-inventing the wheel
 
-#### WHAT TO DO IF YOU'RE INSTALLING A NEW COPY OR UPGRADING YOUR EXISTING COPY OF ANOTHER YAPO INSTALLATION?
+#### WHAT TO DO IF YOU'RE INSTALLING A NEW COPY OR UPGRADING YOUR EXISTING COPY OF YAPO?
 
 1. Download FFMPEG from https://ffmpeg.zeranoe.com/builds/ and move the files in the archive's `bin/` folder to the subfolder `videos/ffmpeg` in the YAPO e+ root folder. The program looks
 for them there, if you're running Windows. If you're running Linux, install FFMPEG using your package manager.
@@ -97,15 +99,15 @@ for them there, if you're running Windows. If you're running Linux, install FFMP
    npm install -g bower
    ```
 
-   Navigate to <drive>\YAPO\videos\static\bower and install JS dependencies by running:
+   Navigate to the YAPO e+ dir, typically something like C:\YAPO, and then the subdir videos\static\bower. There should be a file named bower.json - from there, install the front-end dependencies by running:
   
    ```bash
    bower install
    ```
 
-1. Install all dependencies by executing: `pip install -R requirements.txt` from the main YAPO e+ folder. This installs Django and any other libraries in their minimum required versions.
+1. Install all Python dependencies by executing: `pip install -R requirements.txt` from the main YAPO e+ folder. This installs Django and any other libraries in their minimum required versions. This may take a few minutes.
 
-1. Since the database has changed a bit, it is necessary to migrate (it is, even if it's a new install, because that's how the database is generated).
+1. Since the database has changed a bit, it may be necessary to migrate the system.
 
     1. Prepare database migration:
         ```bash
@@ -125,9 +127,9 @@ for them there, if you're running Windows. If you're running Linux, install FFMP
         ```bash
         You are trying to add a non-nullable field **'date_added'** to folder without a default; we can't do that (the database needs  something to populate existing rows).
         ```
-   
-        When asked to select a fix, select option 1 and type in `datetime.datetime.now()` and press enter.
-   
+      
+        You should select option 1 and type in `datetime.datetime.now()` and press enter.
+      
         If you need more help installing the software, first look towards the end of this document, there's a section named "Installation".
         Only if you really have difficulties, register an issue on Github. I will offer installation help, by mail or through Teamviewer, for a coffee donation.
 
@@ -244,8 +246,9 @@ I made a few videos that describe exactly what you need to do if you want to try
 YAPO's dependencies are: 
 * [Python 3](https://www.python.org/)
 * [FFMPEG](https://ffmpeg.org/)
+* [AngularJS](https://angularjs.org/)
 * [NodeJS](https://nodejs.org/en/)
-* [Bower](https://bower.io/#install-bower)
+* [Bower](https://bower.io/#install-bower) (using npm for installation)
 
 ####  YAPO installation:
 
