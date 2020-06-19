@@ -19,7 +19,7 @@ class SettingsSerializer(serializers.Serializer):
 class LocalSceneFoldersSerializer(serializers.ModelSerializer):
     class Meta:
         model = LocalSceneFolders
-        fields = '__all__'
+        fields = "__all__"
 
 
 class PathWithIds(serializers.CharField):
@@ -34,25 +34,32 @@ class PathWithIds(serializers.CharField):
 
 
 class FolderSerializer(serializers.ModelSerializer):
-    path_id = PathWithIds(source='path_with_ids')
+    path_id = PathWithIds(source="path_with_ids")
 
     class Meta:
         model = Folder
-        fields = ['id', 'level', 'name', 'last_folder_name_only', 'parent', 'scenes', 'path_id', 'date_added']
+        fields = [
+            "id",
+            "level",
+            "name",
+            "last_folder_name_only",
+            "parent",
+            "scenes",
+            "path_id",
+            "date_added",
+        ]
         # fields = ['name', 'path_id']
 
 
 class SceneIdNameSerializer(serializers.ModelSerializer):
     # actorss = ActorListSerializer(source='actors')
 
-
-
     class Meta:
         model = Scene
         depth = 1
         # fields = ['id', 'name', 'path_to_file', 'path_to_dir', 'date_added', 'date_fav', 'date_runner_up', 'play_count',
         #           'is_fav', 'is_runner_up', 'rating', 'description', 'thumbnail', 'scene_tags', 'actors', 'websites' ]
-        fields = ['id', 'name']
+        fields = ["id", "name"]
 
 
 class SceneTagIdNameSerialzier(serializers.ModelSerializer):
@@ -60,7 +67,7 @@ class SceneTagIdNameSerialzier(serializers.ModelSerializer):
 
     class Meta:
         model = SceneTag
-        fields = ['id', 'name', 'usage_count', 'play_count']
+        fields = ["id", "name", "usage_count", "play_count"]
 
     def get_usage_count(self, obj):
         return obj.scenes.count()
@@ -68,21 +75,40 @@ class SceneTagIdNameSerialzier(serializers.ModelSerializer):
 
 class WebsiteSerializer(serializers.ModelSerializer):
     # scenes = SceneIdNameSerializer(read_only=True, many=True)
-    scene_tags_with_names = SceneTagIdNameSerialzier(many=True, read_only=True, source='scene_tags')
+    scene_tags_with_names = SceneTagIdNameSerialzier(
+        many=True, read_only=True, source="scene_tags"
+    )
 
     class Meta:
         model = Website
-        fields = ['id', 'name', 'date_added', 'play_count', 'date_fav', 'date_runner_up', 'is_fav', 'is_runner_up',
-                  'rating', 'thumbnail', 'scenes', 'website_alias', 'exclusions', 'scene_tags', 'scene_tags_with_names']
+        fields = [
+            "id",
+            "name",
+            "date_added",
+            "play_count",
+            "date_fav",
+            "date_runner_up",
+            "is_fav",
+            "is_runner_up",
+            "rating",
+            "thumbnail",
+            "scenes",
+            "website_alias",
+            "exclusions",
+            "scene_tags",
+            "scene_tags_with_names",
+        ]
 
 
 class WebsiteIdNameSerailzier(serializers.ModelSerializer):
-    scene_tags_with_names = SceneTagIdNameSerialzier(many=True, read_only=True, source='scene_tags')
+    scene_tags_with_names = SceneTagIdNameSerialzier(
+        many=True, read_only=True, source="scene_tags"
+    )
     usage_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Website
-        fields = ['id', 'name', 'scene_tags_with_names', 'usage_count', 'play_count']
+        fields = ["id", "name", "scene_tags_with_names", "usage_count", "play_count"]
 
     def get_usage_count(self, obj):
         return obj.scenes.count()
@@ -93,8 +119,22 @@ class SceneTagSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SceneTag
-        fields = ['id', 'name', 'date_added', 'play_count', 'date_fav', 'date_runner_up', 'is_fav', 'is_runner_up',
-                  'rating', 'thumbnail', 'websites', 'scenes', 'scene_tag_alias', 'exclusions']
+        fields = [
+            "id",
+            "name",
+            "date_added",
+            "play_count",
+            "date_fav",
+            "date_runner_up",
+            "is_fav",
+            "is_runner_up",
+            "rating",
+            "thumbnail",
+            "websites",
+            "scenes",
+            "scene_tag_alias",
+            "exclusions",
+        ]
 
 
 class ActorAliasSerializer(serializers.ModelSerializer):
@@ -104,7 +144,7 @@ class ActorAliasSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ActorAlias
-        fields = ['id', 'name', 'is_exempt_from_one_word_search']
+        fields = ["id", "name", "is_exempt_from_one_word_search"]
 
 
 class ActorTagListSerializer(serializers.ModelSerializer):
@@ -115,7 +155,7 @@ class ActorTagListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ActorTag
-        fields = ['id', 'name', 'scene_tags', 'usage_count']
+        fields = ["id", "name", "scene_tags", "usage_count"]
 
     def get_usage_count(self, obj):
         return obj.actors.count()
@@ -126,13 +166,13 @@ class ActorIdNameSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Actor
-        fields = ['id', 'name', 'thumbnail', 'actor_tags']
+        fields = ["id", "name", "thumbnail", "actor_tags"]
 
 
 class ActorIdNameMinimalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Actor
-        fields = ['id', 'name']
+        fields = ["id", "name"]
 
 
 class ActorListSerializer(serializers.ModelSerializer):
@@ -141,8 +181,20 @@ class ActorListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Actor
-        fields = ['id', 'name', 'thumbnail', 'rating', 'height', 'ethnicity', 'weight', 'country_of_origin',
-                  'is_runner_up', 'actor_tags', 'usage_count', 'play_count']
+        fields = [
+            "id",
+            "name",
+            "thumbnail",
+            "rating",
+            "height",
+            "ethnicity",
+            "weight",
+            "country_of_origin",
+            "is_runner_up",
+            "actor_tags",
+            "usage_count",
+            "play_count",
+        ]
 
     def get_usage_count(self, obj):
         return obj.scenes.count()
@@ -167,11 +219,37 @@ class ActorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Actor
         # depth = 2
-        fields = ['id', 'name', 'date_added', 'date_fav', 'date_runner_up', 'date_of_birth', 'play_count', 'is_fav',
-                  'is_runner_up', 'rating', 'description', 'thumbnail', 'gender', 'imdb_id', 'tmdb_id',
-                  'official_pages', 'actor_tags', 'ethnicity', 'weight', 'country_of_origin', 'tattoos', 'piercings', 'height',
-                  'measurements', 'extra_text', 'last_lookup', 'is_exempt_from_one_word_search', 'actor_aliases',
-                  'scenes']
+        fields = [
+            "id",
+            "name",
+            "date_added",
+            "date_fav",
+            "date_runner_up",
+            "date_of_birth",
+            "play_count",
+            "is_fav",
+            "is_runner_up",
+            "rating",
+            "description",
+            "thumbnail",
+            "gender",
+            "imdb_id",
+            "tmdb_id",
+            "official_pages",
+            "actor_tags",
+            "ethnicity",
+            "weight",
+            "country_of_origin",
+            "tattoos",
+            "piercings",
+            "height",
+            "measurements",
+            "extra_text",
+            "last_lookup",
+            "is_exempt_from_one_word_search",
+            "actor_aliases",
+            "scenes",
+        ]
 
         # exclude = ['actor_tags']
         # fields = ('url', 'name', 'actor_aliases', 'date_added')
@@ -208,7 +286,7 @@ class SceneListSerializer(serializers.ModelSerializer):
 
     def setup_eager_loading(self, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('actors', 'scene_tags', 'websites')
+        queryset = queryset.prefetch_related("actors", "scene_tags", "websites")
         return queryset
 
     class Meta:
@@ -216,8 +294,19 @@ class SceneListSerializer(serializers.ModelSerializer):
         # depth = 1
         # fields = ['id', 'name', 'path_to_file', 'path_to_dir', 'hash', 'date_added', 'date_fav', 'date_runner_up', 'play_count',
         #           'is_fav', 'is_runner_up', 'rating', 'description', 'thumbnail', 'scene_tags', 'actors', 'websites' ]
-        fields = ['id', 'name', 'actors', 'scene_tags', 'websites', 'thumbnail', 'folders_in_tree', 'is_runner_up',
-                  'rating', 'path_to_file', 'hash']
+        fields = [
+            "id",
+            "name",
+            "actors",
+            "scene_tags",
+            "websites",
+            "thumbnail",
+            "folders_in_tree",
+            "is_runner_up",
+            "rating",
+            "path_to_file",
+            "hash",
+        ]
 
         # fields = ['id', 'name']
 
@@ -235,10 +324,34 @@ class SceneSerializer(serializers.ModelSerializer):
         #           'websites', 'width', 'height', 'bit_rate', 'duration', 'size', 'codec_name', 'framerate',
         #           'folders_in_tree']
 
-        fields = ['id', 'name', 'path_to_file', 'path_to_dir', 'hash', 'date_added', 'date_fav', 'date_runner_up', 'play_count',
-                  'is_fav', 'is_runner_up', 'rating', 'thumbnail', 'scene_tags', 'actors', 'websites', 'width',
-                  'height',
-                  'bit_rate', 'duration', 'size', 'codec_name', 'framerate', 'description', 'folders_in_tree', 'date_last_played']
+        fields = [
+            "id",
+            "name",
+            "path_to_file",
+            "path_to_dir",
+            "hash",
+            "date_added",
+            "date_fav",
+            "date_runner_up",
+            "play_count",
+            "is_fav",
+            "is_runner_up",
+            "rating",
+            "thumbnail",
+            "scene_tags",
+            "actors",
+            "websites",
+            "width",
+            "height",
+            "bit_rate",
+            "duration",
+            "size",
+            "codec_name",
+            "framerate",
+            "description",
+            "folders_in_tree",
+            "date_last_played",
+        ]
 
 
 class ActorTagSerializer(serializers.ModelSerializer):
@@ -249,8 +362,21 @@ class ActorTagSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActorTag
         # depth = 1
-        fields = ['id', 'name', 'date_added', 'date_fav', 'date_runner_up', 'play_count', 'is_fav', 'is_runner_up',
-                  'rating', 'thumbnail', 'actors', 'scene_tags', 'exclusions']
+        fields = [
+            "id",
+            "name",
+            "date_added",
+            "date_fav",
+            "date_runner_up",
+            "play_count",
+            "is_fav",
+            "is_runner_up",
+            "rating",
+            "thumbnail",
+            "actors",
+            "scene_tags",
+            "exclusions",
+        ]
 
 
 class PlaylistListSerializer(serializers.ModelSerializer):
@@ -258,7 +384,7 @@ class PlaylistListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Playlist
-        fields = ['id', 'name', 'usage_count']
+        fields = ["id", "name", "usage_count"]
 
     def get_usage_count(self, obj):
         return obj.scenes.count()
@@ -267,6 +393,4 @@ class PlaylistListSerializer(serializers.ModelSerializer):
 class PlaylistSerializer(serializers.ModelSerializer):
     class Meta:
         model = Playlist
-        fields = '__all__'
-
-
+        fields = "__all__"

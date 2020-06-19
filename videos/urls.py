@@ -7,7 +7,7 @@ from .models import Actor
 from rest_framework.urlpatterns import format_suffix_patterns
 
 
-app_name = 'videos'
+app_name = "videos"
 
 urlpatterns = [
     # /videos/
@@ -107,7 +107,6 @@ urlpatterns = [
     # url(r'^folders/$', views.folder_view_tree, name='folder-view-tree'),
     #
     # url(r'^folder/(?P<pk>-{0,1}[0-9]+)/$', views.folder_view, name='folder-view'),
-
     #   REST-FRAMEWORK-VIEWS
     #
     #     url(r'^rest/$', views.api_root),
@@ -129,9 +128,8 @@ urlpatterns = [
     #     url(r'^rest/actor-alias/details/(?P<pk>[0-9]+)/html',
     #         views.ActorAliasHTMLRest.as_view(),
     #         name='actor-alias-details-rest'),
-
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
 
-#startup()
+# startup()

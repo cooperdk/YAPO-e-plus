@@ -5,7 +5,7 @@ from videos import *
 import YAPO.settings
 import os, platform
 x=0
-#os.system('mode con: cols=100 lines=4096')
+os.system('mode con: cols=140 lines=4096')
 os.system('cls' if os.name == 'nt' else 'clear')
 if platform.system() == "Windows":
 
@@ -15,9 +15,9 @@ if platform.system() == "Windows":
     STDOUT = -11
 
     hdl = windll.kernel32.GetStdHandle(STDOUT)
-    rect = wintypes.SMALL_RECT(0, 0, 98, 55) # (left, top, right, bottom)
+    rect = wintypes.SMALL_RECT(0, 0, 132, 55) # (left, top, right, bottom)
     windll.kernel32.SetConsoleWindowInfo(hdl, True, byref(rect))
-    bufsize = wintypes._COORD(120, 4096) # rows, columns
+    bufsize = wintypes._COORD(140, 4096) # rows, columns
     windll.kernel32.SetConsoleScreenBufferSize(hdl, bufsize)
     
 if __name__ == "__main__":

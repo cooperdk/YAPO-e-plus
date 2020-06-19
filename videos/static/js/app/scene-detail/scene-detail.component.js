@@ -22,6 +22,14 @@ angular.module('sceneDetail').component('sceneDetail', {
 
             self.isSampleExists = false;
             self.updatedSample = true;
+            self.alerts = [];
+            self.addAlert = function (msg, type, timeout) {
+                self.alerts.push({msg: msg, type: type, timeout: timeout});
+            };
+
+            self.closeAlert = function (index) {
+                self.alerts.splice(index, 1);
+            };
 
             self.addItem = function (itemToAdd, typeOfItemToAdd) {
 
@@ -362,8 +370,9 @@ angular.module('sceneDetail').component('sceneDetail', {
                 }).then(function (response) {
                     self.updatedSample = false;
                     self.updatedSample = true;
+                    self.addAlert("Successfully generated the sample video. Reload to check it out.", 'success', '5000');
                 }, function errorCallback(response) {
-                    alert("Something went wrong!");
+                    self.addAlert("Something went wrong while generating the sample video, please check the console.", 'danger', '100000');
                 });
             };
             

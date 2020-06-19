@@ -19,6 +19,16 @@ angular.module('addItems').component('addItems', {
             var websitesToAdd = "";
 
             self.createSampleVideo = false;
+			
+			self.alerts = [];
+            self.addAlert = function (msg, type, timeout) {
+                self.alerts.push({msg: msg, type: type, timeout: timeout});
+            };
+
+            self.closeAlert = function (index) {
+                self.alerts.splice(index, 1);
+            };
+                
 
             var httpRequest = function () {
                 return $http.get('add-items/', {
@@ -33,8 +43,10 @@ angular.module('addItems').component('addItems', {
                 }).then(function (response) {
                     // alert(angular.toJson(response))
                     // alert("Adding folders and files inside: " + self.pathToFolderToAdd);
+					self.addAlert("OK.", 'success', '3000');
                 }, function errorCallback(response) {
-                    alert("Something went wrong!");
+					self.closeAlert();
+                    self.addAlert("Something went wrong! If adding a folder, check the path!", 'danger', '10000');
                 });
             };
 
@@ -50,6 +62,7 @@ angular.module('addItems').component('addItems', {
             };
 
             self.addFolderClicked = function () {
+				self.addAlert("Folder will be added, scanning commencing...", 'success', '10000');
                 clearFields();
                 foldersToAdd = self.folderInputContent;
                 httpRequest();

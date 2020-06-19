@@ -1,10 +1,8 @@
-
-
-UNKNOWN_PERSON_IMAGE_PATH = 'media/images/actor/Unknown/profile/profile.jpg'
-MEDIA_PATH = 'videos/media/'
-VIDEO_ROOT = 'videos/'
-SHEET_ROOT = 'videos/videosheet'
-TEMP_PATH = 'videos/ffmpeg/temp/'
+UNKNOWN_PERSON_IMAGE_PATH = "media/images/actor/Unknown/profile/profile.jpg"
+MEDIA_PATH = "videos/media/"
+VIDEO_ROOT = "videos/"
+SHEET_ROOT = "videos/videosheet"
+TEMP_PATH = "videos/ffmpeg/temp/"
 VLC_PATH = ""
 LAST_ALL_SCENE_TAG = None
 SETTINGS_VERSION = 3

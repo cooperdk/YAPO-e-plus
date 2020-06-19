@@ -12,7 +12,19 @@ from videos.models import *
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 
-ACCEPTED_VIDEO_EXTENSIONS = {".mp4", ".avi", ".mov", ".flv", ".rm", ".wmv", ".mov", ".m4v", ".mpg", ".mpeg", ".mkv"}
+ACCEPTED_VIDEO_EXTENSIONS = {
+    ".mp4",
+    ".avi",
+    ".mov",
+    ".flv",
+    ".rm",
+    ".wmv",
+    ".mov",
+    ".m4v",
+    ".mpg",
+    ".mpeg",
+    ".mkv",
+}
 TEST_PATH = "Z:\\XBMC\\PR\\19062016"
 
 
@@ -20,13 +32,13 @@ def get_files(walk_dir, make_video_sample):
     # norm_path = os.path.normpath(path)
     # files_in_dir = os.listdir(norm_path)
 
-    print('walk_dir = ' + walk_dir)
+ #   print("walk_dir = " + walk_dir)
 
     # If your current working directory may change during script execution, it's recommended to
     # immediately convert program arguments to an absolute path. Then the variable root below will
     # be an absolute path as well. Example:
     # walk_dir = os.path.abspath(walk_dir)
-    print('walk_dir (absolute) = ' + os.path.abspath(walk_dir))
+#    print("walk_dir (absolute) = " + os.path.abspath(walk_dir))
 
     for root, subdirs, files in os.walk(walk_dir):
         # print('--\nroot = ' + root)
@@ -42,10 +54,14 @@ def get_files(walk_dir, make_video_sample):
             filename_extension = os.path.splitext(file_path)[1]
             for filename_extension_to_test in ACCEPTED_VIDEO_EXTENSIONS:
                 if filename_extension_to_test == filename_extension:
-                    print(f"Filename is {file_path} and the extension is {filename_extension}\n")
+                    print(
+                        f"Filename is {file_path}\nExtension is {filename_extension}\n"
+                    )
 
                     create_scene(file_path, make_video_sample)
-                    print("\n------------------------------------------------------------------------------\n")
+                    print(
+                        "\n------------------------------------------------------------------------------\n"
+                    )
                     break
 
 
@@ -56,7 +72,10 @@ def create_sample_video(scene):
         print("Sample video for scene: {} created successfully.".format(scene.name))
     else:
         print(
-            "Something went wrong while trying to create video sample for scene: {}".format(scene.name))
+            "Something went wrong while trying to create video sample for scene: {}".format(
+                scene.name
+            )
+        )
 
 
 def create_scene(scene_path, make_sample_video):
@@ -66,62 +85,160 @@ def create_scene(scene_path, make_sample_video):
     current_scene.name = os.path.splitext(filename)[0]
     current_scene.path_to_dir = path_to_dir
 
-    print("Scene Name: %s\nPath to Dir: %s\nPath to File: %s" % (
-        current_scene.name, current_scene.path_to_dir, current_scene.path_to_file))
+#    print(
+#        "Scene Name: %s\nPath to Dir: %s\nPath to File: %s"
+#        % (current_scene.name, current_scene.path_to_dir, current_scene.path_to_file)
+#    )
 
     if Scene.objects.filter(path_to_file=current_scene.path_to_file):
         print("Scene Already Exists!")
         scene_in_db = Scene.objects.get(path_to_file=current_scene.path_to_file)
         if scene_in_db.thumbnail is None:
-            print("Trying to use ffprobe on scene: {}".format(scene_in_db.name))
+            print("Trying to use ffprobe on scene... ",end="")
             if ffmpeg_process.ffprobe_get_data_without_save(scene_in_db):
                 print(
-                    "ffprobe successfully gathered information on scene: {}...\nTaking a screenshot with ffmpeg...".format(
-                        scene_in_db.name))
+                    "OK, taking a screenshot... ", end=""
+                    )
 
                 ffmpeg_process.ffmpeg_take_scene_screenshot_without_save(scene_in_db)
 
-                print("Screenshot of scene {} taken...".format(scene_in_db.name))
-        sheet_path = os.path.abspath(os.path.join(const.MEDIA_PATH, 'scenes', str(scene_in_db.id), 'sheet.jpg'))
+                print("Screenshot taken.")
+        sheet_path = os.path.abspath(
+            os.path.join(const.MEDIA_PATH, "scenes", str(scene_in_db.id), "sheet.jpg")
+        )
         if os.path.exists(sheet_path):
             print("Contact Sheet already exists, skipping...")
         else:
             file_path = os.path.abspath(current_scene.path_to_file)
-            #sheetExec = sys.executable + " " + os.path.abspath(os.path.join(const.VIDEO_ROOT, 'videosheet.py'))
-            #print("Executing " + sys.executable + " " + os.path.abspath(os.path.join(const.VIDEO_ROOT, 'videosheet.py')) + " " + file_path + " -t -w 1024 -g 5x6 --quality 75 -f jpg -o " + os.path.abspath(sheet_path))
-            print("Generating Contact Sheet (1024 px wide, 4x4 grid)...")
+            # sheetExec = sys.executable + " " + os.path.abspath(os.path.join(const.VIDEO_ROOT, 'videosheet.py'))
+            # print("Executing " + sys.executable + " " + os.path.abspath(os.path.join(const.VIDEO_ROOT, 'videosheet.py')) + " " + file_path + " -t -w 1024 -g 5x6 --quality 75 -f jpg -o " + os.path.abspath(sheet_path))
+            print("Generating Contact Sheet (1024 px wide, 4x4 grid)... ")
             try:
-                p = subprocess.run([sys.executable, os.path.abspath(os.path.join(const.SHEET_ROOT, 'videosheet.py')),
-                    file_path, "-t","-w","1024","-g","4x4","--quality","75","--timestamp-format","{H}:{M}:{S}",
-                    "--template",os.path.abspath(os.path.join(const.SHEET_ROOT, 'yapo.template')),"--timestamp-border-mode",
-                    "--timestamp-font-size","15",                    
-                    "--start-delay-percent","1","--start-delay-percent","0","-f","jpg","-o", os.path.abspath(sheet_path)])
-                #print("Watermarking: " + sys.executable + " " + os.path.abspath(os.path.join(const.SHEET_ROOT, 'mark.py')) + " " + os.path.abspath(sheet_path))
-                p = subprocess.run([sys.executable, os.path.abspath(os.path.join(const.SHEET_ROOT, 'mark.py')), os.path.abspath(sheet_path)])
+                p = subprocess.run(
+                    [
+                        sys.executable,
+                        os.path.abspath(
+                            os.path.join(const.SHEET_ROOT, "videosheet.py")
+                        ),
+                        file_path,
+                        "-t",
+                        "-w",
+                        "1024",
+                        "-g",
+                        "4x4",
+                        "--quality",
+                        "75",
+                        "--timestamp-format",
+                        "{H}:{M}:{S}",
+                        "--template",
+                        os.path.abspath(
+                            os.path.join(const.SHEET_ROOT, "yapo.template")
+                        ),
+                        "--timestamp-border-mode",
+                        "--timestamp-font-size",
+                        "15",
+                        "--start-delay-percent",
+                        "1",
+                        "--start-delay-percent",
+                        "0",
+                        "-f",
+                        "jpg",
+                        "-o",
+                        os.path.abspath(sheet_path),
+                    ]
+                )
+                # print("Watermarking: " + sys.executable + " " + os.path.abspath(os.path.join(const.SHEET_ROOT, 'mark.py')) + " " + os.path.abspath(sheet_path))
+                p = subprocess.run(
+                    [
+                        sys.executable,
+                        os.path.abspath(os.path.join(const.SHEET_ROOT, "mark.py")),
+                        os.path.abspath(sheet_path),
+                    ]
+                )
                 print("Contact Sheet saved to " + os.path.abspath(sheet_path))
             except:
                 print("Error creating contact sheet!")
         if make_sample_video:
-            video_filename_path = os.path.join(const.MEDIA_PATH, 'scenes', str(scene_in_db.id), 'sample',
-                                               'sample.mp4')
+            video_filename_path = os.path.join(
+                const.MEDIA_PATH, "scenes", str(scene_in_db.id), "sample", "sample.mp4"
+            )
             if not os.path.isfile(video_filename_path):
                 create_sample_video(scene_in_db)
             else:
                 print("Sample for {} already exists!".format(scene_in_db.name))
 
             scene_in_db.save()
+        
     else:
-        print("Trying to use ffprobe on scene: {}".format(current_scene.name))
+        print("Trying to use ffprobe on scene... ", end="")
         if ffmpeg_process.ffprobe_get_data_without_save(current_scene):
             current_scene.save()
             print(
-                "ffprobe successfully gathered information on scene: {}...\nTaking a screenshot with ffmpeg...".format(
-                    current_scene.name))
+                "Taking a screenshot...", end=""
+            )
 
             ffmpeg_process.ffmpeg_take_scene_screenshot_without_save(current_scene)
 
-            print("Screenshot of scene {} taken...".format(
-                current_scene.name))
+            print("Screenshot taken.")
+
+
+            sheet_path = os.path.abspath(
+                os.path.join(const.MEDIA_PATH, "scenes", str(current_scene.id), "sheet.jpg")
+            )
+            if os.path.exists(sheet_path):
+                print("Contact Sheet already exists, skipping...")
+            else:  
+                file_path = os.path.abspath(current_scene.path_to_file)
+                # sheetExec = sys.executable + " " + os.path.abspath(os.path.join(const.VIDEO_ROOT, 'videosheet.py'))
+                # print("Executing " + sys.executable + " " + os.path.abspath(os.path.join(const.VIDEO_ROOT, 'videosheet.py')) + " " + file_path + " -t -w 1024 -g 5x6 --quality 75 -f jpg -o " + os.path.abspath(sheet_path))
+                print("Generating Contact Sheet (1024 px wide, 4x4 grid)... ")
+                try:
+                    p = subprocess.run(
+                        [
+                            sys.executable,
+                            os.path.abspath(
+                                os.path.join(const.SHEET_ROOT, "videosheet.py")
+                            ),
+                            file_path,
+                            "-t",
+                            "-w",
+                            "1024",
+                            "-g",
+                            "4x4",
+                            "--quality",
+                            "75",
+                            "--timestamp-format",
+                            "{H}:{M}:{S}",
+                            "--template",
+                            os.path.abspath(
+                                os.path.join(const.SHEET_ROOT, "yapo.template")
+                            ),
+                            "--timestamp-border-mode",
+                            "--timestamp-font-size",
+                            "15",
+                            "--start-delay-percent",
+                            "1",
+                            "--start-delay-percent",
+                            "0",
+                            "-f",
+                            "jpg",
+                            "-o",
+                            os.path.abspath(sheet_path),
+                        ]
+                    )
+                    # print("Watermarking: " + sys.executable + " " + os.path.abspath(os.path.join(const.SHEET_ROOT, 'mark.py')) + " " + os.path.abspath(sheet_path))
+                    p = subprocess.run(
+                        [
+                            sys.executable,
+                            os.path.abspath(os.path.join(const.SHEET_ROOT, "mark.py")),
+                            os.path.abspath(sheet_path),
+                        ]
+                    )
+                    print("Contact Sheet saved to " + os.path.abspath(sheet_path))
+                except:
+                    print("Error creating contact sheet!")
+
+
 
             if make_sample_video:
                 create_sample_video(current_scene)
@@ -130,18 +247,30 @@ def create_scene(scene_path, make_sample_video):
 
             current_scene.save()
 
-            actors = list(Actor.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
-            actors_alias = list(ActorAlias.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
-            scene_tags = SceneTag.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
-            websites = Website.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
+            actors = list(
+                Actor.objects.extra(select={"length": "Length(name)"}).order_by(
+                    "-length"
+                )
+            )
+            actors_alias = list(
+                ActorAlias.objects.extra(select={"length": "Length(name)"}).order_by(
+                    "-length"
+                )
+            )
+            scene_tags = SceneTag.objects.extra(
+                select={"length": "Length(name)"}
+            ).order_by("-length")
+            websites = Website.objects.extra(
+                select={"length": "Length(name)"}
+            ).order_by("-length")
 
-            filename_parser.parse_scene_all_metadata(current_scene, actors, actors_alias, scene_tags, websites)
+            filename_parser.parse_scene_all_metadata(
+                current_scene, actors, actors_alias, scene_tags, websites
+            )
         else:
-            print("Failed to probe scene {}, skipping scene...".format(current_scene.name))
-
-
-
-
+            print(
+                "Failed to probe scene {}, skipping scene...".format(current_scene.name)
+            )
 
 
 def add_scene_to_folder_view(scene_to_add):
@@ -186,10 +315,11 @@ def recursive_add_folders(parent, folders, scene_to_add, path_with_ids):
                 if parent.last_folder_name_only is None:
                     parent.last_folder_name_only = folders[0]
                 parent.save()
-                path_with_ids.append({'name': parent.last_folder_name_only,
-                                      'id': parent.id})
+                path_with_ids.append(
+                    {"name": parent.last_folder_name_only, "id": parent.id}
+                )
                 # print ("Parent Name is {}, Path with Id's are {}".format(parent.name, path_with_ids.encode('utf-8')))
-                #print(json.dumps(path_with_ids))
+                # print(json.dumps(path_with_ids))
                 if parent.path_with_ids is None:
                     parent.path_with_ids = json.dumps(path_with_ids)
                     parent.save()
@@ -198,10 +328,11 @@ def recursive_add_folders(parent, folders, scene_to_add, path_with_ids):
 
             else:
                 parent = Folder.objects.get(name=folders[0])
-                path_with_ids.append({'name': parent.last_folder_name_only,
-                                      'id': parent.id})
+                path_with_ids.append(
+                    {"name": parent.last_folder_name_only, "id": parent.id}
+                )
                 # print ("Parent Name is {}, Path with Id's are {}".format(parent.name, path_with_ids.encode('utf-8')))
-                #print(json.dumps(path_with_ids))
+                # print(json.dumps(path_with_ids))
                 if parent.path_with_ids is None:
                     parent.path_with_ids = json.dumps(path_with_ids)
                     parent.save()
@@ -230,11 +361,12 @@ def recursive_add_folders(parent, folders, scene_to_add, path_with_ids):
             if parent.last_folder_name_only is None:
                 parent.last_folder_name_only = folders[0]
                 parent.save()
-            path_with_ids.append({'name': parent.last_folder_name_only,
-                                  'id': parent.id})
+            path_with_ids.append(
+                {"name": parent.last_folder_name_only, "id": parent.id}
+            )
             # print ("Parent Name is {}, Path with Id's are {}".format(parent.name.encode('utf-8'),
             #                                                          path_with_ids))
-            #print(json.dumps(path_with_ids))
+            # print(json.dumps(path_with_ids))
             if parent.path_with_ids is None:
                 parent.path_with_ids = json.dumps(path_with_ids)
                 parent.save()
@@ -244,7 +376,12 @@ def recursive_add_folders(parent, folders, scene_to_add, path_with_ids):
     else:
         if not parent.scenes.filter(name=scene_to_add.name):
             parent.scenes.add(scene_to_add)
-            print("Added Scene: " + scene_to_add.name + " to virtual folder " + parent.name)
+            print(
+                "Added Scene: "
+                + scene_to_add.name
+                + " to virtual folder "
+                + parent.name
+            )
             parent.save()
 
 
@@ -275,7 +412,6 @@ def recursive_function(parent, folder):
             parent.children.filter(pk=folder.id).delete()
             # folder.delete()
             print(name + " didn't have any scenes and was deleted!")
-
 
             # siblings = folder.get_siblings()
             # for sibling in siblings:
@@ -310,17 +446,17 @@ def populate_last_folder_name_in_virtual_folders():
 
 
 def main():
-    #scenes = Scene.objects.all()
+    scenes = Scene.objects.all()
     for scene in scenes:
         add_scene_to_folder_view(scene)
 
         # populate_last_folder_name_in_virtual_folders()
-        #write_actors_to_file()
-        #clean_empty_folders()
+        # write_actors_to_file()
+        # clean_empty_folders()
         # os.environ.setdefault("DJANGO_SETTINGS_MODULE", "myproject.settings")
 
         # get_files(TEST_PATH)
-        #find_duplicates()
+        # find_duplicates()
         # scenes_virtual_folder = Scene.objects.all()
         # for s in scenes_virtual_folder:
         #     add_scene_to_folder_view(s)

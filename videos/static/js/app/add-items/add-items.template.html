@@ -1,4 +1,6 @@
-<div class="container-fluid" xmlns:C="http://www.w3.org/1999/xhtml">
+<uib-alert ng-repeat="alert in $ctrl.alerts" class="enter" type="{{ alert.type }}" close="$ctrl.closeAlert($index)"
+           dismiss-on-timeout="{{ alert.timeout }}">{{ alert.msg }}
+</uib-alert><div class="container-fluid" xmlns:C="http://www.w3.org/1999/xhtml">
     <label>Folder path(s) to add</label> (supports multiple folders separated by commas EX: C:\folder1, D:\folder2) Folder added here can be rescanned under the "settings" menu:
 <input class="form-control" id="inputdefault" type="text"
                                              ng-model="$ctrl.folderInputContent">

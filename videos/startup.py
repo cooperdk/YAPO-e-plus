@@ -1,6 +1,7 @@
 import os
 from os import path
 import sys
+import shutil
 import videos.const
 import requests
 from videos.models import Scene, Actor, Website, ActorTag, SceneTag
@@ -38,6 +39,8 @@ def sizeFormat(b):
 
 
 def write_actors_to_file():
+
+    #actors = Actor.objects.all()
     actors = Actor.objects.order_by("id")  # name
     actors_string = ""
     numactors = 0
@@ -60,119 +63,10 @@ def write_actors_to_file():
     )
     file.close()
 
-'''
-    actors = Actor.objects.order_by("id")
-    for actor in actors:
-        actor.tattoos = actor.tattoos.capitalize()
+def verCheck():
 
-        tattoos = str(actor.tattoos).strip()
-        tattoos1 = tattoos.replace(";", ",")
-        tattoos1 = tattoos1.replace(" and ", ",")
-        tattoos1 = tattoos1.replace("-", ",")
-        tattoos1 = tattoos1.replace(":", ",")
+    update = os.path.abspath(os.path.join(os.path.dirname(__file__), "..\VERSION.md"))
 
-        tattoos = tattoos1.split(",")
-
-        numTattoos = len(tattoos)
-        print(f"Actor: {actor.name} - {str(numTattoos)} tattoos",end="")
-
-        if (numTattoos == 0 or numTattoos is None) or (
-            tattoos1.lower().strip() == "none"
-            or tattoos1.lower().strip() == "no tattoos"
-            or tattoos[0].lower().strip() == "none"
-            or tattoos[0].lower().strip() == "no tattoos"
-            or tattoos[0].lower().strip() == "n/a"
-        ):
-            aux.insert_actor_tag(actor, "No tattoos")
-
-        if numTattoos == 1 and (
-            tattoos[0].lower().strip() == "none"
-            or tattoos1.lower().strip() == "none"
-            or tattoos1.lower().strip() == "no tattoos"
-            or tattoos[0].lower().strip() == "no tattoos"
-            or tattoos[0].lower().strip() == "n/a"
-            or tattoos1.lower().strip() == "n/a"
-       ):
-            aux.insert_actor_tag(actor, "No tattoos")
-
-        if numTattoos == 1 and (
-            tattoos1.lower().strip() == "various" or tattoos[0].lower().strip() == "various"
-        ):
-            aux.insert_actor_tag(actor, "Some tattoos")
-
-        elif numTattoos == 1 and (
-            tattoos1.lower().strip() != "various"
-            and tattoos[0].lower().strip() != "various"
-            and tattoos[0].lower().strip() != "none"
-            and tattoos[0].lower().strip() != "none"
-            and tattoos[0].lower().strip() != "unknown"
-            and tattoos[0].lower().strip() != "no tattoos"
-            and tattoos[0].lower().strip() != "n/a"
-        ):
-            aux.insert_actor_tag(actor, "One tattoo")
-
-        if numTattoos >= 2 and numTattoos <= 4:
-            aux.insert_actor_tag(actor, "Few tattoos")
-
-        if numTattoos > 4 and numTattoos <= 6:
-            aux.insert_actor_tag(actor, "Some tattoos")
-
-        if numTattoos > 6 and numTattoos <= 8:
-            aux.insert_actor_tag(actor, "Lots of tattoos")
-
-        if numTattoos > 8:
-            aux.insert_actor_tag(actor, "Massive amount of tattoos")
-
-        if (actor.tattoos and tattoos1) and actor.tattoos.lower() != tattoos1.lower():
-            actor.tattoos = tattoos1
-'''
-
-def getStarted():
-    size = getSizeAll()
-    row = Actor.objects.raw(
-        "SELECT COUNT(*) AS total, id FROM videos_actor"
-    )  # cursor.fetchone()
-    if row[0].total is not None:
-        act = str(row[0].total)
-    row = Scene.objects.raw(
-        "SELECT COUNT(*) AS total, id FROM videos_scene"
-    )  # cursor.fetchone()
-    if row[0].total is not None:
-        sce = str(row[0].total)
-    row = ActorTag.objects.raw(
-        "SELECT COUNT(*) AS total, id FROM videos_actortag"
-    )  # cursor.fetchone()
-    if row[0].total is not None:
-        acttag = str(row[0].total)
-    row = SceneTag.objects.raw(
-        "SELECT COUNT(*) AS total, id FROM videos_scenetag"
-    )  # cursor.fetchone()
-    if row[0].total is not None:
-        sctag = str(row[0].total)
-    print(
-        "\nCurrently, there are "
-        + sce
-        + " videos registered in YAPO e+.\nThey take up "
-        + str(size)
-        + " of disk space."
-    )
-    print("There are " + sctag + " tags available for video clips.")
-    print(
-        "\nThere are "
-        + act
-        + " actors in the database.\nThese actors have "
-        + acttag
-        + " usable tags.\n\n"
-    )
-
-    actors = Actor.objects.all()
-
-    # populate_last_folder_name_in_virtual_folders()
-    write_actors_to_file()
-
-    print("\n")
-
-    update = "././VERSION.md"
     if path.isfile(update):
         verfile = open(update, "r")
         ver = verfile.read()
@@ -200,10 +94,171 @@ def getStarted():
             )
         print("\r\n")
 
+def stats():
+    size = getSizeAll()
+    row = Actor.objects.raw(
+        "SELECT COUNT(*) AS total, id FROM videos_actor"
+    )  # cursor.fetchone()
+    if row[0].total is not None:
+        act = str(row[0].total)
+    row = Scene.objects.raw(
+        "SELECT COUNT(*) AS total, id FROM videos_scene"
+    )  # cursor.fetchone()
+    if row[0].total is not None:
+        sce = str(row[0].total)
+    row = ActorTag.objects.raw(
+        "SELECT COUNT(*) AS total, id FROM videos_actortag"
+    )  # cursor.fetchone()
+    if row[0].total is not None:
+        acttag = str(row[0].total)
+    row = SceneTag.objects.raw(
+        "SELECT COUNT(*) AS total, id FROM videos_scenetag"
+    )  # cursor.fetchone()
+    if row[0].total is not None:
+        sctag = str(row[0].total)
+    print("\nCurrently, there are "+ sce + " videos registered in YAPO e+.\nThey take up " + str(size) + " of disk space.")
+    print("There are " + sctag + " tags available for video clips.")
+    print("\nThere are " + act + " actors in the database.\nThese actors have " + acttag + " usable tags.\n\n")
+
+def backupper():
+    import YAPO.settings as settings
+    src = settings.DATABASES['default']['NAME']
+    dest = os.path.abspath(os.path.join(os.path.dirname(__file__), "..\db_BACKUP.sqlite3"))
+    shutil.copy(src, dest)
+    print("Performed a database backup to " + dest + "\n")
+
+
+def add_scene_to_folder_view(scene_to_add):
+    # scene_path = os.path.normpath(scene_to_add.path_to_dir)
+
+    path = os.path.normpath(scene_to_add.path_to_dir)
+
+    # drive, path = os.path.splitdrive(scene_path)
+
+    print(path)
+    folders = []
+    while scene_to_add<99999999:
+        path, folder = os.path.split(path)
+
+        if folder != "":
+            folders.append(folder)
+        else:
+            if path != "":
+                folders.append(path)
+
+            break
+
+    folders.reverse()
+
+    # print (drive)
+    is_first = True
+    parent = ""
+    # for folder in folders:
+    #     print (folder)
+    path_with_ids = []
+    recursive_add_folders(None, folders, scene_to_add, path_with_ids)
+
+
+def recursive_add_folders(parent, folders, scene_to_add, path_with_ids):
+    if len(folders) != 0:
+        if parent is None:
+            path_with_ids = []
+            if not Folder.objects.filter(name=folders[0]):
+                temp = Folder.objects.create(name=folders[0])
+                print("Created virtual folder: " + temp.name)
+                parent = Folder.objects.get(name=folders[0])
+                if parent.last_folder_name_only is None:
+                    parent.last_folder_name_only = folders[0]
+                parent.save()
+                path_with_ids.append(
+                    {"name": parent.last_folder_name_only, "id": parent.id}
+                )
+                # print ("Parent Name is {}, Path with Id's are {}".format(parent.name, path_with_ids.encode('utf-8')))
+                # print(json.dumps(path_with_ids))
+                if parent.path_with_ids is None:
+                    parent.path_with_ids = json.dumps(path_with_ids)
+                    parent.save()
+                # print ("Last folder name is : {}".format(folders[0]))
+                del folders[0]
+
+            else:
+                parent = Folder.objects.get(name=folders[0])
+                path_with_ids.append(
+                    {"name": parent.last_folder_name_only, "id": parent.id}
+                )
+                # print ("Parent Name is {}, Path with Id's are {}".format(parent.name, path_with_ids.encode('utf-8')))
+                # print(json.dumps(path_with_ids))
+                if parent.path_with_ids is None:
+                    parent.path_with_ids = json.dumps(path_with_ids)
+                    parent.save()
+                # print ("Last folder name is : {}".format(folders[0]))
+                del folders[0]
+
+            recursive_add_folders(parent, folders, scene_to_add, path_with_ids)
+        else:
+            folder_to_add = os.path.join(parent.name, folders[0])
+            parent_children = parent.get_children()
+
+            if_in_children = False
+            for child in parent_children:
+                if child.name == folder_to_add:
+                    if_in_children = True
+                    parent = child
+                    break
+
+            if not if_in_children:
+                parent = Folder.objects.create(name=folder_to_add, parent=parent)
+                print("Created virtual folder: " + parent.name)
+                if parent.last_folder_name_only is None:
+                    parent.last_folder_name_only = folders[0]
+                parent.save()
+
+            if parent.last_folder_name_only is None:
+                parent.last_folder_name_only = folders[0]
+                parent.save()
+            path_with_ids.append(
+                {"name": parent.last_folder_name_only, "id": parent.id}
+            )
+            # print ("Parent Name is {}, Path with Id's are {}".format(parent.name.encode('utf-8'),
+            #                                                          path_with_ids))
+            # print(json.dumps(path_with_ids))
+            if parent.path_with_ids is None:
+                parent.path_with_ids = json.dumps(path_with_ids)
+                parent.save()
+            # print ("Last folder name is : {}".format(folders[0]))
+            del folders[0]
+            recursive_add_folders(parent, folders, scene_to_add, path_with_ids)
+    else:
+        if not parent.scenes.filter(name=scene_to_add.name):
+            parent.scenes.add(scene_to_add)
+            print(
+                "Added Scene: "
+                + scene_to_add.name
+                + " to virtual folder "
+                + parent.name
+            )
+            parent.save()
+
+
+def getStarted():
+
+    #scenes = Scene.objects.all()
+    #for scene in scenes:
+    #    add_scene_to_folder_view(scene)
+    stats()
+    backupper()
+    write_actors_to_file()
+    print("\n")
+    verCheck()
+
+
 class ready:
 
     try:
         if not 'migrat' in sys.argv:
+            print("Not in migration mode.")
             getStarted()
+        else:
+            print("In migration mode.")
     except:
         pass

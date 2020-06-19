@@ -1,7 +1,7 @@
 <span>
 <pagination page-type="'Scene'"></pagination>
 </span>
-
+<div ng-if="$ctrl.searchTerm">This search results in {{ $ctrl.scenes.length }} matching scene(s).</div>
 <div ng-if="!$ctrl.gridView">
     <button type="button" ng-click="$ctrl.multiTag()" class="btn btn-default btn-sm">
         Tag/Delete Multiple Scenes
@@ -21,7 +21,7 @@
     <div id=big-scroll-item>
         <table>
             <tr ng-repeat="scene in $ctrl.scenes">
-                <td>
+                <td >
                     <a href="/#!/scene/{{ scene.id }}">
                         <img ng-src="{{ scene.thumbnail }}" class="thumb-wide"
                              alt="{{ scene.name }}"
@@ -103,9 +103,9 @@
                         </button>
                         </span>
 
-
+<!--<br><span style="font-family: verdana; font-size: 8pt; color: gray;">{{ scene.path_to_file }}</span></small>-->
                     </h4>
-
+                      
                         <span>
                             <uib-rating ng-model="scene.rating" max="10" read-only="isReadonly"
                                         on-hover="hoveringOver(value)"

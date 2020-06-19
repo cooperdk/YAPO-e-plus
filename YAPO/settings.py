@@ -7,8 +7,14 @@ from datetime import datetime
 
 # from pathlib import Path
 
+# Turn logging off
+
+LOGGING_CONFIG = None
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
@@ -21,7 +27,21 @@ DEBUG = True
 SILENCED_SYSTEM_CHECKS = ["fields.W340"]
 ALLOWED_HOSTS = ['*']
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000
-
+AUTOCOMMIT = True
+TEST_MEMCACHE = False
+if not DEBUG or TEST_MEMCACHE:
+    CACHES = {
+        'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+        }
+    }
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        }
+}
 # Application definition
 
 INSTALLED_APPS = [

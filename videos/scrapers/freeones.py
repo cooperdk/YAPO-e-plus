@@ -71,7 +71,9 @@ def search_freeones(actor_to_search, alias, force):
 
     if href_found:
         success = True
-        print("\nI found " + actor_to_search.name + ", so I am looking for information on her profile page.")
+        print("")
+        aux.progress(1,27,"Found " + actor_to_search.name + ", parsing...")
+        #print("\nI found " + actor_to_search.name + ", so I am looking for information on her profile page.")
         actor_to_search.gender = 'F'
         actor_to_search.save()
         actor_page = urllib_parse.urljoin("https://www.freeones.com/", href_found)
@@ -81,22 +83,21 @@ def search_freeones(actor_to_search, alias, force):
         soup_links = soup.find_all("a")
         href_found = "/"+name_with_dash + "/profile" #match_text_in_link_to_query(soup_links, "Profile")
         free_ones_bio_search = soup.find_all("div", {"class": "js-read-more-text read-more-text-ellipsis"})
-        free_ones_career_status_search = soup.find_all("p", {"class": "dashboard-bio-career-status-text"})
+        free_ones_career_status_search = soup.find_all("div", {"class": "timeline-horisontal"})
         free_ones_biography = free_ones_bio_search[0].get_text(strip=True)
         free_ones_country_search = soup.find_all("p", {"class": "color-text-dark font-size-xs font-weight-bold mb-1"})
         for link in free_ones_country_search:
             next_td_tag = link.findNext('p')
             link_text = link.text.strip("',/\n/\t")
-            if link_text == "Country":
+            if link_text.lower() == "country":
                 title=link.findNext('a')
                 free_ones_country=title.get('title')
-                print("10%",end="\r",flush=True)
                 actor_to_search.country_of_origin = free_ones_country
+                aux.progress(2,27,"Country")
         #if len(free_ones_biography)>10: print("Biography saved.")
         #print("Bio: " + free_ones_biography)
         #print("Looking for a profile image... ", end = "")
         has_image=False
-        print("11%",end="\r",flush=True)
         try:
             profile_thumb = soup.find("img", {'class': 'img-fluid'})
             profile_thumb_parent = profile_thumb.parent
@@ -105,7 +106,6 @@ def search_freeones(actor_to_search, alias, force):
             has_image = False
             if len(href)>3:     
                 has_image = True
-                print("12%",end="\r",flush=True)
         except:
             #print("Parse Error - not getting any image.")
             pass
@@ -123,9 +123,9 @@ def search_freeones(actor_to_search, alias, force):
 
             if actor_to_search.thumbnail == const.UNKNOWN_PERSON_IMAGE_PATH or force:
                 if not("freeones.com" in images_page.lower()):
-                    print("15%",end="\r",flush=True)
+                    aux.progress(3,27,"Searching for Photo")
                 elif soup.find("section", {'id': 'fxgp-gallery'}):
-                    print("15%",end="\r",flush=True)
+                    aux.progress(3,27,"Searching for Photo")
                     picture_list = soup.find("section", {'id': 'fxgp-gallery'})
 
                     if picture_list.find("a"):
@@ -135,21 +135,17 @@ def search_freeones(actor_to_search, alias, force):
                         #print("Profile pic path: " + save_path)
                         save_file_name = os.path.join(save_path, 'profile.jpg')
                         if not os.path.isfile(save_file_name):
-#        print("Skipping, as there's already a photo for the profile.")
-                        #if not os.path.isfile(save_path):
                             if first_picture['href']:
                                 if re.match(r'^\/\/', first_picture['href']):
                                         first_picture_link = "https:" + first_picture['href']
                                         aux.save_actor_profile_image_from_web(first_picture_link, actor_to_search,force)
-                                        print("20%",end="\r",flush=True)
+                                        aux.progress(4,27,"Storing photo")
                                 elif re.match(r'^.*jpg$', first_picture['href']):
                                         first_picture_link = first_picture['href']
                                         aux.save_actor_profile_image_from_web(first_picture_link, actor_to_search,force)
-                                        print("20%",end="\r",flush=True)
-                                else:
-                                        print("20%",end="\r",flush=True)
-                        #else:
-                            #print("Skipping photo, as there's already a photo for the profile.")
+                                        aux.progress(4,27,"Storing photo")
+                        else:
+                            aux.progress(4,29,"Not saving photo, one exists already")
 
         #remember to remark:
         #actor_to_search.last_lookup = datetime.datetime.now()
@@ -158,33 +154,21 @@ def search_freeones(actor_to_search, alias, force):
                                    
 
         r = requests.get(biography_page, verify=False)
-
         soup = BeautifulSoup(r.content, "html5lib")
-
-        soup_links = soup.find_all("p", {'class': ['heading', 'mb1']})
+        soup_links = soup.find_all("p", {'class': ['heading', 'mb1']}) #("p", {'class': ['profile-meta-item']})
         #print (soup_links)
         num = 0
+        aux.progress(5,29,"Parsing info")
         for link in soup_links:
             #print (link)
             next_td_tag = link.findNext('p')
             link_text = link.text.strip("',/\n/\t")  #link.get_text(strip=True)  #.strip("',/\r\n/\t")   #link.text.strip("',/\n/\t") get_text()
-            #print (str(num) + ": " + link_text)
+
             num+=1
+            #if num==1: print (str(num) + ": " + link_text)
+            if link_text.strip().lower() == 'personal information':
+           
 
-            if link_text == 'Ethnicity':
-                print("60%",end="\r",flush=True)
-                if not actor_to_search.ethnicity:
-                    #print("E: ",end="")
-                    next_td_tag = link.findNext('p')
-                    next_td_tag = link.findNext('p')
-                    ethnicity = next_td_tag.get_text(strip=True)  #next_td_tag.text.strip("',/\n/\t")
-                    #print(ethnicity)
-                    actor_to_search.ethnicity = ethnicity
-                #else:
-                    #ethnicity = actor_to_search.ethnicity 
-
-            elif link_text == 'Personal Information':
-                print("40%",end="\r",flush=True)
                 if not actor_to_search.date_of_birth:
                     #print(next_td_tag.text)
                     if next_td_tag.text.strip("',/\n/\t"):
@@ -197,202 +181,22 @@ def search_freeones(actor_to_search, alias, force):
                                 parse_date_time = parse_date_time.group(0)
                                 parse_date_time = parse(parse_date_time.encode('utf-8'), fuzzy=True, ignoretz=True)
                                 actor_to_search.date_of_birth = parse_date_time
-                                print("45%",end="\r",flush=True)
-
-            elif link_text == 'Aliases':
-                print("50%",end="\r",flush=True)
-                try:
-                    actor_aliases = next_td_tag.text.strip("'/\n/\t")
-                    if not("Unknown" in actor_aliases):
-                        actor_aliases = actor_aliases.replace(", ", ",")
-                        insert_aliases(actor_to_search, actor_aliases)
-                except:
-                    pass
-            elif link_text == 'Height':
-                print("75%",end="\r",flush=True)
-                if not actor_to_search.height:
-                    height = next_td_tag.get_text(strip=True)  #tag.text.strip("'/\n/\t")
-                    if len(height)<1 or height=="Unknown": height="0"
-                    #print("Height: " + str(height))
-                    height=re.findall(r'[\d]+', height)
-                    height=int(height[0])
-                    #print("Truncated: "+str(height))
-                    #height = re.search(r'heightcm = \"(\d+)\"', height)
-                    #height = height.group(1)
-                    actor_to_search.height = height
-                height=int(actor_to_search.height)
-                doneX=False
-                if not doneX and height is not None:
-                    if height > 110:
-                        if  height < 148:
-                            insert_actor_tag(actor_to_search, "Extremely tiny")
-                            #print("Added tag: Extremely tiny")
-                            doneX=True
-                        if 148 < height < 152:
-                            insert_actor_tag(actor_to_search, "Tiny")
-                            #print("Added tag: Tiny")
-                            doneX=True
-                        if 152 < height < 161:
-                            insert_actor_tag(actor_to_search, "Petite")
-                            #print("Added tag: Petite")
-                            doneX=True
-                        if 178 < height < 186:
-                            insert_actor_tag(actor_to_search, "Tall")
-                            #print("Added tag: Tall")
-                            doneX=True
-                        if 186 < height < 220:
-                            insert_actor_tag(actor_to_search, "Extremely tall")
-                            #print("Added tag: Extremely tall")
-                            doneX=True
-                        print("77%",end="\r",flush=True)
-                
-            elif link_text == 'Weight':
-                print("80%",end="\r",flush=True)
-                if not actor_to_search.weight:
-
-                    weight = next_td_tag.get_text(strip=True)  #tag.text.strip("'/\n/\t")
-                    if len(weight)<1 or weight=="Unknown": weight="0"
-                    #print("Weight: "+str(weight))
-                    weight = re.findall(r'[\d]+', weight)
-                    weight = int(weight[0])
-                    actor_to_search.weight = weight
-                    #print("Truncated: "+str(weight))
-
+                                aux.progress(6,29,"Birthday")
+                                
+            elif link_text.lower() == 'ethnicity':
+                if not actor_to_search.ethnicity:
+                    #print("E: ",end="")
+                    next_td_tag = link.findNext('p')
+                    next_td_tag = link.findNext('p')
+                    ethnicity = next_td_tag.get_text(strip=True)  #next_td_tag.text.strip("',/\n/\t")
+                    #print(ethnicity)
+                    actor_to_search.ethnicity = ethnicity
+                    aux.progress(7,29,"Ethnicity")
+                #else:
+                    #ethnicity = actor_to_search.ethnicity 
 
                     
-            elif link_text == 'Measurements':
-                print("85%",end="\r",flush=True)
-                cupSize = ""
-                if not actor_to_search.measurements:
-                    #print("There are no measurements...")
-                    actor_to_search.measurements = next_td_tag.get_text(strip=True)  #text.strip("'/\n/\t")
-                    if len(actor_to_search.measurements)>8:
-                        try:
-                            measure=re.findall(r'[\d]+', actor_to_search.measurements)
-                            che=int(measure[0])
-                            wai=int(measure[1])
-                            hip=int(measure[2])
-                            #che=int(che*2.54)
-                            #wai=int(wai*2.54)
-                            #hip=int(hip*2.54)
-                            cupSize = onlyChars(actor_to_search.measurements)
-                            actor_to_search.measurements=str(che)+cupSize+"-"+str(wai)+"-"+str(hip)
-                        except: pass    
-                        #print("Measurements: " + actor_to_search.measurements)
-                    else:
-                        actor_to_search.measurements="??-??-??"
-                cupSize = onlyChars(actor_to_search.measurements)
-                
-                if len(cupSize)>0:
-                    insert_actor_tag(actor_to_search, cupSize + " Cup")
-                    #print("This actor has a "+cupSize+" cup.")                
-                    accepted_stringsTiny = {'A'}
-                    accepted_stringsSmall = {'B'}
-                    accepted_stringsReg = {'C'}       
-                    accepted_stringsBig = {'D', 'E', 'F'}
-                    accepted_stringsVBig = {'G', 'H', 'I'}
-                    accepted_stringsHuge = {'J', 'K', 'L', 'M'}
-                    accepted_stringsMassive = {'N', 'O', 'P', 'Q', 'R', 'S'}
-                    accepted_stringsExtreme = {'T', 'U', 'V', 'W', 'X', 'Y', 'Z'}
-                    cupSizePart=[cupSize]
-        
-                    try:
-                        doneY=False
-                        #actor_to_search.last_lookup = datetime.datetime.now()
-                        print("90%",end="\r",flush=True)
-                        while not doneY:
-                            for cupSizePart in cupSize:
-                                if (cupSizePart in accepted_stringsTiny):
-                                    insert_actor_tag(actor_to_search, "Tiny tits")
-                                    #print("Added tag: Tiny tits")
-                                    doneY=True
-
-                                if (cupSizePart in accepted_stringsSmall):
-                                    insert_actor_tag(actor_to_search, "Small tits")
-                                    #print("Added tag: Small tits")
-                                    doneY=True
-
-                                if (cupSizePart in accepted_stringsReg):
-                                    insert_actor_tag(actor_to_search, "Medium tits")
-                                    #print("Added tag: Medium tits")
-                                    doneY=True
-                        
-                                elif (cupSizePart in accepted_stringsBig):
-                                    insert_actor_tag(actor_to_search, "Big tits")
-                                    #print("Added tag: Big tits")
-                                    doneY=True
-
-                                elif (cupSizePart in accepted_stringsVBig):
-                                    insert_actor_tag(actor_to_search, "Very big tits")                  
-                                    #print("Added tag: Very big tits")
-                                    doneY=True
-
-                                elif (cupSizePart in accepted_stringsHuge):
-                                    insert_actor_tag(actor_to_search, "Huge tits")    
-                                    #print("Added tag: Huge tits")
-                                    doneY=True
-
-                                elif (cupSizePart in accepted_stringsMassive):
-                                    insert_actor_tag(actor_to_search, "Massively huge tits")     
-                                    #print("Added tag: Massively huge tits")
-                                    doneY=True
-
-                                elif (cupSizePart in accepted_stringsExtreme):
-                                    insert_actor_tag(actor_to_search, "Extremely huge tits")                            
-                                    #print("Added tag: Extremely huge tits")
-                                    doneY=True
-                    
-                                if done: break
-                            if done: break
-                    except: pass
-
-            elif link_text == 'Tattoos':
-                print("95%",end="\r",flush=True)
-                if not actor_to_search.tattoos:
-                    tattoos = next_td_tag.get_text(strip=True) #text.strip("'/\n/\t")
-                    actor_to_search.tattoos = tattoos.capitalize()
-                    #print ("Tattoos: " + actor_to_search.tattoos)
-
-            elif link_text == 'Piercings':
-                print("97%",end="\r",flush=True)
-                if not actor_to_search.piercings:    
-                    piercings = next_td_tag.get_text(strip=True)  #text.strip("'/\n/\t")
-                    actor_to_search.piercings = piercings
-                    #print ("Piercings: " + piercings)
- 
-            elif link_text == 'Additional Information':
-                if not actor_to_search.extra_text:
-                    actor_to_search.extra_text = next_td_tag.get_text(strip=True)   #text.strip("'/\n/\t")
-                    #print("Additional information saved.")
-
-            elif link_text == 'Fake Boobs':
-                print("98%",end="\r",flush=True)
-                fake_boobs = next_td_tag.get_text(strip=True) #.strip("',/\n/\t")
-                if "Yes" in fake_boobs:
-                    insert_actor_tag(actor_to_search, "Fake tits")
-                    #print("Her tits are fake, added that tag")
-                else:
-                    insert_actor_tag(actor_to_search, "Natural tits")
-                    #print("Her tits are natural, added that tag")
-
-            elif link_text == 'Eye Color':
-                print("70%",end="\r",flush=True)
-                eye_color = next_td_tag.get_text(strip=True) #text.strip("',/\n/\t")
-                eye_color = eye_color.title() + " eyes"
-                if eye_color and len(eye_color)>7:
-                    insert_actor_tag(actor_to_search, eye_color)
-                    #print (eye_color)
-
-            elif link_text == 'Hair Color':
-                print("72%",end="\r",flush=True)
-                hair_color = next_td_tag.get_text(strip=True) #text.strip("',/\n/\t")
-                hair_color = hair_color.title() + ' hair'
-                if hair_color and len(hair_color)>7:
-                    insert_actor_tag(actor_to_search, hair_color)
-                    #print (hair_color)
-                    
-            elif link_text=="Official website":
-                print("60%",end="\r",flush=True)
+            elif link_text.lower()=="official website":
                 official = link.findNext('div')  # ul id="socialmedia
                 all_official = official.find_all("a") #was: li
                 actor_to_search.official_pages = ""            
@@ -405,10 +209,20 @@ def search_freeones(actor_to_search, alias, force):
                     except:
                         #print("Actor apparently has no official website")
                         pass
-                        
-            elif link_text == 'Follow On':
-                #print("Social links...")
-                print("65%",end="\r",flush=True)
+                aux.progress(8,29,"Official WWW")
+
+            elif link_text.lower() == 'aliases':
+                try:
+                    actor_aliases = next_td_tag.text.strip("'/\n/\t")
+                    if not("Unknown" in actor_aliases):
+                        actor_aliases = actor_aliases.replace(", ", ",")
+                        insert_aliases(actor_to_search, actor_aliases)
+                except:
+                    pass
+                aux.progress(9,29,"Aliases")
+
+            elif link_text.lower() == 'follow on':
+
                 social = link.findNext('div')  # ul id="socialmedia
                 all_social = social.find_all("a") #was: li
                 #actor_to_search.official_pages = ""
@@ -422,11 +236,280 @@ def search_freeones(actor_to_search, alias, force):
                     except:
                         #print("Actor apparently has no social links")
                         pass
+                aux.progress(10,29,"Social links")
+
+            elif link_text.lower() == 'appearance':
+                aux.progress(11,29,"Parsing appearance")
+                soup2 = BeautifulSoup(r.content, "html5lib")
+                soup2_links = soup.find_all("dt") #("p", {'class': ['heading', 'mb-0']})
+                for link2 in soup2_links:
+                    next_td_tag1 = link2.findNext('dt')
+                    link2_text = link2.text.strip("',/\n/\t")
+                    num+=1
+                    
+                    if link2_text.lower() == 'eye color':
+                        next_td_tag1 = link2.findNext('span')
+                        eye_color = next_td_tag1.get_text(strip=True) #text.strip("',/\n/\t")
+                        eye_color = eye_color.title() + " eyes"
+                        if eye_color and len(eye_color)>7:
+                            insert_actor_tag(actor_to_search, eye_color)
+                        aux.progress(12,29,"Eye color")
+
+                    elif link2_text.lower() == 'hair color':
+                        next_td_tag1 = link2.findNext('span')
+                        hair_color = next_td_tag1.get_text(strip=True) #text.strip("',/\n/\t")
+                        hair_color = hair_color.title() + ' hair'
+                        if hair_color and len(hair_color)>7:
+                            insert_actor_tag(actor_to_search, hair_color)
+                        aux.progress(13,29,"Hair color")
+
+                    elif link2_text.lower() == 'height':
+                        next_td_tag1 = link2.findNext('span')
+                        if not actor_to_search.height:
+                            height = next_td_tag1.get_text(strip=True)  #tag.text.strip("'/\n/\t")
+                            if len(height)<1 or height=="Unknown": height="0"
+                            #print("Height: " + str(height))
+                            height=re.findall(r'[\d]+', height)
+                            height=int(height[0])
+                            #print("Truncated: "+str(height))
+                            #height = re.search(r'heightcm = \"(\d+)\"', height)
+                            #height = height.group(1)
+                            actor_to_search.height = height
+                        height=int(actor_to_search.height)
+                        aux.progress(14,29,"Height")
+                        doneX=False
+                        if not doneX and height is not None:
+                            if height > 110:
+                                if  height < 148:
+                                    insert_actor_tag(actor_to_search, "Extremely tiny")
+                                    #print("Added tag: Extremely tiny")
+                                    doneX=True
+                                if 148 < height < 152:
+                                    insert_actor_tag(actor_to_search, "Tiny")
+                                    #print("Added tag: Tiny")
+                                    doneX=True
+                                if 152 < height < 161:
+                                    insert_actor_tag(actor_to_search, "Petite")
+                                    #print("Added tag: Petite")
+                                    doneX=True
+                                if 178 < height < 186:
+                                    insert_actor_tag(actor_to_search, "Tall")
+                                    #print("Added tag: Tall")
+                                    doneX=True
+                                if 186 < height < 220:
+                                    insert_actor_tag(actor_to_search, "Extremely tall")
+                                    #print("Added tag: Extremely tall")
+                                    doneX=True
+                                aux.progress(15,29,"Height [Group tag]")
+                        
+                    elif link2_text.lower() == 'weight':
+                        next_td_tag1 = link2.findNext('span')
+                        if not actor_to_search.weight:
+
+                            weight = next_td_tag1.get_text(strip=True)  #tag.text.strip("'/\n/\t")
+                            if len(weight)<1 or weight=="Unknown": weight="0"
+                            weight = re.findall(r'[\d]+', weight)
+                            weight = int(weight[0])
+                            actor_to_search.weight = weight
+                            aux.progress(16,29,"Weight")
+
+                    elif link2_text.lower() == 'measurements':
+                        next_td_tag1 = link2.findNext('span')
+                        cupSize = ""
+                        if not actor_to_search.measurements:
+                            actor_to_search.measurements = next_td_tag1.get_text(strip=True)  #text.strip("'/\n/\t")
+                            aux.progress(17,29,"Measurements")
+                            if actor_to_search.measurements[-1]=="-": actor_to_search.measurements=actor_to_search.measurements[:-1]
+                            if len(actor_to_search.measurements)>8  or len(actor_to_search.measurements)==3:
+                                try:
+                                    measure=re.findall(r'[\d]+', actor_to_search.measurements)
+                                    che=int(measure[0])
+                                    wai=int(measure[1])
+                                    hip=int(measure[2])
+                                    #che=int(che*2.54)
+                                    #wai=int(wai*2.54)
+                                    #hip=int(hip*2.54)
+                                    cupSize = onlyChars(actor_to_search.measurements)
+                                    if len(actor_to_search.measurements)==3:
+                                        actor_to_search.measurements=str(che)+cupSize
+                                    else:
+                                        actor_to_search.measurements=str(che)+cupSize+"-"+str(wai)+"-"+str(hip)
+                                except: pass    
+                            else:
+                                actor_to_search.measurements="??-??-??"
+                        cupSize = onlyChars(actor_to_search.measurements)
+                        
+                        if len(cupSize)>0:
+                            insert_actor_tag(actor_to_search, cupSize + " Cup")
+                            aux.progress(18,29,"Measurements [Cup size tag]")
+            
+                            accepted_stringsTiny = {'A'}
+                            accepted_stringsSmall = {'B'}
+                            accepted_stringsReg = {'C'}       
+                            accepted_stringsBig = {'D', 'E', 'F'}
+                            accepted_stringsVBig = {'G', 'H', 'I'}
+                            accepted_stringsHuge = {'J', 'K', 'L', 'M'}
+                            accepted_stringsMassive = {'N', 'O', 'P', 'Q', 'R', 'S'}
+                            accepted_stringsExtreme = {'T', 'U', 'V', 'W', 'X', 'Y', 'Z'}
+                            cupSizePart=[cupSize]
+                
+                            try:
+                                doneY=False
+                                while not doneY:
+                                    for cupSizePart in cupSize:
+                                        if (cupSizePart in accepted_stringsTiny):
+                                            insert_actor_tag(actor_to_search, "Tiny tits")
+                                            #print("Added tag: Tiny tits")
+                                            doneY=True
+
+                                        if (cupSizePart in accepted_stringsSmall):
+                                            insert_actor_tag(actor_to_search, "Small tits")
+                                            #print("Added tag: Small tits")
+                                            doneY=True
+
+                                        if (cupSizePart in accepted_stringsReg):
+                                            insert_actor_tag(actor_to_search, "Medium tits")
+                                            #print("Added tag: Medium tits")
+                                            doneY=True
+                                
+                                        elif (cupSizePart in accepted_stringsBig):
+                                            insert_actor_tag(actor_to_search, "Big tits")
+                                            #print("Added tag: Big tits")
+                                            doneY=True
+
+                                        elif (cupSizePart in accepted_stringsVBig):
+                                            insert_actor_tag(actor_to_search, "Very big tits")                  
+                                            #print("Added tag: Very big tits")
+                                            doneY=True
+
+                                        elif (cupSizePart in accepted_stringsHuge):
+                                            insert_actor_tag(actor_to_search, "Huge tits")    
+                                            #print("Added tag: Huge tits")
+                                            doneY=True
+
+                                        elif (cupSizePart in accepted_stringsMassive):
+                                            insert_actor_tag(actor_to_search, "Massively huge tits")     
+                                            #print("Added tag: Massively huge tits")
+                                            doneY=True
+
+                                        elif (cupSizePart in accepted_stringsExtreme):
+                                            insert_actor_tag(actor_to_search, "Extremely huge tits")                            
+                                            #print("Added tag: Extremely huge tits")
+                                            doneY=True
+                            
+                                        if done: break
+                                    if done: break
+                                aux.progress(19,29,"Measurements [Tit size tag]")
+                            except: pass
+
+                    elif link2_text.lower() == 'boobs':
+                       
+                        next_td_tag1 = link2.findNext('span')
+                        boobs = next_td_tag1.get_text(strip=True) #.strip("',/\n/\t")
+                        if "fake" in boobs.lower():
+                            insert_actor_tag(actor_to_search, "Fake tits")
+                            #print("Her tits are fake, added that tag")
+                        else:
+                            insert_actor_tag(actor_to_search, "Natural tits")
+                            #print("Her tits are natural, added that tag")
+                        aux.progress(20,29,"Tits fake/natural tag")
+
+                    elif link2_text.lower() == 'tattoos':
+                        next_td_tag1 = link2.findNext('span')
+
+                        if not actor_to_search.tattoos:
+                            tattoos = next_td_tag1.get_text(strip=True) #text.strip("'/\n/\t")
+                            actor_to_search.tattoos = tattoos.capitalize()
+                            aux.progress(21,29,"Tattoos")
+                            #print ("Tattoos: " + actor_to_search.tattoos)
+
+                            tattoos = str(actor_to_search.tattoos).strip()
+                            tattoos1 = tattoos.replace(";", ",")
+                            tattoos1 = tattoos1.replace(" and ", ",")
+                            tattoos1 = tattoos1.replace("-", ",")
+                            tattoos1 = tattoos1.replace(":", ",")
+
+                            tattoos = tattoos1.split(",")
+
+                            numTattoos = len(tattoos)
+                            #print(f"Actor: {actor_to_search.name} - {str(numTattoos)} tattoos", end="")
+
+                            if (numTattoos == 0 or numTattoos is None) or (
+                                    tattoos1.lower().strip() == "none"
+                                    or tattoos1.lower().strip() == "no tattoos"
+                                    or tattoos[0].lower().strip() == "none"
+                                    or tattoos[0].lower().strip() == "no tattoos"
+                                    or tattoos[0].lower().strip() == "n/a"
+                            ):
+                                aux.insert_actor_tag(actor_to_search, "No tattoos")
+
+                            if numTattoos == 1 and (
+                                    tattoos[0].lower().strip() == "none"
+                                    or tattoos1.lower().strip() == "none"
+                                    or tattoos1.lower().strip() == "no tattoos"
+                                    or tattoos[0].lower().strip() == "no tattoos"
+                                    or tattoos[0].lower().strip() == "n/a"
+                                    or tattoos1.lower().strip() == "n/a"
+                            ):
+                                aux.insert_actor_tag(actor_to_search, "No tattoos")
+
+                            if numTattoos == 1 and (
+                                    tattoos1.lower().strip() == "various" or tattoos[0].lower().strip() == "various"
+                            ):
+                                aux.insert_actor_tag(actor_to_search, "Some tattoos")
+
+                            elif numTattoos == 1 and (
+                                    tattoos1.lower().strip() != "various"
+                                    and tattoos[0].lower().strip() != "various"
+                                    and tattoos[0].lower().strip() != "none"
+                                    and tattoos[0].lower().strip() != "none"
+                                    and tattoos[0].lower().strip() != "unknown"
+                                    and tattoos[0].lower().strip() != "no tattoos"
+                                    and tattoos[0].lower().strip() != "n/a"
+                            ):
+                                aux.insert_actor_tag(actor_to_search, "One tattoo")
+
+                            if numTattoos >= 2 and numTattoos <= 4:
+                                aux.insert_actor_tag(actor_to_search, "Few tattoos")
+
+                            if numTattoos > 4 and numTattoos <= 6:
+                                aux.insert_actor_tag(actor_to_search, "Some tattoos")
+
+                            if numTattoos > 6 and numTattoos <= 8:
+                                aux.insert_actor_tag(actor_to_search, "Lots of tattoos")
+
+                            if numTattoos > 8:
+                                aux.insert_actor_tag(actor_to_search, "Massive amount of tattoos")
+
+                            if (actor_to_search.tattoos and tattoos1) and actor_to_search.tattoos.lower() != tattoos1.lower():
+                                actor_to_search.tattoos = tattoos1
+                                
+                            aux.progress(22,29,"Tattoos [Amount tag]")
+                            
+
+                    elif link2_text.lower() == 'piercings':
+                        next_td_tag1 = link2.findNext('span')
+                        if not actor_to_search.piercings:    
+                            piercings = next_td_tag1.get_text(strip=True)  #text.strip("'/\n/\t")
+                            
+                            piercings = str(piercings).strip()
+                            piercings = piercings.replace(";", ",")
+                            piercings = piercings.replace(" and ", ",")
+                            actor_to_search.piercings = piercings
+                            #print ("Piercings: " + piercings)
+                            aux.progress(23,29,"Piercings")
+ 
+            elif link_text == 'Additional Information':
+                if not actor_to_search.extra_text:
+                    actor_to_search.extra_text = next_td_tag.get_text(strip=True)   #text.strip("'/\n/\t")
+                    aux.progress(24,29,"Additional info")
 
         if not (actor_to_search.description) or (len(actor_to_search.description)<72):
             actor_to_search.description = free_ones_biography
-            #print("There's no description or it's too short, so it's added from Freeones.")
-        print("99%",end="\r",flush=True)
+            aux.progress(25,29,"Biography")
+            
+
+        
         try:
             if ethnicity is not None:
                 if "Black" in ethnicity:
@@ -450,38 +533,33 @@ def search_freeones(actor_to_search, alias, force):
                 elif "Inuit" in ethnicity:
                     insert_actor_tag(actor_to_search, "Inuit")
                     #print ("Adding Ethnicity: Inuit")
+            aux.progress(26,29,"Ethnicity tag")
         except:
             pass
             
-        print("100%",end="\r",flush=True)
+
         aux.send_piercings_to_actortag(actor_to_search)
+        aux.progress(27,29,"Sending piercings to actor tags")
     #    sendAllPiercings()
     #    use the above whenever you want to update all piercings in db
 
         actor_to_search.last_lookup = datetime.datetime.now()
         actor_to_search.save()
+        aux.progress(28,29,"Saving to database")
 
     else:
         actor_to_search.last_lookup = datetime.datetime.now()
         actor_to_search.save()
-
+        aux.progress(28,29,"Saving to database")
+ 
     try:
-        #print("Inserted extra additional information:")
-        if ethnicity is not None: print("Ethnicity: " + ethnicity + " was added")
-        if ctry is not None: print("Country: " + ctry + " was added")
-        if parse_date_time is not None: print("Date of birth: " + str(parse_date_time + " was added"))
-        if actor_aliases is not None: print("Aliases: " + actor_aliases + " were added")
-        if height is not None: print("Height: " + str(height) + " was added")
-        if weight is not None: print("Weight: " + str(weight) + " was added")
-        if eye_color is not None: print("Eye color: " + eye_color + " was added")
-        if hair_color is not None: print("Hair color: " + hair_color + " was added")
-    except: pass
-    
-    try:
-        print("Traversed " + str(num) + " text tags from the Freeone profile page, and I am done with " + actor_to_search.name + ".")
+        aux.progress(29,29,str(num) + " tags parsed for " + actor_to_search.name + ".")
+        aux.progress_end()
+        
     except:
         pass
-
+        aux.progress(29,29,str(num) + " tags parsed for " + actor_to_search.name + ".")
+        aux.progress_end()
     return success
 
 def strip_bad_chars(name):
@@ -490,7 +568,7 @@ def strip_bad_chars(name):
         if char in name:
             #print("Before: " + name)
             name = name.replace(char, "")
-            print("Adding Data: " + name)
+            #print("Adding Data: " + name)
     return name
 
 
@@ -578,10 +656,10 @@ def search_freeones_alias(actor_to_search, alias, force):
 
 
 def main():
-    print("test")
+    #print("test")
     for actor in Actor.objects.all():
 
-        print("Fetching info for: " + actor.name)
+        #print("Fetching info for: " + actor.name)
         if not actor.gender == 'M':
             time.sleep(10)
             sucess = search_freeones_with_force_flag(actor, True)
@@ -591,7 +669,7 @@ def main():
                     if sucess:
                         break
 
-        print("Done!")
+        #print("Done!")
 
         # actor = Actor()
         # actor.name = "Daisy Marie"

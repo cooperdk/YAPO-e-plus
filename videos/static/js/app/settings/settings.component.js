@@ -12,7 +12,14 @@ angular.module('settings').component('settings', {
 
                 self.itemsPerPage = 50;
                 self.mediaRootFolders = null;
+                self.alerts = [];
+                self.addAlert = function (msg, type, timeout) {
+                    self.alerts.push({msg: msg, type: type, timeout: timeout});
+                };
 
+                self.closeAlert = function (index) {
+                    self.alerts.splice(index, 1);
+                };
                 
                 var x = helperService.getNumberOfItemsPerPaige();
                 if (helperService.getNumberOfItemsPerPaige() != undefined){
@@ -21,6 +28,7 @@ angular.module('settings').component('settings', {
                 
                 self.changeNumberOfItemsPerPage = function () {
                     helperService.setNumberOfItemsPerPaige(self.itemsPerPage);
+					self.addAlert("OK. changing items per page to "+self.itemsPerPage+".", 'success', '3000');
                     // scopeWatchService.numberOfItemsPerPageChanged('a');
                 };
                 
@@ -51,8 +59,9 @@ angular.module('settings').component('settings', {
                         self.response = response.data.vlc_path;
                         self.pathToVLC = response.data.vlc_path;
                         // alert("Got response from server: " + self.pathToFolderToAdd);
+						self.addAlert("OK.", 'success', '3000');
                     }, function errorCallback(response) {
-                        alert("Something went wrong!");
+                        self.addAlert("Please check that program location.", 'warning', '1000000');
                     });
                 };
 
@@ -71,14 +80,17 @@ angular.module('settings').component('settings', {
                         // self.response = response.data.vlc_path;
                         // self.pathToVLC = response.data.vlc_path;
                         // alert("Got response from server: " + self.pathToFolderToAdd);
-						alert("Done checking for dupes, check the console.");
+						//alert("Done checking for dupes, check the console.");
+						self.addAlert("Done checking for duplicate files.", 'success', '10000');
                     }, function errorCallback(response) {
-                        alert("Something went wrong!");
+                        //alert("Something went wrong!");
+						self.addAlert("Something went wrong while checking for dupes!", 'warning', '10000');
                     });
 			}
                 };
                 
                 self.scrapAllActor = function () {
+					self.addAlert("Starting scrape, please hold on...", 'success', '5000');
                      $http.get('settings/', {
                         params: {
                             scrapAllActors: 'True'
@@ -89,13 +101,15 @@ angular.module('settings').component('settings', {
                         // self.response = response.data.vlc_path;
                         // self.pathToVLC = response.data.vlc_path;
                         // alert("Got response from server: " + self.pathToFolderToAdd);
+						//self.addAlert("Done scraping actors.", 'success', '10000');
                     }, function errorCallback(response) {
-                        alert("Something went wrong!");
+                        self.addAlert("Something went wrong.", 'warning', '1000000');
                     });
                 };
                 
                 
                 self.tagAllScenes = function () {
+					self.addAlert("Beginning tagging ... this may take some time, check the console.", 'success', '5000');
                     $http.get('settings/', {
                         params: {
                             tagAllScenes: 'True',
@@ -107,8 +121,9 @@ angular.module('settings').component('settings', {
                         // self.response = response.data.vlc_path;
                         // self.pathToVLC = response.data.vlc_path;
                         // alert("Got response from server: " + self.pathToFolderToAdd);
+						//self.addAlert("Done tagging scenes.", 'success', '10000');
                     }, function errorCallback(response) {
-                        alert("Something went wrong!");
+                        self.addAlert("Something went wrong.", 'warning', '1000000');
                     });
                     
                 };
@@ -127,7 +142,7 @@ angular.module('settings').component('settings', {
                         // self.pathToVLC = response.data.vlc_path;
                         // alert("Got response from server: " + self.pathToFolderToAdd);
                     }, function errorCallback(response) {
-                        alert("Something went wrong!");
+                        self.addAlert("Something went wrong.", 'warning', '1000000');
                     });
                 }  
                 };
@@ -137,14 +152,14 @@ angular.module('settings').component('settings', {
                         params: {
                             cleanDatabase: true
                         }
-
                     }).then(function (response) {
                         // alert(angular.toJson(response));
                         // self.response = response.data.vlc_path;
                         // self.pathToVLC = response.data.vlc_path;
                         // alert("Got response from server: " + self.pathToFolderToAdd);
+						self.addAlert("Done cleaning the system.", 'success', '10000');
                     }, function errorCallback(response) {
-                        alert("Something went wrong!" + angular.toJson(response));
+                        self.addAlert("Something went wrong while cleaning the system.", 'warning', '1000000');
                     });
                     
                 };
@@ -181,8 +196,10 @@ angular.module('settings').component('settings', {
                         // self.response = response.data.vlc_path;
                         // self.pathToVLC = response.data.vlc_path;
                         // alert("Got response from server: " + self.pathToFolderToAdd);
+						self.addAlert("Folder deleted.", 'success', '4000');
                     }, function errorCallback(response) {
-                        alert("Something went wrong!" + angular.toJson(response));
+                        //alert("Something went wrong!" + angular.toJson(response));
+						self.addAlert("Something went wrong while removing the folder.", 'danger', '1000000');
                     });
                     
                     
@@ -193,8 +210,9 @@ angular.module('settings').component('settings', {
 
                     if (folder != ''){
                         folder = folder.id
+						
                     }
-
+                    self.addAlert("Beginning scan...", 'success', '3000');
                     $http.get('settings/', {
                         params: {
                             folderToScan: folder
@@ -206,8 +224,9 @@ angular.module('settings').component('settings', {
                         // self.response = response.data.vlc_path;
                         // self.pathToVLC = response.data.vlc_path;
                         // alert("Got response from server: " + self.pathToFolderToAdd);
+						self.addAlert("Scanning complete.", 'success', '10000');
                     }, function errorCallback(response) {
-                        alert("Something went wrong!" + angular.toJson(response));
+                        self.addAlert("Something went wrong while scanning.", 'warning', '1000000');
                     });
                     
                 }

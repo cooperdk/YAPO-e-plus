@@ -14,6 +14,6 @@ WORKDIR /YAPO
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 EXPOSE 8000
-RUN python -u manage.py makemigrations
-RUN python -u manage.py migrate
+#RUN python -u manage.py makemigrations
+#RUN python -u manage.py migrate
 ENTRYPOINT python -u manage.py runserver 0.0.0.0:8000

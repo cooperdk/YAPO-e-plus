@@ -1,4 +1,6 @@
-<!--
+<uib-alert ng-repeat="alert in $ctrl.alerts" class="enter" type="{{ alert.type }}" close="$ctrl.closeAlert($index)"
+           dismiss-on-timeout="{{ alert.timeout }}">{{ alert.msg }}
+</uib-alert><!--
         <div class="col-md-2">
 
 

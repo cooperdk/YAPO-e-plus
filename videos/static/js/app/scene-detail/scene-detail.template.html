@@ -1,3 +1,6 @@
+<uib-alert ng-repeat="alert in $ctrl.alerts" class="enter" type="{{ alert.type }}" close="$ctrl.closeAlert($index)"
+           dismiss-on-timeout="{{ alert.timeout }}">{{ alert.msg }}
+</uib-alert>
 <h1 align="center">
 
     <a href="#" editable-text="$ctrl.scene.name"
@@ -10,7 +13,8 @@
 
 
 </h1>
-<a href="/#!/folder/{{ $ctrl.scene.folders_in_tree[0] }}"><h5 align="center">{{$ctrl.scene.path_to_dir}}</h5></a>
+<h5 align="center">{{$ctrl.scene.path_to_dir}}</h5>
+<h5 align="center" style="color: #aa6666;" ng-if="$ctrl.scene.path_to_file.toLowerCase().indexOf('mp4') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('webm') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('ogg') == -1">This is an incompatible video file, you need to generate a sample or transcode it to be able to play it in YAPO e+.</h5>
 <h2 align="center">
     <uib-rating ng-model="$ctrl.scene.rating" max="10" read-only="isReadonly" on-hover="hoveringOver(value)"
                 on-leave="overStar = null" titles="['one','two','three']"
@@ -21,21 +25,20 @@
 
     <a href="{{$ctrl.sheetPath}}" data-toggle="lightbox">
 		<button type="button" class="btn btn-default btn-sm" uib-popover-html="'Will open a contact sheet with 16 images from the video, if it has been generated. This resides in the videos/media/scenes/ folder together with the video thumbnail and video preview.<br>Click outside the box to close it.'" popover-trigger="mouseenter" popover-placement="right">
-        <span class="glyphicon glyphicon glyphicon-th"></span> View Contact Sheet</button></a>
+        <span class="glyphicon glyphicon glyphicon-th"></span>  View Contact Sheet</button></a>
 
     <button type="button" ng-click="$ctrl.playScene()" class="btn btn-default btn-sm">
-        <span class="glyphicon glyphicon-play-circle"></span> Play Scene
+        <span class="glyphicon glyphicon-play-circle"></span>  Play with VLC
     </button>
     <button type="button" ng-click="$ctrl.openFolder()" class="btn btn-default btn-sm">
-        <span class="glyphicon glyphicon-folder-open"></span> Open Folder
+        <span class="glyphicon glyphicon-folder-open"></span>  Open Folder
     </button>
-    <button type="button" ng-click="$ctrl.generateSampleVideo($ctrl.scene)" class="btn btn-default btn-sm"
-            uib-popover-html="'Will try to create a mp4 sample video for this scene. Sample size is about 10MB and its duration is between 30 and 90 seconds
-            ,depending on the source duration. It takes about 30 seconds to generate a sample video, and it is stored in media/scenes/(sceneid)/sample.
-            For now, the server is locked while generating the sample. This is by design, and will be changed later.'"
+    <button type="button" ng-if="$ctrl.scene.path_to_file.toLowerCase().indexOf('mp4') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('webm') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('ogg') == -1" ng-click="$ctrl.generateSampleVideo($ctrl.scene)" class="btn btn-default btn-sm"
+            uib-popover-html="'This video format cannot be played in a browser. Click here to generate a sample. <br>The sample size is about 10MB and its duration is between 30 and 90 seconds
+            , depending on the source duration. You will be notified when it is created if you stay on this page. The sample is stored in media/scenes/(sceneid)/sample.'"
             popover-trigger="mouseenter" popover-placement="right"
     >
-        <span class="glyphicon glyphicon-facetime-video"></span> Generate Sample Video
+        <span class="glyphicon glyphicon-facetime-video"></span>  Generate a sample
     </button>
 
     <button
@@ -48,7 +51,7 @@
                                 type="button">
                                     <span
                                             popover-trigger="mouseenter"
-                                            uib-popover-html="'Add Scene to a playlist.'"
+                                            uib-popover-html="'Add this scene to a playlist.'"
                                             popover-append-to-body="true"
                                             popover-placement="top"
 
@@ -66,17 +69,20 @@
 
 <div class="row">
 
-    <div id="videoDiv" class="col-md-6 pull-left">
-        <span><video id="video" class="video-box" ng-if="$ctrl.updatedSample" poster="{{ $ctrl.scene.thumbnail }}" ng-src="{{ $ctrl.samplePath }}"
-               width="640" height="360" controls></video>
+    <div ng-if="$ctrl.scene.path_to_file.toLowerCase().indexOf('mp4') > -1 || $ctrl.scene.path_to_file.toLowerCase().indexOf('webm') > -1 || $ctrl.scene.path_to_file.toLowerCase().indexOf('ogg') > -1" id="videoDiv" class="col-md-6">
+	
+        <span><video controls id="video" class="video-box" poster="{{ $ctrl.scene.thumbnail }}" ng-src="/play/{{ $ctrl.scene.id }}"
+               width="720" height="405"></video>
+        </span>
+	</div>
+    <div ng-if="$ctrl.scene.path_to_file.toLowerCase().indexOf('mp4') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('webm') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('ogg') == -1" id="videoDiv" class="col-md-6">
+		<span><video ng-click="$ctrl.generateSampleVideo($ctrl.scene)" id="video" class="video-box" ng-if="$ctrl.updatedSample" poster="{{ $ctrl.scene.thumbnail }}" ng-src="{{ $ctrl.samplePath }}"
+               width="720" height="405" controls></video>
         </span>
     </div>
 
-  <!--      <div id="videoDiv" class="col-md-6 pull-left">
-        <span><video id="video" class="video-box" ng-if="$ctrl.scene.path_to_file " ng-src="file://{{ $ctrl.scene.path_to_file }}" poster="{{ $ctrl.scene.thumbnail }}" width="640" height="360" controls></video>
-        </span>
-    </div>
-	-->
+
+
     <div class="col-md-6">
          <ul>
     <li><span>Favorite:
@@ -172,7 +178,7 @@
              File Hash: {{ $ctrl.scene.hash || 'N/A' }}
              </li>
              <li>
-                Date Added: {{ $ctrl.scene.date_added | date:'dd.MM.yyyy HH:mm:ss'}}
+                Date Added: {{ $ctrl.scene.date_added | date:'dd.MM.yyyy HH:mm'}}
             </li>
             <li>
                 Video Bitrate: {{ $ctrl.scene.bit_rate / 1000  | number:0}} kbps
@@ -195,7 +201,7 @@
         </ul>
     </div>
 
-    <div class="col-md-8 col-md-offset-1">
+    <div style="margin-left: 16px;" class="col-md-8">
         <div id="actor-list-row">
 
             <ul>
