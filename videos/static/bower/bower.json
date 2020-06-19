@@ -25,6 +25,7 @@
     "angular-xeditable": "^0.2.0",
     "ngstorage": "^0.3.11",
     "angular-bootstrap": "^2.0.1",
-    "angular-img-cropper": "^1.1.0"
+    "angular-img-cropper": "^1.1.0",
+    "ekko-lightbox": "^4.0.2"
   }
 }
