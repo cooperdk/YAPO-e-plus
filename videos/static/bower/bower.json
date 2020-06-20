@@ -1,12 +1,12 @@
 {
-  "name": "yapo",
-  "homepage": "https://github.com/curtwagner1984/YAPO",
+  "name": "yapo-e-plus",
+  "homepage": "https://github.com/cooperdk/YAPO-e-plus",
   "authors": [
-    "Curt Wagner <curtwagner1984@gmail.com>"
+    "CooperDK <no@mail.here>"
   ],
-  "description": "Yet Another Porn Organizer",
+  "description": "Yet Another Porn Organizer - extended",
   "main": "app.config.js",
-  "license": "MIT",
+  "license": "GPL-3.0",
   "private": true,
   "ignore": [
     "**/.*",
@@ -25,6 +25,7 @@
     "angular-xeditable": "^0.2.0",
     "ngstorage": "^0.3.11",
     "angular-bootstrap": "^2.0.1",
-    "angular-img-cropper": "^1.1.0"
+    "angular-img-cropper": "^1.1.0",
+    "ekko-lightbox": "^4.0.2"
   }
 }

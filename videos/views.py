@@ -1472,7 +1472,9 @@ class ActorViewSet(viewsets.ModelViewSet):
 def display_video(x):
 
     from django.http import StreamingHttpResponse
+    from wsgiref.util import FileWrapper
     from datetime import timedelta
+    import mimetypes
     
     cont = 0
  
@@ -1508,9 +1510,14 @@ def display_video(x):
         scene.date_last_played=datetime.datetime.now()
         scene.save()
         print(f"Play count for scene {scene.id} is now {scene.play_count} and the last played date and time is updated.")
-    
-    response = StreamingHttpResponse(read_video(pathname)) #(open(pathname, 'rb')) #(read_video(pathname), status=206)
-    response['Content-Length'] = size
+    try:
+        response = StreamingHttpResponse(FileWrapper(open(pathname, 'rb'), 8192),
+            content_type=mimetypes.guess_type(pathname)[0]) #(open(pathname, 'rb')) #(read_video(pathname), status=206)
+        #response = StreamingHttpResponse(read_video(pathname)) #(open(pathname, 'rb')) #(read_video(pathname), status=206)
+        response['Content-Length'] = size
+        #response['Content-Disposition'] = "attachment; filename=%s" % filename
     #response["Content-Range"] = 'bytes 0-%s' % (size)
     #response['Content-Disposition'] = f'attachement; filename="{pathname}"'
+    except:
+        print("Error")
     return response

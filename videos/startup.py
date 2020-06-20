@@ -71,6 +71,7 @@ def verCheck():
         verfile = open(update, "r")
         ver = verfile.read()
         ver = str(ver).strip()
+        verfile.close()
         print("--- Version on disk: " + ver)
         try:
             remoteVer = requests.get(
@@ -93,6 +94,7 @@ def verCheck():
                 + chr(9608)
             )
         print("\r\n")
+        
 
 def stats():
     size = getSizeAll()

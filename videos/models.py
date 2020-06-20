@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import models
 from mptt.models import MPTTModel, TreeForeignKey
 from django.dispatch import receiver
@@ -129,9 +129,7 @@ class Website(models.Model):
     is_runner_up = models.BooleanField(default=False)
     rating = models.IntegerField(default=0)
     thumbnail = models.CharField(max_length=500, null=True, blank=True)
-    scene_tags = models.ManyToManyField(
-        SceneTag, blank=True, null=True, related_name="websites"
-    )
+    scene_tags = models.ManyToManyField(SceneTag, blank=True, null=True, related_name="websites")
     website_alias = models.TextField(default="", blank=True)
     exclusions = models.TextField(default="", null=True, blank=True)
     modified_date = models.DateTimeField(auto_now=True)
@@ -183,7 +181,7 @@ class Folder(MPTTModel):
     name = models.CharField(max_length=300, unique=True)
     last_folder_name_only = models.CharField(max_length=100, null=True)
     parent = TreeForeignKey(
-        "self", null=True, blank=True, related_name="children", db_index=True
+        "self", null=True, blank=True, related_name="children", db_index=True, on_delete=models.PROTECT
     )
     scenes = models.ManyToManyField(Scene, null=True, related_name="folders_in_tree")
     path_with_ids = models.CharField(null=True, blank=True, max_length=900)

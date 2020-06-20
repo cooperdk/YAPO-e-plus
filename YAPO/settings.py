@@ -12,6 +12,7 @@ from datetime import datetime
 LOGGING_CONFIG = None
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -61,14 +62,15 @@ INSTALLED_APPS = [
     "rest_framework",
 ]
 
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "django.contrib.auth.middleware.SessionAuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
+#    "django.contrib.auth.middleware.SessionAuthenticationMiddleware",
+
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
@@ -136,10 +138,12 @@ USE_L10N = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
+
 SITE_ROOT = os.path.abspath(os.path.join(BASE_DIR, "videos/"))
 STATIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, "videos/static"))
 STATIC_URL = "/static/"
 BASE_URL = "/"
+#STATICFILES_DIRS = (os.path.abspath(os.path.join(BASE_DIR, "videos/static")), )
 
 MEDIA_ROOT = os.path.abspath(os.path.join(BASE_DIR, "videos/media"))
 MEDIA_URL = "/media/"
