@@ -8,7 +8,7 @@ If you don't want to mess with Python and all the dependencies, there is an inst
 There is a setup available for an easy install.
 There is also a copy of the setup with pre-registered actors, websites and tags (thousands of them). It will be available on Patreon shortly.
 
-* If you're not too afraid of dabbling a bit with this, try the development branch which will have more exciting features. You can consult the README.md and the CHANGELOG.md in there to check out what's new. *
+*If you're not too afraid of dabbling a bit with this, try the development branch which will have more exciting features. You can consult the README.md and the CHANGELOG.md in there to check out what's new.*
 
 ATTENTION - The program directory MUST be renamed to "YAPO" (upper case) as some functions depend on this! 
 
