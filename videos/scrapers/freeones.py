@@ -46,6 +46,7 @@ def sendAllPiercings():
         aux.send_piercings_to_actortag(actor)
 
 def search_freeones(actor_to_search, alias, force):
+    num = 0
     success = False
     if Actor.objects.get(name=actor_to_search.name):
         actor_to_search = Actor.objects.get(name=actor_to_search.name)
@@ -70,6 +71,7 @@ def search_freeones(actor_to_search, alias, force):
 
 
     if href_found:
+    
         success = True
         print("")
         aux.progress(1,27,"Found " + actor_to_search.name + ", parsing...")
@@ -157,7 +159,7 @@ def search_freeones(actor_to_search, alias, force):
         soup = BeautifulSoup(r.content, "html5lib")
         soup_links = soup.find_all("p", {'class': ['heading', 'mb1']}) #("p", {'class': ['profile-meta-item']})
         #print (soup_links)
-        num = 0
+
         aux.progress(5,29,"Parsing info")
         for link in soup_links:
             #print (link)
@@ -594,7 +596,7 @@ def insert_aliases(actor_to_insert, aliases):
         alias = alias.rstrip()
         if not actor_to_insert.actor_aliases.filter(name=alias):
             alias_to_insert = ActorAlias()
-            alias_to_insert.name = alias.encode('utf-8')
+            alias_to_insert.name = alias  #.decode('utf-8')    # Encode gives an error in Py 8
             # alias_to_insert.actor = actor_to_insert
             try:
                 alias_to_insert.save()
