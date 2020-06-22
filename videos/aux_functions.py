@@ -16,6 +16,19 @@ def progress(count, total, suffix=''):
 def progress_end():
     sys.stdout.flush() 
 
+def getMemory():
+    import psutil
+    vmem = round(psutil.virtual_memory().total/1000000000,0)
+    return vmem # "{:.2}".format(vmem.total/100000000) #shold that be 102400000?
+
+def getCPU():
+    import psutil
+    cpufreq = round(psutil.cpu_freq().max/1000,1)
+    return cpufreq
+
+def getCPUCount():
+    import psutil
+    return psutil.cpu_count(logical=False) #set Logical to true if treads are to be included
 
 
 def send_piercings_to_actortag(actor):
