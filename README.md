@@ -1,35 +1,24 @@
 # YAPO e+
 ## Yet Another Porn Organizer (extended plus)
 
-If you don't want to mess with Python and all the dependencies, there is an installer (Windows 10 64-bit) located here: https://github.com/cooperdk/YAPO-e-plus/releases.
+*If you don't want to mess with Python and all the dependencies, there is an installer (Windows 10 64-bit) located here: https://github.com/cooperdk/YAPO-e-plus/releases. It may not include newer commits, please check the changelog and you can manually update the YAPO code after installation.*
 
-#### This is a branch of the original YAPO on which I'm making improvements, such as in-browser playback, file matching and more scraping options. Find the original readme at the bottom (delimited with a line of "=" signs).
+##### This is a branch of the original YAPO on which I'm making improvements, such as in-browser playback, file matching and more scraping options. Find the original readme at the bottom (delimited with a line of "=" signs).
 
-There is a setup available for an easy install.
-There is also a copy of the setup with pre-registered actors, websites and tags (thousands of them). It will be available on Patreon shortly.
+There is a setup available for an easy install. On the releases page, there is a "Getting Started" guide which also includes setup instructions.
+There is a copy of the setup with pre-registered actors, websites and tags (thousands of them) available. It will be available on Patreon shortly.
 
 *If you're not too afraid of dabbling a bit with this, try the development branch which will have more exciting features. You can consult the README.md and the CHANGELOG.md in there to check out what's new.*
 
-ATTENTION - The program directory MUST be renamed to "YAPO" (upper case) as some functions depend on this! 
+There is a **set of logos** available for websites, thanks to @GernBlanston#0168 from Porn Organizing (https://discord.gg/6TvpGA) - get them here: https://gitea.unknown.name/Trizkat/site-logos - they should be unpacked to your YAPO root. YAPO simply matches the website name in your installation with a PNG image in videos/media/logos and if there's a name match, the logo will be shown on the website view. Currently, the filename MUST match the  website name (not case-sensitive). This means that you should rename the logos to whatever you call your websites, or vice versa. I will be working on an automatic website addition tool in the future.
 
-There are a **set of logos** available for websites, thanks to @GernBlanston#0168 and @Trizkat#5181 from Porn Organizing (https://discord.gg/6TvpGA) - get them here: http://yapo-eplus.sex-galleri.dk/websitelogos.zip - they should be unpacked to your YAPO root. YAPO simply matches the website name in your installation with a PNG image in videos/media/logos and if there's a name match, the logo will be shown on the website view. Currently, the filename MUST match the  website name (not case-sensitive).
+Requirements: FFMPEG, VLC, npm and Python 3.7+ installed. Or use the installer which will even run from a USB stick, should you want to do that.
 
-Requirements: FFMPEG, VLC and Python 3.7.7+ installed. Or use the installer which will even run from a USB stick, should you want to do that.
+If something is not working, it is generally enough to make sure all dependencies are installed. Please consult step 3 and 4 under "Installation and upgrade instructions"  below.
 
-If something is not working, it is generally enough to make sure all dependencies are installed. From the YAPO main dir, run:
+##### Discuss and share on Discord: https://discord.gg/zdm7Mdg
 
-```bash
-pip install -r requirements.txt
-```
-
-or updating the database, if you're already using YAPO and updating it - this is also run from the YAPO main dir:
-
-```bash
-python manage.py makemigrations
-python manage.py migrate
-```
-
-#### Discuss and share on Discord: https://discord.gg/zdm7Mdg
+---------------
 
 #### NEW FEATURES:
 
@@ -39,9 +28,9 @@ python manage.py migrate
   For now, they are in each scene's folder under videos/media/scenes. They will be displayed on the scene detail view in the next update.
 
 - Layout change.
-  An update to Bootstrap and a new, darker design for YAPO.
+  An update to Bootstrap and a new, darker design for YAPO. Bootstrap 4 will be implemented later.
   
-- Ready for focused actor photo searching (Google)
+- Ready for focused actor photo searching (Google), feature to be added later.
 
 - Exclusions now available for scene tags, actor tags and websites.
   You can now enter any words that shouldn't trigger a website or actor tag, a website or it's aliases.
@@ -50,24 +39,24 @@ python manage.py migrate
   By adding "Stepsiblings" in the exclusion list for "Stepsiblings Caught", the system will not incorrectly register the website "Stepsiblings" for a file that should only be registered to "Stepsiblings Caught".
 
 
-- Now supports the new Freeones site layout. The scraper now shows a 0-100% completion for each actor scrape.
+- Now supports the new Freeones site layout. The scraper now shows a progress bar for each actor scrape.
 
 - As mentioned, we now offer website/producer logos in the website view, if the logo exists in videos/media/logos. Thanks to GernBlanston for sharing them.
 
-- New Python module requirements, it will be necessary to do "pip install --upgrade -r requirements.txt". If necessary, also "python manage.py makemigrations" and "python manage.py migrate"
+- New Python module requirements, it may be necessary to upgrade your modules.
 
-- On startup, the total disk usage for the video collection is reported.
+- On startup, the total disk usage for the video collection and other information is reported. Also, the database is backed up and your actor collection is exported to a text file in the main YAPO dir.
 
 - YAPO e+ will now strip the measurements field for a bra cup size, tag the actor with the cup size, and also tag with a breast size grouping (fx large or huge).
 
 - YAPO e+ will also tag an actor based on height. Actors of normal height (161-178 cm) won't be tagged.
 
-- There was a field in the actor table for tattoos. This now works, and tatto information shows up in the actor details.
+- Tatto information shows up in the actor details, and a group tag for tattoo amounts is added.
 
-- A field has been added to register information about piercings. In addition, typical types of piercings are now sent to the actor tags.
+- A field has been added to register information about piercings. In addition, typical types of piercings are sent to the actor tags.
 
-- YAPO e+ scrapes actor information from IMDB first (best biographies), then from TMDB (best profile pictures) and then from Freeones (best all-round information). If there's a photo in the system and it's taken from TMDB or added by the user, the system no longer downloads a new one if forced to update the actor.
-  This also ensures that your manually added photos won't be overwritten.
+- YAPO e+ scrapes actor information from IMDB first (best biographies), then from TMDB (next best profiles and best profile pictures) and then from Freeones (best all-round information). If there's a photo in the system and it's taken from TMDB or added by the user, the system no longer downloads a new one, even if you force scrape to update the actor.
+  This also ensures that your manually added photos won't be overwritten. A button will be added later, so you can delete the profile photo.
 
 - YAPO e+ hashes all scenes (don't worry, it's FAST!) and adds the hash checksum to the scenes table.
   When requested in settings, it will perform a dupe check after confirmation, and delete all duplicates so only one copy remains.
@@ -90,30 +79,41 @@ python manage.py migrate
 
 #### WHAT TO DO IF YOU'RE INSTALLING A NEW COPY OR UPGRADING YOUR EXISTING COPY OF ANOTHER YAPO INSTALLATION?
 
-1. Download FFMPEG from https://ffmpeg.zeranoe.com/builds/ and move the files in the archive's `bin/` folder to the subfolder `videos/ffmpeg` in the YAPO e+ root folder. The program looks
-for them there, if you're running Windows. If you're running Linux, install FFMPEG using your package manager.
+1. Get a copy of YAPO onto your computer. Either by downloading the zip, or by [cloning from git](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository).
 
-1. Install Node.js & npm from here: https://nodejs.org/en/download/ and use it to install bower:
+1. 
+
+  1. Linux:
+  Install FFMPEG using your package manager.
+  1. Windows:
+  Download [FFMPEG](https://ffmpeg.zeranoe.com/builds/) and move ffmpeg.exe, ffplay.exe and ffprobe.exe in the archive's `bin/` folder to the subfolder `videos/ffmpeg` in the YAPO e+ root folder. The program looks
+  for them there and only there.
+
+1. Install [node.js & npm] and use it to install bower:
 
    ```bash
    npm install -g bower
    ```
 
-   Navigate to <drive>\YAPO\videos\static\bower and install JS dependencies by running:
-  
+   Install JS dependencies, such as Angular and other tools, by running:
+
    ```bash
+   cd <drive or root path>\YAPO\videos\static\bower
    bower install
    ```
 
-1. Install all dependencies by executing: `pip install -R requirements.txt` from the main YAPO e+ folder. This installs Django and any other libraries in their minimum required versions.
+1. Install all Python dependencies by executing:
 
-1. Since the database has changed a bit, it is necessary to migrate (it is, even if it's a new install, because that's how the database is generated).
+    `pip install -R requirements.txt`
+    from the main YAPO e+ folder. This installs Django and any other libraries in their minimum required versions.
+
+1. Since the YAPO e+ models occasionally change, it may be necessary to migrate.
 
     1. Prepare database migration:
         ```bash
         python manage.py makemigrations
         ```
-    
+
         This will look over the new code and take note of the adjustments that needs to be made to the database.
 
     1. Execute database migration
@@ -127,11 +127,25 @@ for them there, if you're running Windows. If you're running Linux, install FFMP
         ```bash
         You are trying to add a non-nullable field **'date_added'** to folder without a default; we can't do that (the database needs  something to populate existing rows).
         ```
-   
+       
         When asked to select a fix, select option 1 and type in `datetime.datetime.now()` and press enter.
-   
+       
         If you need more help installing the software, first look towards the end of this document, there's a section named "Installation".
         Only if you really have difficulties, register an issue on Github. I will offer installation help, by mail or through Teamviewer, for a coffee donation.
+        
+        If you get errors other that those in part 3 above, try to do
+        
+        `python manage.py migrate --fake`
+        
+        (or replace fake with fake-initial if you don't have a db.sqlite3 database file in your main YAPO e+ folder)
+        
+        You can also secure your database with the command:
+        
+        `python manage.py dumpdata --indent=4 > database.json`
+        
+        Which will export your database tables to json format. You can then import it after executing step 1 and to above to generate a new database with the command:
+        
+        `python manage.py loaddata database.json --ignorenonexistent`
 
 1. Enjoy!
 
@@ -142,7 +156,6 @@ YAPO - Yet Another Porn Organizer
 
 Greetings fellow pervs!
 
-#####  TL;DR 
 YAPO is a software I made to organize and manage porn collections.
 It's not finished yet, but if you want to try it anyway, at the bottom of the page there are videos that will have you running YAPO in less than 15 minutes. There are also screenshots at the bottom of the page as well.
 
