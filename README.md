@@ -8,7 +8,7 @@
 There is a setup available for an easy install. On the releases page, there is a "Getting Started" guide which also includes setup instructions.
 There is a copy of the setup with pre-registered actors, websites and tags (thousands of them) available. It will be available on Patreon shortly.
 
-*If you're not too afraid of dabbling a bit with this, try the development branch which will have more exciting features. You can consult the README.md and the CHANGELOG.md in there to check out what's new.*
+ATTENTION - The program directory should be renamed to "YAPO" (upper case) as some functions depend on this! 
 
 There is a **set of logos** available for websites, thanks to @GernBlanston#0168 from Porn Organizing (https://discord.gg/6TvpGA) - get them here: https://gitea.unknown.name/Trizkat/site-logos - they should be unpacked to your YAPO root. YAPO simply matches the website name in your installation with a PNG image in videos/media/logos and if there's a name match, the logo will be shown on the website view. Currently, the filename MUST match the  website name (not case-sensitive). This means that you should rename the logos to whatever you call your websites, or vice versa. I will be working on an automatic website addition tool in the future.
 

@@ -55,12 +55,8 @@ def write_actors_to_file():
     file = open("actors.txt", "w")
 
     file.write(actors_string)
-    print(
-        'For backup purposes, we just wrote all actors in alphabetical form to actors.txt.\r\nThis can be imported by going to Add>Item Names and clicking "Add Actors".'
-    )
-    print(
-        "For successful recovery on a new setup, you must remove the actor photos\r\nin video/media/actors and re-scrape, as the actor IDs will have changed.\r\n"
-    )
+    print("For backup purposes, we just wrote all actors in alphabetical form to actors.txt.")
+    print("To recover actor data, please consult the guide.")
     file.close()
 
 def verCheck():
@@ -71,10 +67,11 @@ def verCheck():
         verfile = open(update, "r")
         ver = verfile.read()
         ver = str(ver).strip()
+        verfile.close()
         print("--- Version on disk: " + ver)
         try:
             remoteVer = requests.get(
-                "https://raw.githubusercontent.com/cooperdk/YAPO-e-plus/master/VERSION.md"
+                "https://raw.githubusercontent.com/cooperdk/YAPO-e-plus/develop/VERSION.md"
             ).text
             remoteVer = remoteVer.strip()
         except:
@@ -93,6 +90,7 @@ def verCheck():
                 + chr(9608)
             )
         print("\r\n")
+        
 
 def stats():
     size = getSizeAll()
@@ -248,6 +246,18 @@ def getStarted():
     stats()
     backupper()
     write_actors_to_file()
+    mem = int(aux.getMemory())
+    cpu = aux.getCPU()
+    cpucnt = aux.getCPUCount()
+    global videoProcessing
+    print("\nYou have " + str(mem) + " GB available. CPU speed is " +
+          str(cpu) + " and you have " + str(cpucnt) + " cores available.")
+    if mem <= 1:
+        print("Since you have only about a gigabyte of memory, video processing will be disabled.")
+        videoProcessing = False
+    if mem >= 2:
+        print("Since you have sufficient memory, video processing features will be enabled.")
+        videoProcessing = True
     print("\n")
     verCheck()
 
