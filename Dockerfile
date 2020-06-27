@@ -5,8 +5,7 @@ WORKDIR /YAPO
 WORKDIR /YAPO/videos/static/bower
 RUN bower --allow-root install
 WORKDIR /YAPO
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+RUN pip install --upgrade pip && pip install -r requirements.txt
 EXPOSE 8000
 RUN [ ! -f "/YAPO/db.sqlite3" ] && { python -u manage.py makemigrations; python -u manage.py migrate; }
 ENTRYPOINT python -u manage.py runserver 0.0.0.0:8000
