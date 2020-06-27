@@ -335,3 +335,5 @@ fabric.properties
 !videos/media/actor/Unknown/*
 !videos/media/images/actor/Unknown/*
 !videos/media/images/blank.png
+
+.idea
