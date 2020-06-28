@@ -1,18 +1,23 @@
 # YAPO e+
 ## Yet Another Porn Organizer (extended plus)
 
+#### *The YAPO website is coming soon!*
+
 *If you don't want to mess with Python and all the dependencies, there is an installer (Windows 10 64-bit) located here: https://github.com/cooperdk/YAPO-e-plus/releases. It may not include newer commits, please check the changelog and you can manually update the YAPO code after installation.*
 
 ##### This is a branch of the original YAPO on which I'm making improvements, such as in-browser playback, file matching and more scraping options. Find the original readme at the bottom (delimited with a line of "=" signs).
 
 There is a setup available for an easy install. On the releases page, there is a "Getting Started" guide which also includes setup instructions.
-There is a copy of the setup with pre-registered actors, websites and tags (thousands of them) available. It will be available on Patreon shortly.
+
+There's also a Docker image which is described further down.
+
+A copy of the setup with pre-registered actors, websites and tags (thousands of them) is available. It will be available on Patreon shortly. Until then, contact me here to gain access to it.
 
 ATTENTION - The program directory should be renamed to "YAPO" (upper case) as some functions depend on this! 
 
 There is a **set of logos** available for websites, thanks to @GernBlanston#0168 from Porn Organizing (https://discord.gg/6TvpGA) - get them here: https://gitea.unknown.name/Trizkat/site-logos - they should be unpacked to your YAPO root. YAPO simply matches the website name in your installation with a PNG image in videos/media/logos and if there's a name match, the logo will be shown on the website view. Currently, the filename MUST match the  website name (not case-sensitive). This means that you should rename the logos to whatever you call your websites, or vice versa. I will be working on an automatic website addition tool in the future.
 
-Requirements: FFMPEG, VLC, npm and Python 3.7+ installed. Or use the installer which will even run from a USB stick, should you want to do that.
+Requirements: FFMPEG, VLC, npm/Node.js (for installing Bower) and Python 3.7+ installed. If you use the installer, everything is pre-installed for you.
 
 If something is not working, it is generally enough to make sure all dependencies are installed. Please consult step 3 and 4 under "Installation and upgrade instructions"  below.
 
@@ -22,16 +27,13 @@ If something is not working, it is generally enough to make sure all dependencie
 
 #### NEW FEATURES:
 
-- Streaming scene playback from within YAPO e+ (with working seek bar). This will be pushed in the next update, around 17th June 2020.
-
+- Streaming scene playback from within YAPO e+ (with working seek bar).
+- Working dockerfile
 - Contact sheets.
-  For now, they are in each scene's folder under videos/media/scenes. They will be displayed on the scene detail view in the next update.
-
+  These are generated in each scene's folder under videos/media/scenes. They can be displayed by clicking the appropriate button on the scene detail view.
 - Layout change.
   An update to Bootstrap and a new, darker design for YAPO. Bootstrap 4 will be implemented later.
-  
 - Ready for focused actor photo searching (Google), feature to be added later.
-
 - Exclusions now available for scene tags, actor tags and websites.
   You can now enter any words that shouldn't trigger a website or actor tag, a website or it's aliases.
   For example, the word "floral" in the filename would trigger a tag named "oral" - by excluding "floral" you can prevent this).
@@ -77,19 +79,31 @@ If something is not working, it is generally enough to make sure all dependencie
 - Function to move all videos belonging to a website or actor so that they reside in the same folder and an ability to set this automatically
 - An API for videohashes, tags and actors to avoid hundreds of people re-inventing the wheel
 
-#### WHAT TO DO IF YOU'RE INSTALLING A NEW COPY OR UPGRADING YOUR EXISTING COPY OF ANOTHER YAPO INSTALLATION?
+#### Installation and upgrade instructions
 
-1. Get a copy of YAPO onto your computer. Either by downloading the zip, or by [cloning from git](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository).
+##### Local install
 
-1. 
+1. **Get a copy of YAPO onto your computer**. Either by downloading the zip, by getting the [docker image](https://hub.docker.com/repository/docker/cooperdk/yapo-eplus/general), or by [cloning from git](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository). The docker image will require some work to setup, since every video folder must be mounted in the image.
 
-  1. Linux:
-  Install FFMPEG using your package manager.
-  1. Windows:
-  Download [FFMPEG](https://ffmpeg.zeranoe.com/builds/) and move ffmpeg.exe, ffplay.exe and ffprobe.exe in the archive's `bin/` folder to the subfolder `videos/ffmpeg` in the YAPO e+ root folder. The program looks
-  for them there and only there.
+1. **Clone the git branch of your choice** - master or develop. Do this by doing:
 
-1. Install [node.js & npm] and use it to install bower:
+    `git branch -b <master or develop>`
+
+    `git clone -b https://github.com/cooperdk/YAPO-e-plus.git <install dir>`
+
+    The install dir should be <drive>\YAPO (Windows) or \YAPO (Linux).
+
+    You can also just download the branch of your choice by selecting that branch on the Github page, and pressing the green "Clone" button and then clicking "Download zip".
+
+  1. **Linux specific:**
+
+    Install FFMPEG using your package manager, or compile it. It should be as complete as possible, with H.264/H.265, AAC, MP3 etc.
+
+  1. **Windows specific:**
+
+    Download [FFMPEG](https://ffmpeg.zeranoe.com/builds/) and move ffmpeg.exe, ffplay.exe and ffprobe.exe in the archive's `bin/` folder to the subfolder `videos/ffmpeg` in the YAPO e+ root folder. On Windows, YAPO looks for them there and only there. This binary includes everything needed by YAPO.
+
+1. **Install [node.js & npm] and use it to install bower:**
 
    ```bash
    npm install -g bower
@@ -102,12 +116,12 @@ If something is not working, it is generally enough to make sure all dependencie
    bower install
    ```
 
-1. Install all Python dependencies by executing:
+1. **Install all Python dependencies by executing:**
 
     `pip install -R requirements.txt`
     from the main YAPO e+ folder. This installs Django and any other libraries in their minimum required versions.
 
-1. Since the YAPO e+ models occasionally change, it may be necessary to migrate.
+1. **Since the YAPO e+ models occasionally change, it may be necessary to migrate**.
 
     1. Prepare database migration:
         ```bash
@@ -143,13 +157,39 @@ If something is not working, it is generally enough to make sure all dependencie
         
         `python manage.py dumpdata --indent=4 > database.json`
         
-        Which will export your database tables to json format. You can then import it after executing step 1 and to above to generate a new database with the command:
+        Which will export your database tables to json format. You can then import it after executing step 1 and2 above to generate a new database with the command:
         
         `python manage.py loaddata database.json --ignorenonexistent`
+        
+        If you have any issues with this, I will fix your database for a small donation. There are sometimes problems due to Django's way of updating databases. Typically, it is due to primary keys in built-in tables.
 
-1. Enjoy!
+**Running YAPO in a Docker environment**
 
-================================================================================
+- To do this, you will need a working [Docker installation](https://www.docker.com/get-started) (on Windows, only Docker Desktop is supported, since I had no luck in connecting to my Docker Toolbox environment).
+
+  Get the release by doing:
+
+  `docker pull cooperdk/yapo-eplus`
+
+  And run it with:
+
+  `docker run -i -t -p 8000 cooperdk/yapo-eplus`
+
+  The -i argument is needed if YAPO needs to ask you a question, and the -t argument makes sure that you have TTY abilities for your session. The Docker image is hardcoded to serve on port 8000, which is why it has to be opened with the -p argument.
+
+  The database should be setup the first time you run the environment, and you can use the Docker CLI to mount your video folders as Samba shares. On Windows, this requires you to create network shares for each of your main video folders that you want YAPO to access. I don't suggest that you copy the files over to the Docker image.
+
+  Docker Desktop requires the May 2020 update of Windows 10 Home (build 2004), or any version of Windows 10 Professional. You cannot install Docker Desktop on an older release of Windows 10 Home.
+  
+  The docker image is built on a Debian system. Please read up on the above if you're not sure what I mean. If you need support for this, I offer my help for a donation.
+
+8. **Enjoy**!
+
+For visual help setting up your YAPO system, I am preparing guides and tips. You can find a "getting started" guide on the [releases page](https://github.com/cooperdk/YAPO-e-plus/releases).
+
+This concludes this document. Below you'll find the document created by the author of YAPO redux, which was forked from the original YAPO.
+
+------
 
 # YAPO
 YAPO - Yet Another Porn Organizer
