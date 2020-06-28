@@ -1,10 +1,19 @@
 # Changelog
 
-## 20200605-0035
+## 200628-0205 (0.6.12)
 
 ### New
 
-* Now creating video contact sheets of all videos. In the next update, this sheet will be displayed in the scene detail view. For now, they are in each scene's scene folder under "video/media/scenes".
+* YAPO will now stream videos with the embedded HTML5 player. WMV, AVI and FLV files must still be played using the VLC button, and you can only generate previews for files that cannot be played internally. 
+* On startup, YAPO will report the amount of available memory, cores, and your CPU's speed. If these are sufficient, YAPO will (later) allow for transcoding of the above mentioned files.
+* YAPO now runs on Django 3.0.7 (latest release), and only supports Python 3.7 or newer.
+  The Docker image (check README.md) is now working, but requires you to mount your video folders within the virtual environment.
+
+## 200605-0035
+
+### New
+
+* Now creating video contact sheets of all videos. In the next update, this sheet will be displayed by clicking the appropriate button in the scene detail view. They are located in each scene's folder under "video/media/scenes".
 * Layout change. YAPO is now in dark mode, Bootstrap is updated and I have made a nicer layout. Be aware that some dropdown boxes are hard to make out, this will be changed soon.
 * Now prepared for more focused actor photo searching. In a soon-to-come update, YAPO will download two additional profile shots and three action shots (that is, two portrait mode photos and three landscape photos).
 
@@ -14,7 +23,7 @@ From the YAPO main dir, execute:
 `pip install --r requirements.txt`
 
 
-## 20200525-0210
+## 200525-0210
 
 ### New
 
