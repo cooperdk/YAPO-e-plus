@@ -251,7 +251,7 @@ def getStarted():
     cpucnt = aux.getCPUCount()
     global videoProcessing
     print("\nYou have " + str(mem) + " GB available. CPU speed is " +
-          str(cpu) + " and you have " + str(cpucnt) + " cores available.")
+          str(cpu) + " GHz and you have " + str(cpucnt) + " cores available.")
     if mem <= 1:
         print("Since you have only about a gigabyte of memory, video processing will be disabled.")
         videoProcessing = False
