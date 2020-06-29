@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# if the database does not exist: do makemigrations, because they initialize the db
+# if the database does not exist: do makemigrations/migrate, because they initialize the db
 python -u manage.py makemigrations
 python -u manage.py migrate
 
