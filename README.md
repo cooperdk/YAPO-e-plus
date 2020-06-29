@@ -17,7 +17,7 @@ ATTENTION - The program directory should be renamed to "YAPO" (upper case) as so
 
 There is a **set of logos** available for websites, thanks to @GernBlanston#0168 from Porn Organizing (https://discord.gg/6TvpGA) - get them here: https://gitea.unknown.name/Trizkat/site-logos - they should be unpacked to your YAPO root. YAPO simply matches the website name in your installation with a PNG image in videos/media/logos and if there's a name match, the logo will be shown on the website view. Currently, the filename MUST match the  website name (not case-sensitive). This means that you should rename the logos to whatever you call your websites, or vice versa. I will be working on an automatic website addition tool in the future.
 
-Requirements: FFMPEG, VLC, npm/Node.js (for installing Bower) and Python 3.7+ installed. If you use the installer, everything is pre-installed for you.
+Requirements: FFMPEG, VLC (for out-of-browser playback, if you prefer that) and Python 3.7+ installed. If you use the installer, everything is pre-installed for you.
 
 If something is not working, it is generally enough to make sure all dependencies are installed. Please consult step 3 and 4 under "Installation and upgrade instructions"  below.
 
@@ -95,26 +95,14 @@ If something is not working, it is generally enough to make sure all dependencie
 
     You can also just download the branch of your choice by selecting that branch on the Github page, and pressing the green "Clone" button and then clicking "Download zip".
 
-  1. **Linux specific:**
+    * **Linux specific:**
 
-    Install FFMPEG using your package manager, or compile it. It should be as complete as possible, with H.264/H.265, AAC, MP3 etc.
+      Install FFMPEG using your package manager, or compile it. It should be as complete as possible, with H.264/H.265, AAC, MP3 etc.
+      Personally, I use [this package]() (Ubuntu). After following the directions on the page, just do apt-get install ffmpeg and you have a copy with all the libraries you're ever going to need.
 
-  1. **Windows specific:**
+    * **Windows specific:**
 
-    Download [FFMPEG](https://ffmpeg.zeranoe.com/builds/) and move ffmpeg.exe, ffplay.exe and ffprobe.exe in the archive's `bin/` folder to the subfolder `videos/ffmpeg` in the YAPO e+ root folder. On Windows, YAPO looks for them there and only there. This binary includes everything needed by YAPO.
-
-1. **Install [node.js & npm] and use it to install bower:**
-
-   ```bash
-   npm install -g bower
-   ```
-
-   Install JS dependencies, such as Angular and other tools, by running:
-
-   ```bash
-   cd <drive or root path>\YAPO\videos\static\bower
-   bower install
-   ```
+      Download [FFMPEG](https://ffmpeg.zeranoe.com/builds/) and move ffmpeg.exe, ffplay.exe and ffprobe.exe in the archive's `bin/` folder to the subfolder `videos/ffmpeg` in the YAPO e+ root folder. On Windows, YAPO looks for them there and only there. This binary includes everything needed by YAPO. I advise you to update it regularly, Zeranoe builds new versions all the time.
 
 1. **Install all Python dependencies by executing:**
 
@@ -157,7 +145,7 @@ If something is not working, it is generally enough to make sure all dependencie
         
         `python manage.py dumpdata --indent=4 > database.json`
         
-        Which will export your database tables to json format. You can then import it after executing step 1 and2 above to generate a new database with the command:
+        Which will export your database tables to json format. You can then import it after executing step 1 and 2 above to generate a new database with the command:
         
         `python manage.py loaddata database.json --ignorenonexistent`
         

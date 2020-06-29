@@ -1,11 +1,9 @@
 FROM python:3.7.7-slim
-RUN apt-get update -y && apt-get upgrade -y && apt-get install git ffmpeg libavcodec58 libavformat58 libavresample4 libavutil56 gcc python-numpy chromium-driver software-properties-common curl sudo -y && curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash - && apt-get install nodejs -y && npm install -g bower
+RUN apt-get update -y && apt-get upgrade -y && apt-get install git python-numpy -y && add-apt-repository ppa:jonathonf/ffmpeg-4 -y && apt-get update && apt-get install ffmpeg -y
 COPY . /YAPO
-WORKDIR /YAPO
-WORKDIR /YAPO/videos/static/bower
-RUN bower --allow-root install
 WORKDIR /YAPO
 RUN pip install --upgrade pip && pip install -r requirements.txt
 EXPOSE 8000
-RUN [ ! -f "/YAPO/db.sqlite3" ] && { python -u manage.py makemigrations; python -u manage.py migrate; }
-ENTRYPOINT python -u manage.py runserver 0.0.0.0:8000
+ENTRYPOINT [ ! -f "/YAPO/db.sqlite3" ] && { python -u manage.py makemigrations; python -u manage.py migrate; }
+ENTRYPOINT [ ! -f "/YAPO/db.sqlite3" ] && echo "Your YAPO image is ready. Run YAPO with ./yapo.sh and browse to http://localhost:8000"
+ENTRYPOINT [ -f "/YAPO/db.sqlite3" ] && echo "Run YAPO with ./yapo.sh and browse to http://localhost:8000"
