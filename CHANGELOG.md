@@ -2,6 +2,12 @@
 
 ## 200628-0205 (0.6.12)
 
+### Changes
+
+* Smaller updates: Freeones scraper, all javascript dependencies now included with new locations
+
+## 200628-0205 (0.6.12)
+
 ### New
 
 * YAPO will now stream videos with the embedded HTML5 player. WMV, AVI and FLV files must still be played using the VLC button, and you can only generate previews for files that cannot be played internally. 
