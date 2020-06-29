@@ -7,16 +7,14 @@ RUN apk add curl && curl -L ${QEMU_URL} | tar zxvf - -C . --strip-components 1
 FROM arm32v7/python:3.7.7-slim
 # Add QEMU
 COPY --from=qemu qemu-aarch64-static /usr/bin
-RUN apt-get update -y
-RUN apt-get upgrade -y
-RUN apt-get install ffmpeg libavcodec58 libavformat58 libavresample4 libavutil56 gcc -y
-RUN apt-get install python-numpy -y
-RUN apt-get install chromium-driver -y
+RUN apt-get update -y \
+ && apt-get upgrade -y \
+ && apt-get install gcc git -y
+# make a seperate layer for the ffmpeg related stuff
+RUN apt-get install ffmpeg libavcodec58 libavformat58 libavresample4 libavutil56 python-numpy -y
 COPY . /YAPO
 WORKDIR /YAPO
 RUN pip install --upgrade pip \
  && pip install -r requirements.txt
 EXPOSE 8000
-#RUN python -u manage.py makemigrations
-#RUN python -u manage.py migrate
-ENTRYPOINT python -u manage.py runserver 0.0.0.0:8000
+ENTRYPOINT ["/bin/bash", "/YAPO/startup.sh"]
