@@ -116,9 +116,9 @@ If something is not working, it is generally enough to make sure all dependencie
         python manage.py makemigrations
         ```
 
-        This will look over the new code and take note of the adjustments that needs to be made to the database.
+        This will look over the new code and create scripts to make the adjustments to the database.
 
-    1. Execute database migration
+    1. Execute the database migration scripts:
         ```bash
         python manage.py migrate
         ```
