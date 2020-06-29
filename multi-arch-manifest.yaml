@@ -4,11 +4,6 @@ manifests:
     platform:
       architecture: amd64
       os: linux
-  - image: merodac/yapo-eplus:latest-arm64v8
-    platform:
-      architecture: arm64
-      os: linux
-      variant: v8
   - image: merodac/yapo-eplus:latest-arm32v7
     platform:
       architecture: arm
