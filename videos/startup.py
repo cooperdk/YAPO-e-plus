@@ -121,7 +121,7 @@ def stats():
 def backupper():
     import YAPO.settings as settings
     src = settings.DATABASES['default']['NAME']
-    dest = os.path.abspath(os.path.join(os.path.dirname(__file__), "..\db_BACKUP.sqlite3"))
+    dest = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "db_BACKUP.sqlite3"))
     shutil.copy(src, dest)
     print("Performed a database backup to " + dest + "\n")
 
