@@ -54,7 +54,7 @@ class ActorTag(models.Model):
     actor_tag_alias = models.TextField(default="", blank=True)
     exclusions = models.TextField(default="", null=True, blank=True)
     scene_tags = models.ManyToManyField(
-        SceneTag, null=True, blank=True, related_name="actor_tags"
+        SceneTag, blank=True, related_name="actor_tags" # null=True, 
     )
     modified_date = models.DateTimeField(auto_now=True)
 
@@ -89,7 +89,7 @@ class Actor(models.Model):
     tmdb_id = models.CharField(max_length=25, null=True, blank=True)
     official_pages = models.TextField(default="", blank=True)
     actor_tags = models.ManyToManyField(
-        ActorTag, null=True, blank=True, related_name="actors"
+        ActorTag, blank=True, related_name="actors" # null=True, 
     )
     ethnicity = models.CharField(max_length=30, null=True, blank=True)
     weight = models.CharField(max_length=30, null=True, blank=True)
@@ -102,7 +102,7 @@ class Actor(models.Model):
     last_lookup = models.DateTimeField(null=True, blank=True)
     is_exempt_from_one_word_search = models.BooleanField(default=False)
     actor_aliases = models.ManyToManyField(
-        ActorAlias, null=True, blank=True, related_name="actors"
+        ActorAlias, blank=True, related_name="actors" # null=True, 
     )
     modified_date = models.DateTimeField(auto_now=True)
 
@@ -129,7 +129,7 @@ class Website(models.Model):
     is_runner_up = models.BooleanField(default=False)
     rating = models.IntegerField(default=0)
     thumbnail = models.CharField(max_length=500, null=True, blank=True)
-    scene_tags = models.ManyToManyField(SceneTag, blank=True, null=True, related_name="websites")
+    scene_tags = models.ManyToManyField(SceneTag, blank=True, related_name="websites") #null=True, 
     website_alias = models.TextField(default="", blank=True)
     exclusions = models.TextField(default="", null=True, blank=True)
     modified_date = models.DateTimeField(auto_now=True)
@@ -155,11 +155,11 @@ class Scene(models.Model):
     description = models.TextField(default="", blank=True)
     thumbnail = models.CharField(max_length=500, null=True, blank=True)
     scene_tags = models.ManyToManyField(
-        SceneTag, blank=True, null=True, related_name="scenes"
+        SceneTag, blank=True, related_name="scenes" # null=True, 
     )
-    actors = models.ManyToManyField(Actor, null=True, blank=True, related_name="scenes")
+    actors = models.ManyToManyField(Actor, blank=True, related_name="scenes") # null=True, 
     websites = models.ManyToManyField(
-        Website, null=True, blank=True, related_name="scenes"
+        Website, blank=True, related_name="scenes" # null=True, 
     )
     width = models.IntegerField(null=True, blank=True)
     height = models.IntegerField(null=True, blank=True)
@@ -183,7 +183,7 @@ class Folder(MPTTModel):
     parent = TreeForeignKey(
         "self", null=True, blank=True, related_name="children", db_index=True, on_delete=models.PROTECT
     )
-    scenes = models.ManyToManyField(Scene, null=True, related_name="folders_in_tree")
+    scenes = models.ManyToManyField(Scene, related_name="folders_in_tree") # null=True, 
     path_with_ids = models.CharField(null=True, blank=True, max_length=900)
     date_added = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
@@ -203,7 +203,7 @@ class LocalSceneFolders(models.Model):
 class Playlist(models.Model):
     name = models.CharField(max_length=500, unique=True)
     scenes = models.ManyToManyField(
-        Scene, null=True, related_name="playlists", blank=True
+        Scene, related_name="playlists", blank=True # null=True, 
     )
     date_added = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
