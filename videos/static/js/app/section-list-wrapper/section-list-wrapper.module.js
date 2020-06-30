@@ -1,1 +1,0 @@
-angular.module('sectionListWrapper', ['core.actor', 'actorList']);
