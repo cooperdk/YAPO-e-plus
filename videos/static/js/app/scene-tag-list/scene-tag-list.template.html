@@ -1,0 +1,40 @@
+<!--
+    <div class="row">
+        <div class="col-md-2">
+
+
+            Search: <input ng-model="search.name"/>
+
+            <p>
+                Sort by:
+                <select ng-model="$ctrl.orderProp">
+                    <option value="name">Alphabetical</option>
+                    <option value="ethnicity">Ethnicity</option>
+                    <option value="gender">Gender</option>
+                    <option value="height">Height</option>
+                    <option value="$ctrl.tags.scenes.length">Rating</option>
+                    {#                    <option value="age">Newest</option>#}
+                    <option value="-name">Alphabetical Des</option>
+                </select>
+            </p>
+
+        </div>
+-->
+<pagination page-type="'SceneTag'"></pagination>
+
+<ul class="tags">
+    <li ng-repeat="tag in $ctrl.tags">
+        <a href="/#!/scene-tag/{{ tag.id }}">{{ tag.name }} [{{ tag.usage_count }}]</a>
+        <span ng-if="!$ctrl.mainPage" ng-click="$ctrl.deleteSceneTag(tag)" class="glyphicon glyphicon-remove"></span>
+        <span ng-if="$ctrl.mainPage" ng-click="$ctrl.deleteSceneTagFromDb(tag)"
+              class="glyphicon glyphicon-trash on-hover-red-cursor-pointer"
+              uib-popover-html="'<strong>Delete</strong> tag from database!'"
+              popover-trigger="mouseenter">
+
+                            </span>
+
+    </li>
+</ul>
+
+
+

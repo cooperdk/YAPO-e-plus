@@ -1,0 +1,23 @@
+<div class="container-fluid">
+
+
+    <div ng-controller="ModalCtrl">
+<center>
+
+            <img ng-src="{{ $ctrl.actor.thumbnail }}" width="240px" class="img-responsive center-block actor-thumb"
+                 ng-click="open()" />
+
+</center>
+
+        <!--
+            <button type="button" class="btn btn-default" ng-click="open()">Edit Image</button>
+        <button type="button" class="btn btn-default" ng-click="open('lg')">Large modal</button>
+    <button type="button" class="btn btn-default" ng-click="open('sm')">Small modal</button>
+    <button type="button" class="btn btn-default" ng-click="toggleAnimation()">Toggle Animation ({{ animationsEnabled }})</button>
+    -->
+        <div ng-show="selected">Selection from a modal: {{ selected }}</div>
+    </div>
+
+</div>
+
+

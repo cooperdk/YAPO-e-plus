@@ -1,0 +1,36 @@
+<div align="left" style="position: absolute; z-index: 9; overflow; left: 64; top: 32;"><img style="max-width: 320px; max-height: 220px; height: auto; width: auto; cursor:default; border-style: none; border-bottom: none;" ng-src="media/tags/{{$ctrl.actorTag.name | lowercase}}.jpg" onError=null;this.src="media/images/blank.png";this.style="width:0px;"> <!--{{$ctrl.website.thumbnail}}--></div>
+<div ng-if="image.is404">Uh oh!  Image 404'd.</div></center>
+
+<h1 align="center">
+    <a href="#" editable-text="$ctrl.actorTag.name"
+       onaftersave="$ctrl.update()" style="cursor:text">
+        {{ $ctrl.actorTag.name || 'NA' }}
+    </a>
+</h1>
+<div align="center">
+<h2 >
+    <uib-rating ng-model="$ctrl.actorTag.rating" max="10" read-only="isReadonly" on-hover="hoveringOver(value)"
+                on-leave="overStar = null" titles="['one','two','three']"
+                aria-labelledby="default-rating" ng-change="$ctrl.update()"></uib-rating>
+    <br>
+   <h3>This tag is used {{$ctrl.actorTag.actors.length}} times </h3>
+
+    </h2>
+    	    <label
+            uib-popover-html="'The exclusions list prevent any words to be auto-tagged. You can specify multiple exclusions by separating them with a comma.'"
+            popover-trigger="mouseenter" popover-placement="right">
+    Scene Tag Exclusions:
+    <a href="#" editable-textarea="$ctrl.actorTag.exclusions" e-rows="5" e-cols="100"
+       onaftersave="$ctrl.update()">
+        {{ $ctrl.actorTag.exclusions || 'no exclusions' }}
+    </a>
+    </label>
+</div>
+
+
+<p>{{$ctrl.actorTag.description}}</p>
+
+<section-list-wrapper main-page="false" section-type="'ActorList'"></section-list-wrapper>
+
+
+

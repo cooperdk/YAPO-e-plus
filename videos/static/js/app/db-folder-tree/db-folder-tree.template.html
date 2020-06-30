@@ -1,0 +1,45 @@
+<div class="row">
+    <div class="col-md-4" id="left">
+        <div class="well"><h3>
+                <span ng-repeat="n in $ctrl.nav"
+
+                      class="on-hover-red-cursor-pointer">
+                    <a href="#!/folder/{{ n.id }}"> {{ n.last_folder_name_only }}  </a>>
+                </span>
+        </h3></div>
+        <label>Recursive? </label>
+        <input type="checkbox" ng-model="$ctrl.recursive" ng-change="$ctrl.recursiveToggle()">
+        <pagination page-type="'DbFolder'"></pagination>
+        <ul class="dbFolders">
+            <li ng-model="$ctrl.dbFolders"
+                ng-repeat="folder in $ctrl.dbFolders"
+                class="thumbnail">
+                    <span
+                            uib-popover="{{ folder.name }}"
+                            popover-trigger="mouseenter" popover-placement="right-top"
+                    ><a
+                            href="#!/folder/{{ folder.id }}">{{$index + 1}}) {{ folder.last_folder_name_only }} </a>  </span>
+
+
+                <!--
+                <ul>
+                    <scene-list pk="folder.scenes"></scene-list>
+                </ul>
+                -->
+
+            </li>
+        </ul>
+
+    </div>
+    <div class="col-md-8">
+
+        <div class="scene-list">
+
+            <section-list-wrapper main-page="false" section-type="'SceneList'"></section-list-wrapper>
+        </div>
+
+    </div>
+
+
+</div>
+

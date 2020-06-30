@@ -1,0 +1,5 @@
+On windows, ffmpeg.exe and ffprobe.exe go in this folder.
+
+Download the latest release here: https://ffmpeg.zeranoe.com/builds/win64/static/
+
+Or navigate the ffmpeg site here: https://ffmpeg.zeranoe.com/builds/

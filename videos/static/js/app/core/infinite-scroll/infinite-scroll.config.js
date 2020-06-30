@@ -1,0 +1,1 @@
+angular.module('infinite-scroll').value('THROTTLE_MILLISECONDS', 10000);

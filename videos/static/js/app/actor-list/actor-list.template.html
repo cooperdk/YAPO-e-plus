@@ -1,0 +1,125 @@
+<uib-alert ng-repeat="alert in $ctrl.alerts" class="enter" type="{{ alert.type }}" close="$ctrl.closeAlert($index)"
+           dismiss-on-timeout="{{ alert.timeout }}">{{ alert.msg }}
+</uib-alert><!--
+        <div class="col-md-2">
+
+
+            Search: <input ng-model="search.name"/>
+
+            <p>
+                Sort by:
+                <select ng-model="$ctrl.orderProp">
+                    <option value="name">Alphabetical</option>
+                    <option value="ethnicity">Ethnicity</option>
+                    <option value="gender">Gender</option>
+                    <option value="height">Height</option>
+                    <option value="-rating">Rating</option>
+                    {#                    <option value="age">Newest</option>#}
+                    <option value="-name">Alphabetical Des</option>
+                </select>
+            </p>
+
+        </div>
+        -->
+<pagination page-type="'Actor'"></pagination>
+
+
+<div class="col-md-10" id="big-scroll-item" infinite-scroll="$ctrl.pageChange()" infinite-scroll-distance="3"
+     ng-if="!$ctrl.gridView">
+
+    <ul class="actors">
+        <!--
+                Search: <input ng-model="$ctrl.searchTerm"/>
+                {{ $ctrl.searchTerm }}
+                -->
+
+
+        <li ng-repeat="actor in $ctrl.actors "
+            class="thumbnail phone-list-item">
+
+            <a href="/#!/actor/{{ actor.id }}" class="thumb">
+                <img ng-src="{{ actor.thumbnail }}"
+                     alt="{{ actor.name }}"
+                     style="width: 64px;"/>
+            </a>
+            <h4><a href="/#!/actor/{{ actor.id }}">{{$index + 1}}) {{ actor.name }} [{{ actor.usage_count }}]</a>
+
+
+                <span
+                        ng-if="!$ctrl.mainPage" ng-click="$ctrl.removeActorFromScene(actor)"
+                        class="glyphicon glyphicon-remove"
+                        uib-popover="Remove Actor from current scene." popover-trigger="mouseenter">
+
+                            </span>
+                <span ng-if="$ctrl.mainPage" ng-click="$ctrl.deleteActor(actor)"
+                      class="glyphicon glyphicon-trash on-hover-red-cursor-pointer"
+                      uib-popover-html="'<strong>Delete</strong> actor from database!'"
+                      popover-trigger="mouseenter">
+
+                            </span>
+
+                <label class="switch"
+                       uib-popover-html="'Toggle Runner Up.'"
+                       popover-trigger="mouseenter" popover-placement="right">
+                    <input type="checkbox" ng-model="actor.is_runner_up" ng-click="$ctrl.toggleRunnerUp(actor)">
+                    <div class="slider round"></div>
+                </label>
+
+            </h4>
+            <uib-rating ng-model="actor.rating" max="10" read-only="isReadonly" on-hover="hoveringOver(value)"
+                        on-leave="overStar = null" titles="['one','two','three']"
+                        aria-labelledby="default-rating" ng-click="$ctrl.setRating(actor)"></uib-rating>
+
+            <p>
+                   <span ng-if="actor.rating && actor.rating > 0">
+                        Rating: <strong>{{ actor.rating }}</strong>,
+                    </span>
+                <span ng-if="actor.ethnicity">
+                        Ethnicity: <strong>{{ actor.ethnicity }}</strong>,
+                    </span>
+                <span ng-if="actor.weight && actor.weight > 0">
+                        Weight: <strong>{{ actor.weight }}</strong> Kg
+                    </span>
+                <span ng-if="actor.height && actor.height > 0">
+                        Height: <strong> {{ actor.height }}</strong> cm
+                    </span>
+                <span ng-if="actor.measurements">
+                        Measurements: <strong>{{ actor.measurements }}</strong>
+                    </span>
+                <span ng-if="actor.country_of_origin">
+                        Country Of Origin: <strong>{{ actor.country_of_origin }}</strong>
+                    </span>
+
+            </p>
+
+
+        </li>
+
+
+    </ul>
+
+</div>
+
+<div class="col-md-12" id="big-scroll-item" infinite-scroll="$ctrl.pageChange()" infinite-scroll-distance="3"
+     ng-if="$ctrl.gridView">
+    <div class="row-fluid" id="actor-list-grid">
+        <div class="col-md-2" ng-repeat="actor in $ctrl.actors">
+            <a href="/#!/actor/{{ actor.id }}">
+                <img
+                        uib-popover-template="'static/js/app/actor-list/actor-list-grid-popover.template.html'"
+                        popover-append-to-body="true"
+                        popover-trigger="mouseenter" popover-placement="bottom"
+
+                        ng-src="{{ actor.thumbnail }}"
+                        alt="{{ actor.name }}"
+                        style="width: 200px; height: 300px"/>
+
+                <h4>{{ actor.name }}</h4>
+            </a>
+        </div>
+    </div>
+</div>
+
+
+
+
