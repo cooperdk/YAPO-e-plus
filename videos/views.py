@@ -14,6 +14,7 @@ import videos.scrapers.tmdb as scraper_tmdb
 import videos.scrapers.googleimages as scraper_images
 from videos import ffmpeg_process
 import urllib.request
+from YAPO import settings
 
 # For REST framework
 

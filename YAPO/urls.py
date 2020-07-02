@@ -26,7 +26,7 @@ from rest_framework.routers import DefaultRouter
 import videos.aux_functions
 import videos.const
 from videos import views
-
+from YAPO import settings
 # from django.contrib import admin
 # admin.autodiscover()
 
