@@ -316,7 +316,7 @@ def scrape_all_actors(force):
     return Response(status=200)
 
 def tag_all_scenes(ignore_last_lookup):
-    f = open(os.path.abspath(os.path.join(YAPO.settings.BASE_DIR,'..','YAPO','settings.json')), 'r')
+    f = open(CONFIG_JSON, 'r')
     x = f.read()
 
     settings_content = json.loads(x)
@@ -343,7 +343,7 @@ def tag_all_scenes(ignore_last_lookup):
 
 
 def tag_all_scenes_ignore_last_lookup(ignore_last_lookup):
-    f = open(os.path.abspath(os.path.join(YAPO.settings.BASE_DIR,'..','YAPO','settings.json')), 'r')
+    f = open(CONFIG_JSON, 'r')
     x = f.read()
 
     settings_content = json.loads(x)
@@ -829,7 +829,7 @@ def settings(request):
             if request.query_params["pathToVlc"] == "":
                 print("get method works!")
 
-                f = open(os.path.abspath(os.path.join(YAPO.settings.BASE_DIR,'..','YAPO','settings.json')), 'r')
+                f = open(CONFIG_JSON, 'r')
                 x = f.read()
                 settings_content = json.loads(x)
                 print(settings_content["vlc_path"])
@@ -848,7 +848,7 @@ def settings(request):
                     # dict = {'vlc_path': new_path_to_vlc}
                     # y = json.dumps(dict)
 
-                    f = open(os.path.abspath(os.path.join(YAPO.settings.BASE_DIR,'..','YAPO','settings.json')), 'r')
+                    f = open(CONFIG_JSON, 'r')
                     x = f.read()
 
                     settings_cont = json.loads(x)
@@ -857,7 +857,7 @@ def settings(request):
 
                     print(y)
 
-                    f = open(os.path.abspath(os.path.join(YAPO.settings.BASE_DIR,'..','YAPO','settings.json')), 'w')
+                    f = open(CONFIG_JSON, 'w')
                     f.write(y)
                     f.close()
                     const.VLC_PATH = new_path_to_vlc
