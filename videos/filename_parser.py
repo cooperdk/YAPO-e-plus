@@ -10,7 +10,7 @@ import json
 from multiprocessing import Pool, Lock
 import fnmatch
 import time
-
+import YAPO.settings
 django.setup()
 
 from videos.models import Actor, Scene, ActorAlias, SceneTag, Website
@@ -211,7 +211,7 @@ def parse_all_scenes(ignore_last_lookup):
                     )
                 counter += 1
 
-    f = open(os.path.abspath(os.path.join(BASE_DIR,'..','YAPO','settings.json')), 'r')
+    f = open(os.path.abspath(os.path.join(YAPO.settings.BASE_DIR,'..','YAPO','settings.json')), 'r')
     x = f.read()
     settings_content = json.loads(x)
     f.close()
@@ -220,7 +220,7 @@ def parse_all_scenes(ignore_last_lookup):
         datetime.datetime.now(), "%Y-%m-%d %H:%M:%S"
     )
 
-    f = open(os.path.abspath(os.path.join(BASE_DIR,'..','YAPO','settings.json')), 'w')
+    f = open(os.path.abspath(os.path.join(YAPO.settings.BASE_DIR,'..','YAPO','settings.json')), 'w')
     f.write(json.dumps(settings_content))
     f.close()
 

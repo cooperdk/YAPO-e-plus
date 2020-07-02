@@ -26,7 +26,7 @@ from rest_framework.routers import DefaultRouter
 import videos.aux_functions
 import videos.const
 from videos import views
-from YAPO import settings
+import YAPO.settings
 # from django.contrib import admin
 # admin.autodiscover()
 
@@ -97,14 +97,14 @@ default_dict = { 'settings_version': setting_version, 'vlc_path': "", 'last_all_
 need_update = False
 
 try:
-    f = open(os.path.abspath(os.path.join(BASE_DIR, 'settings.json')), 'r')
+    f = open(os.path.abspath(os.path.join(YAPO.settings.BASE_DIR, 'settings.json')), 'r')
     x = f.read()
 
     if x == "":
         need_update = True
         f.close()
         print("Setting.json is empty")
-        f = open(os.path.abspath(os.path.join(BASE_DIR, 'settings.json')), 'w')
+        f = open(os.path.abspath(os.path.join(YAPO.settings.BASE_DIR, 'settings.json')), 'w')
         f.write(json.dumps(default_dict))
         f.close()
 
@@ -126,11 +126,11 @@ try:
 
                 # default_dict['settings_version'] = SETTINGS_VERSION
 
-                f = open(os.path.abspath(os.path.join(BASE_DIR, 'settings.json')), 'w')
+                f = open(os.path.abspath(os.path.join(YAPO.settings.BASE_DIR, 'settings.json')), 'w')
                 f.write(json.dumps(default_dict))
                 f.close()
 
-                f = open(os.path.abspath(os.path.join(BASE_DIR, 'settings.json')), 'r')
+                f = open(os.path.abspath(os.path.join(YAPO.settings.BASE_DIR, 'settings.json')), 'r')
                 x = f.read()
                 settings_content = json.loads(x)
 
@@ -145,21 +145,21 @@ try:
     f.close()
 
 except FileNotFoundError:
-    f = open(os.path.abspath(os.path.join(BASE_DIR, 'settings.json')), 'w')
+    f = open(os.path.abspath(os.path.join(YAPO.settings.BASE_DIR, 'settings.json')), 'w')
     f.close()
 
-    f = open(os.path.abspath(os.path.join(BASE_DIR, 'settings.json')), 'w')
+    f = open(os.path.abspath(os.path.join(YAPO.settings.BASE_DIR, 'settings.json')), 'w')
     f.write(json.dumps(default_dict))
     f.close()
 
 if need_update:
     if videos.aux_functions.actor_folder_from_name_to_id():
-        f = open(os.path.abspath(os.path.join(BASE_DIR, 'settings.json')), 'r')
+        f = open(os.path.abspath(os.path.join(YAPO.settings.BASE_DIR, 'settings.json')), 'r')
         x = f.read()
         settings_content = json.loads(x)
         f.close()
         settings_content['settings_version'] = setting_version
 
-        f = open(os.path.abspath(os.path.join(BASE_DIR, 'settings.json')), 'w')
+        f = open(os.path.abspath(os.path.join(YAPO.settings.BASE_DIR, 'settings.json')), 'w')
         f.write(json.dumps(settings_content))
         f.close()
