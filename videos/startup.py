@@ -7,8 +7,23 @@ import requests
 from videos.models import Scene, Actor, Website, ActorTag, SceneTag
 import videos.aux_functions as aux
 import videos.views
+import YAPO.settings
 
-
+def maybeMoveConfigJson():
+    import YAPO.settings as settings
+    src = os.path.abspath(os.path.join(YAPO.settings.BASE_DIR, 'settings.json'))
+    dest = YAPO.settings.CONFIG_JSON
+    if path.isfile(src):
+        shutil.move(src, dest)
+        print("\n"
+        + chr(9608)
+        + chr(9608)
+        + chr(9608)
+        + f" Your configuration file was moved to  ({dest})! "
+        + chr(9608)
+        + chr(9608)
+        + chr(9608)
+        )
 
 def getSizeAll():
     # queryset.aggregate(Sum('size')).get('column__sum')
@@ -243,6 +258,7 @@ def getStarted():
     #scenes = Scene.objects.all()
     #for scene in scenes:
     #    add_scene_to_folder_view(scene)
+    maybeMoveConfigJson()
     stats()
     backupper()
     write_actors_to_file()

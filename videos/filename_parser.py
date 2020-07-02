@@ -211,7 +211,7 @@ def parse_all_scenes(ignore_last_lookup):
                     )
                 counter += 1
 
-    f = open(CONFIG_JSON, 'r')
+    f = open(YAPO.settings.CONFIG_JSON, 'r')
     x = f.read()
     settings_content = json.loads(x)
     f.close()
@@ -220,7 +220,7 @@ def parse_all_scenes(ignore_last_lookup):
         datetime.datetime.now(), "%Y-%m-%d %H:%M:%S"
     )
 
-    f = open(CONFIG_JSON, 'w')
+    f = open(YAPO.settings.CONFIG_JSON, 'w')
     f.write(json.dumps(settings_content))
     f.close()
 
