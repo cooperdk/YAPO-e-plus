@@ -13,25 +13,21 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
+import json
+from datetime import datetime
+
+from django.conf import settings
 from django.conf.urls import url, include
+from django.conf.urls.static import static
 from django.contrib import admin
 from rest_framework.routers import DefaultRouter
-from django.views.static import serve
-from videos import views
-from django.conf import settings
-from django.conf.urls.static import static
-import json
-from rest_framework.urlpatterns import format_suffix_patterns
 
-from videos.models import ActorTag, SceneTag
-
-from datetime import datetime
-import videos.const
 import videos.aux_functions
-import YAPO.settings
+import videos.const
+from videos import views
 
-#from django.contrib import admin
-#admin.autodiscover()
+# from django.contrib import admin
+# admin.autodiscover()
 
 # actor_alias_list = ActorAliasViewSet.as_view({
 #     'get': 'list',
@@ -57,7 +53,6 @@ import YAPO.settings
 #     'patch': 'partial_update',
 #     'delete': 'destroy'
 # })
-
 
 
 # Create a router and register our viewsets with it.
@@ -88,7 +83,7 @@ urlpatterns = [
                   url(r'^ffmpeg/', views.ffmpeg),
                   url(r'^tag-multiple-items/', views.tag_multiple_items),
                   url(r'^play/', views.display_video)
-                  #url(r'^admin/', admin.site.urls, name='admin')
+                  # url(r'^admin/', admin.site.urls, name='admin')
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # urlpatterns = format_suffix_patterns(urlpatterns, allowed=['json'])
@@ -97,18 +92,18 @@ urlpatterns = [
 setting_version = videos.const.SETTINGS_VERSION
 current_setting_version = 0
 
-default_dict = {'settings_version': setting_version, 'vlc_path': "", 'last_all_scene_tag': ""}
+default_dict = { 'settings_version': setting_version, 'vlc_path': "", 'last_all_scene_tag': "" }
 need_update = False
 
 try:
-    f = open('settings.json', 'r')
+    f = open(os.path.abspath(os.path.join(BASE_DIR, 'settings.json')), 'r')
     x = f.read()
 
     if x == "":
         need_update = True
         f.close()
         print("Setting.json is empty")
-        f = open('settings.json', 'w')
+        f = open(os.path.abspath(os.path.join(BASE_DIR, 'settings.json')), 'w')
         f.write(json.dumps(default_dict))
         f.close()
 
@@ -119,7 +114,7 @@ try:
         f.close()
 
         if ('settings_version' not in settings_content) or (
-                    int(settings_content['settings_version']) < setting_version):
+                int(settings_content['settings_version']) < setting_version):
 
             current_setting_version = int(settings_content['settings_version'])
             if current_setting_version < 2:
@@ -130,11 +125,11 @@ try:
 
                 # default_dict['settings_version'] = SETTINGS_VERSION
 
-                f = open('settings.json', 'w')
+                f = open(os.path.abspath(os.path.join(BASE_DIR, 'settings.json')), 'w')
                 f.write(json.dumps(default_dict))
                 f.close()
 
-                f = open('settings.json', 'r')
+                f = open(os.path.abspath(os.path.join(BASE_DIR, 'settings.json')), 'r')
                 x = f.read()
                 settings_content = json.loads(x)
 
@@ -149,21 +144,21 @@ try:
     f.close()
 
 except FileNotFoundError:
-    f = open('settings.json', 'w')
+    f = open(os.path.abspath(os.path.join(BASE_DIR, 'settings.json')), 'w')
     f.close()
 
-    f = open('settings.json', 'w')
+    f = open(os.path.abspath(os.path.join(BASE_DIR, 'settings.json')), 'w')
     f.write(json.dumps(default_dict))
     f.close()
 
 if need_update:
     if videos.aux_functions.actor_folder_from_name_to_id():
-        f = open('settings.json', 'r')
+        f = open(os.path.abspath(os.path.join(BASE_DIR, 'settings.json')), 'r')
         x = f.read()
         settings_content = json.loads(x)
         f.close()
         settings_content['settings_version'] = setting_version
 
-        f = open('settings.json', 'w')
+        f = open(os.path.abspath(os.path.join(BASE_DIR, 'settings.json')), 'w')
         f.write(json.dumps(settings_content))
         f.close()
