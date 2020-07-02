@@ -398,9 +398,8 @@ class ScrapeActor(views.APIView):
             force = True
         else:
             force = False
-        print("You are now in the scrape actor API REST view")
-        print("Actor to scrape is: " + Actor.objects.get(pk=actor_id).name)
-        print("Site to scrape is: " + search_site)
+        print("Now entering the scrape actor API REST view")
+        print("Scanning for " + Actor.objects.get(pk=actor_id).name + " on " + search_site)
 
         if search_site == "TMDb":
             actor_to_search = Actor.objects.get(pk=actor_id)
@@ -870,7 +869,11 @@ def settings(request):
 
         if "scrapAllActors" in request.query_params:
             if request.query_params["scrapAllActors"] == "True":
-                threading.Thread(target=scrape_all_actors, args=(False,)).start()
+                if request.query_params["force"] == "true":
+                    force = True
+                else:
+                    force = False
+                threading.Thread(target=scrape_all_actors, args=(force,)).start()
 
             return Response(status=200)
 

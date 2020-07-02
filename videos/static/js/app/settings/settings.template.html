@@ -17,6 +17,9 @@
             popover-trigger="mouseenter" popover-placement="right-top">
     <span class="glyphicon glyphicon-user"></span> Scrape All Actors
     </button>
+    <input type="checkbox" ng-model="$ctrl.forceScrape"
+    uib-popover-html="'Override existing values while scraping with selected scraper'"
+    popover-trigger="mouseenter" popover-placement="top"> Force
 	<span style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>
     <button type="button" ng-click="$ctrl.tagAllScenes()" class="btn btn-default btn-sm"
             uib-popover-html="'Checks all scenes in the database against all known Tags, Websites and Actors and adds any new tags to the scenes.'"

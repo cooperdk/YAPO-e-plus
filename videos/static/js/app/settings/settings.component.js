@@ -12,6 +12,7 @@ angular.module('settings').component('settings', {
 
                 self.itemsPerPage = 50;
                 self.mediaRootFolders = null;
+                self.forceScrape = false;
                 self.alerts = [];
                 self.addAlert = function (msg, type, timeout) {
                     self.alerts.push({msg: msg, type: type, timeout: timeout});
@@ -90,46 +91,51 @@ angular.module('settings').component('settings', {
                 };
                 
                 self.scrapAllActor = function () {
-					self.addAlert("Starting scrape, please hold on...", 'success', '5000');
-                     $http.get('settings/', {
-                        params: {
-                            scrapAllActors: 'True'
-                        }
+                    if (confirm("Are you sure? This may take a long time. The process can only be interrupted by force quitting YAPO.")) {
+                       self.addAlert("Starting scrape, please hold on...", 'success', '5000');
+                        $http.get('settings/', {
+                            params: {
+                                scrapAllActors: 'True',
+                                force: self.forceScrape
+                            }
 
-                    }).then(function (response) {
+                    }   ).then(function (response) {
                         // alert(angular.toJson(response));
                         // self.response = response.data.vlc_path;
                         // self.pathToVLC = response.data.vlc_path;
                         // alert("Got response from server: " + self.pathToFolderToAdd);
-						//self.addAlert("Done scraping actors.", 'success', '10000');
-                    }, function errorCallback(response) {
+                        //self.addAlert("Done scraping actors.", 'success', '10000');
+                        }, function errorCallback(response) {
                         self.addAlert("Something went wrong.", 'warning', '1000000');
-                    });
+                        });
+                    }
                 };
                 
                 
                 self.tagAllScenes = function () {
-					self.addAlert("Beginning tagging ... this may take some time, check the console.", 'success', '5000');
-                    $http.get('settings/', {
-                        params: {
-                            tagAllScenes: 'True',
-                            ignore_last_lookup: 'False'
-                        }
 
-                    }).then(function (response) {
-                        // alert(angular.toJson(response));
-                        // self.response = response.data.vlc_path;
-                        // self.pathToVLC = response.data.vlc_path;
-                        // alert("Got response from server: " + self.pathToFolderToAdd);
-						//self.addAlert("Done tagging scenes.", 'success', '10000');
-                    }, function errorCallback(response) {
-                        self.addAlert("Something went wrong.", 'warning', '1000000');
-                    });
-                    
+                    if (confirm("Are you sure? This may take a long time. The process can only be interrupted by force quitting YAPO.")) {
+                        self.addAlert("Beginning tagging ... this may take some time, check the console.", 'success', '5000');
+                        $http.get('settings/', {
+                            params: {
+                                tagAllScenes: 'True',
+                                ignore_last_lookup: 'False'
+                            }
+
+                        }).then(function (response) {
+                            // alert(angular.toJson(response));
+                            // self.response = response.data.vlc_path;
+                            // self.pathToVLC = response.data.vlc_path;
+                            // alert("Got response from server: " + self.pathToFolderToAdd);
+                            //self.addAlert("Done tagging scenes.", 'success', '10000');
+                        }, function errorCallback(response) {
+                            self.addAlert("Something went wrong.", 'warning', '1000000');
+                        });
+                    }
                 };
                 
                 self.tagAllScenesIgnore = function () {
-			    if (confirm("Are you sure? This may take a long time."))		{
+			    if (confirm("Are you sure? This may take a long time. The process can only be interrupted by force quitting YAPO."))		{
                     $http.get('settings/', {
                         params: {
                             tagAllScenesIgnore: 'True',
