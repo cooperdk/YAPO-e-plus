@@ -1,9 +1,9 @@
-import os
 import json
-import videos.const
-
+import os
 # import videos.aux_functions
 from datetime import datetime
+
+import videos.const
 
 # from pathlib import Path
 
@@ -25,7 +25,7 @@ SECRET_KEY = "0px^lshd1lsf6uq#%90lre3$iqkz9=i7a0ko2_83b$n@=&(*d5"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-#SILENCED_SYSTEM_CHECKS = ["fields.W340"]
+# SILENCED_SYSTEM_CHECKS = ["fields.W340"]
 ALLOWED_HOSTS = ['*']
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000
 AUTOCOMMIT = True
@@ -33,8 +33,8 @@ TEST_MEMCACHE = False
 if not DEBUG or TEST_MEMCACHE:
     CACHES = {
         'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '127.0.0.1:11211',
+            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'LOCATION': '127.0.0.1:11211',
         }
     }
 else:
@@ -42,7 +42,7 @@ else:
         'default': {
             'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
         }
-}
+    }
 # Application definition
 
 INSTALLED_APPS = [
@@ -69,7 +69,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
-#    "django.contrib.auth.middleware.SessionAuthenticationMiddleware",
+    #    "django.contrib.auth.middleware.SessionAuthenticationMiddleware",
 
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -118,9 +118,9 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",},
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",},
+    { "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", },
+    { "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator", },
+    { "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator", },
 ]
 
 # Internationalization
@@ -143,7 +143,7 @@ SITE_ROOT = os.path.abspath(os.path.join(BASE_DIR, "videos/"))
 STATIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, "videos/static"))
 STATIC_URL = "/static/"
 BASE_URL = "/"
-#STATICFILES_DIRS = (os.path.abspath(os.path.join(BASE_DIR, "videos/static")), )
+# STATICFILES_DIRS = (os.path.abspath(os.path.join(BASE_DIR, "videos/static")), )
 
 MEDIA_ROOT = os.path.abspath(os.path.join(BASE_DIR, "videos/media"))
 MEDIA_URL = "/media/"
