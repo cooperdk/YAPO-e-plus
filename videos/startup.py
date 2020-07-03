@@ -7,18 +7,22 @@ import requests
 from videos.models import Scene, Actor, ActorTag, SceneTag, Folder
 import videos.aux_functions as aux
 import YAPO.settings
+from YAPO.config import Config
+from YAPO.utils import Logger
+
+log = Logger()
 
 
 def maybeMoveConfigJson():
     import YAPO.settings as settings
-    src = os.path.abspath(os.path.join(YAPO.settings.BASE_DIR, 'settings.json'))
+    src = os.path.abspath(os.path.join(Config().root_path, 'settings.json'))
     dest = YAPO.settings.CONFIG_JSON
     if path.isfile(src):
         shutil.move(src, dest)
-        print("\n███ Your configuration file was moved to  ({0})! ███".format(dest))
+        log.info("\n███ Your configuration file was moved to  ({0})! ███".format(dest))
 
 
-def getSizeAll():
+def getSizeAll() -> str:
     # queryset.aggregate(Sum('size')).get('column__sum')
     # cursor = connection.cursor()
     # cursor.execute("SELECT SUM(size) AS total FROM videos_scene")[0]
@@ -32,7 +36,7 @@ def getSizeAll():
         return "no space"
 
 
-def sizeFormat(b):
+def sizeFormat(b: int) -> str:
 
     if b < 1000:
         return "%i" % b + "B"
@@ -47,8 +51,6 @@ def sizeFormat(b):
 
 
 def write_actors_to_file():
-
-    #actors = Actor.objects.all()
     actors = Actor.objects.order_by("id")  # name
     actors_string = ""
     numactors = 0
@@ -65,6 +67,7 @@ def write_actors_to_file():
 
     print("For backup purposes, we just wrote all actors in alphabetical form to actors.txt.")
     print("To recover actor data, please consult the guide.")
+
 
 def verCheck():
     update = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "VERSION.md"))
@@ -85,8 +88,8 @@ def verCheck():
 
         # print("Github version: "+str(remoteVer))
         if str(ver) != str(remoteVer):
-            print(f"███ A new version of YAPO e+ is available ({remoteVer})! ███")
-        print("\r\n")
+            log.info(f'███ A new version of YAPO e+ is available ({remoteVer})! ███')
+        log.info('\n')
 
 
 def stats():
