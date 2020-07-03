@@ -133,7 +133,7 @@ try:
             # 2016-08-14 18:03:10.153443
             videos.const.LAST_ALL_SCENE_TAG = datetime.strptime(settings_content['last_all_scene_tag'],
                                                                 "%Y-%m-%d %H:%M:%S")
-            print("The last full scene tagging was done {}\n".format(videos.const.LAST_ALL_SCENE_TAG))
+            print(f"The last full scene tagging was done {videos.const.LAST_ALL_SCENE_TAG}\n")
 
 except FileNotFoundError:
     with open(YAPO.settings.CONFIG_JSON, 'w'):

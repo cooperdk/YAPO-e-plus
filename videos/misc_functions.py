@@ -17,26 +17,30 @@ import videos.const as const
 def strip_char(objects, char_to_strip):
     for o in objects:
         if char_to_strip in o.name:
-            print("Before: " + o.name)
+            print("Before: {o.name}")
             o.name = o.name.replace(char_to_strip, "")
-            print("After: " + o.name)
+            print("After: {o.name}")
             o.save()
 
 
 def fix_profile_images(actors):
     for actor in actors:
         path_to_check = os.path.join(
-            os.path.abspath("E:\\djangoProject\\YAPO\\videos\\static\\images\\actor"),
+            "E:","djangoProject",
+            "YAPO",
+            "videos",
+            "static",
+            "images",
+            "actor",
             actor.name,
-            "profile\\profile.jpg",
+            "profile",
+            "profile.jpg",
         )
         print(path_to_check)
         if os.path.isfile(path_to_check):
             rel_path = os.path.relpath(
-                path_to_check, "E:\\djangoProject\\YAPO\\videos\\"
+                path_to_check, os.path.join("E:","djangoProject","YAPO","videos")
             )
-            print(rel_path)
-            rel_path = rel_path.replace("\\", "/")
             print(rel_path)
             actor.thumbnail = rel_path
             actor.save()

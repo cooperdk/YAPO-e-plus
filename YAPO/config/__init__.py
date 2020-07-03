@@ -5,7 +5,7 @@ from YAPO.utils import Constants
 
 class Config(metaclass=Singleton):
   def __init__(self):
-    self.root_path = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..'))
+    self.root_path = os.path.abspath(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))
     self.yapo_path = os.path.join(self.root_path, Constants().code_subdir)
     self.site_path = os.path.join(self.root_path, Constants().site_subdir)
     self.data_path = os.path.join(self.root_path, Constants().data_subdir)

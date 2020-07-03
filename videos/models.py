@@ -20,7 +20,7 @@ class ActorAlias(models.Model):
     # actor = models.ForeignKey(Actor, on_delete=models.CASCADE)
 
     def __str__(self):
-        return "%s " % (self.name,)
+        return f"{self.name} "
 
 
 class SceneTag(models.Model):
@@ -38,7 +38,7 @@ class SceneTag(models.Model):
     modified_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return "%s " % (self.name,)
+        return f"{self.name} "
 
 
 class ActorTag(models.Model):
@@ -59,7 +59,7 @@ class ActorTag(models.Model):
     modified_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return "%s " % (self.name,)
+        return f"{self.name} "
 
 
 class Actor(models.Model):
@@ -135,7 +135,7 @@ class Website(models.Model):
     modified_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return "%s " % (self.name,)
+        return f"{self.name} "
 
 
 class Scene(models.Model):
@@ -171,7 +171,7 @@ class Scene(models.Model):
     modified_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return "%s " % (self.name,)
+        return f"{self.name} "
 
     def get_absolute_url(self):
         return reverse("videos:scene-details", kwargs={"pk": self.pk})
@@ -189,7 +189,7 @@ class Folder(MPTTModel):
     modified_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return "%s " % (self.name,)
+        return f"{self.name} "
 
     class MPTTMeta:
         order_insertion_by = ["name"]
@@ -209,7 +209,7 @@ class Playlist(models.Model):
     modified_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return "%s " % (self.name,)
+        return f"{self.name} "
 
 
 @receiver(signals.post_save, sender=ActorTag)

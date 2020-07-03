@@ -39,4 +39,4 @@ class Logger(metaclass=Singleton):
 
 
 def timeprint(message: str):
-  print('%s> %s' % (str(datetime.now().strftime(Config().timeprint_format)), message))
+  print(f"{datetime.now().strftime(Config().timeprint_format)}> {message}"
