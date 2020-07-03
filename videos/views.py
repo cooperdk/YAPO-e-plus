@@ -316,11 +316,10 @@ def scrape_all_actors(force):
     return Response(status=200)
 
 def tag_all_scenes(ignore_last_lookup):
-    f = open(YAPO.settings.CONFIG_JSON, 'r')
-    x = f.read()
+    with open(YAPO.settings.CONFIG_JSON, 'r') as f:
+        x = f.read()
 
     settings_content = json.loads(x)
-    f.close()
 
     current_setting_version = int(settings_content["settings_version"])
     if current_setting_version < 3:
@@ -343,11 +342,10 @@ def tag_all_scenes(ignore_last_lookup):
 
 
 def tag_all_scenes_ignore_last_lookup(ignore_last_lookup):
-    f = open(YAPO.settings.CONFIG_JSON, 'r')
-    x = f.read()
+    with open(YAPO.settings.CONFIG_JSON, 'r') as f:
+        x = f.read()
 
     settings_content = json.loads(x)
-    f.close()
 
     current_setting_version = int(settings_content["settings_version"])
     if current_setting_version < 3:
@@ -828,12 +826,11 @@ def settings(request):
             if request.query_params["pathToVlc"] == "":
                 print("get method works!")
 
-                f = open(YAPO.settings.CONFIG_JSON, 'r')
-                x = f.read()
+                with open(YAPO.settings.CONFIG_JSON, 'r') as f:
+                    x = f.read()
                 settings_content = json.loads(x)
                 print(settings_content["vlc_path"])
                 print(x)
-                f.close()
                 serializer = SettingsSerializer(x)
 
                 return Response(serializer.data)
@@ -847,8 +844,8 @@ def settings(request):
                     # dict = {'vlc_path': new_path_to_vlc}
                     # y = json.dumps(dict)
 
-                    f = open(YAPO.settings.CONFIG_JSON, 'r')
-                    x = f.read()
+                    with open(YAPO.settings.CONFIG_JSON, 'r') as f:
+                        x = f.read()
 
                     settings_cont = json.loads(x)
                     settings_cont["vlc_path"] = new_path_to_vlc
@@ -856,9 +853,9 @@ def settings(request):
 
                     print(y)
 
-                    f = open(YAPO.settings.CONFIG_JSON, 'w')
-                    f.write(y)
-                    f.close()
+                    with open(YAPO.settings.CONFIG_JSON, 'w') as f:
+                        f.write(y)
+
                     const.VLC_PATH = new_path_to_vlc
                     return Response(status=200)
 
