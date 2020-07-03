@@ -1,6 +1,6 @@
-image: merodac/yapo-eplus:latest
+image: teamyapo/yapo-eplus:latest
 manifests:
-  - image: merodac/yapo-eplus:latest-amd64
+  - image: cooperdk/yapo-eplus:latest-amd64
     platform:
       architecture: amd64
       os: linux
