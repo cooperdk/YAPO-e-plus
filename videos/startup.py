@@ -19,7 +19,7 @@ def maybeMoveConfigJson():
     dest = YAPO.settings.CONFIG_JSON
     if path.isfile(src):
         shutil.move(src, dest)
-        log.info("\n███ Your configuration file was moved to  ({0})! ███".format(dest))
+        log.info(f"\n███ Your configuration file was moved to  ({dest})! ███")
 
 
 def getSizeAll() -> str:
@@ -39,28 +39,21 @@ def getSizeAll() -> str:
 def sizeFormat(b: int) -> str:
 
     if b < 1000:
-        return "%i" % b + "B"
-    elif 1000 <= b < 1000000:
-        return "%.1f" % float(b / 1000) + "KB"
-    elif 1000000 <= b < 1000000000:
-        return "%.1f" % float(b / 1000000) + "MB"
-    elif 1000000000 <= b < 1000000000000:
-        return "%.1f" % float(b / 1000000000) + "GB"
-    elif 1000000000000 <= b:
-        return "%.1f" % float(b / 1000000000000) + "TB"
+        return f"{b}B"
+    elif b < 1000000:
+        return f"{b/1000:.1f}KB"
+    elif b < 1000000000:
+        return f"{b/1000000:.1f}MB"
+    elif b < 1000000000000:
+        return f"{b/1000000000:.1f}GB"
+    else:
+        return f"{b/1000000000000:.1f}TB"
 
 
 def write_actors_to_file():
     actors = Actor.objects.order_by("id")  # name
-    actors_string = ""
-    numactors = 0
-    for actor in actors:
-
-        if not (numactors == 0):
-            actors_string += "," + actor.name
-        else:
-            actors_string += actor.name
-        numactors += 1
+    actors_string = ",".join(actor.name for actor in actors)
+    numactors = len(actors)
 
     with open("actors.txt", "w") as file:
         file.write(actors_string)
@@ -70,13 +63,14 @@ def write_actors_to_file():
 
 
 def verCheck():
-    update = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "VERSION.md"))
+    #dirname of dirname of file results in parent directory
+    update = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "VERSION.md")
 
     if path.isfile(update):
         with open(update, "r") as verfile:
             ver = verfile.read()
         ver = str(ver).strip()
-        print("--- Version on disk: " + ver)
+        print(f"--- Version on disk: {ver}")
         try:
             remoteVer = requests.get(
                 "https://raw.githubusercontent.com/cooperdk/YAPO-e-plus/develop/VERSION.md"
@@ -116,16 +110,16 @@ def stats():
         sctag = str(row[0].total)
     # TODO assign that all values got read correctly and have a valid value!
 
-    print("\nCurrently, there are {0} videos registered in YAPO e+.\nThey take up {1} of disk space.".format(sce, str(size)))
-    print("There are {0} tags available for video clips.".format(sctag))
-    print("\nThere are {0} actors in the database.\nThese actors have {1} usable tags.\n\n".format(act, acttag))
+    print(f"\nCurrently, there are {sce} videos registered in YAPO e+.\nThey take up {size} of disk space.")
+    print(f"There are {sctag} tags available for video clips.")
+    print(f"\nThere are {act} actors in the database.\nThese actors have {acttag} usable tags.\n\n")
 
 def backupper():
     import YAPO.settings as settings
     src = settings.DATABASES['default']['NAME']
-    dest = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "db_BACKUP.sqlite3"))
+    dest = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "db_BACKUP.sqlite3"))
     shutil.copy(src, dest)
-    print("Performed a database backup to " + dest + "\n")
+    print(f"Performed a database backup to {dest}\n")
 
 
 def add_scene_to_folder_view(scene_to_add):
@@ -165,7 +159,7 @@ def recursive_add_folders(parent, folders, scene_to_add, path_with_ids):
             path_with_ids = []
             if not Folder.objects.filter(name=folders[0]):
                 temp = Folder.objects.create(name=folders[0])
-                print("Created virtual folder: " + temp.name)
+                print(f"Created virtual folder: {temp.name}")
                 parent = Folder.objects.get(name=folders[0])
                 if parent.last_folder_name_only is None:
                     parent.last_folder_name_only = folders[0]
@@ -208,7 +202,7 @@ def recursive_add_folders(parent, folders, scene_to_add, path_with_ids):
 
             if not if_in_children:
                 parent = Folder.objects.create(name=folder_to_add, parent=parent)
-                print("Created virtual folder: " + parent.name)
+                print(f"Created virtual folder: {parent.name}")
                 if parent.last_folder_name_only is None:
                     parent.last_folder_name_only = folders[0]
                 parent.save()
@@ -232,10 +226,7 @@ def recursive_add_folders(parent, folders, scene_to_add, path_with_ids):
         if not parent.scenes.filter(name=scene_to_add.name):
             parent.scenes.add(scene_to_add)
             print(
-                "Added Scene: "
-                + scene_to_add.name
-                + " to virtual folder "
-                + parent.name
+                f"Added Scene: {scene_to_add.name} to virtual folder {parent.name}"
             )
             parent.save()
 
@@ -253,8 +244,7 @@ def getStarted():
     cpu = aux.getCPU()
     cpucnt = aux.getCPUCount()
     global videoProcessing
-    print("\nYou have " + str(mem) + " GB available. CPU speed is " +
-          str(cpu) + " GHz and you have " + str(cpucnt) + " cores available.")
+    print(f"\nYou have {mem} GB available. CPU speed is {cpu} GHz and you have {cpucnt} cores available.")
     if mem <= 1:
         print("Since you have only about a gigabyte of memory, video processing will be disabled.")
         videoProcessing = False

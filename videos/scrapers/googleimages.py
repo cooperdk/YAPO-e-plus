@@ -181,7 +181,7 @@ class googleimagesdownload:
         except Exception as e:
             print("Looks like we cannot locate the path the 'chromedriver' (use the '--chromedriver' "
                   "argument to specify the path to the executable.) or google chrome browser is not "
-                  "installed on your machine (exception: %s)" % e)
+                  f"installed on your machine (exception: {e})")
             sys.exit()
         browser.set_window_size(1024, 768)
 
@@ -236,7 +236,7 @@ class googleimagesdownload:
             start_line = s.find('class="dtviD"')
             start_content = s.find('href="', start_line + 1)
             end_content = s.find('">', start_content + 1)
-            url_item = "https://www.google.com" + str(s[start_content + 6:end_content])
+            url_item = f"https://www.google.com{s[start_content + 6:end_content]}"
             url_item = url_item.replace('&amp;', '&')
 
             start_line_2 = s.find('class="dtviD"')
@@ -309,10 +309,10 @@ class googleimagesdownload:
             image_name = image_name[:image_name.find('?')]
         # if ".jpg" in image_name or ".gif" in image_name or ".png" in image_name or ".bmp" in image_name or ".svg" in image_name or ".webp" in image_name or ".ico" in image_name:
         if any(map(lambda extension: extension in image_name, extensions)):
-            file_name = main_directory + "/" + image_name
+            file_name = f"{main_directory}/{image_name}"
         else:
-            file_name = main_directory + "/" + image_name + ".jpg"
-            image_name = image_name + ".jpg"
+            file_name = f"{main_directory}/{image_name}.jpg"
+            image_name = f"{image_name}.jpg"
 
         try:
             output_file = open(file_name, 'wb')
@@ -322,7 +322,7 @@ class googleimagesdownload:
             raise e
         except OSError as e:
             raise e
-        print("completed ====> " + image_name.encode('raw_unicode_escape').decode('utf-8'))
+        print(f"completed ====> {image_name.encode('raw_unicode_escape').decode('utf-8')}")
         return
 
     def similar_images(self,similar_images):
@@ -330,7 +330,7 @@ class googleimagesdownload:
         cur_version = sys.version_info
         if cur_version >= version:  # If the Current Version of Python is 3.0 or above
             try:
-                searchUrl = 'https://www.google.com/searchbyimage?site=search&sa=X&image_url=' + similar_images
+                searchUrl = f'https://www.google.com/searchbyimage?site=search&sa=X&image_url={similar_images}'
                 headers = {}
                 headers['User-Agent'] = "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36"
 
@@ -341,7 +341,7 @@ class googleimagesdownload:
                 l2 = content.find('&', l1)
                 urll = content[l1:l2]
 
-                newurl = "https://www.google.com/search?tbs=sbi:" + urll + "&site=search&sa=X"
+                newurl = f"https://www.google.com/search?tbs=sbi:{urll}&site=search&sa=X"
                 req2 = urllib.request.Request(newurl, headers=headers)
                 resp2 = urllib.request.urlopen(req2)
                 l3 = content.find('/search?sa=X&amp;q=')
@@ -349,10 +349,10 @@ class googleimagesdownload:
                 urll2 = content[l3 + 19:l4]
                 return urll2
             except:
-                return "Cloud not connect to Google Images endpoint"
+                return "Could not connect to Google Images endpoint"
         else:  # If the Current Version of Python is 2.x
             try:
-                searchUrl = 'https://www.google.com/searchbyimage?site=search&sa=X&image_url=' + similar_images
+                searchUrl = f'https://www.google.com/searchbyimage?site=search&sa=X&image_url={similar_images}'
                 headers = {}
                 headers['User-Agent'] = "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.27 Safari/537.17"
 
@@ -363,7 +363,7 @@ class googleimagesdownload:
                 l2 = content.find('&', l1)
                 urll = content[l1:l2]
 
-                newurl = "https://www.google.com/search?tbs=sbi:" + urll + "&site=search&sa=X"
+                newurl = f"https://www.google.com/search?tbs=sbi:{urll}&site=search&sa=X"
                 req2 = urllib2.Request(newurl, headers=headers)
                 resp2 = urllib2.urlopen(req2)
                 l3 = content.find('/search?sa=X&amp;q=')
@@ -371,7 +371,7 @@ class googleimagesdownload:
                 urll2 = content[l3 + 19:l4]
                 return(urll2)
             except:
-                return "Cloud not connect to Google Images endpoint"
+                return "Could not connect to Google Images endpoint"
 
     #Building URL parameters
     def build_url_parameters(self,arguments):
@@ -385,13 +385,13 @@ class googleimagesdownload:
         if arguments['time_range']:
             json_acceptable_string = arguments['time_range'].replace("'", "\"")
             d = json.loads(json_acceptable_string)
-            time_range = ',cdr:1,cd_min:' + d['time_min'] + ',cd_max:' + d['time_max']
+            time_range = f",cdr:1,cd_min:{d['time_min']},cd_max:{d['time_max']}"
         else:
             time_range = ''
 
         if arguments['exact_size']:
             size_array = [x.strip() for x in arguments['exact_size'].split(',')]
-            exact_size = ",isz:ex,iszw:" + str(size_array[0]) + ",iszh:" + str(size_array[1])
+            exact_size = f",isz:ex,iszw:{size_array[0]},iszh:{size_array[1]}"
         else:
             exact_size = ''
 
@@ -430,13 +430,11 @@ class googleimagesdownload:
         elif similar_images:
             print(similar_images)
             keywordem = self.similar_images(similar_images)
-            url = 'https://www.google.com/search?q=' + keywordem + '&espv=2&biw=1366&bih=667&site=webhp&source=lnms&tbm=isch&sa=X&ei=XosDVaCXD8TasATItgE&ved=0CAcQ_AUoAg'
+            url = f"https://www.google.com/search?q={keywordem}&espv=2&biw=1366&bih=667&site=webhp&source=lnms&tbm=isch&sa=X&ei=XosDVaCXD8TasATItgE&ved=0CAcQ_AUoAg"
         elif specific_site:
-            url = 'https://www.google.com/search?q=' + quote(
-                search_term.encode('utf-8')) + '&as_sitesearch=' + specific_site + '&espv=2&biw=1366&bih=667&site=webhp&source=lnms&tbm=isch' + params + '&sa=X&ei=XosDVaCXD8TasATItgE&ved=0CAcQ_AUoAg'
+            url = f"https://www.google.com/search?q={quote(search_term.encode('utf-8'))}&as_sitesearch={specific_site}&espv=2&biw=1366&bih=667&site=webhp&source=lnms&tbm=isch{params}&sa=X&ei=XosDVaCXD8TasATItgE&ved=0CAcQ_AUoAg"
         else:
-            url = 'https://www.google.com/search?q=' + quote(
-                search_term.encode('utf-8')) + '&espv=2&biw=1366&bih=667&site=webhp&source=lnms&tbm=isch' + params + '&sa=X&ei=XosDVaCXD8TasATItgE&ved=0CAcQ_AUoAg'
+            url = f"https://www.google.com/search?q={quote(search_term.encode('utf-8'))}&espv=2&biw=1366&bih=667&site=webhp&source=lnms&tbm=isch{params}&sa=X&ei=XosDVaCXD8TasATItgE&ved=0CAcQ_AUoAg"
 
         #safe search check
         if safe_search:
@@ -452,7 +450,7 @@ class googleimagesdownload:
             size = file_info.st_size
             for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
                 if size < 1024.0:
-                    return "%3.1f %s" % (size, x)
+                    return f"{size:3.1f} {x}"
                 size /= 1024.0
             return size
 
@@ -480,7 +478,7 @@ class googleimagesdownload:
 
     # make directories
     def create_directories(self,main_directory, dir_name,thumbnail,thumbnail_only):
-        dir_name_thumbnail = dir_name + " - thumbnail"
+        dir_name_thumbnail = f"{dir_name} - thumbnail"
         # make a search keyword  directory
         try:
             if not os.path.exists(main_directory):
@@ -513,7 +511,7 @@ class googleimagesdownload:
     # Download Image thumbnails
     def download_image_thumbnail(self,image_url,main_directory,dir_name,return_image_name,print_urls,socket_timeout,print_size,no_download,save_source,img_src,ignore_urls):
         if print_urls or no_download:
-            print("Image URL: " + image_url)
+            print(f"Image URL: {image_url}")
         if no_download:
             return "success","Printed url without downloading"
         try:
@@ -530,50 +528,50 @@ class googleimagesdownload:
                 data = response.read()
                 response.close()
 
-                path = remove_illegal_characters(main_directory + "/" + dir_name + " - thumbnail" + "/" + return_image_name)
+                path = remove_illegal_characters(os.path.join(main_directory, f"{dir_name} - thumbnail", return_image_name)
 
                 try:
                     output_file = open(path, 'wb')
                     output_file.write(data)
                     output_file.close()
                     if save_source:
-                        list_path = main_directory + "/" + save_source + ".txt"
+                        list_path = os.path.join(main_directory, f"{save_source}.txt")
                         list_file = open(list_path,'a')
                         list_file.write(path + '\t' + img_src + '\n')
                         list_file.close()
                 except OSError as e:
                     download_status = 'fail'
-                    download_message = "OSError on an image...trying next one..." + " Error: " + str(e)
+                    download_message = f"OSError on an image...trying next one... Error: {e}"
                 except IOError as e:
                     download_status = 'fail'
-                    download_message = "IOError on an image...trying next one..." + " Error: " + str(e)
+                    download_message = f"IOError on an image...trying next one... Error: {e}"
 
                 download_status = 'success'
-                download_message = "Completed Image Thumbnail ====> " + return_image_name
+                download_message = f"Completed Image Thumbnail ====> {return_image_name}"
 
                 # image size parameter
                 if print_size:
-                    print("Image Size: " + str(self.file_size(path)))
+                    print(f"Image Size: {self.file_size(path)}")
 
             except UnicodeEncodeError as e:
                 download_status = 'fail'
-                download_message = "UnicodeEncodeError on an image...trying next one..." + " Error: " + str(e)
+                download_message = f"UnicodeEncodeError on an image...trying next one... Error: {e}"
 
         except HTTPError as e:  # If there is any HTTPError
             download_status = 'fail'
-            download_message = "HTTPError on an image...trying next one..." + " Error: " + str(e)
+            download_message = f"HTTPError on an image...trying next one... Error: {e}"
 
         except URLError as e:
             download_status = 'fail'
-            download_message = "URLError on an image...trying next one..." + " Error: " + str(e)
+            download_message = f"URLError on an image...trying next one... Error: {e}"
 
         except ssl.CertificateError as e:
             download_status = 'fail'
-            download_message = "CertificateError on an image...trying next one..." + " Error: " + str(e)
+            download_message = f"CertificateError on an image...trying next one... Error: {e}"
 
         except IOError as e:  # If there is any IOError
             download_status = 'fail'
-            download_message = "IOError on an image...trying next one..." + " Error: " + str(e)
+            download_message = f"IOError on an image...trying next one... Error: {e}"
         return download_status, download_message
 
 
@@ -581,7 +579,7 @@ class googleimagesdownload:
     def download_image(self,image_url,image_format,main_directory,dir_name,count,print_urls,socket_timeout,prefix,print_size,no_numbering,no_download,save_source,img_src,silent_mode,thumbnail_only,format,ignore_urls):
         if not silent_mode:
             if print_urls or no_download:
-                print("Image URL: " + image_url)
+                print(f"Image URL: {image_url}")
         if ignore_urls:
             if any(url in image_url for url in ignore_urls.split(',')):
                 return "fail", "Image ignored due to 'ignore url' parameter", None, image_url
@@ -620,93 +618,93 @@ class googleimagesdownload:
                     return_image_name = ''
                     absolute_path = ''
                     return download_status, download_message, return_image_name, absolute_path
-                elif image_name.lower().find("." + image_format) < 0:
-                    image_name = image_name + "." + image_format
+                elif image_name.lower().find(f".{image_format}") < 0:
+                    image_name += f".{image_format}"
                 else:
                     image_name = image_name[:image_name.lower().find("." + image_format) + (len(image_format) + 1)]
 
                 # prefix name in image
                 if not prefix:
-                    prefix = prefix + "_"
+                    prefix += "_"
                 else:
                     prefix = ''
 
                 if no_numbering:
-                    path = main_directory + "/" + dir_name + "/" + prefix + image_name
+                    path = os.path.join(main_directory, dir_name, f"{prefix}{image_name}")
                 else:
-                    path = main_directory + "/" + dir_name + "/" + prefix + str(count) + "." + image_name
+                    path = os.path.join(main_directory, dir_name, f"{prefix}{count}.{image_name}")
 
                 try:
                     output_file = open(path, 'wb')
                     output_file.write(data)
                     output_file.close()
                     if save_source:
-                        list_path = main_directory + "/" + save_source + ".txt"
+                        list_path = os.path.join(main_directory, f"{save_source}.txt")
                         list_file = open(list_path,'a')
-                        list_file.write(path + '\t' + img_src + '\n')
+                        list_file.write(f"{path}\t{img_src}\n")
                         list_file.close()
                     absolute_path = os.path.abspath(path)
                 except OSError as e:
                     download_status = 'fail'
-                    download_message = "OSError on an image...trying next one..." + " Error: " + str(e)
+                    download_message = f"OSError on an image...trying next one... Error: {e}"
                     return_image_name = ''
                     absolute_path = ''
 
                 #return image name back to calling method to use it for thumbnail downloads
                 download_status = 'success'
-                download_message = "Completed Image ====> " + prefix + str(count) + "." + image_name
-                return_image_name = prefix + str(count) + "." + image_name
+                download_message = f"Completed Image ====> {prefix}{count}.{image_name}"
+                return_image_name = f"{prefix}{count}.{image_name}"
 
                 # image size parameter
                 if not silent_mode:
                     if print_size:
-                        print("Image Size: " + str(self.file_size(path)))
+                        print(f"Image Size: {self.file_size(path)}")
 
             except UnicodeEncodeError as e:
                 download_status = 'fail'
-                download_message = "UnicodeEncodeError on an image...trying next one..." + " Error: " + str(e)
+                download_message = f"UnicodeEncodeError on an image...trying next one... Error: {e}"
                 return_image_name = ''
                 absolute_path = ''
 
             except URLError as e:
                 download_status = 'fail'
-                download_message = "URLError on an image...trying next one..." + " Error: " + str(e)
+                download_message = f"URLError on an image...trying next one... Error: {e}"
                 return_image_name = ''
                 absolute_path = ''
                 
             except BadStatusLine as e:
                 download_status = 'fail'
-                download_message = "BadStatusLine on an image...trying next one..." + " Error: " + str(e)
+                download_message = f"BadStatusLine on an image...trying next one... Error: {e}"
                 return_image_name = ''
                 absolute_path = ''
 
         except HTTPError as e:  # If there is any HTTPError
             download_status = 'fail'
-            download_message = "HTTPError on an image...trying next one..." + " Error: " + str(e)
+            download_message = f"HTTPError on an image...trying next one... Error: {e}"
             return_image_name = ''
             absolute_path = ''
 
         except URLError as e:
             download_status = 'fail'
-            download_message = "URLError on an image...trying next one..." + " Error: " + str(e)
+            download_message = f"URLError on an image...trying next one... Error: {e}"
             return_image_name = ''
             absolute_path = ''
 
         except ssl.CertificateError as e:
             download_status = 'fail'
-            download_message = "CertificateError on an image...trying next one..." + " Error: " + str(e)
+            download_message = f"CertificateError on an image...trying next one... Error: {e}"
             return_image_name = ''
             absolute_path = ''
 
         except IOError as e:  # If there is any IOError
             download_status = 'fail'
-            download_message = "IOError on an image...trying next one..." + " Error: " + str(e)
+            download_message = f"IOError on an image...trying next one... Error: {e}"
             return_image_name = ''
             absolute_path = ''
 
         except IncompleteRead as e:
             download_status = 'fail'
-            download_message = "IncompleteReadError on an image...trying next one..." + " Error: " + str(e)
+            download_message = f"IncompleteReadError on an image...trying next one... Error: {e}"
             return_image_name = ''
             absolute_path = ''
 
@@ -805,9 +803,7 @@ class googleimagesdownload:
                 page = page[end_content:]
             i += 1
         if count < limit:
-            print("\n\nUnfortunately all " + str(
-                limit) + " could not be downloaded because some images were not downloadable. " + str(
-                count-1) + " is all we got for this search filter!")
+            print(f"\n\nUnfortunately all {limit} could not be downloaded because some images were not downloadable. {count-1} is all we got for this search filter!")
         return items,errorCount,abs_path
 
     def _parse_AF_initDataCallback(self, page):
@@ -855,7 +851,7 @@ class googleimagesdownload:
                     json_obj = json.loads(data_str)
                     return json_obj
                 except Exception as e:
-                    print('WARNING:', e, t)
+                    print(f'WARNING: {e} {t}')
                     return {}
 
             entries = list(map(parse_json, scriptTexts))
@@ -897,7 +893,7 @@ class googleimagesdownload:
                     return rg_meta
 
                 except Exception as e:
-                    print("WARNING:", e, meta)
+                    print(f"WARNING: {e} {meta}")
 
             metas = list(filter(None, map(meta_array2meta_dict, imgMetas)))
             return metas
@@ -979,13 +975,13 @@ class googleimagesdownload:
 
         # Additional words added to keywords
         if arguments['suffix_keywords']:
-            suffix_keywords = [" " + str(sk) for sk in arguments['suffix_keywords'].split(',')]
+            suffix_keywords = [f" {sk}" for sk in arguments['suffix_keywords'].split(',')]
         else:
             suffix_keywords = ['']
 
         # Additional words added to keywords
         if arguments['prefix_keywords']:
-            prefix_keywords = [str(sk) + " " for sk in arguments['prefix_keywords'].split(',')]
+            prefix_keywords = [f"{sk} " for sk in arguments['prefix_keywords'].split(',')]
         else:
             prefix_keywords = ['']
 
@@ -1030,12 +1026,12 @@ class googleimagesdownload:
             for sky in suffix_keywords:             # 2.for every suffix keywords
                 i = 0
                 while i < len(search_keyword):      # 3.for every main keyword
-                    iteration = "\n" + "Item no.: " + str(i + 1) + " -->" + " Item name = " + (pky) + (search_keyword[i]) + (sky)
+                    iteration = f"\nItem no.: {i + 1} --> Item name = {pky}{search_keyword[i]}{sky}"
                     if not arguments["silent_mode"]:
                         print(iteration.encode('raw_unicode_escape').decode('utf-8'))
                         print("Evaluating...")
                     else:
-                        print("Downloading images for: " + (pky) + (search_keyword[i]) + (sky) + " ...")
+                        print(f"Downloading images for: {pky}{search_keyword[i]}{sky} ...")
                     search_term = pky + search_keyword[i] + sky
 
                     if arguments['image_directory']:
@@ -1073,7 +1069,7 @@ class googleimagesdownload:
                                 os.makedirs("logs")
                         except OSError as e:
                             print(e)
-                        json_file = open("logs/"+search_keyword[i]+".json", "w")
+                        json_file = open(os.path.join("logs",f"{search_keyword[i]}.json", "w")
                         json.dump(items, json_file, indent=4, sort_keys=True)
                         json_file.close()
 
@@ -1083,7 +1079,7 @@ class googleimagesdownload:
                         tabs = self.get_all_tabs(raw_html)
                         for key, value in tabs.items():
                             final_search_term = (search_term + " - " + key)
-                            print("\nNow Downloading - " + final_search_term)
+                            print(f"\nNow Downloading - {final_search_term}")
                             if limit < 101:
                                 new_raw_html = self.download_page(value)  # download page
                             else:
@@ -1107,10 +1103,10 @@ def remove_illegal_characters(string):
     try:
         name = badchars.sub('_', string)
         if badnames.match(name):
-            name = '_' + name
+            name = f"_{name}"
         return name
     except Exception as e:
-        print("ERROR cleaning filename:", e)
+        print(f"ERROR cleaning filename: {e}")
     return string
 
 
@@ -1133,8 +1129,8 @@ def main():
         total_time = t1 - t0  # Calculating the total time required to crawl, find and download all the links of 60,000 images
         if not arguments["silent_mode"]:
             print("\nEverything downloaded!")
-            print("Total errors: " + str(total_errors))
-            print("Total time taken: " + str(total_time) + " Seconds")
+            print(f"Total errors: {total_errors}")
+            print(f"Total time taken: {total_time} Seconds")
 
 if __name__ == "__main__":
     main()

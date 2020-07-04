@@ -11,7 +11,7 @@ def progress(count, total, suffix=''):
     percents = round(100.0 * count / float(total), 1)
     bar = '\u2588' * filled_len + '\u2591' * (bar_len - filled_len)
 
-    sys.stdout.write('%s [%s%s] ... %s\r' % (bar, percents, '%', suffix + "                 "))
+    sys.stdout.write(f"{bar} [{percents}%] ... {suffix}\r                 "))
 
 def progress_end():
     sys.stdout.flush() 
@@ -132,13 +132,13 @@ def strip_bad_chars(name):
         if char in name:
             # print("Before: " + name)
             name = name.replace(char, "")
-            print("Adding Data: " + name)
+            print(f"Adding Data: {name}")
     return name
 
 
 def save_actor_profile_image_from_web(image_link, actor, force):
     save_path = os.path.join(
-        videos.const.MEDIA_PATH, "actor/" + str(actor.id) + "/profile/"
+        videos.const.MEDIA_PATH, "actor", str(actor.id),"profile/"
     )
 
     if not os.path.exists(save_path):
@@ -189,9 +189,7 @@ def actor_folder_from_name_to_id():
         as_uri = urllib.request.pathname2url(rel_path)
 
         print(
-            "Actor {} thumb path is: {} \n and it should be {}".format(
-                actor.name, actor.thumbnail, as_uri
-            )
+           f"Actor {actor.name} thumb path is: {actor.thumbnail} \n and it should be {as_uri}"
         )
         print(actor.thumbnail != as_uri)
         if (actor.thumbnail != videos.const.UNKNOWN_PERSON_IMAGE_PATH) and (
@@ -204,7 +202,7 @@ def actor_folder_from_name_to_id():
                 )
 
                 print(
-                    "Renamed {} to {}".format(
+                    "Renamed %s to %s"%(
                         os.path.join(videos.const.MEDIA_PATH, "actor", actor.name),
                         os.path.join(videos.const.MEDIA_PATH, "actor", str(actor.id)),
                     )
@@ -234,14 +232,9 @@ def actor_folder_from_name_to_id():
                     as_uri_changed = urllib.request.pathname2url(rel_path_changed)
                     actor.thumbnail = as_uri_changed
                     actor.save()
-                    print(
-                        "Changed {} thumb in database to {}".format(
-                            actor.name, as_uri_changed
-                        )
-                    )
+                    print(f"Changed {actor.name} thumb in database to {as_uri_changed}")
                 else:
-                    print(
-                        "File {} not found!".format(
+                    print("File %s not found!"%(
                             os.path.join(videos.const.MEDIA_PATH, "actor", actor.name)
                         )
                     )
@@ -260,9 +253,7 @@ def actor_folder_from_name_to_id():
             actor.thumbnail = as_uri_changed
             actor.save()
 
-            print(
-                "Changed {} thumb in database to {}".format(actor.name, as_uri_changed)
-            )
+            print(f"Changed {actor.name} thumb in database to {as_uri_changed}")
 
     return True
 

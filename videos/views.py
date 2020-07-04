@@ -59,10 +59,7 @@ def get_scenes_in_folder_recursive(folder, scene_list):
 
 
 def onlyChars(input):
-    valids = ""
-    for character in input:
-        if character.isalpha():
-            valids += character
+    valids = "".join(character for character in input if character.isalpha())
     return valids
 
 
@@ -117,13 +114,13 @@ def search_in_get_queryset(original_queryset, request):
             #             qs_list = tmp_list
 
             if search_string.startswith("<"):
-                string_keyarg = search_field + "__lte"
+                string_keyarg = "{search_field}__lte"
                 search_string = search_string.replace("<", "")
             elif search_string.startswith(">"):
-                string_keyarg = search_field + "__gte"
+                string_keyarg = "{search_field}__gte"
                 search_string = search_string.replace(">", "")
             else:
-                string_keyarg = search_field + "__icontains"
+                string_keyarg = f"{search_field}__icontains"
 
             if search_string:
                 original_queryset = original_queryset.filter(
@@ -298,7 +295,7 @@ def scrape_all_actors(force):
                     scraper_freeones.search_freeones_with_force_flag(actor, True)
                     print("Finished Freeones search")
             else:
-                print(actor.name + " was already searched...                                                                        \r",end="")
+                print("{actor.name} was already searched...                                                                        \r",end="")
         else:
 
             print("Searching in TMDb")
@@ -330,10 +327,9 @@ def tag_all_scenes(ignore_last_lookup):
 
             scene_tag_to_add = SceneTag.objects.get(name=actorTag.name)
             actorTag.scene_tags.add(scene_tag_to_add)
+            scenetag=SceneTag.objects.filter(name=actorTag.name)
             print(
-                "Added scene tag {} to actor tag {}".format(
-                    SceneTag.objects.filter(name=actorTag.name), actorTag.name
-                )
+                f"Added scene tag {scenetag} to actor tag {actorTag.name}"
             )
 
     filename_parser.parse_all_scenes(False)
@@ -356,10 +352,9 @@ def tag_all_scenes_ignore_last_lookup(ignore_last_lookup):
 
             scene_tag_to_add = SceneTag.objects.get(name=actorTag.name)
             actorTag.scene_tags.add(scene_tag_to_add)
+            scenetag=SceneTag.objects.filter(name=actorTag.name)
             print(
-                "Added scene tag {} to actor tag {}".format(
-                    SceneTag.objects.filter(name=actorTag.name), actorTag.name
-                )
+                f"Added scene tag {scenetag} to actor tag {actorTag.name}"
             )
 
     filename_parser.parse_all_scenes(True)
@@ -397,7 +392,7 @@ class ScrapeActor(views.APIView):
         else:
             force = False
         print("Now entering the scrape actor API REST view")
-        print("Scanning for " + Actor.objects.get(pk=actor_id).name + " on " + search_site)
+        print(f"Scanning for {Actor.objects.get(pk=actor_id).name} on {search_site}")
 
         if search_site == "TMDb":
             actor_to_search = Actor.objects.get(pk=actor_id)
@@ -460,21 +455,17 @@ def permenatly_delete_scene_and_remove_from_db(scene):
     success_delete_media_path = False
     try:
         os.remove(scene.path_to_file)
-        print("Successfully deleted scene '{}'".format(scene.path_to_file))
+        print(f"Successfully deleted scene '{scene.path_to_file}'")
         success_delete_file = True
     except OSError as e:
         if e.errno == errno.ENOENT:
             print(
-                "File {} already deleted! [Err No:{}, Err File:{} Err:{}]".format(
-                    scene.path_to_file, e.errno, e.filename, e.strerror
-                )
+                f"File {scene.path_to_file} already deleted! [Err No:{e.errno}, Err File:{e.filename} Err:{e.strerror}]"
             )
             success_delete_file = True
         else:
             print(
-                "Got OSError while trying to delete {} : Error number:{} Error Filename:{} Error:{}".format(
-                    scene.path_to_file, e.errno, e.filename, e.strerror
-                )
+                f"Got OSError while trying to delete {scene.path_to_file} : Error number:{e.errno} Error Filename:{e.filename} Error:{e.strerror}"
             )
 
     media_path = os.path.relpath(
@@ -483,22 +474,20 @@ def permenatly_delete_scene_and_remove_from_db(scene):
     print(os.path.dirname(os.path.abspath(__file__)))
     try:
         shutil.rmtree(media_path)
-        print("Deleted '{}'".format(media_path))
+        print(f"Deleted '{media_path}'")
         success_delete_media_path = True
     except OSError as e:
         if e.errno == errno.ENOENT:
-            print("Directory '{}' already deleted".format(media_path))
+            print(f"Directory '{media_path}' already deleted")
             success_delete_media_path = True
         else:
             print(
-                "Got OSError while trying to delete {} : Error number:{} Error Filename:{} Error:{}".format(
-                    scene.path_to_file, e.errno, e.filename, e.strerror
-                )
+                f"Got OSError while trying to delete {scene.path_to_file} : Error number:{e.errno} Error Filename:{e.filename} Error:{e.strerror}"
             )
 
     if success_delete_file and success_delete_media_path:
         scene.delete()
-        print("Removed '{}' from database".format(scene.name))
+        print(f"Removed '{scene.name}' from database")
 
 
 def checkDupeHash(hash):
@@ -534,18 +523,14 @@ def tag_multiple_items(request):
                         scene_to_update = Scene.objects.get(pk=x)
                         scene_to_update.websites.add(website_to_add)
                         print(
-                            "Added Website '{}' to scene '{}'".format(
-                                website_to_add.name, scene_to_update.name
-                            )
+                            f"Added Website '{website_to_add.name}' to scene '{scene_to_update.name}'"
                         )
 
                         if website_to_add.scene_tags.count() > 0:
                             for tag in website_to_add.scene_tags.all():
                                 scene_to_update.scene_tags.add(tag)
                                 print(
-                                    "Added Scene Tag '{}' to scene '{}'".format(
-                                        tag.name, scene_to_update.name
-                                    )
+                                    f"Added Scene Tag '{tag.name}' to scene '{scene_to_update.name}'"
                                 )
 
                         scene_to_update.save()
@@ -554,18 +539,14 @@ def tag_multiple_items(request):
                         scene_to_update = Scene.objects.get(pk=x)
                         scene_to_update.websites.remove(website_to_add)
                         print(
-                            "Removed Website '{}' from scene '{}'".format(
-                                website_to_add.name, scene_to_update.name
-                            )
+                            f"Removed Website '{website_to_add.name}' from scene '{scene_to_update.name}'"
                         )
                         if website_to_add.scene_tags.count() > 0:
                             for tag in website_to_add.scene_tags.all():
                                 if tag in scene_to_update.scene_tags.all():
                                     scene_to_update.scene_tags.remove(tag)
                                     print(
-                                        "Removed Scene Tag '{}' from scene '{}'".format(
-                                            tag.name, scene_to_update.name
-                                        )
+                                        f"Removed Scene Tag '{tag.name}' from scene '{scene_to_update.name}'"
                                     )
                         scene_to_update.save()
 
@@ -581,9 +562,7 @@ def tag_multiple_items(request):
                         scene_to_update.scene_tags.add(scene_tag_to_add)
                         scene_to_update.save()
                         print(
-                            "Added Scene Tag '{}' to scene '{}'".format(
-                                scene_tag_to_add.name, scene_to_update.name
-                            )
+                            f"Added Scene Tag '{scene_tag_to_add.name}' to scene '{scene_to_update.name}'"
                         )
 
                 if params["addOrRemove"] == "remove":
@@ -592,9 +571,7 @@ def tag_multiple_items(request):
                         scene_to_update.scene_tags.remove(scene_tag_to_add)
                         scene_to_update.save()
                         print(
-                            "Removed Scene Tag '{}' from scene '{}'".format(
-                                scene_tag_to_add.name, scene_to_update.name
-                            )
+                            f"Removed Scene Tag '{scene_tag_to_add.name}' from scene '{scene_to_update.name}'"
                         )
             elif params["patchType"] == "actors":
                 actor_id = params["patchData"][0]
@@ -607,9 +584,7 @@ def tag_multiple_items(request):
                         scene_to_update = Scene.objects.get(pk=x)
                         scene_to_update.actors.add(actor_to_add)
                         print(
-                            "Added Actor '{}' to scene '{}'".format(
-                                actor_to_add.name, scene_to_update.name
-                            )
+                            f"Added Actor '{actor_to_add.name}' to scene '{scene_to_update.name}'"
                         )
 
                         if actor_to_add.actor_tags.count() > 0:
@@ -618,10 +593,7 @@ def tag_multiple_items(request):
                                     actor_tag.scene_tags.first()
                                 )
                                 print(
-                                    "Added Scene Tag '{}' to scene '{}'".format(
-                                        actor_tag.scene_tags.first().name,
-                                        scene_to_update.name,
-                                    )
+                                    f"Added Scene Tag '{actor_tag.scene_tags.first().name}' to scene '{scene_to_update.name}'"
                                 )
 
                         scene_to_update.save()
@@ -631,9 +603,7 @@ def tag_multiple_items(request):
                         scene_to_update = Scene.objects.get(pk=x)
                         scene_to_update.actors.remove(actor_to_add)
                         print(
-                            "Removed Actor '{}' from scene '{}'".format(
-                                actor_to_add.name, scene_to_update.name
-                            )
+                            f"Removed Actor '{actor_to_add.name}' from scene '{scene_to_update.name}'"
                         )
 
                         if actor_to_add.actor_tags.count() > 0:
@@ -646,10 +616,7 @@ def tag_multiple_items(request):
                                         actor_tag.scene_tags.first()
                                     )
                                     print(
-                                        "Removed Scene Tag '{}' to scene '{}'".format(
-                                            actor_tag.scene_tags.first().name,
-                                            scene_to_update.name,
-                                        )
+                                        f"Removed Scene Tag '{actor_tag.scene_tags.first().name}' to scene '{scene_to_update.name}'"
                                     )
                         scene_to_update.save()
 
@@ -666,9 +633,7 @@ def tag_multiple_items(request):
                         scene_to_update = Scene.objects.get(pk=x)
                         scene_to_update.delete()
                         print(
-                            "Removed scene '{}' from database".format(
-                                scene_to_update.name
-                            )
+                            f"Removed scene '{scene_to_update.name}' from database"
                         )
 
             elif params["patchType"] == "playlists":
@@ -682,9 +647,7 @@ def tag_multiple_items(request):
                         scene_to_update = Scene.objects.get(pk=x)
                         scene_to_update.playlists.add(playlist_to_add)
                         print(
-                            "Scene '{}' was added to playlist '{}'".format(
-                                scene_to_update.name, playlist_to_add.name
-                            )
+                            f"Scene '{scene_to_update.name}' was added to playlist '{playlist_to_add.name}'"
                         )
                         scene_to_update.save()
                 if params["addOrRemove"] == "remove":
@@ -692,9 +655,7 @@ def tag_multiple_items(request):
                         scene_to_update = Scene.objects.get(pk=x)
                         scene_to_update.playlists.remove(playlist_to_add)
                         print(
-                            "Scene '{}' was removed to playlist '{}'".format(
-                                scene_to_update.name, playlist_to_add.name
-                            )
+                            f"Scene '{scene_to_update.name}' was removed to playlist '{playlist_to_add.name}'"
                         )
                         scene_to_update.save()
 
@@ -708,9 +669,7 @@ def tag_multiple_items(request):
                     # scene_to_update[patch_type] = patch_data
 
                     print(
-                        "Set scene's '{}' attribute '{}' to '{}'".format(
-                            scene_to_update, patch_type, patch_data
-                        )
+                        f"Set scene's '{scene_to_update}' attribute '{patch_type}' to '{patch_data}'"
                     )
                     scene_to_update.save()
 
@@ -727,9 +686,7 @@ def tag_multiple_items(request):
                         actor_to_update.actor_tags.add(actor_tag_to_add)
                         actor_to_update.save()
                         print(
-                            "Added Actor Tag '{}' to actor {}".format(
-                                actor_tag_to_add.name, actor_to_update.name
-                            )
+                            f"Added Actor Tag '{actor_tag_to_add.name}' to actor {actor_to_update.name}"
                         )
                 elif params["addOrRemove"] == "remove":
 
@@ -738,9 +695,7 @@ def tag_multiple_items(request):
                         actor_to_update.actor_tags.remove(actor_tag_to_add)
                         actor_to_update.save()
                         print(
-                            "Removed Actor Tag '{}' to actor {}".format(
-                                actor_tag_to_add.name, actor_to_update.name
-                            )
+                            f"Removed Actor Tag '{actor_tag_to_add.name}' to actor {actor_to_update.name}"
                         )
             else:
                 actors_to_update = params["itemsToUpdate"]
@@ -752,9 +707,7 @@ def tag_multiple_items(request):
                     # scene_to_update[patch_type] = patch_data
 
                     print(
-                        "Set actors's '{}' attribute '{}' to '{}'".format(
-                            actor_to_update, patch_type, patch_data
-                        )
+                        f"Set actors's '{actor_to_update}' attribute '{patch_type}' to '{patch_data}'"
                     )
                     actor_to_update.save()
 
@@ -772,9 +725,7 @@ def clean_dir(type_of_model_to_clean):
     ):
 
         print(
-            "Checking {} folder {} out of {}".format(
-                type_of_model_to_clean, index, number_of_folders
-            )
+            f"Checking {type_of_model_to_clean} folder {index} out of {number_of_folders}"
         )
         try:
             dir_in_path_int = int(dir_in_path)
@@ -787,9 +738,7 @@ def clean_dir(type_of_model_to_clean):
                         const.MEDIA_PATH, type_of_model_to_clean, dir_in_path
                     )
                     print(
-                        "Actor id {} is not in the database... Deleting folder {}".format(
-                            dir_in_path_int, dir_to_delete
-                        )
+                        f"Actor id {dir_in_path_int} is not in the database... Deleting folder {dir_to_delete}"
                     )
                     shutil.rmtree(dir_to_delete)
             elif type_of_model_to_clean == "scenes":
@@ -801,18 +750,14 @@ def clean_dir(type_of_model_to_clean):
                         const.MEDIA_PATH, type_of_model_to_clean, dir_in_path
                     )
                     print(
-                        "Scene id {} is not in the database... Deleting folder {}".format(
-                            dir_in_path_int, dir_to_delete
-                        )
+                        f"Scene id {dir_in_path_int} is not in the database... Deleting folder {dir_to_delete}"
                     )
                     shutil.rmtree(dir_to_delete)
             index += 1
 
         except ValueError:
             print(
-                "Dir name '{}' Could not be converted to an integer, skipping...".format(
-                    dir_in_path
-                )
+                f"Dir name '{dir_in_path}' Could not be converted to an integer, skipping..."
             )
             index += 1
             pass
@@ -898,9 +843,7 @@ def settings(request):
                     # print("Checked " + str(anumber) + "...\n")
                     if checkDupeHash(scene_1.hash) > 1:
                         print(
-                            "Scene "
-                            + str(scene_1.id)
-                            + " has at least one dupe, running the dupe scanner...\n"
+                            f"Scene {scene_1.id} has at least one dupe, running the dupe scanner...\n"
                         )
                         for scene_2 in Scene.objects.all():
                             if not scene_1.pk == scene_2.pk:
@@ -911,12 +854,7 @@ def settings(request):
                                 #    str(scene_2.id) + " - " + scene_2.name + "\nFile path: " + scene_2.path_to_file)
                                 if scene_2.hash == scene_1.hash:
                                     print(
-                                        "Confirmed! Duplicate scene info:\n "
-                                        + str(scene_2.id)
-                                        + " - "
-                                        + scene_2.path_to_file
-                                        + "\nHash: "
-                                        + scene_2.hash
+                                        f"Confirmed! Duplicate scene info:\n {scene_2.id} - {scene_2.path_to_file}\nHash: {scene_2.hash}"
                                     )
                                     # print("Passing ID " + str(scene_2.id) + " to delete function...")
                                     permenatly_delete_scene_and_remove_from_db(scene_2)
@@ -935,12 +873,10 @@ def settings(request):
                 counter = 1
                 print("Cleaning Scenes...")  # CooperDK This was enabled
                 for scene in scenes:
-                    print("Checking scene {} out of {}".format(counter, count))
+                    print(f"Checking scene {counter} out of {count}")
                     if not os.path.isfile(scene.path_to_file):
                         print(
-                            "File for scene {} does not exist in path {}".format(
-                                scene.name, scene.path_to_file
-                            )
+                            f"File for scene {scene.name} does not exist in path {scene.path_to_file}"
                         )
                         permenatly_delete_scene_and_remove_from_db(scene)
                     counter += 1
@@ -952,10 +888,10 @@ def settings(request):
                 count = aliases.count()
                 counter = 1
                 for alias in aliases:
-                    print("Checking Alias {} out of {}".format(counter, count))
+                    print(f"Checking Alias {counter} out of {count}")
                     if alias.actors.count() == 0:
                         alias.delete()
-                        print("Alias {} has no actor... deleting".format(alias.name))
+                        print(f"Alias {alias.name} has no actor... deleting")
                     counter += 1
                 print("Finished cleaning aliases...")
 
@@ -1022,17 +958,15 @@ def add_comma_seperated_items_to_db(string_of_comma_seperated_items, type_of_ite
                 if not ActorAlias.objects.filter(name=object_to_insert.name):
                     object_to_insert.save()
                     print(
-                        "Added {} {} To db".format(type_of_item, object_to_insert.name)
+                        f"Added {type_of_item} {object_to_insert.name} To db"
                     )
             else:
                 object_to_insert.save()
-                print("Added {} {} To db".format(type_of_item, object_to_insert.name))
+                print(f"Added {type_of_item} {object_to_insert.name} To db")
         except django.db.IntegrityError as e:
             # content = {'something whent wrong': e}
             print(
-                "{} while trying to add {} {}".format(
-                    e, type_of_item, object_to_insert.name
-                )
+                f"{e} while trying to add {type_of_item} {object_to_insert.name}"
             )
             # return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -1058,14 +992,10 @@ class AddItems(views.APIView):
                         local_scene_folder.save()
                     except django.db.IntegrityError as e:
                         print(
-                            "{} while trying to add {} to folder list".format(
-                                e, local_scene_folder.name
-                            )
+                            f"{e} while trying to add {local_scene_folder.name} to folder list"
                         )
                     print(
-                        "Added folder {} to folder list...".format(
-                            local_scene_folder.name
-                        )
+                        f"Added folder {local_scene_folder.name} to folder list..."
                     )
                 else:
                     content = {"Path does not exist!": "Can't find path!"}
@@ -1098,34 +1028,26 @@ def play_scene_vlc(scene, random):
     scene.play_count += 1
     scene.date_last_played = datetime.datetime.now()
     print(
-        "Play count for scene '{}' is now '{}' and the date the scene was last played is '{}'".format(
-            scene.name, scene.play_count, scene.date_last_played
-        )
+        f"Play count for scene '{scene.name}' is now '{scene.play_count}' and the date the scene was last played is '{scene.date_last_played}'"
     )
     scene.save()
 
     for scene_tag in scene.scene_tags.all():
         scene_tag.play_count += 1
         print(
-            "Play count for scene tag '{}' is now '{}'".format(
-                scene_tag.name, scene_tag.play_count
-            )
+            f"Play count for scene tag '{scene_tag.name}' is now '{scene_tag.play_count}'"
         )
         scene_tag.save()
 
     for actor in scene.actors.all():
         actor.play_count += 1
-        print(
-            "Play count for actor '{}' is now '{}'".format(actor.name, actor.play_count)
-        )
+        print(f"Play count for actor '{actor.name}' is now '{actor.play_count}'")
         actor.save()
 
     for website in scene.websites.all():
         website.play_count += 1
         print(
-            "Play count for site '{}' is now '{}'".format(
-                website.name, website.play_count
-            )
+            f"Play count for site '{website.name}' is now '{website.play_count}'"
         )
         website.save()
 
@@ -1138,9 +1060,9 @@ def play_scene_vlc(scene, random):
         if not pls.scenes.filter(id=scene.id):
             pls.scenes.add(scene)
             pls.save()
-            print("Added scene '{}' to Random Plays playlist.".format(scene.name))
+            print(f"Added scene '{scene.name}' to Random Plays playlist.")
         else:
-            print("Scene '{}' already in playlist Random Plays.".format(scene.name))
+            print(f"Scene '{scene.name}' already in playlist Random Plays.")
 
 
 @api_view(["GET", "POST"])
@@ -1262,8 +1184,10 @@ class AssetAdd(views.APIView):
 
                     current_tumb = os.path.join(
                         const.MEDIA_PATH,
-                        "actor/{}/".format(actor.id),
-                        "profile/profile.jpg",
+                        "actor",
+                        f"{actor.id}",
+                        "profile",
+                        "profile.jpg",
                     )
                     print(current_tumb)
 
@@ -1295,7 +1219,7 @@ class FileUploadView(views.APIView):
 
 def angualr_index(request):
 
-    return render(request, "videos/angular/index.html")
+    return render(request, os.path.join("videos","angular","index.html"))
 
 
 @api_view(["GET"])
@@ -1495,7 +1419,7 @@ def display_video(x):
         #return HttpResponse("No Video")
     sceneid = x.path
     sceneid = sceneid.split('/')[-1]
-    print ("Requesting scene ID " + str(sceneid) + "...\r", end="")
+    print (f"Requesting scene ID {sceneid}...\r", end="")
     scene = Scene.objects.get(pk=sceneid)
     pathname = scene.path_to_file
     size = scene.size
@@ -1506,7 +1430,7 @@ def display_video(x):
     else:
         then = datetime.datetime.now() - timedelta(hours = 12)
     if now > then + timedelta(hours=3):
-        print ("Playback: [" + pathname + "] (" + str(int(size/1024/1024))+" MB)")
+        print (f"Playback: [{pathname}] ({size//1048576} MB)")#1048576 is 1024^2
         scene.play_count+=1
         scene.date_last_played=datetime.datetime.now()
         scene.save()
