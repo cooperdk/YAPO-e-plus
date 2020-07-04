@@ -1,13 +1,13 @@
 import os
 from os import path
 import sys
+import json
 import shutil
-import videos.const
 import requests
-from videos.models import Scene, Actor, Website, ActorTag, SceneTag
+from videos.models import Scene, Actor, ActorTag, SceneTag, Folder
 import videos.aux_functions as aux
-import videos.views
 import YAPO.settings
+
 
 def maybeMoveConfigJson():
     import YAPO.settings as settings
@@ -15,15 +15,8 @@ def maybeMoveConfigJson():
     dest = YAPO.settings.CONFIG_JSON
     if path.isfile(src):
         shutil.move(src, dest)
-        print("\n"
-        + chr(9608)
-        + chr(9608)
-        + chr(9608)
-        + f" Your configuration file was moved to  ({dest})! "
-        + chr(9608)
-        + chr(9608)
-        + chr(9608)
-        )
+        print("\n███ Your configuration file was moved to  ({0})! ███".format(dest))
+
 
 def getSizeAll():
     # queryset.aggregate(Sum('size')).get('column__sum')
@@ -67,22 +60,19 @@ def write_actors_to_file():
             actors_string += actor.name
         numactors += 1
 
-    file = open("actors.txt", "w")
+    with open("actors.txt", "w") as file:
+        file.write(actors_string)
 
-    file.write(actors_string)
     print("For backup purposes, we just wrote all actors in alphabetical form to actors.txt.")
     print("To recover actor data, please consult the guide.")
-    file.close()
 
 def verCheck():
-
-    update = os.path.abspath(os.path.join(os.path.dirname(__file__), "..\VERSION.md"))
+    update = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "VERSION.md"))
 
     if path.isfile(update):
-        verfile = open(update, "r")
-        ver = verfile.read()
+        with open(update, "r") as verfile:
+            ver = verfile.read()
         ver = str(ver).strip()
-        verfile.close()
         print("--- Version on disk: " + ver)
         try:
             remoteVer = requests.get(
@@ -95,17 +85,9 @@ def verCheck():
 
         # print("Github version: "+str(remoteVer))
         if str(ver) != str(remoteVer):
-            print(
-                chr(9608)
-                + chr(9608)
-                + chr(9608)
-                + f" A new version of YAPO e+ is available ({remoteVer})! "
-                + chr(9608)
-                + chr(9608)
-                + chr(9608)
-            )
+            print(f"███ A new version of YAPO e+ is available ({remoteVer})! ███")
         print("\r\n")
-        
+
 
 def stats():
     size = getSizeAll()
@@ -129,9 +111,11 @@ def stats():
     )  # cursor.fetchone()
     if row[0].total is not None:
         sctag = str(row[0].total)
-    print("\nCurrently, there are "+ sce + " videos registered in YAPO e+.\nThey take up " + str(size) + " of disk space.")
-    print("There are " + sctag + " tags available for video clips.")
-    print("\nThere are " + act + " actors in the database.\nThese actors have " + acttag + " usable tags.\n\n")
+    # TODO assign that all values got read correctly and have a valid value!
+
+    print("\nCurrently, there are {0} videos registered in YAPO e+.\nThey take up {1} of disk space.".format(sce, str(size)))
+    print("There are {0} tags available for video clips.".format(sctag))
+    print("\nThere are {0} actors in the database.\nThese actors have {1} usable tags.\n\n".format(act, acttag))
 
 def backupper():
     import YAPO.settings as settings
