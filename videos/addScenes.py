@@ -91,7 +91,7 @@ def create_scene(scene_path, make_sample_video):
 #    )
 
     if Scene.objects.filter(path_to_file=current_scene.path_to_file):
-        print("Scene Already Exists!")
+        print("Scene already exists, skipping scene.")
         scene_in_db = Scene.objects.get(path_to_file=current_scene.path_to_file)
         if scene_in_db.thumbnail is None:
             print("Trying to use ffprobe on scene... ",end="")
@@ -107,7 +107,7 @@ def create_scene(scene_path, make_sample_video):
             os.path.join(const.MEDIA_PATH, "scenes", str(scene_in_db.id), "sheet.jpg")
         )
         if os.path.exists(sheet_path):
-            print("Contact Sheet already exists, skipping...")
+            print("Contact sheet for this scene already exists, not re-generating.")
         else:
             file_path = os.path.abspath(current_scene.path_to_file)
             # sheetExec = sys.executable + " " + os.path.abspath(os.path.join(const.VIDEO_ROOT, 'videosheet.py'))
@@ -186,7 +186,7 @@ def create_scene(scene_path, make_sample_video):
                 os.path.join(const.MEDIA_PATH, "scenes", str(current_scene.id), "sheet.jpg")
             )
             if os.path.exists(sheet_path):
-                print("Contact Sheet already exists, skipping...")
+                print("Contact sheet for this scene already exists, not re-generating.")
             else:  
                 file_path = os.path.abspath(current_scene.path_to_file)
                 # sheetExec = sys.executable + " " + os.path.abspath(os.path.join(const.VIDEO_ROOT, 'videosheet.py'))

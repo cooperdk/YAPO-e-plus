@@ -154,6 +154,7 @@ angular.module('settings').component('settings', {
                 };
 				
                 self.cleanDatabase = function () {
+			    if (confirm("Please ensure that all of your drives are connected, otherwise scene data will be deleted from YAPO.")) {
                     $http.get('settings/', {
                         params: {
                             cleanDatabase: true
@@ -163,11 +164,11 @@ angular.module('settings').component('settings', {
                         // self.response = response.data.vlc_path;
                         // self.pathToVLC = response.data.vlc_path;
                         // alert("Got response from server: " + self.pathToFolderToAdd);
-						self.addAlert("Done cleaning the system.", 'success', '10000');
+                        self.addAlert("Done cleaning the system.", 'success', '10000');
                     }, function errorCallback(response) {
                         self.addAlert("Something went wrong while cleaning the system.", 'warning', '1000000');
                     });
-                    
+                }
                 };
                 
                 

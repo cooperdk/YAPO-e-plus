@@ -772,9 +772,9 @@ def clean_dir(type_of_model_to_clean):
     ):
 
         print(
-            "Checking {} folder {} out of {}".format(
+            "Checking {} folder {} out of {}\r".format(
                 type_of_model_to_clean, index, number_of_folders
-            )
+            ),end=""
         )
         try:
             dir_in_path_int = int(dir_in_path)
@@ -895,12 +895,12 @@ def settings(request):
                 for scene_1 in Scene.objects.all():
                     anumber += 1
                     # if not anumber % 100:
-                    # print("Checked " + str(anumber) + "...\n")
+                    print("Checked " + str(anumber) + "...\r",end="")
                     if checkDupeHash(scene_1.hash) > 1:
                         print(
                             "Scene "
                             + str(scene_1.id)
-                            + " has at least one dupe, running the dupe scanner...\n"
+                            + " - at least one dupe, scanning..."
                         )
                         for scene_2 in Scene.objects.all():
                             if not scene_1.pk == scene_2.pk:
@@ -935,7 +935,7 @@ def settings(request):
                 counter = 1
                 print("Cleaning Scenes...")  # CooperDK This was enabled
                 for scene in scenes:
-                    print("Checking scene {} out of {}".format(counter, count))
+                    print("Checking scene {} out of {}\r".format(counter, count), end="")
                     if not os.path.isfile(scene.path_to_file):
                         print(
                             "File for scene {} does not exist in path {}".format(
@@ -944,7 +944,7 @@ def settings(request):
                         )
                         permenatly_delete_scene_and_remove_from_db(scene)
                     counter += 1
-                print("Finished cleaning scenes...")
+                print("\nFinished cleaning scenes...")
 
                 print("Cleaning Aliases...")
 
@@ -952,12 +952,12 @@ def settings(request):
                 count = aliases.count()
                 counter = 1
                 for alias in aliases:
-                    print("Checking Alias {} out of {}".format(counter, count))
+                    print("Checking Alias {} out of {}\r".format(counter, count),end="")
                     if alias.actors.count() == 0:
                         alias.delete()
                         print("Alias {} has no actor... deleting".format(alias.name))
                     counter += 1
-                print("Finished cleaning aliases...")
+                print("\nFinished cleaning aliases...")
 
                 print("Cleaning actor dirs that are no longer in database...")
 
@@ -975,7 +975,7 @@ def settings(request):
                 all_folders = LocalSceneFolders.objects.all()
                 for folder in all_folders:
                     videos.addScenes.get_files(folder.name, False)
-
+        print("\nDone.")
         return Response(status=200)
 
 
