@@ -1,0 +1,76 @@
+.browsehappy {
+  margin: 0.2em 0;
+  background: #ccc;
+  color: #000;
+  padding: 0.2em 0;
+}
+
+body {
+  padding: 0;
+  padding-top: 50px;
+  font-family: 'Roboto Condensed', sans-serif;
+  font-weight: 300;
+}
+
+.link-section {
+    padding: 20px 0px;
+    background-color: #9f9f9f;
+    border-bottom: 1px solid #8b8b8b;
+    text-align: center;
+    color: #fff;
+}
+
+.link-section-btn {
+    margin: 5px 10px;
+}
+
+h3 {
+    font-family: 'Roboto Condensed', sans-serif;
+    margin-bottom: 4px;
+    color: #5c5c5c;
+}
+
+p {
+    font-size: 20px;
+}
+
+.intro-text {
+    margin-top: 25px;
+}
+
+.navbar {
+    background-color: #4e4e4e;
+}
+
+.navbar-brand {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-weight: 700;
+    color: #ccc !important;
+}
+
+
+.toggle-btn {
+    margin: 10px 0px;
+}
+
+.tagline {
+    padding-bottom: 25px;
+}
+
+
+.gh-iframe {
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    margin-top: 15px;
+    margin-left: 0;
+    z-index: 50000;
+}
+
+.code-btn {
+    margin-top: 10px;
+}
+
+.repo-badges {
+    margin-top: 20px;
+}

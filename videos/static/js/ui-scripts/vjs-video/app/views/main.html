@@ -1,0 +1,63 @@
+<p class="intro-text">Below are a few examples of how to use vjs-video within an Angular project. In addtion to the code snippets, take a look at the Angular controller that controls <a href="https://github.com/LonnyGomes/vjs-video/blob/master/app/scripts/controllers/main.js">this page</a> for more insights on using some of the more advanced features.</p>
+<h2>Fixed size</h2>
+<h3>video</h3>
+<video ng-if="!isSmallScreen()" id="example_video_1" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264" poster="//s3.amazonaws.com/lonnygomes.com/assets/8269691015_hd_poster.jpg" vjs-video vjs-setup="options">
+    <source src="//s3.amazonaws.com/lonnygomes.com/assets/8269691015_hd.mp4" type='video/mp4' />
+    <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+    </p>
+</video>
+
+<video ng-if="isSmallScreen()" id="example_video_1" class="video-js vjs-default-skin" controls preload="auto" width="320" height="132" poster="//s3.amazonaws.com/lonnygomes.com/assets/8269691015_hd_poster.jpg" vjs-video vjs-setup="options">
+    <source src="//s3.amazonaws.com/lonnygomes.com/assets/8269691015_hd.mp4" type='video/mp4' />
+    <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+    </p>
+</video>
+
+<gist ng-if="!isSmallScreen()" id="793356c48eaea4451b6e"></gist>
+<div ng-show="isSmallScreen()">
+    <a class="btn btn-primary btn-sm btn-link code-btn" href="https://gist.github.com/LonnyGomes/793356c48eaea4451b6e">Veiw Code</a>
+</div>
+
+<h3>audio</h3>
+<audio id="audio_example" class="video-js vjs-default-skin" controls preload="auto" width="300" height="300" poster="http://s3.amazonaws.com/lonnygomes.com/assets/mass_defect_poster.jpg" vjs-video>
+    <source src="http://s3.amazonaws.com/lonnygomes.com/assets/DJ-MassDefect-Fado.mp3" type='audio/mp3'/>
+</audio>
+
+<gist id="5aac20e65a09897793260070076f0e29"></gist>
+
+<h2>Responsive</h2>
+<vjs-video-container vjs-ratio="640:264">
+    <video class="video-js vjs-default-skin" width="50" height="50" controls preload="auto" poster="//s3.amazonaws.com/lonnygomes.com/assets/8269691015_hd_poster.jpg">
+        <source src="//s3.amazonaws.com/lonnygomes.com/assets/8269691015_hd.mp4" type='video/mp4' />
+        <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+        </p>
+    </video>
+</vjs-video-container>
+
+<gist ng-if="!isSmallScreen()" id="e67dbc19e5548376cdc4"></gist>
+<div ng-show="isSmallScreen()">
+    <a class="btn btn-primary btn-sm btn-link code-btn" href="https://gist.github.com/LonnyGomes/e67dbc19e5548376cdc4">Veiw Code</a>
+</div>
+
+<h2>Bindable sources/tracks</h2>
+<video ng-if="!isSmallScreen()" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264" poster="//s3.amazonaws.com/lonnygomes.com/assets/8269691015_hd_poster.jpg" vjs-video vjs-media="media">
+    <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+</video>
+
+<video ng-if="isSmallScreen()" class="video-js vjs-default-skin" controls preload="auto" width="320" height="132" poster="//s3.amazonaws.com/lonnygomes.com/assets/8269691015_hd_poster.jpg" vjs-video vjs-media="media">
+    <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+</video>
+
+<gist ng-if="!isSmallScreen()" id="d75e8c1704668283e049"></gist>
+<div ng-show="isSmallScreen()">
+    <a class="btn btn-primary btn-sm btn-link code-btn" href="https://gist.github.com/LonnyGomes/d75e8c1704668283e049">Veiw Code</a>
+</div>
+
+<h2>Bindable sources toggle example</h2>
+
+<video ng-if="!isSmallScreen()" class="video-js vjs-default-skin" controls preload="auto" width="592" height="252" vjs-video vjs-media="mediaToggle"></video>
+
+<video ng-if="isSmallScreen()" class="video-js vjs-default-skin" controls preload="auto" width="340" height="145" vjs-video vjs-media="mediaToggle"></video>
+
+<button class="btn btn-primary btn-lg toggle-btn" ng-click="toggleMedia()">Toggle Video</button>
+<button class="btn btn-primary btn-lg toggle-btn" ng-click="toggleAudio()">Toggle Audio</button>

@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>vjs-video: an angular.js directive for video.js</title>
+    <meta name="vjs-video" content="vjs-video is a directive that makes using angular.js with video.js easy">
+    <meta property="og:title" content="vjs-video is a directive that makes using angular.js with video.js easy"/>
+    <meta name="twitter:card" content="vjs-video is a directive that makes using angular.js with video.js easy">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <link href='https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700,300' rel='stylesheet' type='text/css'>
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <!-- build:css(.) styles/vendor.css -->
+    <!-- bower:css -->
+    <link rel="stylesheet" href="bower_components/video.js/dist/video-js/video-js.css" />
+    <!-- endbower -->
+    <!-- endbuild -->
+    <!-- build:css(.tmp) styles/main.css -->
+    <link rel="stylesheet" href="bower_components/bootstrap-css/css/bootstrap.min.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <!-- endbuild -->
+  </head>
+  <body ng-app="vjsVideoApp">
+    <!--[if lte IE 8]>
+      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+
+    <div class="gh-iframe"><iframe src="https://ghbtns.com/github-btn.html?user=lonnygomes&repo=vjs-video&type=star&count=true" frameborder="0" scrolling="0" width="100px" height="20px"></iframe></div>
+
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+              <a class="navbar-brand" href="#">vjs-video</a>
+            </div>
+        </div><!-- /.container-fluid -->
+    </nav>
+    <section class="container-fluid link-section">
+        <div class="container">
+            <img src="images/vjs-angular-logo.png" alt="vjs-video logo">
+            <h2 class="tagline">vjs-video is a directive that makes using <a href="http://angularjs.com">angular.js</a> with <a href="http://videojs.com">video.js</a> easy.</h2>
+            <a class="btn btn-primary btn-lg link-section-btn" target="_blank" href="https://raw.githubusercontent.com/LonnyGomes/vjs-video/master/dist/vjs-video.js">Download vjs-video</a>
+            <a class="btn btn-primary btn-lg link-section-btn" href="https://github.com/LonnyGomes/vjs-video#vjs-video">View Documentation</a>
+
+            <div class="repo-badges">
+                <a href="https://badge.fury.io/js/vjs-video"><img src="https://badge.fury.io/js/vjs-video.svg" alt="npm version" height="18"></a>
+                <a href="https://badge.fury.io/bo/vjs-video"><img src="https://badge.fury.io/bo/vjs-video.svg" alt="Bower version" height="18"></a>
+            </div>
+        </div>
+    </section>
+    <div class="container">
+    <div ng-include="'views/main.html'" ng-controller="MainCtrl"></div>
+    </div>
+
+
+
+    <!-- build:js(.) scripts/vendor.js -->
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <!-- bower:js -->
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/video.js/dist/video-js/video.js"></script>
+    <!-- endbower -->
+    <script src="bower_components/angular-gist/angular-gist.js"></script>
+    <!-- endbuild -->
+
+        <!-- build:js({.tmp,app}) scripts/scripts.js -->
+        <script src="scripts/app.js"></script>
+        <script src="scripts/controllers/main.js"></script>
+        <script src="scripts/directives/vjs.directive.js"></script>
+        <!-- endbuild -->
+
+       <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-69492899-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+</body>
+</html>
