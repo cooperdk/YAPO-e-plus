@@ -1093,7 +1093,10 @@ class AddItems(views.APIView):
 
 def play_scene_vlc(scene, random):
     file_path = os.path.normpath(scene.path_to_file)
-    vlc_path = os.path.normpath(const.VLC_PATH)
+    if platform.system() == "Windows":
+        vlc_path = os.path.normpath(const.VLC_PATH)
+    else:
+        vlc_path = "vlc"
     p = subprocess.Popen([vlc_path, file_path])
     scene.play_count += 1
     scene.date_last_played = datetime.datetime.now()
