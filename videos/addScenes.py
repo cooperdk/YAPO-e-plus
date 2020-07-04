@@ -24,9 +24,8 @@ ACCEPTED_VIDEO_EXTENSIONS = {
     ".mpg",
     ".mpeg",
     ".mkv",
+    ".webm"
 }
-TEST_PATH = "Z:\\XBMC\\PR\\19062016"
-
 
 def get_files(walk_dir, make_video_sample):
     # norm_path = os.path.normpath(path)
