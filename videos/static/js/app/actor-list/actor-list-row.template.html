@@ -1,6 +1,6 @@
 <div id="actor-list-row" >
     <ul>
-        <li style="vertical-align: middle;" ng-repeat="actor in $ctrl.actors | orderBy:$ctrl.sortBy">
+        <li style="vertical-align: middle;" ng-repeat="actor in $ctrl.actors | orderBy:actor.name">
 
             <a href="/#!/actor/{{ actor.id }}">
 

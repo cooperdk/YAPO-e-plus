@@ -28,17 +28,22 @@ angular.module('actorList').component('actorList', {
     controller: ['$scope', 'Actor', 'pagerService', 'Scene', 'ActorTag', 'scopeWatchService', 'helperService',
         function ActorListController($scope, Actor, pagerService, Scene, ActorTag, scopeWatchService, helperService) {
 
+
             var self = this;
+
             var didSceneLoad = false;
             var didActorTagLoad = false;
             var didSectionListWrapperLoad = false;
+
 
             self.actors = [];
 
             self.ordering = "name";
             self.pageType = 'Actor';
 
+
             self.gridView = false;
+
 
             var checkGridOption = function () {
                 if ((helperService.getGridView() != undefined) && (helperService.getGridView()['actor'] != undefined)) {
@@ -68,6 +73,7 @@ angular.module('actorList').component('actorList', {
 
                 };
 
+
                 self.actorsToadd = pagerService.getNextPage(input);
 
                 self.actorsToadd.$promise.then(function (res) {
@@ -82,6 +88,7 @@ angular.module('actorList').component('actorList', {
                     scopeWatchService.paginationInit(paginationInfo);
 
                     self.actors = helperService.resourceToArray(res[0]);
+
 
                 });
 
@@ -126,11 +133,11 @@ angular.module('actorList').component('actorList', {
                     console.log("Sort Order Changed!");
                     self.actors = [];
                     self.sortBy = sortOrder['sortBy'];
+                    
                     if (sortOrder.mainPage == undefined || sortOrder.mainPage == true ) {
                         self.nextPage(0);
                     }
                     didSectionListWrapperLoad = true;
-
                 }
 
             });

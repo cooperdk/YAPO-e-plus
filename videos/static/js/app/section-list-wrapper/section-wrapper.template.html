@@ -4,6 +4,7 @@
         <option ng-repeat="(key,val) in $ctrl.searchInFields" value="{{ key }}">{{ val }}</option>
     </select>
 
+
     <input type="text" ng-model="$ctrl.searchTerm" ng-model-options="{debounce: 500}" ng-change="$ctrl.searchTermChanged()">
 
     <label>Order By:</label>
@@ -11,7 +12,7 @@
         <option ng-repeat="(key,val) in $ctrl.orderFields" value="{{ key }}">{{ val }}</option>
     </select>
 
-    <label>Runner Up:</label>
+    <label>Runner UP</label>
     <input type="checkbox" ng-model="$ctrl.runnerUp" ng-change="$ctrl.runnerUpFilterChange()">
 
     <div ng-if="$ctrl.sectionTypefunc('ActorList')">
@@ -24,11 +25,6 @@
         <input type="checkbox" ng-model="$ctrl.sceneGridView" ng-change="$ctrl.saveGridView()">
     </div>
 
-    <button type="button" onclick="$scope.reload()" class="btn btn-default btn-sm"
-            uib-popover-html="'Will reload the selected sorting method, as the UI won't do that automatically.'"
-            popover-trigger="mouseenter" popover-placement="right-top">
-    <span class="glyphicon glyphicon-refresh"></span> Refresh sorting
-    </button>
 
 </div>
 
@@ -36,11 +32,17 @@
 
 <scene-list main-page="$ctrl.mainPage" ng-if="$ctrl.sectionTypefunc('SceneList')"></scene-list>
 
+
+
+
+
+
 <website-list main-page="$ctrl.mainPage" ng-if="$ctrl.sectionTypefunc('WebsiteList')"></website-list>
 
 <actor-tag-list main-page="$ctrl.mainPage" ng-if="$ctrl.sectionTypefunc('ActorTagList')"></actor-tag-list>
 
 <scene-tag-list main-page="$ctrl.mainPage" ng-if="$ctrl.sectionTypefunc('SceneTagList')"></scene-tag-list>
+
 
 <db-folder-tree main-page="$ctrl.mainPage" route="$ctrl.routParam" ng-if="$ctrl.sectionTypefunc('DbFolder')"></db-folder-tree>
 

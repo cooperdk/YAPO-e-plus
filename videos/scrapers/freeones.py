@@ -254,7 +254,7 @@ def search_freeones(actor_to_search, alias, force):
                     #link2_text = link2.text.strip("',/\n/\t")
                     num+=1
                     if  link2_text.lower().strip() == 'eye color': #'eye color' in link2_text.lower().strip():
-                        next_td_tag1 = link2.find_next('span').find_next('span').find_next('span')
+                        next_td_tag1 = link2.find_next('a')
                         eye_color = next_td_tag1.get_text(strip=True) #text.strip("',/\n/\t")
                         eye_color = eye_color.title() + " eyes"
                         if eye_color and len(eye_color)>7:
@@ -262,7 +262,7 @@ def search_freeones(actor_to_search, alias, force):
                         aux.progress(12,29,"Eye color")
 
                     elif link2_text.lower().strip() == 'hair color':
-                        next_td_tag1 = link2.find_next('span').find_next('span').find_next('span')
+                        next_td_tag1 = link2.find_next('a')
                         hair_color = next_td_tag1.get_text(strip=True) #text.strip("',/\n/\t")
                         hair_color = hair_color.title() + ' hair'
                         if hair_color and len(hair_color)>7:
@@ -270,7 +270,7 @@ def search_freeones(actor_to_search, alias, force):
                         aux.progress(13,29,"Hair color")
 
                     elif link2_text.lower().strip() == 'height':
-                        next_td_tag1 = link2.find_next('span').find_next('span')
+                        next_td_tag1 = link2.find_next('a')
                         if not actor_to_search.height:
                             height = next_td_tag1.get_text(strip=True)  #tag.text.strip("'/\n/\t")
                             if len(height)<1 or height=="Unknown": height="0"
@@ -285,7 +285,7 @@ def search_freeones(actor_to_search, alias, force):
                         aux.progress(14,29,"Height")
                         doneX=False
                         if not doneX and height is not None:
-                            if height > 100:
+                            if height > 110:
                                 if  height < 148:
                                     insert_actor_tag(actor_to_search, "Extremely tiny")
                                     #print("Added tag: Extremely tiny")
@@ -309,7 +309,7 @@ def search_freeones(actor_to_search, alias, force):
                                 aux.progress(15,29,"Height [Group tag]")
                         
                     elif link2_text.lower().strip() == 'weight':
-                        next_td_tag1 = link2.find_next('span').find_next('span')
+                        next_td_tag1 = link2.find_next('a')
                         if not actor_to_search.weight:
 
                             weight = next_td_tag1.get_text(strip=True)  #tag.text.strip("'/\n/\t")
@@ -324,38 +324,22 @@ def search_freeones(actor_to_search, alias, force):
                         cupSize = ""
                         if not actor_to_search.measurements or actor_to_search.measurements=="":
                             try:
-                                mea = link2.find_next('span').find_next('span').get_text(strip=True)
-                                #print(mea)
-                                meas=mea.split("-")
-                                measlen = len(meas)
-                                if measlen == 2 and meas[1] == "": measlen = 1
-                                if measlen == 3 and meas[2] == "": measlen = 2
-
-                                #print("\n\n\n" + str(measlen) + "\n\n\n")
-                                #print ("\n\n" + che + "\n\n")
-                                che = meas[0]
-                                #print ("CHE " + str(che))
-                                if measlen > 1:
-                                    wai = meas[1]
-                                else:
-                                    wai = "??"
-                                #print ("WAI " + str(wai))
-                                if measlen > 2:
-                                    hip = meas[2]
-                                else:
-                                    hip = "??"
-                                #print("HIP " + str(hip))
-                                #if not che: che="??"
-                                #if not wai: wai="??"
-                                #if not hip: hip="??"
-                                #if not(isinstance(wai, int)): wai = "??"
-                                #if not(isinstance(hip, int)): hip = "??"
+                                che = link2.find_next('a').get_text(strip=True)
+                                #print (str(che))
+                                wai = link2.find_next('a').find_next('a').get_text(strip=True)
+                                #print (str(wai))
+                                hip = link2.find_next('a').find_next('a').find_next('a').get_text(strip=True)
+                                #print (str(hip))
+                                if not che: che="??"
+                                if not wai: wai="??"
+                                if not hip: hip="??"
                                 measure = str(che) + "-" + str(wai) + "-" + str(hip)
+                                #print (measure)
                             except:
                                 pass
                             actor_to_search.measurements = measure            #next_td_tag1.get_text(strip=True)  #text.strip("'/\n/\t")
                             aux.progress(17,29,"Measurements")
-                            #if actor_to_search.measurements[-1]=="-": actor_to_search.measurements=actor_to_search.measurements[:-1]
+                            if actor_to_search.measurements[-1]=="-": actor_to_search.measurements=actor_to_search.measurements[:-1]
                             if len(actor_to_search.measurements)>8  or len(actor_to_search.measurements)==3:
                                 try:
                                     measure=re.findall(r'[\d]+', actor_to_search.measurements)
@@ -440,7 +424,7 @@ def search_freeones(actor_to_search, alias, force):
 
                     elif link2_text.lower().strip() == 'boobs':
                        
-                        next_td_tag1 = link2.find_next('span')
+                        next_td_tag1 = link2.find_next('a')
                         boobs = next_td_tag1.get_text(strip=True) #.strip("',/\n/\t")
                         if "fake" in boobs.lower():
                             insert_actor_tag(actor_to_search, "Fake tits")
