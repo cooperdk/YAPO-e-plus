@@ -32,10 +32,7 @@
                 Search: <input ng-model="$ctrl.searchTerm"/>
                 {{ $ctrl.searchTerm }}
                 -->
-
-
-        <li ng-repeat="actor in $ctrl.actors "
-            class="thumbnail phone-list-item">
+        <li ng-repeat="actor in $ctrl.actors | orderBy:$ctrl.sortBy" class="thumbnail phone-list-item">
 
             <a href="/#!/actor/{{ actor.id }}" class="thumb">
                 <img ng-src="{{ actor.thumbnail }}"
