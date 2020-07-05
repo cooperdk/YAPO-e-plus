@@ -434,7 +434,18 @@ angular.module('actorDetail').component('actorDetail', {
 
             };
 
-            self.howOld = function (datetime) {
+
+            self.ageYears = function (dateTime) { // Will return the correct age in years based on today's date
+                var birthday = new Date(dateTime);
+                var today = new Date();
+                var age = ((today - birthday) / (31557600000));
+                var age = Math.floor( age );
+                console.log("Actor Age:" + age);
+                return age;
+                }
+
+            self.howOld = function (datetime) { // Deprecated. The previous function works,
+                                                // this one will make an actor a year older already on New Years Day.
                 var actorDob = new Date(datetime);
                 var actorDobYear = actorDob.getFullYear();
 
@@ -446,7 +457,6 @@ angular.module('actorDetail').component('actorDetail', {
                 console.log("Actor Age:" + nowYear - actorDobYear);
 
                 return (nowYear - actorDobYear)
-
 
             };
 
