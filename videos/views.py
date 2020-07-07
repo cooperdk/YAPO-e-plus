@@ -30,18 +30,18 @@ from rest_framework import filters
 from itertools import chain
 import base64
 import shutil
-
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import status
 from operator import attrgetter
 from random import shuffle
 import videos.const as const
+import YAPO.settings
 from django.utils.datastructures import MultiValueDictKeyError
 import threading
 import videos.startup
 from django.db import connection
 # import pathlib
-import YAPO.settings
+
 
 
 def get_scenes_in_folder_recursive(folder, scene_list):
@@ -724,9 +724,7 @@ def clean_dir(type_of_model_to_clean):
         os.path.join(const.MEDIA_PATH, type_of_model_to_clean)
     ):
 
-        print(
-            f"Checking {type_of_model_to_clean} folder {index} out of {number_of_folders}"
-        )
+        print(f"Checking {type_of_model_to_clean} folder {index} out of {number_of_folders}\r", end="")
         try:
             dir_in_path_int = int(dir_in_path)
 
@@ -840,11 +838,9 @@ def settings(request):
                 for scene_1 in Scene.objects.all():
                     anumber += 1
                     # if not anumber % 100:
-                    # print("Checked " + str(anumber) + "...\n")
+                    print("Checked " + str(anumber) + "...\r", end="")
                     if checkDupeHash(scene_1.hash) > 1:
-                        print(
-                            f"Scene {scene_1.id} has at least one dupe, running the dupe scanner...\n"
-                        )
+                        print(f"Scene {scene_1.id} at least one dupe, scanning...")
                         for scene_2 in Scene.objects.all():
                             if not scene_1.pk == scene_2.pk:
                                 # if scene_2.path_to_file == scene_1.path_to_file:
@@ -873,14 +869,14 @@ def settings(request):
                 counter = 1
                 print("Cleaning Scenes...")  # CooperDK This was enabled
                 for scene in scenes:
-                    print(f"Checking scene {counter} out of {count}")
+                    print(f"Checking scene {counter} out of {count}\r", end="")
                     if not os.path.isfile(scene.path_to_file):
                         print(
                             f"File for scene {scene.name} does not exist in path {scene.path_to_file}"
                         )
                         permenatly_delete_scene_and_remove_from_db(scene)
                     counter += 1
-                print("Finished cleaning scenes...")
+                print("\nFinished cleaning scenes...")
 
                 print("Cleaning Aliases...")
 
@@ -888,12 +884,12 @@ def settings(request):
                 count = aliases.count()
                 counter = 1
                 for alias in aliases:
-                    print(f"Checking Alias {counter} out of {count}")
+                    print(f"Checking Alias {counter} out of {count}\r", end="")
                     if alias.actors.count() == 0:
                         alias.delete()
                         print(f"Alias {alias.name} has no actor... deleting")
                     counter += 1
-                print("Finished cleaning aliases...")
+                print("\nFinished cleaning aliases...")
 
                 print("Cleaning actor dirs that are no longer in database...")
 
@@ -911,7 +907,7 @@ def settings(request):
                 all_folders = LocalSceneFolders.objects.all()
                 for folder in all_folders:
                     videos.addScenes.get_files(folder.name, False)
-
+        print("\nDone.")
         return Response(status=200)
 
 
@@ -1023,7 +1019,10 @@ class AddItems(views.APIView):
 
 def play_scene_vlc(scene, random):
     file_path = os.path.normpath(scene.path_to_file)
-    vlc_path = os.path.normpath(const.VLC_PATH)
+    if platform.system() == "Windows":
+        vlc_path = os.path.normpath(const.VLC_PATH)
+    else:
+        vlc_path = "vlc"
     p = subprocess.Popen([vlc_path, file_path])
     scene.play_count += 1
     scene.date_last_played = datetime.datetime.now()

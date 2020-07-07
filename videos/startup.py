@@ -5,24 +5,15 @@ import json
 import shutil
 import requests
 from videos.models import Scene, Actor, ActorTag, SceneTag, Folder
-import videos.aux_functions as aux
-import YAPO.settings
+import videos.const as vc
+import videos.aux_functions as auxf
+import YAPO.settings as settings
 from YAPO.config import Config
 from YAPO.utils.printing import Logger
 
 log = Logger()
 
-
-def maybeMoveConfigJson():
-    import YAPO.settings as settings
-    src = os.path.abspath(os.path.join(Config().root_path, 'settings.json'))
-    dest = YAPO.settings.CONFIG_JSON
-    if path.isfile(src):
-        shutil.move(src, dest)
-        log.info(f"\n███ Your configuration file was moved to  ({dest})! ███")
-
-
-def getSizeAll() -> str:
+def getSizeAll () -> str:
     # queryset.aggregate(Sum('size')).get('column__sum')
     # cursor = connection.cursor()
     # cursor.execute("SELECT SUM(size) AS total FROM videos_scene")[0]
@@ -36,8 +27,7 @@ def getSizeAll() -> str:
         return "no space"
 
 
-def sizeFormat(b: int) -> str:
-
+def sizeFormat (b: int) -> str:
     if b < 1000:
         return f"{b}B"
     elif b < 1000000:
@@ -62,7 +52,7 @@ def write_actors_to_file():
     print("To recover actor data, please consult the guide.")
 
 
-def verCheck():
+def verCheck ():
     #dirname of dirname of file results in parent directory
     update = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "VERSION.md"))
 
@@ -86,7 +76,7 @@ def verCheck():
         log.info('\n')
 
 
-def stats():
+def stats ():
     size = getSizeAll()
     row = Actor.objects.raw(
         "SELECT COUNT(*) AS total, id FROM videos_actor"
@@ -114,15 +104,15 @@ def stats():
     print(f"There are {sctag} tags available for video clips.")
     print(f"\nThere are {act} actors in the database.\nThese actors have {acttag} usable tags.\n\n")
 
-def backupper():
-    import YAPO.settings as settings
+
+def backupper ():
     src = settings.DATABASES['default']['NAME']
     dest = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "db_BACKUP.sqlite3"))
     shutil.copy(src, dest)
     print(f"Performed a database backup to {dest}\n")
 
 
-def add_scene_to_folder_view(scene_to_add):
+def add_scene_to_folder_view (scene_to_add):
     # scene_path = os.path.normpath(scene_to_add.path_to_dir)
 
     path = os.path.normpath(scene_to_add.path_to_dir)
@@ -131,7 +121,7 @@ def add_scene_to_folder_view(scene_to_add):
 
     print(path)
     folders = []
-    while scene_to_add<99999999:
+    while scene_to_add < 99999999:
         path, folder = os.path.split(path)
 
         if folder != "":
@@ -153,7 +143,7 @@ def add_scene_to_folder_view(scene_to_add):
     recursive_add_folders(None, folders, scene_to_add, path_with_ids)
 
 
-def recursive_add_folders(parent, folders, scene_to_add, path_with_ids):
+def recursive_add_folders (parent, folders, scene_to_add, path_with_ids):
     if len(folders) != 0:
         if parent is None:
             path_with_ids = []
@@ -165,7 +155,7 @@ def recursive_add_folders(parent, folders, scene_to_add, path_with_ids):
                     parent.last_folder_name_only = folders[0]
                 parent.save()
                 path_with_ids.append(
-                    {"name": parent.last_folder_name_only, "id": parent.id}
+                    { "name": parent.last_folder_name_only, "id": parent.id }
                 )
                 # print ("Parent Name is {}, Path with Id's are {}".format(parent.name, path_with_ids.encode('utf-8')))
                 # print(json.dumps(path_with_ids))
@@ -178,7 +168,7 @@ def recursive_add_folders(parent, folders, scene_to_add, path_with_ids):
             else:
                 parent = Folder.objects.get(name=folders[0])
                 path_with_ids.append(
-                    {"name": parent.last_folder_name_only, "id": parent.id}
+                    { "name": parent.last_folder_name_only, "id": parent.id }
                 )
                 # print ("Parent Name is {}, Path with Id's are {}".format(parent.name, path_with_ids.encode('utf-8')))
                 # print(json.dumps(path_with_ids))
@@ -211,7 +201,7 @@ def recursive_add_folders(parent, folders, scene_to_add, path_with_ids):
                 parent.last_folder_name_only = folders[0]
                 parent.save()
             path_with_ids.append(
-                {"name": parent.last_folder_name_only, "id": parent.id}
+                { "name": parent.last_folder_name_only, "id": parent.id }
             )
             # print ("Parent Name is {}, Path with Id's are {}".format(parent.name.encode('utf-8'),
             #                                                          path_with_ids))
@@ -231,18 +221,48 @@ def recursive_add_folders(parent, folders, scene_to_add, path_with_ids):
             parent.save()
 
 
-def getStarted():
+def configconvert ():
+    # This function will convert an old JSON configuration file
+    jsonconf = False
+    jsonsrc = settings.CONFIG_JSON
 
-    #scenes = Scene.objects.all()
-    #for scene in scenes:
-    #    add_scene_to_folder_view(scene)
-    maybeMoveConfigJson()
+    if not path.isfile(settings.CONFIG_YML):
+        print(settings.CONFIG_YML + " does not exist, converting old configuration file...")
+
+        if path.isfile(settings.OLD_CONFIG_JSON):
+            jsonconf = True
+            jsonsrc = settings.OLD_CONFIG_JSON
+
+        if path.isfile(settings.CONFIG_JSON):
+            jsonconf = True
+            jsonsrc = settings.CONFIG_JSON
+
+        if jsonconf == True:
+
+            with open(jsonsrc, 'r') as orig_conf:
+                conf_content = orig_conf.read()
+            content = json.loads(conf_content)
+
+            auxf.saveconf("settings_version", str(content["settings_version"]))
+            auxf.saveconf("vlc_path", str(content["vlc_path"]))
+            auxf.saveconf("last_all_scene_tag", str(content["last_all_scene_tag"]))
+            print(f"\n███ Your JSON configuration was converted to YAML: ({settings.CONFIG_YML})! ███")
+
+        else:
+            auxf.saveconf("settings_version", vc.SETTINGS_VERSION)
+            auxf.saveconf("vlc_path", vc.VLC_PATH)
+            auxf.saveconf("last_all_scene_tag", vc.LAST_ALL_SCENE_TAG)
+            print(f"\n███ A new YAML configuration file was written to ({settings.CONFIG_YML})! ███")
+
+def getStarted ():
+
+    configconvert()
     stats()
     backupper()
     write_actors_to_file()
-    mem = int(aux.getMemory())
-    cpu = aux.getCPU()
-    cpucnt = aux.getCPUCount()
+    mem = int(auxf.getMemory())
+    cpu = auxf.getCPU()
+    cpucnt = auxf.getCPUCount()
     global videoProcessing
     print(f"\nYou have {mem} GB available. CPU speed is {cpu} GHz and you have {cpucnt} cores available.")
     if mem <= 1:
@@ -258,7 +278,7 @@ def getStarted():
 class ready:
 
     try:
-        if not 'migrat' in sys.argv:
+        if not 'migra' in sys.argv:
             print("Not in migration mode.")
             getStarted()
         else:

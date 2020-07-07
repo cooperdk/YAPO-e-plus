@@ -3,10 +3,10 @@
 </uib-alert>
 <div class="container-fluid">
 
-    <label>Path to VLC player:</label><input class="form-control" id="inputdefault" type="text"
+    <label>Path to VLC player (Windows only):</label><input class="form-control" id="inputdefault" type="text"
                                              ng-model="$ctrl.pathToVLC">
     <button style="background-color: #33ccff;" type="button" ng-click="$ctrl.updateVlcPath()" class="btn btn-default btn-sm"
-            uib-popover-html="'Sets YAPO\'s VLC path to the path in the text input.'"
+            uib-popover-html="'Sets YAPO\'s VLC path to the path in the text input. Only for Windows, as we run vlc without specifying path on Linux.'"
             popover-trigger="mouseenter" popover-placement="right-top"
     
         <span style="width:10%" class="glyphicon glyphicon-cog"></span> Set VLC Path

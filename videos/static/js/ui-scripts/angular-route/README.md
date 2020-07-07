@@ -1,7 +1,7 @@
-# packaged angular-animate
+# packaged angular-route
 
 This repo is for distribution on `npm` and `bower`. The source for this module is in the
-[main AngularJS repo](https://github.com/angular/angular.js/tree/master/src/ngAnimate).
+[main AngularJS repo](https://github.com/angular/angular.js/tree/master/src/ngRoute).
 Please file issues and pull requests against that repo.
 
 ## Install
@@ -11,37 +11,37 @@ You can install this package either with `npm` or with `bower`.
 ### npm
 
 ```shell
-npm install angular-animate
+npm install angular-route
 ```
 
-Then add `ngAnimate` as a dependency for your app:
+Then add `ngRoute` as a dependency for your app:
 
 ```javascript
-angular.module('myApp', [require('angular-animate')]);
+angular.module('myApp', [require('videos/static/js/scripts/angular-route/angular-route')]);
 ```
 
 ### bower
 
 ```shell
-bower install angular-animate
+bower install angular-route
 ```
 
-Then add a `<script>` to your `index.html`:
+Add a `<script>` to your `index.html`:
 
 ```html
-<script src="/bower_components/angular-animate/angular-animate.js"></script>
+<script src="/bower_components/angular-route/angular-route.js"></script>
 ```
 
-Then add `ngAnimate` as a dependency for your app:
+Then add `ngRoute` as a dependency for your app:
 
 ```javascript
-angular.module('myApp', ['ngAnimate']);
+angular.module('myApp', ['ngRoute']);
 ```
 
 ## Documentation
 
 Documentation is available on the
-[AngularJS docs site](http://docs.angularjs.org/api/ngAnimate).
+[AngularJS docs site](http://docs.angularjs.org/api/ngRoute).
 
 ## License
 
