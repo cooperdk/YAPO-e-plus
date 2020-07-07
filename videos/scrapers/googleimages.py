@@ -528,7 +528,7 @@ class googleimagesdownload:
                 data = response.read()
                 response.close()
 
-                path = remove_illegal_characters(os.path.join(main_directory, f"{dir_name} - thumbnail", return_image_name)
+                path = remove_illegal_characters(os.path.join(main_directory, f"{dir_name} - thumbnail", return_image_name))
 
                 try:
                     output_file = open(path, 'wb')
@@ -1069,9 +1069,8 @@ class googleimagesdownload:
                                 os.makedirs("logs")
                         except OSError as e:
                             print(e)
-                        json_file = open(os.path.join("logs",f"{search_keyword[i]}.json", "w")
-                        json.dump(items, json_file, indent=4, sort_keys=True)
-                        json_file.close()
+                        with open(os.path.join("logs",f"{search_keyword[i]}.json", "w")) as json_file:
+                            json.dump(items, json_file, indent=4, sort_keys=True)
 
                     #Related images
                     if arguments['related_images']:

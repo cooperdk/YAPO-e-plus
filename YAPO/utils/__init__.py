@@ -1,7 +1,3 @@
-from datetime import datetime
-from YAPO.config import Config
-
-
 class Singleton(type):
   _instances = {}
 
@@ -22,21 +18,3 @@ class Constants(metaclass=Singleton):
     self.site_static_subdir = 'static'
     self.site_media_subdir = 'media'
     self.default_timeprint_format = '%Y-%m-%d, %H:%M:%S'
-
-
-class Logger(metaclass=Singleton):
-  def warn(self, message: str):
-    timeprint(message)
-
-  def debug(self, message: str):
-    timeprint(message)
-
-  def info(self, message: str):
-    timeprint(message)
-
-  def error(self, message: str):
-    timeprint(message)
-
-
-def timeprint(message: str):
-  print(f"{datetime.now().strftime(Config().timeprint_format)}> {message}"

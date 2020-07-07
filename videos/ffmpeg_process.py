@@ -4,7 +4,7 @@ import sys
 import platform
 
 os.environ["DJANGO_SETTINGS_MODULE"] = "settings"
-sys.path.append(os.path.abspath(os.path.join("E:","djangoProject","YAPO","YAPO"))
+sys.path.append(os.path.abspath(os.path.join("E:","djangoProject","YAPO","YAPO")))
 
 import shutil
 import subprocess

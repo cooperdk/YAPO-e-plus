@@ -8,7 +8,7 @@ from videos.models import Scene, Actor, ActorTag, SceneTag, Folder
 import videos.aux_functions as aux
 import YAPO.settings
 from YAPO.config import Config
-from YAPO.utils import Logger
+from YAPO.utils.printing import Logger
 
 log = Logger()
 
@@ -64,7 +64,7 @@ def write_actors_to_file():
 
 def verCheck():
     #dirname of dirname of file results in parent directory
-    update = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "VERSION.md")
+    update = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "VERSION.md"))
 
     if path.isfile(update):
         with open(update, "r") as verfile:
