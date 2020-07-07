@@ -247,20 +247,20 @@ def configconvert ():
 
         if jsonconf == True:
 
-            with open(jsonsrc, 'r') as fx:
-                xx = fx.read()
-            content = json.loads(xx)
+            with open(jsonsrc, 'r') as orig_conf:
+                conf_content = orig_conf.read()
+            content = json.loads(conf_content)
 
             auxf.saveconf("settings_version", str(content["settings_version"]))
             auxf.saveconf("vlc_path", str(content["vlc_path"]))
             auxf.saveconf("last_all_scene_tag", str(content["last_all_scene_tag"]))
-            print(f"\n███ Your JSON configuration was converted to YAML: ({src})! ███")
+            print(f"\n███ Your JSON configuration was converted to YAML: ({settings.CONFIG_YML})! ███")
 
         else:
             auxf.saveconf("settings_version", vc.SETTINGS_VERSION)
             auxf.saveconf("vlc_path", vc.VLC_PATH)
             auxf.saveconf("last_all_scene_tag", vc.LAST_ALL_SCENE_TAG)
-            print(f"\n███ A new YAML configuration file was written to ({src})! ███")
+            print(f"\n███ A new YAML configuration file was written to ({settings.CONFIG_YML})! ███")
 
 def getStarted ():
 
@@ -285,7 +285,7 @@ def getStarted ():
 
 
 class ready:
-    getStarted()
+    
     try:
         if not 'migra' in sys.argv:
             print("Not in migration mode.")
