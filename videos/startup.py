@@ -285,7 +285,7 @@ def getStarted ():
 
 
 class ready:
-    getStarted()
+    
     try:
         if not 'migra' in sys.argv:
             print("Not in migration mode.")
