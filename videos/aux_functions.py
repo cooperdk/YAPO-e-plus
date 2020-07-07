@@ -10,7 +10,7 @@ import YAPO.settings as ysettings
 import videos.const as constx
 
 
-def saveconf (yvar, yval):
+def saveconf (yvar: str, yval: str):
     yaml_dict = {}
     configfile = ysettings.CONFIG_YML
 
