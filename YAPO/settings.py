@@ -16,6 +16,8 @@ LOGGING_CONFIG = None
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_DIR = os.path.join(BASE_DIR, 'config')
 CONFIG_JSON = os.path.join(CONFIG_DIR, 'settings.json')
+OLD_CONFIG_JSON = os.path.join(BASE_DIR, 'settings.json')
+CONFIG_YML = os.path.join(CONFIG_DIR, 'settings.yml')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
@@ -161,70 +163,3 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "YAPO.pagination.HeaderLimitOffsetPagination",
     "PAGE_SIZE": 500,
 }
-#
-# SETTINGS_VERSION = 1
-# default_dict = {'settings_version': '3', 'vlc_path': "", 'last_all_scene_tag': ""}
-# need_update = False
-# try:
-#     f = open('settings.json', 'r')
-#     x = f.read()
-#
-#     if x == "":
-#         need_update = True
-#         f.close()
-#         print("Setting.json is empty")
-#
-#
-#
-#         f = open('settings.json', 'w')
-#         f.write(json.dumps(default_dict))
-#         f.close()
-#
-#     else:
-#         # print(x)
-#
-#         settings_content = json.loads(x)
-#         f.close()
-#
-#         if ('settings_version' not in settings_content) or (
-#                     int(settings_content['settings_version']) < SETTINGS_VERSION):
-#             need_update = True
-#             for x in settings_content:
-#                 if x in default_dict:
-#                     default_dict[x] = settings_content[x]
-#
-#             f = open('settings.json', 'w')
-#             f.write(json.dumps(default_dict))
-#             f.close()
-#
-#             f = open('settings.json', 'r')
-#             x = f.read()
-#             settings_content = json.loads(x)
-#
-#         print(settings_content['vlc_path'])
-#         videos.const.VLC_PATH = settings_content['vlc_path']
-#         if settings_content['last_all_scene_tag'] != "":
-#             # 2016-08-14 18:03:10.153443
-#             videos.const.LAST_ALL_SCENE_TAG = datetime.strptime(settings_content['last_all_scene_tag'], "%Y-%m-%d %H:%M:%S")
-#             print("Last full scene tagging : {}".format(videos.const.LAST_ALL_SCENE_TAG))
-#
-#     f.close()
-#
-# except FileNotFoundError:
-#     f = open('settings.json', 'w')
-#     f.close()
-#
-#     f = open('settings.json', 'w')
-#     f.write(json.dumps(default_dict))
-#     f.close()
-
-# if need_update:
-#     videos.aux_functions.actor_folder_from_name_to_id()
-
-
-# with open('settings.json', 'r+') as f:
-#     print("contetns of setting.json" + f.read())
-#     print(f.read())
-#     print(f.readline())
-#     # f.write("test")
-#     f.close()

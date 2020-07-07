@@ -531,6 +531,7 @@ def search_freeones(actor_to_search, alias, force):
                             piercings = str(piercings).strip()
                             piercings = piercings.replace(";", ",")
                             piercings = piercings.replace(" and ", ",")
+                            if any([piercings.lower() == "none", piercings.lower() == "no piercings", piercings.lower() == "no"]): piercings="No piercings"
                             actor_to_search.piercings = piercings
                             #print ("Piercings: " + piercings)
                             aux.progress(23,29,"Piercings")

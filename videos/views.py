@@ -30,18 +30,18 @@ from rest_framework import filters
 from itertools import chain
 import base64
 import shutil
-
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import status
 from operator import attrgetter
 from random import shuffle
 import videos.const as const
+import YAPO.settings
 from django.utils.datastructures import MultiValueDictKeyError
 import threading
 import videos.startup
 from django.db import connection
 # import pathlib
-import YAPO.settings
+
 
 
 def get_scenes_in_folder_recursive(folder, scene_list):
