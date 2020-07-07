@@ -91,7 +91,7 @@ def ffmpeg_take_screenshot(screenshot_time, filename):
 
 
 def ffprobe(filename):
-    command_call = f'{FFPROBE_BIN} {FFPROBE_JSON_ARGUMENTS} "{FILENAME}"'
+    command_call = f'{FFPROBE_BIN} {FFPROBE_JSON_ARGUMENTS} "{filename}"'
     # print("Calling ffprobe...")# command call: {}".format(command_call))
 
     return execute_subprocess(command_call, "ffprobe")

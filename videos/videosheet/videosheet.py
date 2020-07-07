@@ -361,17 +361,18 @@ class MediaInfo(object):
         if hours > 0:
             duration += f"{hours}:"
 
-        duration += f"{minutes:02d}:{remaining_seconds:02d}"
+        duration += "%s:%s" % (
+            str(int(minutes)).zfill(2),
+            str(int(math.floor(remaining_seconds))).zfill(2),
+        )
 
         if show_centis or show_millis:
             coeff = 1000 if show_millis else 100
+            digits = 3 if show_millis else 2
             centis = math.floor(
                 (remaining_seconds - math.floor(remaining_seconds)) * coeff
             )
-            if show_millis:
-	            duration += f".{centis:03d}"
-	        else:
-	            duration += f".{centis:02d}"
+            duration += ".%s" % (str(int(centis)).zfill(digits))
 
         return duration
 
