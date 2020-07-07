@@ -6,8 +6,7 @@ from datetime import datetime
 
 import videos.const
 
-CONFIG_DIR = Config().config_path
-CONFIG_JSON = os.path.join(CONFIG_DIR, 'settings.json')
+CONFIG_JSON = os.path.join(Config().config_path, Constants().default_json_settings_filename)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/

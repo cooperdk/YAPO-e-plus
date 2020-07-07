@@ -3,6 +3,8 @@ import re
 import datetime
 import django
 import hashlib
+
+from YAPO.config import Config
 from videos import const
 import videos.scrapers.filenames as filenames
 import json
@@ -203,21 +205,15 @@ def parse_all_scenes(ignore_last_lookup):
           )
         counter += 1
 
-  with open(YAPO.settings.CONFIG_JSON, 'r') as f:
-    x = f.read()
+  now = datetime.datetime.now()
 
-  settings_content = json.loads(x)
-
-  settings_content["last_all_scene_tag"] = datetime.datetime.strftime(
-    datetime.datetime.now(), "%Y-%m-%d %H:%M:%S"
+  Config().last_all_scene_tag = datetime.datetime.strftime(
+    now, "%Y-%m-%d %H:%M:%S"
   )
 
-  with open(YAPO.settings.CONFIG_JSON, 'w') as f:
-    f.write(json.dumps(settings_content))
+  Config().save()
 
-  const.LAST_ALL_SCENE_TAG = datetime.datetime.strptime(
-    settings_content["last_all_scene_tag"], "%Y-%m-%d %H:%M:%S"
-  )
+  const.LAST_ALL_SCENE_TAG = now
 
   print("Finished parsing...")
 
