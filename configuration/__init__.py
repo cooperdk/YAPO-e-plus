@@ -105,7 +105,7 @@ class Config(metaclass=Singleton):
   def get_old_settings_as_json(self):
     # return f'{{"settings_version": 3, "vlc_path": "{os.path.normpath(self.vlc_path)}", "last_all_scene_tag": "{__nullable_time_to_string__(self.last_all_scene_tag)}"}}'
     # the given vlc_path somehow leads to a json error, it thinks the ':' should be escaped? Unclear, because a colon should just work fine
-    return f'{{"settings_version": 3, "vlc_path": "", "last_all_scene_tag": "{__nullable_time_to_string__(self.last_all_scene_tag)}"}}'
+    return f'{{"settings_version": {self.current_setting_version}, "vlc_path": "", "last_all_scene_tag": "{__nullable_time_to_string__(self.last_all_scene_tag)}"}}'
 
 
 def __nullable_time_to_string__(time: Optional[datetime]) -> str:
