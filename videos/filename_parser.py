@@ -4,11 +4,9 @@ import datetime
 import django
 import hashlib
 
-from YAPO.config import Config
+from configuration import Config
 from videos import const
 import videos.scrapers.filenames as filenames
-import json
-import YAPO.settings
 
 django.setup()
 

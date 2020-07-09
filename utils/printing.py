@@ -1,6 +1,6 @@
 from datetime import datetime
-from YAPO.config import Config
-from YAPO.utils import Singleton
+from configuration import Config
+from utils import Singleton
 
 
 class Logger(metaclass=Singleton):

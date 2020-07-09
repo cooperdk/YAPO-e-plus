@@ -1,12 +1,13 @@
 import json
 import os
-from YAPO.config import Config, Constants
+from configuration import Config, Constants, save
 # import videos.aux_functions
 from datetime import datetime
 
 import videos.const
 
 CONFIG_JSON = os.path.join(Config().config_path, Constants().default_json_settings_filename)
+
 OLD_CONFIG_JSON = os.path.join(Config().root_path, 'settings.json')
 CONFIG_YML = os.path.join(Config().config_path, 'settings.yml')
 

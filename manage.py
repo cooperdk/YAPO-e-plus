@@ -4,7 +4,7 @@ import platform
 import sys
 
 import YAPO.settings
-from YAPO.config import Config
+from configuration import Config
 
 x = 0
 if os.name == 'nt':

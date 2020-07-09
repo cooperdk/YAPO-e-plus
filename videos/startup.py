@@ -4,12 +4,12 @@ import sys
 import json
 import shutil
 import requests
+
+from utils.printing import Logger
 from videos.models import Scene, Actor, ActorTag, SceneTag, Folder
 import videos.const as vc
 import videos.aux_functions as auxf
 import YAPO.settings as settings
-from YAPO.config import Config
-from YAPO.utils.printing import Logger
 
 log = Logger()
 
@@ -221,42 +221,7 @@ def recursive_add_folders (parent, folders, scene_to_add, path_with_ids):
             parent.save()
 
 
-def configconvert ():
-    # This function will convert an old JSON configuration file
-    jsonconf = False
-    jsonsrc = settings.CONFIG_JSON
-
-    if not path.isfile(settings.CONFIG_YML):
-        print(settings.CONFIG_YML + " does not exist, converting old configuration file...")
-
-        if path.isfile(settings.OLD_CONFIG_JSON):
-            jsonconf = True
-            jsonsrc = settings.OLD_CONFIG_JSON
-
-        if path.isfile(settings.CONFIG_JSON):
-            jsonconf = True
-            jsonsrc = settings.CONFIG_JSON
-
-        if jsonconf == True:
-
-            with open(jsonsrc, 'r') as orig_conf:
-                conf_content = orig_conf.read()
-            content = json.loads(conf_content)
-
-            auxf.saveconf("settings_version", str(content["settings_version"]))
-            auxf.saveconf("vlc_path", str(content["vlc_path"]))
-            auxf.saveconf("last_all_scene_tag", str(content["last_all_scene_tag"]))
-            print(f"\n███ Your JSON configuration was converted to YAML: ({settings.CONFIG_YML})! ███")
-
-        else:
-            auxf.saveconf("settings_version", vc.SETTINGS_VERSION)
-            auxf.saveconf("vlc_path", vc.VLC_PATH)
-            auxf.saveconf("last_all_scene_tag", vc.LAST_ALL_SCENE_TAG)
-            print(f"\n███ A new YAML configuration file was written to ({settings.CONFIG_YML})! ███")
-
 def getStarted ():
-
-    configconvert()
     stats()
     backupper()
     write_actors_to_file()
