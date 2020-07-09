@@ -12,6 +12,7 @@ import videos.scrapers.freeones as scraper_freeones
 import videos.scrapers.imdb as scraper_imdb
 import videos.scrapers.tmdb as scraper_tmdb
 import videos.scrapers.googleimages as scraper_images
+from configuration import Config
 from videos import ffmpeg_process
 import urllib.request
 
@@ -767,39 +768,16 @@ def settings(request):
 
         if "pathToVlc" in request.query_params:
             if request.query_params["pathToVlc"] == "":
-                print("get method works!")
 
-                with open(YAPO.settings.CONFIG_JSON, 'r') as f:
-                    x = f.read()
-                settings_content = json.loads(x)
-                print(settings_content["vlc_path"])
-                print(x)
-                serializer = SettingsSerializer(x)
+                serializer = SettingsSerializer(Config().get_old_settings_as_json())
 
                 return Response(serializer.data)
             else:
-                print(request.query_params["pathToVlc"])
-
                 new_path_to_vlc = os.path.abspath(request.query_params["pathToVlc"])
 
                 if os.path.isfile(new_path_to_vlc):
-                    print("Actual path to a file!")
-                    # dict = {'vlc_path': new_path_to_vlc}
-                    # y = json.dumps(dict)
-
-                    with open(YAPO.settings.CONFIG_JSON, 'r') as f:
-                        x = f.read()
-
-                    settings_cont = json.loads(x)
-                    settings_cont["vlc_path"] = new_path_to_vlc
-                    y = json.dumps(settings_cont)
-
-                    print(y)
-
-                    with open(YAPO.settings.CONFIG_JSON, 'w') as f:
-                        f.write(y)
-
-                    const.VLC_PATH = new_path_to_vlc
+                    Config().vlc_path = new_path_to_vlc
+                    Config().save()
                     return Response(status=200)
 
                 else:

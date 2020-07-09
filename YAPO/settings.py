@@ -1,6 +1,6 @@
 import json
 import os
-from configuration import Config, Constants, save
+from configuration import Config, Constants
 # import videos.aux_functions
 from datetime import datetime
 

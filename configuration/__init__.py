@@ -65,7 +65,7 @@ class Config(metaclass=Singleton):
         settings_dict = json.loads(file.read())
         self.__update_settings__({__yaml_root_element__: settings_dict})
       self.__log__("Converting old json format configuration file to yaml...")
-      save(self)
+      self.save()
       os.remove(settings_path)
       self.__log__("Finished, deleted old json format configuration file.")
       return
@@ -94,6 +94,15 @@ class Config(metaclass=Singleton):
       }
     }
 
+  def save(self) -> None:
+    with open(self.configfile_path, 'w+') as file:
+      yaml.dump(self.__settings_to_dict__(), stream=file, default_flow_style=False)
+
+  def get_old_settings_as_json(self):
+    # return f'{{"settings_version": 3, "vlc_path": "{os.path.normpath(self.vlc_path)}", "last_all_scene_tag": "{__nullable_time_to_string__(self.last_all_scene_tag)}"}}'
+    # the given vlc_path somehow leads to a json error, it thinks the ':' should be escaped? Unclear, because a colon should just work fine
+    return f'{{"settings_version": 3, "vlc_path": "", "last_all_scene_tag": "{__nullable_time_to_string__(self.last_all_scene_tag)}"}}'
+
 
 def __nullable_time_to_string__(time: Optional[datetime]) -> str:
   if time:
@@ -107,9 +116,7 @@ def __nullable_time_from_string__(timestring: str) -> Optional[datetime]:
   return datetime.strptime(timestring, __settings_datetime_format__)
 
 
-def save(config: Config) -> None:
-  with open(config.configfile_path, 'w+') as file:
-    yaml.dump(config.__settings_to_dict__(), stream=file, default_flow_style=False)
+
 
 
 
