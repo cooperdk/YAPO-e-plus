@@ -313,14 +313,9 @@ def scrape_all_actors(force):
     print("\rDone scraping actors.                                                                                               ")
     return Response(status=200)
 
+
 def tag_all_scenes(ignore_last_lookup):
-    with open(YAPO.settings.CONFIG_JSON, 'r') as f:
-        x = f.read()
-
-    settings_content = json.loads(x)
-
-    current_setting_version = int(settings_content["settings_version"])
-    if current_setting_version < 3:
+    if Config().current_setting_version < 3:
 
         for actorTag in ActorTag.objects.all():
             if not SceneTag.objects.filter(name=actorTag.name):
@@ -339,13 +334,7 @@ def tag_all_scenes(ignore_last_lookup):
 
 
 def tag_all_scenes_ignore_last_lookup(ignore_last_lookup):
-    with open(YAPO.settings.CONFIG_JSON, 'r') as f:
-        x = f.read()
-
-    settings_content = json.loads(x)
-
-    current_setting_version = int(settings_content["settings_version"])
-    if current_setting_version < 3:
+    if Config().current_setting_version < 3:
 
         for actorTag in ActorTag.objects.all():
             if not SceneTag.objects.filter(name=actorTag.name):

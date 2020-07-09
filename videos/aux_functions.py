@@ -10,30 +10,6 @@ import YAPO.settings as ysettings
 import videos.const as constx
 
 
-def saveconf (yvar: str, yval: str):
-    yaml_dict = {}
-    configfile = ysettings.CONFIG_YML
-
-    if not path.isfile(configfile):
-        pathlib.Path(configfile).touch()
-
-    with open(configfile) as f:
-        yaml_dict = yaml.safe_load(f)
-        if yaml_dict is None:
-            yaml_dict = {}
-
-    yaml_dict[yvar] = yval
-    with open(configfile, 'w') as f:
-        yaml_dict = yaml.dump(yaml_dict, stream=f, default_flow_style=False)
-
-
-def readconf (configfile, variable):
-    with open(configfile, 'r') as file:
-        yaml_dict = yaml.safe_load(file)
-    value = yaml_dict[variable]
-    return value
-
-
 def progress (count, total, suffix=''):
     bar_len = 60
     filled_len = int(round(bar_len * count / float(total)))

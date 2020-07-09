@@ -26,6 +26,7 @@ class Config(metaclass=Singleton):
   timeprint_format: str
   configfile_path: str
   vlc_path: Optional[str]
+  current_setting_version: int
 
   def __init__(self):
     self.root_path = os.path.abspath(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
@@ -39,6 +40,7 @@ class Config(metaclass=Singleton):
     self.site_media_path = os.path.join(self.site_path, Constants().site_media_subdir)
     self.timeprint_format = Constants().default_timeprint_format
     self.configfile_path = os.path.join(self.config_path, Constants().default_yaml_settings_filename)
+    self.current_setting_version = 3
     self.vlc_path = None
     self.last_all_scene_tag = None
     self.__update_config_from_file__()
@@ -77,9 +79,10 @@ class Config(metaclass=Singleton):
       self.config_path = settings_dict[__yaml_root_element__].get("config_path") or self.config_path
       self.database_dir = settings_dict[__yaml_root_element__].get("db_dir") or self.database_dir
       self.timeprint_format = settings_dict[__yaml_root_element__].get("log_timeformat") or self.timeprint_format
-      self.last_all_scene_tag = __nullable_time_from_string__(settings_dict[__yaml_root_element__].get("last_all_scene_tag")) or self.last_all_scene_tag
+      self.last_all_scene_tag = __string_to_nullable_time__(settings_dict[__yaml_root_element__].get("last_all_scene_tag")) or self.last_all_scene_tag
       self.site_media_path = settings_dict[__yaml_root_element__].get("site_media_path") or self.site_media_path
       self.vlc_path = settings_dict[__yaml_root_element__].get("vlc_path") or self.vlc_path
+      self.current_setting_version = __string_to_nullable_int__(settings_dict[__yaml_root_element__].get("current_setting_version")) or self.current_setting_version
 
   def __settings_to_dict__(self):
     return {
@@ -90,7 +93,8 @@ class Config(metaclass=Singleton):
         "log_timeformat": self.timeprint_format,
         "last_all_scene_tag": __nullable_time_to_string__(self.last_all_scene_tag),
         "site_media_path": self.site_media_path,
-        "vlc_path": self.vlc_path
+        "vlc_path": self.vlc_path,
+        "current_setting_version": __nullable_int_to_string__(self.current_setting_version)
       }
     }
 
@@ -110,13 +114,22 @@ def __nullable_time_to_string__(time: Optional[datetime]) -> str:
   return __settings_keyword_none__
 
 
-def __nullable_time_from_string__(timestring: str) -> Optional[datetime]:
+def __string_to_nullable_time__(timestring: str) -> Optional[datetime]:
   if not timestring or timestring == __settings_keyword_none__:
     return None
   return datetime.strptime(timestring, __settings_datetime_format__)
 
 
+def __nullable_int_to_string__(number: Optional[int]) -> str:
+  if number:
+    return str(number)
+  return __settings_keyword_none__
 
+
+def __string_to_nullable_int__(intstring: str) -> Optional[int]:
+  if not intstring or intstring == __settings_keyword_none__:
+    return None
+  return int(intstring)
 
 
 

@@ -6,11 +6,6 @@ from datetime import datetime
 
 import videos.const
 
-CONFIG_JSON = os.path.join(Config().config_path, Constants().default_json_settings_filename)
-
-OLD_CONFIG_JSON = os.path.join(Config().root_path, 'settings.json')
-CONFIG_YML = os.path.join(Config().config_path, 'settings.yml')
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
