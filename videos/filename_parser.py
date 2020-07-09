@@ -3,10 +3,10 @@ import re
 import datetime
 import django
 import hashlib
+
+from configuration import Config
 from videos import const
 import videos.scrapers.filenames as filenames
-import json
-import YAPO.settings
 
 django.setup()
 
@@ -93,9 +93,7 @@ def parse_all_scenes(ignore_last_lookup):
       percent = (counter / scene_count) * 100
       os.system("cls" if os.name == "nt" else "clear")
       print(
-        "{}% done - scene {} out of {} - ignoring last lookup".format(
-          int(percent), counter, scene_count
-        )
+        f"{int(percent)}% done - scene {counter} out of {scene_count} - ignoring last lookup"
       )
 
       filtered_alias = filter_alias(actors_alias)
@@ -144,9 +142,7 @@ def parse_all_scenes(ignore_last_lookup):
         percent = (counter / scene_count) * 100
         os.system("cls" if os.name == "nt" else "clear")
         print(
-          "{}% done - scene {} out of {} - not ignoring last lookup".format(
-            int(percent), counter, scene_count
-          )
+          f"{int(percent)}% done - scene {counter} out of {scene_count} - not ignoring last lookup"
         )
 
         if (a[0]) or (b[0]) or (c[0]) or (d[0]):
@@ -158,7 +154,7 @@ def parse_all_scenes(ignore_last_lookup):
     else:
       for scene in scenes:
 
-        print("Scene {} out of {}".format(counter, scene_count))
+        print(f"Scene {counter} out of {scene_count}")
 
         if scene.last_filename_tag_lookup:
           actors_filtered = list(
@@ -207,27 +203,21 @@ def parse_all_scenes(ignore_last_lookup):
           )
         counter += 1
 
-  with open(YAPO.settings.CONFIG_JSON, 'r') as f:
-    x = f.read()
+  now = datetime.datetime.now()
 
-  settings_content = json.loads(x)
-
-  settings_content["last_all_scene_tag"] = datetime.datetime.strftime(
-    datetime.datetime.now(), "%Y-%m-%d %H:%M:%S"
+  Config().last_all_scene_tag = datetime.datetime.strftime(
+    now, "%Y-%m-%d %H:%M:%S"
   )
 
-  with open(YAPO.settings.CONFIG_JSON, 'w') as f:
-    f.write(json.dumps(settings_content))
+  Config().save()
 
-  const.LAST_ALL_SCENE_TAG = datetime.datetime.strptime(
-    settings_content["last_all_scene_tag"], "%Y-%m-%d %H:%M:%S"
-  )
+  const.LAST_ALL_SCENE_TAG = now
 
   print("Finished parsing...")
 
 
 def parse_scene_all_metadata(scene, actors, actors_alias, scene_tags, websites):
-  print("Parsing scene path:\r\n{}\r\n\r\n".format(scene.path_to_file))
+  print(f"Parsing scene path:\r\n{scene.path_to_file}\r\n\r\n")
 
   scene_path = scene.path_to_file.lower()
 
@@ -249,14 +239,14 @@ def parse_scene_all_metadata(scene, actors, actors_alias, scene_tags, websites):
   if site != "None":
     print(site)
   else:
-    print("")
+    print()
 
   if not (scene.hash):
     print("\r\nHashing scene... ", end="")
     scene.hash = get_hash(scene.path_to_file)  # NEW HASHER
-    print("ID: " + scene.hash)
+    print(f"ID: {scene.hash}")
   else:
-    print("Scene already hashed (" + scene.hash + ")")
+    print(f"Scene already hashed ({scene.hash})")
   scene.last_filename_tag_lookup = datetime.datetime.now()
 
   print("\r\nFinished parsing scene, touching last lookup")
@@ -402,7 +392,7 @@ def parse_actors_in_scene(scene_to_parse, scene_path, actors, actors_alias):
         add_actor_to_scene(actor, scene_to_parse)
 
         if actor.actor_tags.count() > 0:
-          print("Actor has " + str(actor.actor_tags.count()) + " tags...")
+          print(f"Actor has {actor.actor_tags.count()} tags...")
           t = 1
           for actor_tag in actor.actor_tags.all():
             current_tag = actor_tag.scene_tags.first()
@@ -426,7 +416,7 @@ def parse_actors_in_scene(scene_to_parse, scene_path, actors, actors_alias):
 
                   for excl in current_tag.exclusions.split(","):
                     excl = excl.strip().lower()
-                    print("There is an exclusion: " + excl + "...")
+                    print(f"There is an exclusion: {excl}...")
 
                     if len(excl) > 2:
                       regex_search_term = get_regex_search_term(
@@ -495,7 +485,7 @@ def parse_actors_in_scene(scene_to_parse, scene_path, actors, actors_alias):
         scene_path = ans["scene_path"]
 
         actor_in_alias = alias.actors.first()
-        print(alias.name + " is an alias for " + actor_in_alias.name)
+        print(f"{alias.name} is an alias for {actor_in_alias.name}")
         add_actor_to_scene(actor_in_alias, scene_to_parse)
 
         # if re.search(regex_search_term, scene_path, re.IGNORECASE) is not None:
@@ -516,17 +506,13 @@ def add_actor_to_scene(actor_to_add, scene_to_add_to):
   # if not Scene.objects.filter(pk=scene_to_add_to.pk, actors__pk=actor_to_add.pk):
   if not scene_to_add_to.actors.filter(pk=actor_to_add.pk):
     print(
-      "Adding Actor: {} to the scene {}".format(
-        actor_to_add.name, scene_to_add_to.name
-      )
+      f"Adding Actor: {actor_to_add.name} to the scene {scene_to_add_to.name}"
     )
     scene_to_add_to.actors.add(actor_to_add)
     scene_to_add_to.save()
   else:
     print(
-      "Actor: {} is already registered to the scene {}".format(
-        actor_to_add.name, scene_to_add_to.name
-      )
+      f"Actor: {actor_to_add.name} is already registered to the scene {scene_to_add_to.name}"
     )
 
 
@@ -537,16 +523,7 @@ def get_regex_search_term(name, delimiter):
       name = name.replace(char, "")
   name_split_list = name.split(delimiter)
   is_first_iteration = True
-  regex_search_term = ""
-  for part_of_name in name_split_list:
-
-    if is_first_iteration:
-      regex_search_term = regex_search_term + part_of_name
-      is_first_iteration = False
-    else:
-      regex_search_term = regex_search_term + ".{0,1}" + part_of_name
-      # print ("regex search term is: "  + regex_search_term)
-      # regex_search_term =  "r\"" + regex_search_term + "\""
+  regex_search_term = ".{0,1}".join(part_of_name for part_of_name in name_split_list)
   return regex_search_term
 
 
@@ -573,9 +550,7 @@ def parse_scene_tags_in_scene(scene, scene_path, scene_tags):
 
         if exclude == False:
           print(
-            "Adding Tag: {} to the scene {}".format(
-              scene_tag.name, scene.name
-            )
+            f"Adding Tag: {scene_tag.name} to the scene {scene.name}"
           )
           scene.scene_tags.add(scene_tag)
 
@@ -607,9 +582,7 @@ def parse_scene_tags_in_scene(scene, scene_path, scene_tags):
 
             if exclude == False:
               print(
-                "Adding Tag: {} to the scene {}".format(
-                  scene_tag.name, scene.name
-                )
+                f"Adding Tag: {scene_tag.name} to the scene {scene.name}"
               )
               scene.scene_tags.add(scene_tag)
   return scene_path
@@ -646,9 +619,7 @@ def parse_website_in_scenes(scene, scene_path, websites):
         for scene_tag in website.scene_tags.all():
           if not scene.scene_tags.filter(id=scene_tag.id):
             print(
-              "Adding Scene Tag '{}' to the scene {}".format(
-                website.name, scene.name
-              )
+              f"Adding Scene Tag '{website.name}' to the scene {scene.name}"
             )
             scene.scene_tags.add(scene_tag)
 
@@ -695,9 +666,7 @@ def parse_website_in_scenes(scene, scene_path, websites):
             for scene_tag in website.scene_tags.all():
               if not scene.scene_tags.filter(id=scene_tag.id):
                 print(
-                  "Adding Scene Tag '{}' to the scene {}".format(
-                    website.name, scene.name
-                  )
+                  f"Adding Scene Tag '{website.name}' to the scene {scene.name}"
                 )
             scene.scene_tags.add(scene_tag)
 

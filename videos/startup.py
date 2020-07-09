@@ -4,21 +4,16 @@ import sys
 import json
 import shutil
 import requests
+
+from utils.printing import Logger
 from videos.models import Scene, Actor, ActorTag, SceneTag, Folder
-import videos.aux_functions as aux
-import YAPO.settings
+import videos.const as vc
+import videos.aux_functions as auxf
+import YAPO.settings as settings
 
+log = Logger()
 
-def maybeMoveConfigJson():
-    import YAPO.settings as settings
-    src = os.path.abspath(os.path.join(YAPO.settings.BASE_DIR, 'settings.json'))
-    dest = YAPO.settings.CONFIG_JSON
-    if path.isfile(src):
-        shutil.move(src, dest)
-        print("\n███ Your configuration file was moved to  ({0})! ███".format(dest))
-
-
-def getSizeAll():
+def getSizeAll () -> str:
     # queryset.aggregate(Sum('size')).get('column__sum')
     # cursor = connection.cursor()
     # cursor.execute("SELECT SUM(size) AS total FROM videos_scene")[0]
@@ -32,33 +27,23 @@ def getSizeAll():
         return "no space"
 
 
-def sizeFormat(b):
-
+def sizeFormat (b: int) -> str:
     if b < 1000:
-        return "%i" % b + "B"
-    elif 1000 <= b < 1000000:
-        return "%.1f" % float(b / 1000) + "KB"
-    elif 1000000 <= b < 1000000000:
-        return "%.1f" % float(b / 1000000) + "MB"
-    elif 1000000000 <= b < 1000000000000:
-        return "%.1f" % float(b / 1000000000) + "GB"
-    elif 1000000000000 <= b:
-        return "%.1f" % float(b / 1000000000000) + "TB"
+        return f"{b}B"
+    elif b < 1000000:
+        return f"{b/1000:.1f}KB"
+    elif b < 1000000000:
+        return f"{b/1000000:.1f}MB"
+    elif b < 1000000000000:
+        return f"{b/1000000000:.1f}GB"
+    else:
+        return f"{b/1000000000000:.1f}TB"
 
 
 def write_actors_to_file():
-
-    #actors = Actor.objects.all()
     actors = Actor.objects.order_by("id")  # name
-    actors_string = ""
-    numactors = 0
-    for actor in actors:
-
-        if not (numactors == 0):
-            actors_string += "," + actor.name
-        else:
-            actors_string += actor.name
-        numactors += 1
+    actors_string = ",".join(actor.name for actor in actors)
+    numactors = len(actors)
 
     with open("actors.txt", "w") as file:
         file.write(actors_string)
@@ -66,14 +51,16 @@ def write_actors_to_file():
     print("For backup purposes, we just wrote all actors in alphabetical form to actors.txt.")
     print("To recover actor data, please consult the guide.")
 
-def verCheck():
-    update = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "VERSION.md"))
+
+def verCheck ():
+    #dirname of dirname of file results in parent directory
+    update = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "VERSION.md"))
 
     if path.isfile(update):
         with open(update, "r") as verfile:
             ver = verfile.read()
         ver = str(ver).strip()
-        print("--- Version on disk: " + ver)
+        print(f"--- Version on disk: {ver}")
         try:
             remoteVer = requests.get(
                 "https://raw.githubusercontent.com/cooperdk/YAPO-e-plus/develop/VERSION.md"
@@ -85,11 +72,11 @@ def verCheck():
 
         # print("Github version: "+str(remoteVer))
         if str(ver) != str(remoteVer):
-            print(f"███ A new version of YAPO e+ is available ({remoteVer})! ███")
-        print("\r\n")
+            log.info(f'███ A new version of YAPO e+ is available ({remoteVer})! ███')
+        log.info('\n')
 
 
-def stats():
+def stats ():
     size = getSizeAll()
     row = Actor.objects.raw(
         "SELECT COUNT(*) AS total, id FROM videos_actor"
@@ -113,19 +100,19 @@ def stats():
         sctag = str(row[0].total)
     # TODO assign that all values got read correctly and have a valid value!
 
-    print("\nCurrently, there are {0} videos registered in YAPO e+.\nThey take up {1} of disk space.".format(sce, str(size)))
-    print("There are {0} tags available for video clips.".format(sctag))
-    print("\nThere are {0} actors in the database.\nThese actors have {1} usable tags.\n\n".format(act, acttag))
+    print(f"\nCurrently, there are {sce} videos registered in YAPO e+.\nThey take up {size} of disk space.")
+    print(f"There are {sctag} tags available for video clips.")
+    print(f"\nThere are {act} actors in the database.\nThese actors have {acttag} usable tags.\n\n")
 
-def backupper():
-    import YAPO.settings as settings
+
+def backupper ():
     src = settings.DATABASES['default']['NAME']
-    dest = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "db_BACKUP.sqlite3"))
+    dest = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "db_BACKUP.sqlite3"))
     shutil.copy(src, dest)
-    print("Performed a database backup to " + dest + "\n")
+    print(f"Performed a database backup to {dest}\n")
 
 
-def add_scene_to_folder_view(scene_to_add):
+def add_scene_to_folder_view (scene_to_add):
     # scene_path = os.path.normpath(scene_to_add.path_to_dir)
 
     path = os.path.normpath(scene_to_add.path_to_dir)
@@ -134,7 +121,7 @@ def add_scene_to_folder_view(scene_to_add):
 
     print(path)
     folders = []
-    while scene_to_add<99999999:
+    while scene_to_add < 99999999:
         path, folder = os.path.split(path)
 
         if folder != "":
@@ -156,19 +143,19 @@ def add_scene_to_folder_view(scene_to_add):
     recursive_add_folders(None, folders, scene_to_add, path_with_ids)
 
 
-def recursive_add_folders(parent, folders, scene_to_add, path_with_ids):
+def recursive_add_folders (parent, folders, scene_to_add, path_with_ids):
     if len(folders) != 0:
         if parent is None:
             path_with_ids = []
             if not Folder.objects.filter(name=folders[0]):
                 temp = Folder.objects.create(name=folders[0])
-                print("Created virtual folder: " + temp.name)
+                print(f"Created virtual folder: {temp.name}")
                 parent = Folder.objects.get(name=folders[0])
                 if parent.last_folder_name_only is None:
                     parent.last_folder_name_only = folders[0]
                 parent.save()
                 path_with_ids.append(
-                    {"name": parent.last_folder_name_only, "id": parent.id}
+                    { "name": parent.last_folder_name_only, "id": parent.id }
                 )
                 # print ("Parent Name is {}, Path with Id's are {}".format(parent.name, path_with_ids.encode('utf-8')))
                 # print(json.dumps(path_with_ids))
@@ -181,7 +168,7 @@ def recursive_add_folders(parent, folders, scene_to_add, path_with_ids):
             else:
                 parent = Folder.objects.get(name=folders[0])
                 path_with_ids.append(
-                    {"name": parent.last_folder_name_only, "id": parent.id}
+                    { "name": parent.last_folder_name_only, "id": parent.id }
                 )
                 # print ("Parent Name is {}, Path with Id's are {}".format(parent.name, path_with_ids.encode('utf-8')))
                 # print(json.dumps(path_with_ids))
@@ -205,7 +192,7 @@ def recursive_add_folders(parent, folders, scene_to_add, path_with_ids):
 
             if not if_in_children:
                 parent = Folder.objects.create(name=folder_to_add, parent=parent)
-                print("Created virtual folder: " + parent.name)
+                print(f"Created virtual folder: {parent.name}")
                 if parent.last_folder_name_only is None:
                     parent.last_folder_name_only = folders[0]
                 parent.save()
@@ -214,7 +201,7 @@ def recursive_add_folders(parent, folders, scene_to_add, path_with_ids):
                 parent.last_folder_name_only = folders[0]
                 parent.save()
             path_with_ids.append(
-                {"name": parent.last_folder_name_only, "id": parent.id}
+                { "name": parent.last_folder_name_only, "id": parent.id }
             )
             # print ("Parent Name is {}, Path with Id's are {}".format(parent.name.encode('utf-8'),
             #                                                          path_with_ids))
@@ -229,29 +216,20 @@ def recursive_add_folders(parent, folders, scene_to_add, path_with_ids):
         if not parent.scenes.filter(name=scene_to_add.name):
             parent.scenes.add(scene_to_add)
             print(
-                "Added Scene: "
-                + scene_to_add.name
-                + " to virtual folder "
-                + parent.name
+                f"Added Scene: {scene_to_add.name} to virtual folder {parent.name}"
             )
             parent.save()
 
 
-def getStarted():
-
-    #scenes = Scene.objects.all()
-    #for scene in scenes:
-    #    add_scene_to_folder_view(scene)
-    maybeMoveConfigJson()
+def getStarted ():
     stats()
     backupper()
     write_actors_to_file()
-    mem = int(aux.getMemory())
-    cpu = aux.getCPU()
-    cpucnt = aux.getCPUCount()
+    mem = int(auxf.getMemory())
+    cpu = auxf.getCPU()
+    cpucnt = auxf.getCPUCount()
     global videoProcessing
-    print("\nYou have " + str(mem) + " GB available. CPU speed is " +
-          str(cpu) + " GHz and you have " + str(cpucnt) + " cores available.")
+    print(f"\nYou have {mem} GB available. CPU speed is {cpu} GHz and you have {cpucnt} cores available.")
     if mem <= 1:
         print("Since you have only about a gigabyte of memory, video processing will be disabled.")
         videoProcessing = False
@@ -265,7 +243,7 @@ def getStarted():
 class ready:
 
     try:
-        if not 'migrat' in sys.argv:
+        if not 'migra' in sys.argv:
             print("Not in migration mode.")
             getStarted()
         else:

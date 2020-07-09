@@ -30,10 +30,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 # MEDIA_PATH = "videos\\media"
 
 def onlyChars(input):
-    valids = ""
-    for character in input:
-        if character.isalpha():
-            valids += character
+    valids = "".join(char for char in input if char.isalpha())
     return valids
     
 def parse(scene):
@@ -51,7 +48,7 @@ def matcher(text):
         return("Unknown")
 
 def site_facialfest(text):
-    if "facialfest" in text.lower() or "facial fest" in text.lower(): return("RENAME|Facial Fest")
+    if "facialfest" in text.lower().replace(" ",""): return("RENAME|Facial Fest")
     if len(text) < 6: return False
     if text[:2].lower() == "ff":
         site="FF"

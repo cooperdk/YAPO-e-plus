@@ -1,21 +1,10 @@
 import json
 import os
+from configuration import Config, Constants
 # import videos.aux_functions
 from datetime import datetime
 
 import videos.const
-
-# from pathlib import Path
-
-# Turn logging off
-
-LOGGING_CONFIG = None
-
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CONFIG_DIR = os.path.join(BASE_DIR, 'config')
-CONFIG_JSON = os.path.join(CONFIG_DIR, 'settings.json')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
@@ -107,7 +96,7 @@ WSGI_APPLICATION = "YAPO.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+        "NAME": Config().database_path,
     }
 }
 
@@ -139,14 +128,13 @@ USE_L10N = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
-SITE_ROOT = os.path.abspath(os.path.join(BASE_DIR, "videos/"))
-STATIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, "videos/static"))
-STATIC_URL = "/static/"
+SITE_ROOT = Config().site_path
+STATIC_ROOT = Config().site_static_path
+STATIC_URL = "/{0}/".format(Constants().site_static_subdir)
 BASE_URL = "/"
-# STATICFILES_DIRS = (os.path.abspath(os.path.join(BASE_DIR, "videos/static")), )
 
-MEDIA_ROOT = os.path.abspath(os.path.join(BASE_DIR, "videos/media"))
-MEDIA_URL = "/media/"
+MEDIA_ROOT = Config().site_media_path
+MEDIA_URL = "/{0}/".format(Constants().site_media_subdir)
 
 # APPEND_SLASH = True
 
@@ -161,70 +149,3 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "YAPO.pagination.HeaderLimitOffsetPagination",
     "PAGE_SIZE": 500,
 }
-#
-# SETTINGS_VERSION = 1
-# default_dict = {'settings_version': '3', 'vlc_path': "", 'last_all_scene_tag': ""}
-# need_update = False
-# try:
-#     f = open('settings.json', 'r')
-#     x = f.read()
-#
-#     if x == "":
-#         need_update = True
-#         f.close()
-#         print("Setting.json is empty")
-#
-#
-#
-#         f = open('settings.json', 'w')
-#         f.write(json.dumps(default_dict))
-#         f.close()
-#
-#     else:
-#         # print(x)
-#
-#         settings_content = json.loads(x)
-#         f.close()
-#
-#         if ('settings_version' not in settings_content) or (
-#                     int(settings_content['settings_version']) < SETTINGS_VERSION):
-#             need_update = True
-#             for x in settings_content:
-#                 if x in default_dict:
-#                     default_dict[x] = settings_content[x]
-#
-#             f = open('settings.json', 'w')
-#             f.write(json.dumps(default_dict))
-#             f.close()
-#
-#             f = open('settings.json', 'r')
-#             x = f.read()
-#             settings_content = json.loads(x)
-#
-#         print(settings_content['vlc_path'])
-#         videos.const.VLC_PATH = settings_content['vlc_path']
-#         if settings_content['last_all_scene_tag'] != "":
-#             # 2016-08-14 18:03:10.153443
-#             videos.const.LAST_ALL_SCENE_TAG = datetime.strptime(settings_content['last_all_scene_tag'], "%Y-%m-%d %H:%M:%S")
-#             print("Last full scene tagging : {}".format(videos.const.LAST_ALL_SCENE_TAG))
-#
-#     f.close()
-#
-# except FileNotFoundError:
-#     f = open('settings.json', 'w')
-#     f.close()
-#
-#     f = open('settings.json', 'w')
-#     f.write(json.dumps(default_dict))
-#     f.close()
-
-# if need_update:
-#     videos.aux_functions.actor_folder_from_name_to_id()
-
-
-# with open('settings.json', 'r+') as f:
-#     print("contetns of setting.json" + f.read())
-#     print(f.read())
-#     print(f.readline())
-#     # f.write("test")
-#     f.close()

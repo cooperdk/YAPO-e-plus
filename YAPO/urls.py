@@ -21,11 +21,11 @@ from django.conf.urls import url, include
 from django.conf.urls.static import static
 from django.contrib import admin
 from rest_framework.routers import DefaultRouter
-
-import videos.aux_functions
 import videos.const
-from videos import views
 import YAPO.settings
+import videos.aux_functions
+from videos import views
+
 # from django.contrib import admin
 # admin.autodiscover()
 
@@ -87,65 +87,3 @@ urlpatterns = [
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # urlpatterns = format_suffix_patterns(urlpatterns, allowed=['json'])
-
-#  Startup script checks settings.json and creates it if it doesn't exist
-setting_version = videos.const.SETTINGS_VERSION
-current_setting_version = 0
-
-default_dict = {'settings_version': setting_version, 'vlc_path': "", 'last_all_scene_tag': ""}
-need_update = False
-
-try:
-    with open(YAPO.settings.CONFIG_JSON, 'r') as f:
-      x = f.read()
-
-    if not x:
-        need_update = True
-        print("Setting.json is empty")
-        with open(YAPO.settings.CONFIG_JSON, 'w') as f:
-          f.write(json.dumps(default_dict))
-
-    else:
-        settings_content = json.loads(x)
-
-        if ('settings_version' not in settings_content) or (
-                int(settings_content['settings_version']) < setting_version):
-
-            current_setting_version = int(settings_content['settings_version'])
-            if current_setting_version < 2:
-                need_update = True
-                for x in settings_content:
-                    if x in default_dict:
-                        default_dict[x] = settings_content[x]
-
-                # default_dict['settings_version'] = SETTINGS_VERSION
-
-                with open(YAPO.settings.CONFIG_JSON, 'w') as f:
-                  f.write(json.dumps(default_dict))
-
-                with open(YAPO.settings.CONFIG_JSON, 'r') as f:
-                  x = f.read()
-                settings_content = json.loads(x)
-
-        print("VLC location: " + settings_content['vlc_path'])
-        videos.const.VLC_PATH = settings_content['vlc_path']
-        if settings_content['last_all_scene_tag'] != "":
-            # 2016-08-14 18:03:10.153443
-            videos.const.LAST_ALL_SCENE_TAG = datetime.strptime(settings_content['last_all_scene_tag'],
-                                                                "%Y-%m-%d %H:%M:%S")
-            print("The last full scene tagging was done {}\n".format(videos.const.LAST_ALL_SCENE_TAG))
-
-except FileNotFoundError:
-    with open(YAPO.settings.CONFIG_JSON, 'w'):
-      f.write(json.dumps(default_dict))
-
-if need_update:
-    if videos.aux_functions.actor_folder_from_name_to_id():
-        with open(YAPO.settings.CONFIG_JSON, 'r') as f:
-          x = f.read()
-        settings_content = json.loads(x)
-
-        settings_content['settings_version'] = setting_version
-
-        with open(YAPO.settings.CONFIG_JSON, 'w') as f:
-          f.write(json.dumps(settings_content))

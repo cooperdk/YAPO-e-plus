@@ -1,37 +1,47 @@
-import os,sys
-import videos.const
+import os
+import sys
+import pathlib
+import yaml
+from os import path
 import urllib.request
 from videos.models import Actor, Scene, ActorTag
-import videos.views
+#import videos.views
+import YAPO.settings as ysettings
+import videos.const as constx
 
-def progress(count, total, suffix=''):
+
+def progress (count, total, suffix=''):
     bar_len = 60
     filled_len = int(round(bar_len * count / float(total)))
 
     percents = round(100.0 * count / float(total), 1)
     bar = '\u2588' * filled_len + '\u2591' * (bar_len - filled_len)
 
-    sys.stdout.write('%s [%s%s] ... %s\r' % (bar, percents, '%', suffix + "                 "))
+    sys.stdout.write(f"{bar} [{percents}%] ... {suffix}\r                 ")
 
-def progress_end():
-    sys.stdout.flush() 
 
-def getMemory():
+def progress_end ():
+    sys.stdout.flush()
+
+
+def getMemory ():
     import psutil
-    vmem = round(psutil.virtual_memory().total/1000000000,0)
-    return vmem # "{:.2}".format(vmem.total/100000000) #shold that be 102400000?
+    vmem = round(psutil.virtual_memory().total / 1000000000, 0)
+    return vmem  # "{:.2}".format(vmem.total/100000000) #shold that be 102400000?
 
-def getCPU():
+
+def getCPU ():
     import psutil
-    cpufreq = round(psutil.cpu_freq().max/1000,1)
+    cpufreq = round(psutil.cpu_freq().max / 1000, 1)
     return cpufreq
 
-def getCPUCount():
+
+def getCPUCount ():
     import psutil
-    return psutil.cpu_count(logical=False) #set Logical to true if treads are to be included
+    return psutil.cpu_count(logical=False)  # set Logical to true if treads are to be included
 
 
-def send_piercings_to_actortag(actor):
+def send_piercings_to_actortag (actor):
     piercings = actor.piercings
     if piercings:
         if ("navel" or "belly button" or "bellybutton") in piercings.lower():
@@ -90,11 +100,11 @@ def send_piercings_to_actortag(actor):
             insert_actor_tag(actor, "Pierced right ear")
         if "chest" in piercings.lower():
             insert_actor_tag(actor, "Pierced dermal on chest")
-        if "none" in piercings.lower():
+        if any([piercings.lower() == "none", piercings.lower() == "no piercings", piercings.lower() == "no"]):
             insert_actor_tag(actor, "No piercings")
 
 
-def insert_actor_tag(actor_to_insert, actor_tag_name):
+def insert_actor_tag (actor_to_insert, actor_tag_name):
     actor_tag_name = strip_bad_chars(actor_tag_name)
 
     if not ActorTag.objects.filter(name=actor_tag_name):
@@ -102,15 +112,15 @@ def insert_actor_tag(actor_to_insert, actor_tag_name):
         actor_tag.name = actor_tag_name
         actor_tag.save()
         actor_to_insert.actor_tags.add(actor_tag)
-#        print("Added new tag: " + actor_tag_name + " for " + actor_to_insert.name)
+    #        print("Added new tag: " + actor_tag_name + " for " + actor_to_insert.name)
     else:
         actor_tag = ActorTag.objects.get(name=actor_tag_name)
         actor_to_insert.actor_tags.add(actor_tag)
-#        print("Added tag: " + actor_tag_name + " for " + actor_to_insert.name)
+        #        print("Added tag: " + actor_tag_name + " for " + actor_to_insert.name)
         actor_tag.save()
 
 
-def url_is_alive(url):
+def url_is_alive (url):
     """
     Checks that a given URL is reachable.
     :param url: A URL
@@ -126,19 +136,19 @@ def url_is_alive(url):
         return False
 
 
-def strip_bad_chars(name):
-    bad_chars = {" "}
+def strip_bad_chars (name):
+    bad_chars = { " " }
     for char in bad_chars:
         if char in name:
             # print("Before: " + name)
             name = name.replace(char, "")
-            print("Adding Data: " + name)
+            print(f"Adding Data: {name}")
     return name
 
 
-def save_actor_profile_image_from_web(image_link, actor, force):
+def save_actor_profile_image_from_web (image_link, actor, force):
     save_path = os.path.join(
-        videos.const.MEDIA_PATH, "actor/" + str(actor.id) + "/profile/"
+        constx.MEDIA_PATH, "actor", str(actor.id),"profile/"
     )
 
     if not os.path.exists(save_path):
@@ -171,13 +181,13 @@ def save_actor_profile_image_from_web(image_link, actor, force):
     actor.thumbnail = as_uri
 
 
-def actor_folder_from_name_to_id():
+def actor_folder_from_name_to_id ():
     actors = Actor.objects.all()
 
     for actor in actors:
         rel_path = os.path.relpath(
             os.path.join(
-                videos.const.MEDIA_PATH,
+                constx.MEDIA_PATH,
                 "actor",
                 str(actor.id),
                 "profile",
@@ -189,41 +199,39 @@ def actor_folder_from_name_to_id():
         as_uri = urllib.request.pathname2url(rel_path)
 
         print(
-            "Actor {} thumb path is: {} \n and it should be {}".format(
-                actor.name, actor.thumbnail, as_uri
-            )
+           f"Actor {actor.name} thumb path is: {actor.thumbnail} \n and it should be {as_uri}"
         )
         print(actor.thumbnail != as_uri)
-        if (actor.thumbnail != videos.const.UNKNOWN_PERSON_IMAGE_PATH) and (
-            actor.thumbnail != as_uri
+        if (actor.thumbnail != constx.UNKNOWN_PERSON_IMAGE_PATH) and (
+                actor.thumbnail != as_uri
         ):
             try:
                 os.rename(
-                    os.path.join(videos.const.MEDIA_PATH, "actor", actor.name),
-                    os.path.join(videos.const.MEDIA_PATH, "actor", str(actor.id)),
+                    os.path.join(constx.MEDIA_PATH, "actor", actor.name),
+                    os.path.join(constx.MEDIA_PATH, "actor", str(actor.id)),
                 )
 
                 print(
-                    "Renamed {} to {}".format(
-                        os.path.join(videos.const.MEDIA_PATH, "actor", actor.name),
-                        os.path.join(videos.const.MEDIA_PATH, "actor", str(actor.id)),
+                    "Renamed %s to %s"%(
+                        os.path.join(constx.MEDIA_PATH, "actor", actor.name),
+                        os.path.join(constx.MEDIA_PATH, "actor", str(actor.id)),
                     )
                 )
             except FileNotFoundError:
 
                 if os.path.isfile(
-                    os.path.join(
-                        videos.const.MEDIA_PATH,
-                        "actor",
-                        str(actor.id),
-                        "profile",
-                        "profile.jpg",
-                    )
+                        os.path.join(
+                            constx.MEDIA_PATH,
+                            "actor",
+                            str(actor.id),
+                            "profile",
+                            "profile.jpg",
+                        )
                 ):
 
                     rel_path_changed = os.path.relpath(
                         os.path.join(
-                            videos.const.MEDIA_PATH,
+                            constx.MEDIA_PATH,
                             "actor",
                             str(actor.id),
                             "profile",
@@ -234,21 +242,16 @@ def actor_folder_from_name_to_id():
                     as_uri_changed = urllib.request.pathname2url(rel_path_changed)
                     actor.thumbnail = as_uri_changed
                     actor.save()
-                    print(
-                        "Changed {} thumb in database to {}".format(
-                            actor.name, as_uri_changed
-                        )
-                    )
+                    print(f"Changed {actor.name} thumb in database to {as_uri_changed}")
                 else:
-                    print(
-                        "File {} not found!".format(
-                            os.path.join(videos.const.MEDIA_PATH, "actor", actor.name)
+                    print("File %s not found!"%(
+                            os.path.join(constx.MEDIA_PATH, "actor", actor.name)
                         )
                     )
 
             rel_path_changed = os.path.relpath(
                 os.path.join(
-                    videos.const.MEDIA_PATH,
+                    constx.MEDIA_PATH,
                     "actor",
                     str(actor.id),
                     "profile",
@@ -260,9 +263,7 @@ def actor_folder_from_name_to_id():
             actor.thumbnail = as_uri_changed
             actor.save()
 
-            print(
-                "Changed {} thumb in database to {}".format(actor.name, as_uri_changed)
-            )
+            print(f"Changed {actor.name} thumb in database to {as_uri_changed}")
 
     return True
 

@@ -4,6 +4,7 @@ import platform
 import sys
 
 import YAPO.settings
+from configuration import Config
 
 x = 0
 if os.name == 'nt':
@@ -45,7 +46,7 @@ if __name__ == "__main__":
         print("=================================================================")
         print("")
         # print("Static files dir is: {}".format(YAPO.settings.STATIC_ROOT))
-        print("Configdir is " + YAPO.settings.CONFIG_DIR)
+        print(f"Configdir is {Config().config_path}")
         print(f"Media files are located in {YAPO.settings.MEDIA_ROOT},\nyou may want to consider backing them up.\n")
 
     from django.core.management import execute_from_command_line

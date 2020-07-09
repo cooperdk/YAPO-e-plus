@@ -65,16 +65,12 @@ def get_files(walk_dir, make_video_sample):
 
 
 def create_sample_video(scene):
-    print("Trying to create a sample video for scene: {}".format(scene.name))
+    print(f"Trying to create a sample video for scene: {scene.name}")
     success = ffmpeg_process.ffmpeg_create_sammple_video(scene)
     if success:
-        print("Sample video for scene: {} created successfully.".format(scene.name))
+        print(f"Sample video for scene: {scene.name} created successfully.")
     else:
-        print(
-            "Something went wrong while trying to create video sample for scene: {}".format(
-                scene.name
-            )
-        )
+        print(f"Something went wrong while trying to create video sample for scene: {scene.name}")
 
 
 def create_scene(scene_path, make_sample_video):
@@ -95,9 +91,7 @@ def create_scene(scene_path, make_sample_video):
         if scene_in_db.thumbnail is None:
             print("Trying to use ffprobe on scene... ",end="")
             if ffmpeg_process.ffprobe_get_data_without_save(scene_in_db):
-                print(
-                    "OK, taking a screenshot... ", end=""
-                    )
+                print("OK, taking a screenshot... ", end="")
 
                 ffmpeg_process.ffmpeg_take_scene_screenshot_without_save(scene_in_db)
 
@@ -154,7 +148,7 @@ def create_scene(scene_path, make_sample_video):
                         os.path.abspath(sheet_path),
                     ]
                 )
-                print("Contact Sheet saved to " + os.path.abspath(sheet_path))
+                print("Contact Sheet saved to %s"%(os.path.abspath(sheet_path)))
             except:
                 print("Error creating contact sheet!")
         if make_sample_video:
@@ -164,7 +158,7 @@ def create_scene(scene_path, make_sample_video):
             if not os.path.isfile(video_filename_path):
                 create_sample_video(scene_in_db)
             else:
-                print("Sample for {} already exists!".format(scene_in_db.name))
+                print(f"Sample for {scene_in_db.name} already exists!")
 
             scene_in_db.save()
         
@@ -172,9 +166,7 @@ def create_scene(scene_path, make_sample_video):
         print("Trying to use ffprobe on scene... ", end="")
         if ffmpeg_process.ffprobe_get_data_without_save(current_scene):
             current_scene.save()
-            print(
-                "Taking a screenshot...", end=""
-            )
+            print("Taking a screenshot...", end="")
 
             ffmpeg_process.ffmpeg_take_scene_screenshot_without_save(current_scene)
 
@@ -233,7 +225,7 @@ def create_scene(scene_path, make_sample_video):
                             os.path.abspath(sheet_path),
                         ]
                     )
-                    print("Contact Sheet saved to " + os.path.abspath(sheet_path))
+                    print("Contact Sheet saved to %s"%(os.path.abspath(sheet_path)))
                 except:
                     print("Error creating contact sheet!")
 
@@ -267,9 +259,7 @@ def create_scene(scene_path, make_sample_video):
                 current_scene, actors, actors_alias, scene_tags, websites
             )
         else:
-            print(
-                "Failed to probe scene {}, skipping scene...".format(current_scene.name)
-            )
+            print(f"Failed to probe scene {current_scene.name}, skipping scene...")
 
 
 def add_scene_to_folder_view(scene_to_add):
@@ -309,7 +299,7 @@ def recursive_add_folders(parent, folders, scene_to_add, path_with_ids):
             path_with_ids = []
             if not Folder.objects.filter(name=folders[0]):
                 temp = Folder.objects.create(name=folders[0])
-                print("Created virtual folder: " + temp.name)
+                print(f"Created virtual folder: {temp.name}")
                 parent = Folder.objects.get(name=folders[0])
                 if parent.last_folder_name_only is None:
                     parent.last_folder_name_only = folders[0]
@@ -352,7 +342,7 @@ def recursive_add_folders(parent, folders, scene_to_add, path_with_ids):
 
             if not if_in_children:
                 parent = Folder.objects.create(name=folder_to_add, parent=parent)
-                print("Created virtual folder: " + parent.name)
+                print(f"Created virtual folder: {parent.name}")
                 if parent.last_folder_name_only is None:
                     parent.last_folder_name_only = folders[0]
                 parent.save()
@@ -376,10 +366,7 @@ def recursive_add_folders(parent, folders, scene_to_add, path_with_ids):
         if not parent.scenes.filter(name=scene_to_add.name):
             parent.scenes.add(scene_to_add)
             print(
-                "Added Scene: "
-                + scene_to_add.name
-                + " to virtual folder "
-                + parent.name
+                f"Added Scene: {scene_to_add.name} to virtual folder {parent.name}"
             )
             parent.save()
 
@@ -395,7 +382,7 @@ def clean_empty_folders():
 
 
 def recursive_function(parent, folder):
-    print("In folder " + folder.name)
+    print(f"In folder {folder.name}")
     if folder.get_next_sibling() is not None:
         sibling = folder.get_next_sibling()
         recursive_function(folder, sibling)
@@ -405,12 +392,12 @@ def recursive_function(parent, folder):
         for child in children:
             recursive_function(folder, child)
     else:
-        print("         " + folder.name + " is leaf")
+        print(f"         {folder.name} is leaf")
         if folder.scenes.all().count() == 0:
             name = folder.name
             parent.children.filter(pk=folder.id).delete()
             # folder.delete()
-            print(name + " didn't have any scenes and was deleted!")
+            print(f"{name} didn't have any scenes and was deleted!")
 
             # siblings = folder.get_siblings()
             # for sibling in siblings:
@@ -419,9 +406,7 @@ def recursive_function(parent, folder):
 
 def write_actors_to_file():
     actors = Actor.objects.all()
-    actors_string = ""
-    for actor in actors:
-        actors_string += "," + actor.name
+    actors_string = ",".join([actor.name for actor in actors])
 
     file = open("actors.txt", "w")
 
@@ -434,12 +419,12 @@ def populate_last_folder_name_in_virtual_folders():
     all_folders = Folder.objects.all()
     for folder in all_folders:
         if not folder.last_folder_name_only:
-            print("Folder name is" + folder.name)
+            print(f"Folder name is {folder.name}")
             name = os.path.normpath(folder.name)
             only_last = os.path.basename(name)
             if only_last == "":
                 only_last = name
-            print("Folder last name is {}".format(only_last))
+            print(f"Folder last name is {only_last}")
             folder.last_folder_name_only = only_last
             folder.save()
 

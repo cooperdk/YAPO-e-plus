@@ -1,6 +1,6 @@
 actors.txt
 videos/static/package-lock.json
-settings.json
+config/settings.json
 
 # Created by https://www.toptal.com/developers/gitignore/api/python,django,pycharm,visualstudiocode,bower
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,django,pycharm,visualstudiocode,bower

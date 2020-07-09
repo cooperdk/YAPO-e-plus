@@ -35,14 +35,14 @@ def search_imdb(actor_to_search, alias, force):
     # https://www.iafd.com/results.asp?searchtype=comprehensive&searchstring=isis+love
     if alias:
         name_with_plus = alias.name.replace(' ', '+')
-        print("Searching IMDB for: " + actor_to_search.name + " alias: " + alias.name)
+        print(f"Searching IMDB for: {actor_to_search.name} alias: {alias.name}")
         name = alias.name
     else:
         name_with_plus = name.replace(' ', '+')
-        print("Searching IMDB for: " + actor_to_search.name)
-        print("(" + name_with_plus + ")")
-    r = requests.get("https://www.imdb.com/search/name?name=" + name_with_plus + "&adult=include", verify=False)
-    print("https://www.imdb.com/search/name?name=" + name_with_plus + "&adult=include")
+        print(f"Searching IMDB for: {actor_to_search.name}")
+        print(f"({name_with_plus})")
+    r = requests.get(f"https://www.imdb.com/search/name?name={name_with_plus}&adult=include", verify=False)
+    print(f"https://www.imdb.com/search/name?name={name_with_plus}&adult=include")
     soup = BeautifulSoup(r.content, "html5lib")
     # link = soup.find_all("a", {"text": "Isis Love"})
     for soup_links in soup.find_all("h3", attrs={'class': 'lister-item-header'}):	#, class_="lister-item-header")
@@ -58,12 +58,12 @@ def search_imdb(actor_to_search, alias, force):
 
         if href_found:
             success = True
-            bio_page = urllib_parse.urljoin("https://www.imdb.com/", href_found) + '/bio?ref_=nm_ov_bio_sm'
-            imdb_id = href_found.replace("/name/","")
-            imdb_id = imdb_id.replace("/","")
-            print(actor_to_search.name + " was found on IMDB!")# + href_found + "ID " + imdb_id)
+            found_lnk = urllib_parse.urljoin("https://www.imdb.com/",href_found)
+            bio_page = f"{found_lnk}/bio?ref_=nm_ov_bio_sm"
+            imdb_id = href_found.replace("/name/","").replace("/","")
+            print(f"{actor_to_search.name} was found on IMDB!")# + href_found + "ID " + imdb_id)
             actor_to_search.imdb_id = imdb_id
-            print("Scraping biography from " + bio_page)
+            print(f"Scraping biography from {bio_page}")
             r = requests.get(bio_page, verify=False)
             soup = BeautifulSoup(r.content, "html5lib")
             soup_bio = soup.find("div", attrs={'class': 'soda'})
@@ -84,7 +84,7 @@ def search_imdb(actor_to_search, alias, force):
         else:
             #actor_to_search.last_lookup = datetime.datetime.now()
            #actor_to_search.save()
-            print(actor_to_search.name + " was not found on IMDB.")
+            print(f"{actor_to_search.name} was not found on IMDB.")
 		
         return success
 
@@ -94,7 +94,7 @@ def strip_bad_chars(name):
         if char in name:
             #print("Before: " + name)
             name = name.replace(char, "")
-            print("Adding Data: " + name)
+            print(f"Adding Data: {name}")
     return name
 
 def insert_aliases(actor_to_insert, aliases):
@@ -152,7 +152,7 @@ def main():
     print("test")
     for actor in Actor.objects.all():
 
-        print("Fetching info for: " + actor.name)
+        print(f"Fetching info for: {actor.name}")
         time.sleep(10)
         sucess = search_imdb_with_force_flag(actor, True)
         if not sucess:

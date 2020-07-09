@@ -30,10 +30,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 # MEDIA_PATH = "videos\\media"
 
 def onlyChars(input):
-    valids = ""
-    for character in input:
-        if character.isalpha():
-            valids += character
+    valids = "".join(char for char in input if char.isalpha())
     return valids
 
 def inchtocm(input):
@@ -55,13 +52,13 @@ def search_freeones(actor_to_search, alias, force):
     if alias:
         name_with_plus = alias.name.replace(' ', '+')
         name_with_dash = alias.name.replace(' ', '-')        
-        print("searching AKA: " + alias.name+"... ",end="")
+        print(f"searching AKA: {alias.name}... ",end="")
         name = alias.name
     else:
         name_with_plus = name.replace(' ', '+')
         name_with_dash = name.replace(' ', '-')
-        print("Searching Freeones for: " + actor_to_search.name + "... ",end="")
-    r = requests.get("https://www.freeones.com/babes?q=" + name_with_dash, verify=False)
+        print(f"Searching Freeones for: {actor_to_search.name}... ",end="")
+    r = requests.get(f"https://www.freeones.com/babes?q={name_with_dash}", verify=False)
 
     soup = BeautifulSoup(r.content, "html5lib")
 
@@ -74,7 +71,7 @@ def search_freeones(actor_to_search, alias, force):
     
         success = True
         print("")
-        aux.progress(1,27,"Found " + actor_to_search.name + ", parsing...")
+        aux.progress(1,27,f"Found {actor_to_search.name}, parsing...")
         #print("\nI found " + actor_to_search.name + ", so I am looking for information on her profile page.")
         actor_to_search.gender = 'F'
         actor_to_search.save()
@@ -83,7 +80,7 @@ def search_freeones(actor_to_search, alias, force):
 
         soup = BeautifulSoup(r.content, "html5lib")
         soup_links = soup.find_all("a")
-        href_found = "/"+name_with_dash + "/profile" #match_text_in_link_to_query(soup_links, "Profile")
+        href_found = f"/{name_with_dash}/profile" #match_text_in_link_to_query(soup_links, "Profile")
         free_ones_bio_search = soup.find_all("div", {"class": "js-read-more-text read-more-text-ellipsis"})
         free_ones_career_status_search = soup.find_all("div", {"class": "timeline-horisontal"})
         free_ones_biography = free_ones_bio_search[0].get_text(strip=True)
@@ -104,7 +101,8 @@ def search_freeones(actor_to_search, alias, force):
             profile_thumb = soup.find("img", {'class': 'img-fluid'})
             profile_thumb_parent = profile_thumb.parent
             href=profile_thumb_parent['href']
-            if href[0]=="/": href = "https://www.freeones.com" + href
+            if href[0]=="/":
+                href = f"https://www.freeones.com{href}"
             has_image = False
             if len(href)>3:     
                 has_image = True
@@ -133,13 +131,13 @@ def search_freeones(actor_to_search, alias, force):
                     if picture_list.find("a"):
                         first_picture = picture_list.find("a")
                         #print("Saving... ", end="")
-                        save_path = os.path.join(videos.const.MEDIA_PATH, 'actor/' + str(actor_to_search.id) + '/profile/')
+                        save_path = os.path.join(videos.const.MEDIA_PATH, 'actor', str(actor_to_search.id), 'profile')
                         #print("Profile pic path: " + save_path)
                         save_file_name = os.path.join(save_path, 'profile.jpg')
                         if not os.path.isfile(save_file_name):
                             if first_picture['href']:
                                 if re.match(r'^\/\/', first_picture['href']):
-                                        first_picture_link = "https:" + first_picture['href']
+                                        first_picture_link = f"https:{first_picture['href']}"
                                         aux.save_actor_profile_image_from_web(first_picture_link, actor_to_search,force)
                                         aux.progress(4,27,"Storing photo")
                                 elif re.match(r'^.*jpg$', first_picture['href']):
@@ -206,7 +204,7 @@ def search_freeones(actor_to_search, alias, force):
                     try:
                         href = official_link['href']
                         if href not in actor_to_search.official_pages:
-                            actor_to_search.official_pages = actor_to_search.official_pages + official_link['href'] + ","  
+                            actor_to_search.official_pages += f"{official_link['href']},"  
                             #print ("Official Website added: " + official_link['href'])
                     except:
                         #print("Actor apparently has no official website")
@@ -531,6 +529,8 @@ def search_freeones(actor_to_search, alias, force):
                             piercings = str(piercings).strip()
                             piercings = piercings.replace(";", ",")
                             piercings = piercings.replace(" and ", ",")
+                            if any([piercings.lower() == "none", piercings.lower() == "no piercings", piercings.lower() == "no"]):
+                                piercings="No piercings"
                             actor_to_search.piercings = piercings
                             #print ("Piercings: " + piercings)
                             aux.progress(23,29,"Piercings")
@@ -592,7 +592,7 @@ def search_freeones(actor_to_search, alias, force):
         print("")
     try:
         if success:
-            aux.progress(29,29,str(num) + " tags parsed for " + actor_to_search.name + ".")
+            aux.progress(29,29,f"{num} tags parsed for {actor_to_search.name}.")
             aux.progress_end()
         print("")
     except:
