@@ -361,7 +361,7 @@ angular.module('sceneDetail').component('sceneDetail', {
             };
 
             self.generateSampleVideo = function (scene) {
-
+                self.addAlert("Generating sample video, please wait...", 'info', '100000');
                 $http.get('ffmpeg/', {
                     params: {
                         generateSampleVideo: true,
@@ -370,8 +370,10 @@ angular.module('sceneDetail').component('sceneDetail', {
                 }).then(function (response) {
                     self.updatedSample = false;
                     self.updatedSample = true;
+                    self.closeAlert();
                     self.addAlert("Successfully generated the sample video. Reload to check it out.", 'success', '5000');
                 }, function errorCallback(response) {
+                    self.closeAlert();
                     self.addAlert("Something went wrong while generating the sample video, please check the console.", 'danger', '100000');
                 });
             };

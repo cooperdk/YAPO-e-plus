@@ -4,7 +4,7 @@ import sys
 import platform
 
 os.environ["DJANGO_SETTINGS_MODULE"] = "settings"
-sys.path.append(os.path.abspath(os.path.join("E:","djangoProject","YAPO","YAPO")))
+sys.path.append(os.path.abspath("E:\djangoProject\YAPO\YAPO"))
 
 import shutil
 import subprocess
@@ -83,7 +83,13 @@ def execute_subprocess(command_call, type_of_bin):
 
 
 def ffmpeg_take_screenshot(screenshot_time, filename):
-    command_call = f'{FFMPEG_BIN} -y -ss {screenshot_time} -i "{filename}" {FFMPEG_SCREENSHOT_ARGUMENTS} {SCREENSHOT_OUTPUT_PATH}'
+    command_call = '{} -y -ss {} -i "{}" {} {}'.format(
+        FFMPEG_BIN,
+        screenshot_time,
+        filename,
+        FFMPEG_SCREENSHOT_ARGUMENTS,
+        SCREENSHOT_OUTPUT_PATH,
+    )
 
 #    print("Taking screenshot of video...")  # (command_call)
 
@@ -91,7 +97,7 @@ def ffmpeg_take_screenshot(screenshot_time, filename):
 
 
 def ffprobe(filename):
-    command_call = f'{FFPROBE_BIN} {FFPROBE_JSON_ARGUMENTS} "{filename}"'
+    command_call = '{} {} "{}"'.format(FFPROBE_BIN, FFPROBE_JSON_ARGUMENTS, filename)
     # print("Calling ffprobe...")# command call: {}".format(command_call))
 
     return execute_subprocess(command_call, "ffprobe")
@@ -101,7 +107,7 @@ def get_length(filename):
     # result = subprocess.Popen([FFPROBE_BIN, filename],
     #                           stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
-    command_call = f'{FFPROBE_BIN} "{filename}"'
+    command_call = '{} "{}"'.format(FFPROBE_BIN, filename)
 #    print("Getting video length...")  # (command_call)
 
     result = subprocess.Popen(
@@ -122,8 +128,8 @@ def get_length(filename):
 
 # ffmpeg -i input.flv -vf fps=1 out%d.png
 def make_screenshots(fps_of_screenshots, filename):
-    input_argument = f'-i "{filename}"'
-    video_filters = f"-q:v 4 -vf fps={fps_of_screenshots},scale=640:-2"
+    input_argument = '-i "{}"'.format(filename)
+    video_filters = "-q:v 4 -vf fps={},scale=640:-2".format(fps_of_screenshots)
 
     print("Taking screenshots...")
     # print("{} {} {} {}".format(FFMPEG_BIN, input_argument, video_filters, FFMPEG_TEMP_OUTPUT_IMAGES))
@@ -133,11 +139,13 @@ def make_screenshots(fps_of_screenshots, filename):
 
 
 def make_video_from_screenshots(framerate):
-    framerate_argument = f"-framerate {framerate}"
-    input_argument = f"-i {FFMPEG_TEMP_OUTPUT_IMAGES}"
+    framerate_argument = "-framerate {}".format(framerate)
+    input_argument = "-i {}".format(FFMPEG_TEMP_OUTPUT_IMAGES)
     other_arguments = "-q:v 4 -c:v libx264 -pix_fmt yuv420p -preset ultrafast"
     output_video = OUTPUT_VIDEO_NAME
-    " ".join((FFMPEG_BIN, framerate_argument, input_argument, other_arguments, output_video))
+    command_call = "{} {} {} {} {}".format(
+        FFMPEG_BIN, framerate_argument, input_argument, other_arguments, output_video
+    )
     print(
         "Making video from frames..."
     )  # using ffmpeg command: \n{}".format(command_call))
@@ -150,7 +158,7 @@ def seconds_to_string(seconds):
     m, s = divmod(seconds, 60)
     h, m = divmod(m, 60)
 
-    return f"{h:0>2}:{m:0>2}:{s:0>2}"
+    return "{0:0>2}:{1:0>2}:{2:0>2}".format(int(h), int(m), int(s))
 
 
 def time_markers(
@@ -230,16 +238,18 @@ def make_sample_video(
 
 
 def extract_frames_in_given_time(filename, seek_time, frames_per_segment, start_number):
-    seek_argument = f"-ss {seek_time}"
-    input_argument = f'-i "{filename}"'
-    number_of_frames_argument = f"-vframes {frames_per_segment}"
+    seek_argument = "-ss {}".format(seek_time)
+    input_argument = '-i "{}"'.format(filename)
+    number_of_frames_argument = "-vframes {}".format(frames_per_segment)
     # scale_argument = "-q:v 1 -vf scale={}:trunc(ow/a/2)*2".format(image_width_pixels)
 
     # scales images to a fixed 16:9 size and adds black bars
-    scale_argument = f'-q:v 4 -vf "scale={SAMPLE_RESOLUTION},pad=ih*16/9:ih:(ow-iw)/2:(oh-ih)/2"'
-    start_number_argument = f"-start_number {start_number}"
+    scale_argument = '-q:v 4 -vf "scale={},pad=ih*16/9:ih:(ow-iw)/2:(oh-ih)/2"'.format(
+        SAMPLE_RESOLUTION
+    )
+    start_number_argument = "-start_number {}".format(start_number)
 
-    command_call = " ".join((
+    command_call = "{} {} {} {} {} {} {}".format(
         FFMPEG_BIN,
         seek_argument,
         input_argument,
@@ -247,7 +257,7 @@ def extract_frames_in_given_time(filename, seek_time, frames_per_segment, start_
         scale_argument,
         start_number_argument,
         FFMPEG_TEMP_OUTPUT_IMAGES,
-    ))
+    )
     print(
         "Extracting frames from scene..."
     )  # using ffmpeg command: \n{}".format(command_call))
@@ -267,7 +277,7 @@ def extract_frames_in_given_time(filename, seek_time, frames_per_segment, start_
     else:
         ans = -1
         print("Something went wrong while extracting video frames, exiting function...")
-        print(f"This is the output of the error: {a[0]}")
+        print("This is the output of the error: {}".format(a[0]))
 
     if b"Output file is empty, nothing was encoded" in output:
         ans = -1
@@ -342,7 +352,11 @@ def parse_ffprobe_data(ffprobe_json_output):
             try:
                 ans["framerate"] = framerate_numerator / framerate_denominator
             except ZeroDivisionError:
-                print(f"Average framerate in JSON is {temp} could not divide by zero!")
+                print(
+                    "Average framerate in JSON is "
+                    + temp
+                    + " could not divide by zero!"
+                )
                 ans["framerate"] = 0
 
     return ans
@@ -532,7 +546,7 @@ def main():
 
                 print(scene.name)
                 for key, y in parsed_ffprobe_data.items():
-                    print(f"{key}: {y}")
+                    print(key + ": " + str(y))
 
                 scene.framerate = parsed_ffprobe_data["framerate"]
                 scene.bit_rate = parsed_ffprobe_data["bitrate"]
@@ -546,7 +560,7 @@ def main():
 
                 scene.save()
         else:
-            print(f"Scene {scene.name.encode('utf-8')} was already processed")
+            print("Scene {} was already processed".format(scene.name.encode("utf-8")))
 
 
 if __name__ == "__main__":

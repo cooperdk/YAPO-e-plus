@@ -762,7 +762,7 @@ def settings(request):
 
                 return Response(serializer.data)
             else:
-                new_path_to_vlc = os.path.abspath(request.query_params["pathToVlc"])
+                new_path_to_vlc = os.path.abspath(request.query_params["pathToVlc"]).replace("\\","/")
 
                 if os.path.isfile(new_path_to_vlc):
                     Config().vlc_path = new_path_to_vlc
@@ -770,7 +770,7 @@ def settings(request):
                     return Response(status=200)
 
                 else:
-                    print("Path does not exist!")
+                    print("Error: VLC path does not exist!")
 
                     return Response(status=500)
 
@@ -987,7 +987,7 @@ class AddItems(views.APIView):
 def play_scene_vlc(scene, random):
     file_path = os.path.normpath(scene.path_to_file)
     if platform.system() == "Windows":
-        vlc_path = os.path.normpath(const.VLC_PATH)
+        vlc_path = Config().vlc_path #os.path.normpath(const.VLC_PATH)
     else:
         vlc_path = "vlc"
     p = subprocess.Popen([vlc_path, file_path])

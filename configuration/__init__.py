@@ -1,4 +1,5 @@
 import os
+import platform
 from datetime import datetime
 from typing import Dict, Optional
 
@@ -41,7 +42,10 @@ class Config(metaclass=Singleton):
     self.timeprint_format = Constants().default_timeprint_format
     self.configfile_path = os.path.join(self.config_path, Constants().default_yaml_settings_filename)
     self.current_setting_version = 3
-    self.vlc_path = None
+    if os.name == 'nt':
+        self.vlc_path = "c:/program files/videolan/vlc/vlc.exe"
+    else:
+        self.vlc_path = None
     self.last_all_scene_tag = None
     self.__update_config_from_file__()
 
@@ -81,7 +85,7 @@ class Config(metaclass=Singleton):
       self.timeprint_format = settings_dict[__yaml_root_element__].get("log_timeformat") or self.timeprint_format
       self.last_all_scene_tag = __string_to_nullable_time__(settings_dict[__yaml_root_element__].get("last_all_scene_tag")) or self.last_all_scene_tag
       self.site_media_path = settings_dict[__yaml_root_element__].get("site_media_path") or self.site_media_path
-      self.vlc_path = settings_dict[__yaml_root_element__].get("vlc_path") or self.vlc_path
+      self.vlc_path = settings_dict[__yaml_root_element__].get("vlc_path")
       self.current_setting_version = __string_to_nullable_int__(settings_dict[__yaml_root_element__].get("current_setting_version")) or self.current_setting_version
 
   def __settings_to_dict__(self):
@@ -105,7 +109,7 @@ class Config(metaclass=Singleton):
   def get_old_settings_as_json(self):
     # return f'{{"settings_version": 3, "vlc_path": "{os.path.normpath(self.vlc_path)}", "last_all_scene_tag": "{__nullable_time_to_string__(self.last_all_scene_tag)}"}}'
     # the given vlc_path somehow leads to a json error, it thinks the ':' should be escaped? Unclear, because a colon should just work fine
-    return f'{{"settings_version": {self.current_setting_version}, "vlc_path": "", "last_all_scene_tag": "{__nullable_time_to_string__(self.last_all_scene_tag)}"}}'
+    return f'{{"settings_version": {self.current_setting_version}, "vlc_path": "{self.vlc_path}", "last_all_scene_tag": "{__nullable_time_to_string__(self.last_all_scene_tag)}"}}'
 
 
 def __nullable_time_to_string__(time: Optional[datetime]) -> str:
