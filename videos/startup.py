@@ -10,7 +10,7 @@ from videos.models import Scene, Actor, ActorTag, SceneTag, Folder
 import videos.const as vc
 import videos.aux_functions as auxf
 import YAPO.settings as settings
-
+from configuration import Config
 log = Logger()
 
 def getSizeAll () -> str:
@@ -41,14 +41,16 @@ def sizeFormat (b: int) -> str:
 
 
 def write_actors_to_file():
+    actortxt = os.path.join(Config().data_path, "actors_dump.txt")
     actors = Actor.objects.order_by("id")  # name
     actors_string = ",".join(actor.name for actor in actors)
     numactors = len(actors)
 
-    with open("actors.txt", "w") as file:
+    with open(actortxt, "w") as file:
         file.write(actors_string)
 
-    print("For backup purposes, we just wrote all actors in alphabetical form to actors.txt.")
+    print("For backup purposes, we just wrote all actors in alphabetical form to:")
+    print(actortxt)
     print("To recover actor data, please consult the guide.")
 
 
@@ -106,8 +108,8 @@ def stats ():
 
 
 def backupper ():
-    src = settings.DATABASES['default']['NAME']
-    dest = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "db_BACKUP.sqlite3"))
+    src = Config().database_path
+    dest = os.path.join(Config().database_dir, "db.sqlite3.backup")
     shutil.copy(src, dest)
     print(f"Performed a database backup to {dest}\n")
 

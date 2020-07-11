@@ -98,7 +98,7 @@ class Config(metaclass=Singleton):
         "last_all_scene_tag": __nullable_time_to_string__(self.last_all_scene_tag),
         "site_media_path": self.site_media_path,
         "vlc_path": self.vlc_path,
-        "current_setting_version": __nullable_int_to_string__(self.current_setting_version)
+        "current_setting_version": self.current_setting_version
       }
     }
 
