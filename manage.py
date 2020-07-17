@@ -42,12 +42,13 @@ if __name__ == "__main__":
         print("    |  |  /  _____  \  |  |      |  `--'  |      |  |____   |_|  ")
         print("    |__| /__/     \__\ | _|       \______/       |_______|       ")
         print("")
-        print("    For changes to the main branch, please consult README.md.")
+        print("              YET ANOTHER PORN ORGANIZER - extended")
         print("=================================================================")
         print("")
-        # print("Static files dir is: {}".format(YAPO.settings.STATIC_ROOT))
-        print(f"Configdir is {Config().config_path}")
-        print(f"Media files are located in {YAPO.settings.MEDIA_ROOT},\nyou may want to consider backing them up.\n")
+        print(f"Database dir is:    {Config().database_dir}")
+        print(f"Config dir is:      {Config().config_path}")
+        print(f"Media files dir is: {Config().site_media_path}")
+        print("Consider making regular backup of these directories.\n")
 
     from django.core.management import execute_from_command_line
 

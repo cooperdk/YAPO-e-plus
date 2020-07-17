@@ -1,5 +1,4 @@
 import os
-import platform
 from datetime import datetime
 from typing import Dict, Optional
 
@@ -8,7 +7,7 @@ import json
 from utils import Singleton
 from utils import Constants
 
-__yaml_root_element__ = "YAMLConfig"
+__yaml_root_element__ = "YAPOConfig"
 __settings_datetime_format__ = "%Y-%m-%d %H:%M:%S"
 __settings_keyword_none__ = "None"
 
@@ -40,6 +39,7 @@ class Config(metaclass=Singleton):
     self.site_static_path = os.path.join(self.site_path, Constants().site_static_subdir)
     self.site_media_path = os.path.join(self.site_path, Constants().site_media_subdir)
     self.timeprint_format = Constants().default_timeprint_format
+    self.videoprocessing = Constants().videoprocessing
     self.configfile_path = os.path.join(self.config_path, Constants().default_yaml_settings_filename)
     self.current_setting_version = 3
     if os.name == 'nt':
@@ -50,7 +50,7 @@ class Config(metaclass=Singleton):
     self.__update_config_from_file__()
 
   def __log__(self, message: str) -> None:  # should be utils.printing, but that leads to circular dependency
-    print(f"{datetime.now().strftime(self.timeprint_format)}> {message}")
+    print(f"[CONF ] {datetime.now().strftime(self.timeprint_format)}> {message}")
 
   def __update_config_from_file__(self) -> None:
     if os.path.isfile(self.configfile_path):

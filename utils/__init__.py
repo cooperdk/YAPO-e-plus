@@ -18,5 +18,6 @@ class Constants(metaclass=Singleton):
     self.site_static_subdir = 'static'
     self.site_media_subdir = 'media'
     self.default_timeprint_format = '%Y-%m-%d, %H:%M:%S'
+    self.videoprocessing = True
     self.default_json_settings_filename = 'settings.json'
     self.default_yaml_settings_filename = 'settings.yml'

@@ -1,10 +1,13 @@
 import json
 import os
+import sys
 from configuration import Config, Constants
+from utils.printing import Logger
 # import videos.aux_functions
 from datetime import datetime
-
 import videos.const
+import shutil
+log = Logger()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
@@ -20,6 +23,7 @@ ALLOWED_HOSTS = ['*']
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000
 AUTOCOMMIT = True
 TEST_MEMCACHE = False
+
 if not DEBUG or TEST_MEMCACHE:
     CACHES = {
         'default': {
@@ -33,11 +37,55 @@ else:
             'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
         }
     }
+
+# First of all, check if the db is located in the old folder (root)
+
+if not 'migra' in sys.argv:
+    src = Config().root_path
+    dest = os.path.join(Config().database_dir)
+    okmoved = True
+    if not os.path.isfile(os.path.join(src, "db.sqlite3")) and not os.path.isfile(os.path.join(dest, "db.sqlite3")):
+        print("\n")
+        log.error("No database")
+        print(f"There is no database installed at: {os.path.join(dest, 'db.sqlite3')}")
+        print(
+            "Please run the below commands from your YAPO main directory to create the database,\nor place your database at the above location.\n\nConsult the guide or website for help.")
+        print("\nCODE TO RUN:")
+        print("python manage.py makemigrations")
+        print("python manage.py migrate\n")
+        # input("\nPress enter to exit YAPO. ")
+        quit()
+
+    if os.path.isfile(os.path.join(src, "db.sqlite3")):
+        if not os.path.isfile(os.path.join(dest, "db.sqlite3")):
+            try:
+                shutil.move(src, dest)
+                okmoved = True
+            except:
+                log.error("Error moving the database")
+                print("There was an error moving the database to it's new location:")
+                print(f"{src} -> {dest}")
+                input("Please check the source and destination. Press enter to exit YAPO. ")
+                quit()
+        else:
+            log.error("Databases at two locations")
+            print(f"There is a database file at both the below listed locations. You need to delete the one")
+            print("you don't wish to use and make sure the other is in the listed destination directory.")
+            print("This is a check because we have moved the database to a subdirectory.")
+            print("")
+            print(f"SOURCE: {src}")
+            print(f"DESTINATION: {src}")
+            input("Press enter to exit YAPO, and start it again when the above is taken care of. ")
+            quit()
+        if okmoved:
+            log.info(f"The database was moved to {dest}.")
+
+
 # Application definition
 
 INSTALLED_APPS = [
-    # 'dal',
-    # 'dal_select2',
+    'dal',
+    'dal_select2',
     "django.contrib.admin.apps.SimpleAdminConfig",  # was 'django.contrib.admin'
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -60,7 +108,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     #    "django.contrib.auth.middleware.SessionAuthenticationMiddleware",
-
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 

@@ -62,7 +62,7 @@ def verCheck ():
         with open(update, "r") as verfile:
             ver = verfile.read()
         ver = str(ver).strip()
-        print(f"--- Version on disk: {ver}")
+        print(f"--- Version {ver}")
         try:
             remoteVer = requests.get(
                 "https://raw.githubusercontent.com/cooperdk/YAPO-e-plus/develop/VERSION.md"
@@ -75,7 +75,7 @@ def verCheck ():
         # print("Github version: "+str(remoteVer))
         if str(ver) != str(remoteVer):
             log.info(f'███ A new version of YAPO e+ is available ({remoteVer})! ███')
-        log.info('\n')
+
 
 
 def stats ():
@@ -114,116 +114,11 @@ def backupper ():
     print(f"Performed a database backup to {dest}\n")
 
 
-def add_scene_to_folder_view (scene_to_add):
-    # scene_path = os.path.normpath(scene_to_add.path_to_dir)
-
-    path = os.path.normpath(scene_to_add.path_to_dir)
-
-    # drive, path = os.path.splitdrive(scene_path)
-
-    print(path)
-    folders = []
-    while scene_to_add < 99999999:
-        path, folder = os.path.split(path)
-
-        if folder != "":
-            folders.append(folder)
-        else:
-            if path != "":
-                folders.append(path)
-
-            break
-
-    folders.reverse()
-
-    # print (drive)
-    is_first = True
-    parent = ""
-    # for folder in folders:
-    #     print (folder)
-    path_with_ids = []
-    recursive_add_folders(None, folders, scene_to_add, path_with_ids)
-
-
-def recursive_add_folders (parent, folders, scene_to_add, path_with_ids):
-    if len(folders) != 0:
-        if parent is None:
-            path_with_ids = []
-            if not Folder.objects.filter(name=folders[0]):
-                temp = Folder.objects.create(name=folders[0])
-                print(f"Created virtual folder: {temp.name}")
-                parent = Folder.objects.get(name=folders[0])
-                if parent.last_folder_name_only is None:
-                    parent.last_folder_name_only = folders[0]
-                parent.save()
-                path_with_ids.append(
-                    { "name": parent.last_folder_name_only, "id": parent.id }
-                )
-                # print ("Parent Name is {}, Path with Id's are {}".format(parent.name, path_with_ids.encode('utf-8')))
-                # print(json.dumps(path_with_ids))
-                if parent.path_with_ids is None:
-                    parent.path_with_ids = json.dumps(path_with_ids)
-                    parent.save()
-                # print ("Last folder name is : {}".format(folders[0]))
-                del folders[0]
-
-            else:
-                parent = Folder.objects.get(name=folders[0])
-                path_with_ids.append(
-                    { "name": parent.last_folder_name_only, "id": parent.id }
-                )
-                # print ("Parent Name is {}, Path with Id's are {}".format(parent.name, path_with_ids.encode('utf-8')))
-                # print(json.dumps(path_with_ids))
-                if parent.path_with_ids is None:
-                    parent.path_with_ids = json.dumps(path_with_ids)
-                    parent.save()
-                # print ("Last folder name is : {}".format(folders[0]))
-                del folders[0]
-
-            recursive_add_folders(parent, folders, scene_to_add, path_with_ids)
-        else:
-            folder_to_add = os.path.join(parent.name, folders[0])
-            parent_children = parent.get_children()
-
-            if_in_children = False
-            for child in parent_children:
-                if child.name == folder_to_add:
-                    if_in_children = True
-                    parent = child
-                    break
-
-            if not if_in_children:
-                parent = Folder.objects.create(name=folder_to_add, parent=parent)
-                print(f"Created virtual folder: {parent.name}")
-                if parent.last_folder_name_only is None:
-                    parent.last_folder_name_only = folders[0]
-                parent.save()
-
-            if parent.last_folder_name_only is None:
-                parent.last_folder_name_only = folders[0]
-                parent.save()
-            path_with_ids.append(
-                { "name": parent.last_folder_name_only, "id": parent.id }
-            )
-            # print ("Parent Name is {}, Path with Id's are {}".format(parent.name.encode('utf-8'),
-            #                                                          path_with_ids))
-            # print(json.dumps(path_with_ids))
-            if parent.path_with_ids is None:
-                parent.path_with_ids = json.dumps(path_with_ids)
-                parent.save()
-            # print ("Last folder name is : {}".format(folders[0]))
-            del folders[0]
-            recursive_add_folders(parent, folders, scene_to_add, path_with_ids)
-    else:
-        if not parent.scenes.filter(name=scene_to_add.name):
-            parent.scenes.add(scene_to_add)
-            print(
-                f"Added Scene: {scene_to_add.name} to virtual folder {parent.name}"
-            )
-            parent.save()
-
-
 def getStarted ():
+
+    print("")
+    verCheck()
+    print("")
     stats()
     backupper()
     write_actors_to_file()
@@ -232,23 +127,25 @@ def getStarted ():
     cpucnt = auxf.getCPUCount()
     global videoProcessing
     print(f"\nYou have {mem} GB available. CPU speed is {cpu} GHz and you have {cpucnt} cores available.")
-    if mem <= 1:
-        print("Since you have only about a gigabyte of memory, video processing will be disabled.")
-        videoProcessing = False
-    if mem >= 2:
-        print("Since you have sufficient memory, video processing features will be enabled.")
-        videoProcessing = True
-    print("\n")
-    verCheck()
 
-
+    if mem >= 2 and cpu > 1.2:
+        print("Since you have sufficient hardware, video processing features will be enabled.")
+        Config().videoprocessing = True
+        log.info("Video processing enabled, sufficient hardware specifications")
+    else:
+        print("Since you have insufficient hardware, video processing will be disabled.")
+        Config().videoprocessing = False
+        log.info("Video processing disabled, too low hardware specification")
+    print("\n\n")
 class ready:
 
     try:
-        if not 'migra' in sys.argv:
-            print("Not in migration mode.")
+        if not 'migrat' in str(sys.argv[1:]):
+            print("Not in migration mode. Executing startup sequence.")
             getStarted()
         else:
-            print("In migration mode.")
+            log.info(f'User entered migration mode with the "{sys.argv[1]}" command.')
+            print("\n")
     except:
+        log.warn("An error occured while testing if the user is in migration mode or not.")
         pass
