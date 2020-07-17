@@ -40,7 +40,7 @@ else:
 
 # First of all, check if the db is located in the old folder (root)
 
-if not 'migra' in sys.argv:
+if not 'migrat' in str(sys.argv[1:]):
     src = Config().root_path
     dest = os.path.join(Config().database_dir)
     okmoved = True
