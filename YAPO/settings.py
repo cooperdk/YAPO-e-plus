@@ -53,7 +53,7 @@ if not 'migra' in sys.argv:
         print("\nCODE TO RUN:")
         print("python manage.py makemigrations")
         print("python manage.py migrate\n")
-        # input("\nPress enter to exit YAPO. ")
+        input("\nPress enter to exit YAPO and take care of the above. >")
         quit()
 
     if os.path.isfile(os.path.join(src, "db.sqlite3")):
@@ -65,7 +65,7 @@ if not 'migra' in sys.argv:
                 log.error("Error moving the database")
                 print("There was an error moving the database to it's new location:")
                 print(f"{src} -> {dest}")
-                input("Please check the source and destination. Press enter to exit YAPO. ")
+                input("Please check the source and destination. Press enter to exit YAPO. >")
                 quit()
         else:
             log.error("Databases at two locations")
@@ -75,7 +75,7 @@ if not 'migra' in sys.argv:
             print("")
             print(f"SOURCE: {src}")
             print(f"DESTINATION: {src}")
-            input("Press enter to exit YAPO, and start it again when the above is taken care of. ")
+            input("Press enter to exit YAPO, and start it again when the above is taken care of. >")
             quit()
         if okmoved:
             log.info(f"The database was moved to {dest}.")
