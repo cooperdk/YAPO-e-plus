@@ -1,14 +1,10 @@
 import os
 import sys
-import pathlib
-import yaml
-from os import path
 import urllib.request
-from videos.models import Actor, Scene, ActorTag
-#import videos.views
-import YAPO.settings as ysettings
 import videos.const as constx
-
+from videos.models import Actor, ActorTag
+from utils.printing import Logger as logger
+from configuration import Config
 
 def progress (count, total, suffix=''):
     bar_len = 60
@@ -133,6 +129,7 @@ def url_is_alive (url):
         urllib.request.urlopen(request)
         return True
     except urllib.request.HTTPError:
+        logger.warn(f"URL is not alive: {url}")
         return False
 
 
@@ -147,9 +144,7 @@ def strip_bad_chars (name):
 
 
 def save_actor_profile_image_from_web (image_link, actor, force):
-    save_path = os.path.join(
-        constx.MEDIA_PATH, "actor", str(actor.id),"profile/"
-    )
+    save_path = os.path.join(Config().site_media_path, "actor", str(actor.id),"profile/")
 
     if not os.path.exists(save_path):
         os.makedirs(save_path)
@@ -174,10 +169,9 @@ def save_actor_profile_image_from_web (image_link, actor, force):
             print("Download error, you need to try again or insert a photo manually.")
 
     else:
-        print("Skipping, because there's already a usable photo.")
+        print("Skipping photo download - there's already a usable photo.")
     rel_path = os.path.relpath(save_file_name, start="videos")
     as_uri = urllib.request.pathname2url(rel_path)
-
     actor.thumbnail = as_uri
 
 
