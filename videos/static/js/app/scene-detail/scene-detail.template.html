@@ -58,6 +58,7 @@
                                             class="glyphicon glyphicon-plus"></span>
                         </button>
 
+
     <a href="#!/scene/{{ $ctrl.next }}"><span
             uib-popover-html="'Next Scene in list.'"
             popover-trigger="mouseenter" popover-placement="bottom"
@@ -84,6 +85,17 @@
 
 
     <div class="col-md-6">
+        <div class="alcenter">Scrape info from:<br>
+                        <p>
+                                    <button type="button" ng-click="$ctrl.scanScene('TPDB')" class="btn btn-default btn-sm">
+        <span class="glyphicon glyphicon-play-circle"></span>  Scan The Porn DB
+    </button>
+                            <input type="checkbox" ng-model="$ctrl.forceScan"
+                                   uib-popover-html="Force scanning."
+                                   popover-trigger="mouseenter" popover-placement="top"> Force
+
+                        </p>
+        </div>
          <ul>
     <li><span>Favorite:
         <!-- Rounded switch -->

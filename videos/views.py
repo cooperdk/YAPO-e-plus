@@ -42,7 +42,8 @@ import threading
 import videos.startup
 from django.db import connection
 # import pathlib
-
+from utils.printing import Logger
+log = Logger()
 
 
 def get_scenes_in_folder_recursive(folder, scene_list):
@@ -373,7 +374,31 @@ def tag_all_scenes_ignore_last_lookup(ignore_last_lookup):
 
 
 # views
+
+class scanScene(views.APIView):
+    def get(self, request, format=None):
+        import videos.aux_functions as aux
+        success = False
+        search_site = request.query_params["scanSite"]
+        scene_id = request.query_params["scene"]
+        scene_name=Scene.objects.get(pk=scene_id).name
+        if request.query_params["force"] == "true":
+            force = True
+        else:
+            force = False
+        print("Now entering the scene scanner API REST view")
+        print(f"Scanning for {scene_name} on {search_site}")
+        scene_name2 = aux.tpdb_formatter(scene_name)
+        print(f'Searching the scrubbed title "{scene_name2}"')
+
+        if success:
+            return Response(status=200)
+
+        else:
+            return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+
 class ScrapeActor(views.APIView):
+
     def get(self, request, format=None):
         search_site = request.query_params["scrapeSite"]
         actor_id = request.query_params["actor"]
@@ -440,7 +465,7 @@ class ScrapeActor(views.APIView):
                 return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
 
 
-def permenatly_delete_scene_and_remove_from_db(scene):
+def permanently_delete_scene_and_remove_from_db(scene):
     success_delete_file = False
     success_delete_media_path = False
     try:
@@ -617,7 +642,7 @@ def tag_multiple_items(request):
                     print("permDelete true")
                     for x in scenes_to_update:
                         scene_to_update = Scene.objects.get(pk=x)
-                        permenatly_delete_scene_and_remove_from_db(scene_to_update)
+                        permanently_delete_scene_and_remove_from_db(scene_to_update)
                 else:
                     for x in scenes_to_update:
                         scene_to_update = Scene.objects.get(pk=x)
@@ -750,6 +775,18 @@ def clean_dir(type_of_model_to_clean):
             index += 1
             pass
 
+def sizeformat (b: int) -> str: # returns a human-readable filesize depending on the file's size
+    if b < 1000:
+        return f"{b} bytes"
+    elif b < 1000000:
+        return f"{b/1000:.1f} kilobytes"
+    elif b < 1000000000:
+        return f"{b/1000000:.1f} megabytes"
+    elif b < 1000000000000:
+        return f"{b/1000000000:.1f} gigabytes"
+    else:
+        return f"{b/1000000000000:.1f} terabytes"
+
 
 @api_view(["GET", "POST"])
 def settings(request):
@@ -801,6 +838,8 @@ def settings(request):
         if "checkDupes" in request.query_params:
             if request.query_params["checkDupes"] == "True":
                 print("Checking database for duplicates by hash...")
+                total_saved = 0
+                total_deleted = 0
                 anumber = 0
                 for scene_1 in Scene.objects.all():
                     anumber += 1
@@ -816,12 +855,17 @@ def settings(request):
                                 #    "\nis duplicate of " +
                                 #    str(scene_2.id) + " - " + scene_2.name + "\nFile path: " + scene_2.path_to_file)
                                 if scene_2.hash == scene_1.hash:
-                                    print(
-                                        f"Confirmed! Duplicate scene info:\n {scene_2.id} - {scene_2.path_to_file}\nHash: {scene_2.hash}"
-                                    )
+                                    total_deleted += 1
+                                    total_saved = total_saved + scene_2.size
+                                    print(f"Confirmed! Duplicate scene info:\n {scene_2.id} - {scene_2.path_to_file}\nHash: {scene_2.hash}")
                                     # print("Passing ID " + str(scene_2.id) + " to delete function...")
-                                    permenatly_delete_scene_and_remove_from_db(scene_2)
+                                    permanently_delete_scene_and_remove_from_db(scene_2)
+                if total_deleted > 0:
+                    # print(f"Deleted {total_deleted} files, saving {sizeformat(total_saved)}")
+                    log.info(f"Deleted {total_deleted} files, saving {sizeformat(total_saved)}")
                 return Response(status=200)
+
+
         # populate_last_folder_name_in_virtual_folders()
         #    write_actors_to_file()
         #    clean_empty_folders()
@@ -841,7 +885,7 @@ def settings(request):
                         print(
                             f"File for scene {scene.name} does not exist in path {scene.path_to_file}"
                         )
-                        permenatly_delete_scene_and_remove_from_db(scene)
+                        permanently_delete_scene_and_remove_from_db(scene)
                     counter += 1
                 print("\nFinished cleaning scenes...")
 

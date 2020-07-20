@@ -4,7 +4,7 @@ import subprocess
 from videos import ffmpeg_process
 import django
 from videos import filename_parser
-import videos.const as const
+from configuration import Config, Constants
 
 django.setup()
 
@@ -79,7 +79,12 @@ def create_scene(scene_path, make_sample_video):
     path_to_dir, filename = os.path.split(scene_path)
     current_scene.name = os.path.splitext(filename)[0]
     current_scene.path_to_dir = path_to_dir
-
+    sheet_width = Config().sheet_width
+    sheet_grid = Config().sheet_grid
+    if sheet_width > 2048:
+        sheet_width = 2048
+    if sheet_width < 800:
+        sheet_width = 800
 #    print(
 #        "Scene Name: %s\nPath to Dir: %s\nPath to File: %s"
 #        % (current_scene.name, current_scene.path_to_dir, current_scene.path_to_file)
@@ -97,35 +102,33 @@ def create_scene(scene_path, make_sample_video):
 
                 print("Screenshot taken.")
         sheet_path = os.path.abspath(
-            os.path.join(const.MEDIA_PATH, "scenes", str(scene_in_db.id), "sheet.jpg")
+            os.path.join(Config().site_media_path, "scenes", str(scene_in_db.id), "sheet.jpg")
         )
         if os.path.exists(sheet_path):
             print("Contact sheet for this scene already exists, not re-generating.")
         else:
             file_path = os.path.abspath(current_scene.path_to_file)
-            # sheetExec = sys.executable + " " + os.path.abspath(os.path.join(const.VIDEO_ROOT, 'videosheet.py'))
-            # print("Executing " + sys.executable + " " + os.path.abspath(os.path.join(const.VIDEO_ROOT, 'videosheet.py')) + " " + file_path + " -t -w 1024 -g 5x6 --quality 75 -f jpg -o " + os.path.abspath(sheet_path))
-            print("Generating Contact Sheet (1024 px wide, 4x4 grid)... ")
+            print(f"Generating Contact Sheet ({sheet_width} px wide, grid: {sheet_grid}... ")
             try:
                 p = subprocess.run(
                     [
                         sys.executable,
                         os.path.abspath(
-                            os.path.join(const.SHEET_ROOT, "videosheet.py")
+                            os.path.join(Config().site_path, "videosheet", "videosheet.py")
                         ),
                         file_path,
                         "-t",
                         "-w",
-                        "1024",
+                        str(sheet_width),
                         "-g",
-                        "4x4",
+                        sheet_grid,
                         "--quality",
                         "75",
                         "--timestamp-format",
                         "{H}:{M}:{S}",
                         "--template",
                         os.path.abspath(
-                            os.path.join(const.SHEET_ROOT, "yapo.template")
+                            os.path.join(Config().site_path, "videosheet", "yapo.template")
                         ),
                         "--timestamp-border-mode",
                         "--timestamp-font-size",
@@ -140,11 +143,10 @@ def create_scene(scene_path, make_sample_video):
                         os.path.abspath(sheet_path),
                     ]
                 )
-                # print("Watermarking: " + sys.executable + " " + os.path.abspath(os.path.join(const.SHEET_ROOT, 'mark.py')) + " " + os.path.abspath(sheet_path))
                 p = subprocess.run(
                     [
                         sys.executable,
-                        os.path.abspath(os.path.join(const.SHEET_ROOT, "mark.py")),
+                        os.path.join(Config().site_path, "videosheet", "mark.py"),
                         os.path.abspath(sheet_path),
                     ]
                 )
@@ -153,7 +155,7 @@ def create_scene(scene_path, make_sample_video):
                 print("Error creating contact sheet!")
         if make_sample_video:
             video_filename_path = os.path.join(
-                const.MEDIA_PATH, "scenes", str(scene_in_db.id), "sample", "sample.mp4"
+                Config().site_media_path, "scenes", str(scene_in_db.id), "sample", "sample.mp4"
             )
             if not os.path.isfile(video_filename_path):
                 create_sample_video(scene_in_db)
@@ -174,35 +176,33 @@ def create_scene(scene_path, make_sample_video):
 
 
             sheet_path = os.path.abspath(
-                os.path.join(const.MEDIA_PATH, "scenes", str(current_scene.id), "sheet.jpg")
+                os.path.join(Config().site_media_path, "scenes", str(current_scene.id), "sheet.jpg")
             )
             if os.path.exists(sheet_path):
                 print("Contact sheet for this scene already exists, not re-generating.")
             else:  
                 file_path = os.path.abspath(current_scene.path_to_file)
-                # sheetExec = sys.executable + " " + os.path.abspath(os.path.join(const.VIDEO_ROOT, 'videosheet.py'))
-                # print("Executing " + sys.executable + " " + os.path.abspath(os.path.join(const.VIDEO_ROOT, 'videosheet.py')) + " " + file_path + " -t -w 1024 -g 5x6 --quality 75 -f jpg -o " + os.path.abspath(sheet_path))
-                print("Generating Contact Sheet (1024 px wide, 4x4 grid)... ")
+                print(f"Generating Contact Sheet ({sheet_width} px wide, grid: {sheet_grid})... ")
                 try:
                     p = subprocess.run(
                         [
                             sys.executable,
                             os.path.abspath(
-                                os.path.join(const.SHEET_ROOT, "videosheet.py")
+                                os.path.join(Config().site_path, "videosheet", "videosheet.py")
                             ),
                             file_path,
                             "-t",
                             "-w",
-                            "1024",
+                            str(sheet_width),
                             "-g",
-                            "4x4",
+                            sheet_grid,
                             "--quality",
                             "75",
                             "--timestamp-format",
                             "{H}:{M}:{S}",
                             "--template",
                             os.path.abspath(
-                                os.path.join(const.SHEET_ROOT, "yapo.template")
+                                os.path.join(Config().site_path, "videosheet", "yapo.template")
                             ),
                             "--timestamp-border-mode",
                             "--timestamp-font-size",
@@ -217,11 +217,10 @@ def create_scene(scene_path, make_sample_video):
                             os.path.abspath(sheet_path),
                         ]
                     )
-                    # print("Watermarking: " + sys.executable + " " + os.path.abspath(os.path.join(const.SHEET_ROOT, 'mark.py')) + " " + os.path.abspath(sheet_path))
                     p = subprocess.run(
                         [
                             sys.executable,
-                            os.path.abspath(os.path.join(const.SHEET_ROOT, "mark.py")),
+                            os.path.join(Config().site_path, "videosheet", "mark.py"),
                             os.path.abspath(sheet_path),
                         ]
                     )

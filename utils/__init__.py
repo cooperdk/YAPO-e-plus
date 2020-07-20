@@ -21,3 +21,7 @@ class Constants(metaclass=Singleton):
     self.videoprocessing = True
     self.default_json_settings_filename = 'settings.json'
     self.default_yaml_settings_filename = 'settings.yml'
+    self.unknown_person_image_path = "media/images/actor/Unknown/profile/profile.jpg"
+    self.sheet_width = 1024
+    self.sheet_grid = "4x4"
+    self.vlc_path = "c:/program files/videolan/vlc/vlc.exe"
