@@ -243,6 +243,8 @@ def tpdb (scene_id: int, force: bool):
                                     if not actor.country_of_origin or actor.country_of_origin == "":
                                         if "birthplace" in performer_extras.keys():
                                             birthplace = performer_extras['birthplace']
+                                            if "united states" in birthplace.lower():
+                                                birthplace = "United States"
                                             if birthplace is not None:
                                                 if actor.country_of_origin == None or actor.country_of_origin == "":
                                                     actor.country_of_origin = birthplace
@@ -254,6 +256,7 @@ def tpdb (scene_id: int, force: bool):
                                             weight = performer_extras['weight']
                                             if weight is not None:
                                                 weight = re.findall(r'[\d]+', weight)
+                                                weight = weight[0]
                                                 actor.weight = weight
                                                 print(f"Weight: {weight} kg")
                                                 added = True
@@ -269,6 +272,7 @@ def tpdb (scene_id: int, force: bool):
                                                     height = int(round(height * 2.54))
                                                 else:
                                                     height = int(round(height * 2.54))
+                                                height=height[0]
                                                 actor.height = height
                                                 print(f"Height: {height} cm")
                                                 added = True
