@@ -142,6 +142,7 @@ class Scene(models.Model):
     name = models.CharField(max_length=500)
     tpdb_id = models.CharField(null=True, default="", max_length=48, blank=True)
     release_id = models.CharField(null=True, default="", max_length=64, blank=True)
+    release_date = models.DateTimeField(null=True, blank=True)
     hash = models.CharField(default="", max_length=32, blank=True)
     path_to_file = models.CharField(max_length=500, unique=True)
     path_to_dir = models.CharField(max_length=500)

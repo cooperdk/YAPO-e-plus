@@ -331,7 +331,8 @@ class SceneSerializer(serializers.ModelSerializer):
             "path_to_dir",
             "hash",
             "tpdb_id",
-            "release_id"
+            "release_id",
+            "release_date",
             "date_added",
             "date_fav",
             "date_runner_up",

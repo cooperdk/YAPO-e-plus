@@ -5,13 +5,15 @@ import _thread
 import django.db
 import errno
 from django.shortcuts import render, get_object_or_404
+import requests
 import json
 import videos.addScenes
 import videos.filename_parser as filename_parser
 import videos.scrapers.freeones as scraper_freeones
 import videos.scrapers.imdb as scraper_imdb
 import videos.scrapers.tmdb as scraper_tmdb
-import videos.scrapers.googleimages as scraper_images
+import videos.scrapers.scanners as scanners
+#import videos.scrapers.googleimages as scraper_images
 from configuration import Config
 from videos import ffmpeg_process
 import urllib.request
@@ -44,6 +46,8 @@ from django.db import connection
 # import pathlib
 from utils.printing import Logger
 log = Logger()
+
+
 
 
 def get_scenes_in_folder_recursive(folder, scene_list):
@@ -377,25 +381,24 @@ def tag_all_scenes_ignore_last_lookup(ignore_last_lookup):
 
 class scanScene(views.APIView):
     def get(self, request, format=None):
-        import videos.aux_functions as aux
-        success = False
+
         search_site = request.query_params["scanSite"]
         scene_id = request.query_params["scene"]
-        scene_name=Scene.objects.get(pk=scene_id).name
+
         if request.query_params["force"] == "true":
             force = True
         else:
             force = False
-        print("Now entering the scene scanner API REST view")
-        print(f"Scanning for {scene_name} on {search_site}")
-        scene_name2 = aux.tpdb_formatter(scene_name)
-        print(f'Searching the scrubbed title "{scene_name2}"')
+        print("Now entering the TPDB scene scanner API REST view")
+
+        success = scanners.tpdb(scene_id, force)
 
         if success:
             return Response(status=200)
 
         else:
-            return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
 
 class ScrapeActor(views.APIView):
 

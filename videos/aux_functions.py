@@ -153,7 +153,7 @@ def remove_text_inside_brackets(text, brackets="()[]"):
 def tpdb_formatter (name):
     trashTitle = (
         'RARBG', 'COM', '\d{3,4}x\d{3,4}', 'HEVC', 'H265', 'AVC', '\dK', '\d{3,4}p', 'TOWN.AG_', 'XXX', 'MP4',
-        'KLEENEX', 'SD', 'H264', 'repack', '1500k', '500k', '1000k'
+        'KLEENEX', 'SD', 'H264', 'repack', '1500k', '500k', '1000k', 'rq'
     )
 
     name = re.sub(r'(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s\d{2}\s\d{4}', '', name)
@@ -172,10 +172,13 @@ def tpdb_formatter (name):
     name = remove_text_inside_brackets(name)
     name = re.sub(' +', ' ', name)
 
-    name = name.replace(" ","+")
-    name = name.replace(".","+")
-    #print(f"New name to use for searching: {name}")
+    #name = name.replace(" ","+")
+    #name = name.replace(".","+")
+    print(f"New name to use for searching: {name}")
     return name
+
+
+
 def strip_bad_chars (name):
     bad_chars = { " " }
     for char in bad_chars:
