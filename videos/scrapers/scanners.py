@@ -197,6 +197,7 @@ def tpdb (scene_id: int, force: bool):
                                     elif len(perflist) < 3:
                                         perflist = actor.name
                                     print(f"Got actor {actor.name} from db...")
+                                    added = False
 
                                     if actor.date_of_birth == None or actor.date_of_birth == "" or actor.date_of_birth == "1970-01-01":
                                         if "birthday" in performer_extras.keys():
@@ -204,6 +205,7 @@ def tpdb (scene_id: int, force: bool):
                                             if dob is not None:
                                                 actor.date_of_birth = performer_extras["birthday"]
                                                 print(f"Added info: Birthday: {actor.date_of_birth}")
+                                                added = True
                                                 # actor.save()
                                             # print(performer_extras.keys())
 
@@ -217,11 +219,13 @@ def tpdb (scene_id: int, force: bool):
                                                 if not "fake tits" in str(actor.actor_tags.all().lower()):
                                                     actor.actor_tags.add("Fake tits")
                                                     print("Added tag: Fake tits")
+                                                    added = True
                                             elif faketits == False:
                                                 print("No...")
                                                 if not "natural tits" in str(actor.actor_tags.all().lower()):
                                                     actor.actor_tags.add("Natural tits")
                                                     print("Added tag: Natural tits")
+                                                    added = True
                                             # actor.save()
                                         else:
                                             print("No info on this actor's tits...")
@@ -233,6 +237,7 @@ def tpdb (scene_id: int, force: bool):
                                                 if actor.ethnicity == None or actor.ethnicity == "":
                                                     actor.ethnicity = ethnicity
                                                     print(f"Ethnicity: {ethnicity}")
+                                                    added = True
                                                     # actor.save()
 
                                     if not actor.country_of_origin or actor.country_of_origin == "":
@@ -242,6 +247,7 @@ def tpdb (scene_id: int, force: bool):
                                                 if actor.country_of_origin == None or actor.country_of_origin == "":
                                                     actor.country_of_origin = birthplace
                                                     print(f"Birthplace: {birthplace}")
+                                                    added = True
                                                     # actor.save()
                                     if not actor.weight or actor.weight == 0:
                                         if "weight" in performer_extras.keys():
@@ -250,6 +256,7 @@ def tpdb (scene_id: int, force: bool):
                                                 weight = re.findall(r'[\d]+', weight)
                                                 actor.weight = weight
                                                 print(f"Weight: {weight} kg")
+                                                added = True
 
                                     if not actor.height or actor.height == 0:
                                         if "height" in performer_extras.keys():
@@ -264,10 +271,15 @@ def tpdb (scene_id: int, force: bool):
                                                     height = int(round(height * 2.54))
                                                 actor.height = height
                                                 print(f"Height: {height} cm")
+                                                added = True
 
                                     if "hair_colour" in performer_extras.keys():
                                         hair = performer_extras['hair_colour']
                                         if hair is not None:
+                                            hair = hair.replace("Brunette, ", "")
+                                            hair = hair.replace("Blonde, ", "")
+                                            hair = hair.replace("Redhead, ", "")
+
                                             print(f"Hair color: {hair}")
                                             if hair is not None:
                                                 tags = str(actor.actor_tags.all())
@@ -278,17 +290,21 @@ def tpdb (scene_id: int, force: bool):
                                                         actor.actor_tags.remove(remtag)
                                                     insert_actor_tag(actor, hair + " hair")
                                                     print(f"Added tag: {hair} hair")
+                                                    added = True
                                                 else:
                                                     print(f"Didn't add tag: {hair} hair - it exists already.")
 
                                     if performer["parent"]["bio"] is not None and len(performer["parent"]["bio"]) > 72:
                                         actor.description = performer["parent"]["bio"]
+                                        added = True
                                         # actor.save()
 
                                     if not actor.gender:
                                         actor.gender = "F"
+                                        added = True
 
-                                    actor.last_lookup = datetime.datetime.now()
+                                    if added == True:
+                                        actor.last_lookup = datetime.datetime.now()
                                     actor.save()
             newtitle = ""
             if site:
