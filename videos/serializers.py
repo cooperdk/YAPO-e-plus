@@ -330,6 +330,9 @@ class SceneSerializer(serializers.ModelSerializer):
             "path_to_file",
             "path_to_dir",
             "hash",
+            "tpdb_id",
+            "release_id",
+            "release_date",
             "date_added",
             "date_fav",
             "date_runner_up",
@@ -351,6 +354,8 @@ class SceneSerializer(serializers.ModelSerializer):
             "description",
             "folders_in_tree",
             "date_last_played",
+            "orig_name",
+            "orig_path_to_file",
         ]
 
 

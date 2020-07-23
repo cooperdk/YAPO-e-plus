@@ -15,7 +15,8 @@ from bs4 import BeautifulSoup
 from dateutil.parser import parse
 import videos.const as const
 from django.utils import timezone
-
+from utils.printing import Logger
+log = Logger()
 
 import requests.packages.urllib3
 requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
@@ -70,7 +71,7 @@ def search_freeones(actor_to_search, alias, force):
     if href_found:
     
         success = True
-        print("")
+        print("\r")
         aux.progress(1,27,f"Found {actor_to_search.name}, parsing...")
         #print("\nI found " + actor_to_search.name + ", so I am looking for information on her profile page.")
         actor_to_search.gender = 'F'
@@ -145,7 +146,7 @@ def search_freeones(actor_to_search, alias, force):
                                         aux.save_actor_profile_image_from_web(first_picture_link, actor_to_search,force)
                                         aux.progress(4,27,"Storing photo")
                         else:
-                            aux.progress(4,29,"Not saving photo, one exists already")
+                            aux.progress(4,29,"Not saving photo, one exists")
 
         #remember to remark:
         #actor_to_search.last_lookup = datetime.datetime.now()
@@ -375,7 +376,7 @@ def search_freeones(actor_to_search, alias, force):
                         
                         if len(cupSize)>0:
                             insert_actor_tag(actor_to_search, cupSize + " Cup")
-                            aux.progress(18,29,"Measurements [Cup size tag]")
+                            aux.progress(18,29,"Measurements [Cup size]")
             
                             accepted_stringsTiny = {'A'}
                             accepted_stringsSmall = {'B'}
@@ -433,7 +434,7 @@ def search_freeones(actor_to_search, alias, force):
                             
                                         if done: break
                                     if done: break
-                                aux.progress(19,29,"Measurements [Tit size tag]")
+                                aux.progress(19,29,"Measurements [Tits size]")
                             except: pass
 
                     elif link2_text.lower().strip() == 'boobs':
@@ -446,7 +447,7 @@ def search_freeones(actor_to_search, alias, force):
                         else:
                             insert_actor_tag(actor_to_search, "Natural tits")
                             #print("Her tits are natural, added that tag")
-                        aux.progress(20,29,"Tits fake/natural tag")
+                        aux.progress(20,29,"Tits fake/natural")
 
                     elif link2_text.lower().strip() == 'tattoos':
                         next_td_tag1 = link2.find_next('span').find_next('span').find_next('span')
@@ -518,7 +519,7 @@ def search_freeones(actor_to_search, alias, force):
                             if (actor_to_search.tattoos and tattoos1) and actor_to_search.tattoos.lower() != tattoos1.lower():
                                 actor_to_search.tattoos = tattoos1
                                 
-                            aux.progress(22,29,"Tattoos [Amount tag]")
+                            aux.progress(22,29,"Tattoos [Amount]")
                             
 
                     elif link2_text.lower().strip() == 'piercings':
@@ -569,13 +570,13 @@ def search_freeones(actor_to_search, alias, force):
                 elif "Inuit" in ethnicity:
                     insert_actor_tag(actor_to_search, "Inuit")
                     #print ("Adding Ethnicity: Inuit")
-            aux.progress(26,29,"Ethnicity tag")
+            aux.progress(26,29,"Ethnicity")
         except:
             pass
             
 
         aux.send_piercings_to_actortag(actor_to_search)
-        aux.progress(27,29,"Sending piercings to actor tags")
+        aux.progress(27,29,"Sending piercings to tags")
     #    sendAllPiercings()
     #    use the above whenever you want to update all piercings in db
 
@@ -586,17 +587,18 @@ def search_freeones(actor_to_search, alias, force):
     else:
         actor_to_search.last_lookup = datetime.datetime.now()
         actor_to_search.save()
-        print(" (Not Found)")
+        print(" Not Found")
         fail = True
         aux.progress_end()
         print("")
-    try:
-        if success:
-            aux.progress(29,29,f"{num} tags parsed for {actor_to_search.name}.")
-            aux.progress_end()
+#    try:
+    if success:
+        aux.progress(29,29,f"{num} tags parsed for {actor_to_search.name}.")
+        aux.progress_end()
         print("")
-    except:
-        pass
+        log.info(f"Actor scraped: {actor_to_search.name}")
+#    except:
+#        pass
         #aux.progress(29,29,str(num) + " tags parsed for " + actor_to_search.name + ".")
         #aux.progress_end()
         #print("")

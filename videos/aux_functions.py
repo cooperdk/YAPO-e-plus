@@ -1,19 +1,19 @@
 import os
 import sys
+import re
 import urllib.request
-import videos.const as constx
-from videos.models import Actor, ActorTag
-from utils.printing import Logger as logger
-from configuration import Config
+from videos.models import Actor, Scene, ActorTag
+from configuration import Config, Constants
+from dateutil.parser import parse
 
-def progress (count, total, suffix=''):
-    bar_len = 60
+def progress (count: int, total: int, suffix=''):
+    bar_len = 42
     filled_len = int(round(bar_len * count / float(total)))
 
     percents = round(100.0 * count / float(total), 1)
     bar = '\u2588' * filled_len + '\u2591' * (bar_len - filled_len)
-
-    sys.stdout.write(f"{bar} [{percents}%] ... {suffix}\r                 ")
+    #bar = '█' * filled_len + '░' * (bar_len - filled_len)
+    sys.stdout.write(f"\r{bar} [{percents}%] - {suffix}                    \r")
 
 
 def progress_end ():
@@ -129,8 +129,54 @@ def url_is_alive (url):
         urllib.request.urlopen(request)
         return True
     except urllib.request.HTTPError:
-        logger.warn(f"URL is not alive: {url}")
         return False
+
+
+def remove_text_inside_brackets(text, brackets="()[]"):
+    count = [0] * (len(brackets) // 2) # count open/close brackets
+    saved_chars = []
+    for character in text:
+        for i, b in enumerate(brackets):
+            if character == b: # found bracket
+                kind, is_close = divmod(i, 2)
+                count[kind] += (-1)**is_close # `+1`: open, `-1`: close
+                if count[kind] < 0: # unbalanced bracket
+                    count[kind] = 0  # keep it
+                else:  # found bracket to remove
+                    break
+        else: # character is not a [balanced] bracket
+            if not any(count): # outside brackets
+                saved_chars.append(character)
+    return ''.join(saved_chars)
+
+
+def tpdb_formatter (name):
+    trashTitle = (
+        'RARBG', 'COM', '\d{3,4}x\d{3,4}', 'HEVC', 'H265', 'AVC', '\dK', '\d{3,4}p', 'TOWN.AG_', 'XXX', 'MP4',
+        'KLEENEX', 'SD', 'H264', 'repack', '1500k', '500k', '1000k', 'rq'
+    )
+
+    name = re.sub(r'(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s\d{2}\s\d{4}', '', name)
+    name = re.sub(r'(\d+)[/\.-](\d+)[/\.-](\d+)', '', name)
+    name = re.sub(r'\W', ' ', name)
+    for trash in trashTitle:
+        name = re.sub(r'\b%s\b' % trash, '', name, flags=re.IGNORECASE)
+    name = ' '.join(name.split())
+
+    name = name.replace("(", " ")
+    name = name.replace(")", " ")
+    name = name.replace("[", " ")
+    name = name.replace("]", " ")
+    name = name.replace("!", " ")
+    name = name.replace("?", " ")
+    name = remove_text_inside_brackets(name)
+    name = re.sub(' +', ' ', name)
+
+    #name = name.replace(" ","+")
+    #name = name.replace(".","+")
+    print(f"New name to use for searching: {name}")
+    return name
+
 
 
 def strip_bad_chars (name):
@@ -144,7 +190,9 @@ def strip_bad_chars (name):
 
 
 def save_actor_profile_image_from_web (image_link, actor, force):
-    save_path = os.path.join(Config().site_media_path, "actor", str(actor.id),"profile/")
+    save_path = os.path.join(
+        Config().site_media_path, "actor", str(actor.id),"profile/"
+    )
 
     if not os.path.exists(save_path):
         os.makedirs(save_path)
@@ -169,9 +217,10 @@ def save_actor_profile_image_from_web (image_link, actor, force):
             print("Download error, you need to try again or insert a photo manually.")
 
     else:
-        print("Skipping photo download - there's already a usable photo.")
+        print("Skipping, because there's already a usable photo.")
     rel_path = os.path.relpath(save_file_name, start="videos")
     as_uri = urllib.request.pathname2url(rel_path)
+
     actor.thumbnail = as_uri
 
 
@@ -181,7 +230,7 @@ def actor_folder_from_name_to_id ():
     for actor in actors:
         rel_path = os.path.relpath(
             os.path.join(
-                constx.MEDIA_PATH,
+                Config().site_media_path,
                 "actor",
                 str(actor.id),
                 "profile",
@@ -196,26 +245,26 @@ def actor_folder_from_name_to_id ():
            f"Actor {actor.name} thumb path is: {actor.thumbnail} \n and it should be {as_uri}"
         )
         print(actor.thumbnail != as_uri)
-        if (actor.thumbnail != constx.UNKNOWN_PERSON_IMAGE_PATH) and (
+        if (actor.thumbnail != Config().unknown_person_image_path) and (
                 actor.thumbnail != as_uri
         ):
             try:
                 os.rename(
-                    os.path.join(constx.MEDIA_PATH, "actor", actor.name),
-                    os.path.join(constx.MEDIA_PATH, "actor", str(actor.id)),
+                    os.path.join(Config().site_media_path, "actor", actor.name),
+                    os.path.join(Config().site_media_path, "actor", str(actor.id)),
                 )
 
                 print(
                     "Renamed %s to %s"%(
-                        os.path.join(constx.MEDIA_PATH, "actor", actor.name),
-                        os.path.join(constx.MEDIA_PATH, "actor", str(actor.id)),
+                        os.path.join(Config().site_media_path, "actor", actor.name),
+                        os.path.join(Config().site_media_path, "actor", str(actor.id)),
                     )
                 )
             except FileNotFoundError:
 
                 if os.path.isfile(
                         os.path.join(
-                            constx.MEDIA_PATH,
+                            Config().site_media_path,
                             "actor",
                             str(actor.id),
                             "profile",
@@ -225,7 +274,7 @@ def actor_folder_from_name_to_id ():
 
                     rel_path_changed = os.path.relpath(
                         os.path.join(
-                            constx.MEDIA_PATH,
+                            Config().site_media_path,
                             "actor",
                             str(actor.id),
                             "profile",
@@ -239,13 +288,13 @@ def actor_folder_from_name_to_id ():
                     print(f"Changed {actor.name} thumb in database to {as_uri_changed}")
                 else:
                     print("File %s not found!"%(
-                            os.path.join(constx.MEDIA_PATH, "actor", actor.name)
+                            os.path.join(Config().site_media_path, "actor", actor.name)
                         )
                     )
 
             rel_path_changed = os.path.relpath(
                 os.path.join(
-                    constx.MEDIA_PATH,
+                    Config().site_media_path,
                     "actor",
                     str(actor.id),
                     "profile",

@@ -82,7 +82,8 @@ urlpatterns = [
                   url(r'^settings/', views.settings),
                   url(r'^ffmpeg/', views.ffmpeg),
                   url(r'^tag-multiple-items/', views.tag_multiple_items),
-                  url(r'^play/', views.display_video)
+                  url(r'^play/', views.display_video),
+                  url(r'^scan-scene/', views.scanScene.as_view())
                   # url(r'^admin/', admin.site.urls, name='admin')
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

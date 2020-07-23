@@ -23,11 +23,13 @@ class Config(metaclass=Singleton):
   database_path: str
   site_static_path: str
   site_media_path: str
+  unknown_person_image_path: str
   timeprint_format: str
   configfile_path: str
   vlc_path: Optional[str]
   current_setting_version: int
-
+  sheet_width: int
+  sheet_grid: str
   def __init__(self):
     self.root_path = os.path.abspath(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
     self.yapo_path = os.path.join(self.root_path, Constants().code_subdir)
@@ -38,15 +40,19 @@ class Config(metaclass=Singleton):
     self.database_path = os.path.join(self.database_dir, Constants().db_filename)
     self.site_static_path = os.path.join(self.site_path, Constants().site_static_subdir)
     self.site_media_path = os.path.join(self.site_path, Constants().site_media_subdir)
+    self.unknown_person_image_path = Constants().unknown_person_image_path
     self.timeprint_format = Constants().default_timeprint_format
     self.videoprocessing = Constants().videoprocessing
+    self.sheet_width = Constants().sheet_width
+    self.sheet_grid = Constants().sheet_grid
     self.configfile_path = os.path.join(self.config_path, Constants().default_yaml_settings_filename)
     self.current_setting_version = 3
     if os.name == 'nt':
-        self.vlc_path = "c:/program files/videolan/vlc/vlc.exe"
+        self.vlc_path = Constants().vlc_path
     else:
         self.vlc_path = None
     self.last_all_scene_tag = None
+    self.autorename_scenes = False
     self.__update_config_from_file__()
 
   def __log__(self, message: str) -> None:  # should be utils.printing, but that leads to circular dependency
@@ -85,9 +91,12 @@ class Config(metaclass=Singleton):
       self.timeprint_format = settings_dict[__yaml_root_element__].get("log_timeformat") or self.timeprint_format
       self.last_all_scene_tag = __string_to_nullable_time__(settings_dict[__yaml_root_element__].get("last_all_scene_tag")) or self.last_all_scene_tag
       self.site_media_path = settings_dict[__yaml_root_element__].get("site_media_path") or self.site_media_path
+      self.unknown_person_image_path = settings_dict[__yaml_root_element__].get("unknown_person_image_path") or self.unknown_person_image_path
       self.vlc_path = settings_dict[__yaml_root_element__].get("vlc_path")
       self.current_setting_version = __string_to_nullable_int__(settings_dict[__yaml_root_element__].get("current_setting_version")) or self.current_setting_version
-
+      self.autorename_scenes = settings_dict[__yaml_root_element__].get("autorename_scenes") or self.autorename_scenes
+      self.sheet_width = __string_to_nullable_int__(settings_dict[__yaml_root_element__].get("sheet_width")) or self.sheet_width
+      self.sheet_grid = settings_dict[__yaml_root_element__].get("sheet_grid") or self.sheet_grid
   def __settings_to_dict__(self):
     return {
       __yaml_root_element__: {
@@ -97,8 +106,12 @@ class Config(metaclass=Singleton):
         "log_timeformat": self.timeprint_format,
         "last_all_scene_tag": __nullable_time_to_string__(self.last_all_scene_tag),
         "site_media_path": self.site_media_path,
+        "unknown_person_image_path": self.unknown_person_image_path,
         "vlc_path": self.vlc_path,
-        "current_setting_version": self.current_setting_version
+        "current_setting_version": self.current_setting_version,
+        "autorename_scenes": self.autorename_scenes,
+        "sheet_width": self.sheet_width,
+        "sheet_grid": self.sheet_grid
       }
     }
 

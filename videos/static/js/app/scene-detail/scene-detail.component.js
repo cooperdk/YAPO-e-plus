@@ -22,6 +22,7 @@ angular.module('sceneDetail').component('sceneDetail', {
 
             self.isSampleExists = false;
             self.updatedSample = true;
+            self.forceScan = false;
             self.alerts = [];
             self.addAlert = function (msg, type, timeout) {
                 self.alerts.push({msg: msg, type: type, timeout: timeout});
@@ -358,6 +359,27 @@ angular.module('sceneDetail').component('sceneDetail', {
                         path: self.scene.path_to_dir
                     }
                 })
+            };
+
+            self.scanScene = function (scanSite) {
+
+                return $http.get('scan-scene/', {
+                    params: {
+                        scene: self.scene.id,
+                        scanSite: scanSite,
+                        force: self.forceScan
+
+                    }
+                }).then(function (response) {
+                    // alert(angular.toJson(response))
+                    self.addAlert("Succesfully scraped: " + self.scene.name + " from " + scanSite, 'success', '5000');
+                    self.getCurrentScene()
+                }, function errorCallback(response) {
+                    self.addAlert(scanSite + " could not find: " + self.scene.name + " - Try a different scanner or try to rename the title! ", 'warning', '5000');
+                    console.log(angular.toJson(response))
+                });
+
+
             };
 
             self.generateSampleVideo = function (scene) {

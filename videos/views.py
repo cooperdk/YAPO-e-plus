@@ -1,45 +1,57 @@
-import base64
-import errno
 import os
 import os.path
-import platform
-import shutil
 import subprocess
-import threading
-import urllib.request
-from itertools import chain
-from operator import attrgetter
-from random import shuffle
-
+import _thread
 import django.db
-from django.shortcuts import render
-from django.utils.datastructures import MultiValueDictKeyError
-from rest_framework import filters
-from rest_framework import generics
-from rest_framework import renderers
-from rest_framework import status
-from rest_framework import viewsets, views
-from rest_framework.decorators import api_view
-from rest_framework.parsers import FileUploadParser
-from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.response import Response
-from rest_framework.reverse import reverse
-
+import errno
+from django.shortcuts import render, get_object_or_404
+import requests
+import json
 import videos.addScenes
-import videos.const as const
 import videos.filename_parser as filename_parser
 import videos.scrapers.freeones as scraper_freeones
 import videos.scrapers.imdb as scraper_imdb
 import videos.scrapers.tmdb as scraper_tmdb
-import videos.startup
+import videos.scrapers.scanners as scanners
+#import videos.scrapers.googleimages as scraper_images
 from configuration import Config
 from videos import ffmpeg_process
-from videos.serializers import *
-from utils.printing import Logger as logger
+import urllib.request
+import YAPO.settings
 
 # For REST framework
 
-def get_scenes_in_folder_recursive (folder, scene_list):
+import platform
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from videos.serializers import *
+from rest_framework import generics
+from rest_framework.reverse import reverse
+from rest_framework import renderers
+from rest_framework import viewsets, views
+from rest_framework.parsers import FileUploadParser
+from rest_framework import filters
+from itertools import chain
+import base64
+import shutil
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework import status
+from operator import attrgetter
+from random import shuffle
+import videos.const as const
+import YAPO.settings
+from django.utils.datastructures import MultiValueDictKeyError
+import threading
+import videos.startup
+from django.db import connection
+# import pathlib
+from utils.printing import Logger
+log = Logger()
+
+
+
+
+def get_scenes_in_folder_recursive(folder, scene_list):
     scenes = list(folder.scenes.all())
     scene_list = list(chain(scene_list, scenes))
 
@@ -53,12 +65,12 @@ def get_scenes_in_folder_recursive (folder, scene_list):
         return scene_list
 
 
-def onlyChars (input):
+def onlyChars(input):
     valids = "".join(character for character in input if character.isalpha())
     return valids
 
 
-def get_folders_recursive (folder, folder_list):
+def get_folders_recursive(folder, folder_list):
     # scenes = list(folder.scenes.all())
     # scene_list = list(chain(scene_list, scenes))
 
@@ -77,13 +89,13 @@ def get_folders_recursive (folder, folder_list):
         return folder_list
 
 
-def lambda_attrgetter (string, x):
+def lambda_attrgetter(string, x):
     y = attrgetter(string)
 
     return y(x)
 
 
-def search_in_get_queryset (original_queryset, request):
+def search_in_get_queryset(original_queryset, request):
     qs_list = list()
     term_is_not_null = False
     random = False
@@ -119,7 +131,7 @@ def search_in_get_queryset (original_queryset, request):
 
             if search_string:
                 original_queryset = original_queryset.filter(
-                    **{ string_keyarg: search_string }
+                    **{string_keyarg: search_string}
                 )
                 was_searched = True
                 # qs_list = [i for i in qs_list if (search_string in i.name)]
@@ -129,8 +141,8 @@ def search_in_get_queryset (original_queryset, request):
                     original_queryset = original_queryset.filter(level=0)
 
     if (
-            "recursive" in request.query_params
-            and request.query_params["recursive"] == "true"
+        "recursive" in request.query_params
+        and request.query_params["recursive"] == "true"
     ):
         print("Recursive is TRUE!!!!")
         print(request.query_params["folders_in_tree"])
@@ -156,17 +168,17 @@ def search_in_get_queryset (original_queryset, request):
                 # print (term_string)
 
                 if (
-                        (term_string is not None)
-                        and (term_string != "")
-                        and (qp != "limit")
-                        and (qp != "offset")
-                        and (qp != "ordering")
-                        and (qp != "recursive")
-                        and (qp != "sortBy")
-                        and (qp != "searchField")
-                        and (qp != "format")
-                        and (qp != "pageType")
-                        and (qp != "search")
+                    (term_string is not None)
+                    and (term_string != "")
+                    and (qp != "limit")
+                    and (qp != "offset")
+                    and (qp != "ordering")
+                    and (qp != "recursive")
+                    and (qp != "sortBy")
+                    and (qp != "searchField")
+                    and (qp != "format")
+                    and (qp != "pageType")
+                    and (qp != "search")
                 ):
 
                     # if qp == 'sortBy':
@@ -186,7 +198,7 @@ def search_in_get_queryset (original_queryset, request):
                                     if bool(term) == getattr(i, qp):
                                         t_list.append(i)
                                 elif (
-                                        getattr(i, qp)
+                                    getattr(i, qp)
                                 ).__class__.__name__ == "ManyRelatedManager":
                                     print(getattr(i, qp).all())
                                     x = getattr(i, qp).all()
@@ -201,7 +213,7 @@ def search_in_get_queryset (original_queryset, request):
                             qs_list = t_list
                         else:
                             qs_list = list(
-                                chain(qs_list, original_queryset.filter(**{ qp: term }))
+                                chain(qs_list, original_queryset.filter(**{qp: term}))
                             )
 
     if "sortBy" in request.query_params:
@@ -270,12 +282,12 @@ def search_in_get_queryset (original_queryset, request):
             return original_queryset.order_by(sort_by)
 
 
-def scrape_all_actors (force):
+def scrape_all_actors(force):
     actors = Actor.objects.all()
 
     for actor in actors:
-
-        # print("\r")
+    
+        #print("\r")
 
         if not force:
             if actor.last_lookup is None:
@@ -290,9 +302,7 @@ def scrape_all_actors (force):
                     scraper_freeones.search_freeones_with_force_flag(actor, True)
                     print("Finished Freeones search")
             else:
-                print(
-                    "{actor.name} was already searched...                                                                        \r",
-                    end="")
+                print("{actor.name} was already searched...                                                                        \r",end="")
         else:
 
             print("Searching in TMDb")
@@ -306,12 +316,11 @@ def scrape_all_actors (force):
                 print("Searching in Freeones")
                 scraper_freeones.search_freeones_with_force_flag(actor, True)
                 print("Finished Freeones search.")
-    print(
-        "\rDone scraping actors.                                                                                               ")
+    print("\rDone scraping actors.                                                                                               ")
     return Response(status=200)
 
 
-def tag_all_scenes (ignore_last_lookup):
+def tag_all_scenes(ignore_last_lookup):
     if Config().current_setting_version < 3:
 
         for actorTag in ActorTag.objects.all():
@@ -320,7 +329,7 @@ def tag_all_scenes (ignore_last_lookup):
 
             scene_tag_to_add = SceneTag.objects.get(name=actorTag.name)
             actorTag.scene_tags.add(scene_tag_to_add)
-            scenetag = SceneTag.objects.filter(name=actorTag.name)
+            scenetag=SceneTag.objects.filter(name=actorTag.name)
             print(
                 f"Added scene tag {scenetag} to actor tag {actorTag.name}"
             )
@@ -330,7 +339,7 @@ def tag_all_scenes (ignore_last_lookup):
     return Response(status=200)
 
 
-def tag_all_scenes_ignore_last_lookup (ignore_last_lookup):
+def tag_all_scenes_ignore_last_lookup(ignore_last_lookup):
     if Config().current_setting_version < 3:
 
         for actorTag in ActorTag.objects.all():
@@ -339,7 +348,7 @@ def tag_all_scenes_ignore_last_lookup (ignore_last_lookup):
 
             scene_tag_to_add = SceneTag.objects.get(name=actorTag.name)
             actorTag.scene_tags.add(scene_tag_to_add)
-            scenetag = SceneTag.objects.filter(name=actorTag.name)
+            scenetag=SceneTag.objects.filter(name=actorTag.name)
             print(
                 f"Added scene tag {scenetag} to actor tag {actorTag.name}"
             )
@@ -370,8 +379,31 @@ def tag_all_scenes_ignore_last_lookup (ignore_last_lookup):
 
 
 # views
+
+class scanScene(views.APIView):
+    def get(self, request, format=None):
+
+        search_site = request.query_params["scanSite"]
+        scene_id = request.query_params["scene"]
+
+        if request.query_params["force"] == "true":
+            force = True
+        else:
+            force = False
+        print("Now entering the TPDB scene scanner API REST view")
+
+        success = scanners.tpdb(scene_id, force)
+
+        if success:
+            return Response(status=200)
+
+        else:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+
 class ScrapeActor(views.APIView):
-    def get (self, request, format=None):
+
+    def get(self, request, format=None):
         search_site = request.query_params["scrapeSite"]
         actor_id = request.query_params["actor"]
         if request.query_params["force"] == "true":
@@ -437,28 +469,22 @@ class ScrapeActor(views.APIView):
                 return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
 
 
-def rename_scene (scene, newname):
-    oldname = scene.name
-    scene.name = str(newname)
-    scene.save()
-    logger.info(f"Renamed scene {scene.id} to {scene.name}")
-
-def permenatly_delete_scene_and_remove_from_db (scene):
+def permanently_delete_scene_and_remove_from_db(scene):
     success_delete_file = False
     success_delete_media_path = False
     try:
         os.remove(scene.path_to_file)
-        logger.info(f"Deleted scene '{scene.path_to_file}'")
+        print(f"Successfully deleted scene '{scene.path_to_file}'")
         success_delete_file = True
     except OSError as e:
         if e.errno == errno.ENOENT:
-            logger.warn(
-                f"File {scene.path_to_file} already deleted! - Error: {e.strerror}]"
+            print(
+                f"File {scene.path_to_file} already deleted! [Err No:{e.errno}, Err File:{e.filename} Err:{e.strerror}]"
             )
             success_delete_file = True
         else:
-            logger.error(
-                f"Got OSError while trying to delete {scene.path_to_file} - Error: {e.strerror}"
+            print(
+                f"Got OSError while trying to delete {scene.path_to_file} : Error number:{e.errno} Error Filename:{e.filename} Error:{e.strerror}"
             )
 
     media_path = os.path.relpath(
@@ -474,8 +500,8 @@ def permenatly_delete_scene_and_remove_from_db (scene):
             print(f"Directory '{media_path}' already deleted")
             success_delete_media_path = True
         else:
-            logger.error(
-                f"Got OSError while trying to delete {scene.path_to_file} - Error:{e.strerror}"
+            print(
+                f"Got OSError while trying to delete {scene.path_to_file} : Error number:{e.errno} Error Filename:{e.filename} Error:{e.strerror}"
             )
 
     if success_delete_file and success_delete_media_path:
@@ -483,7 +509,7 @@ def permenatly_delete_scene_and_remove_from_db (scene):
         print(f"Removed '{scene.name}' from database")
 
 
-def checkDupeHash (hash):
+def checkDupeHash(hash):
     from django.db import connection
 
     cursor = connection.cursor()
@@ -495,7 +521,7 @@ def checkDupeHash (hash):
 
 
 @api_view(["GET", "POST"])
-def tag_multiple_items (request):
+def tag_multiple_items(request):
     if request.method == "POST":
         # print("We got a post request!")
 
@@ -602,8 +628,8 @@ def tag_multiple_items (request):
                         if actor_to_add.actor_tags.count() > 0:
                             for actor_tag in actor_to_add.actor_tags.all():
                                 if (
-                                        actor_tag.scene_tags.first()
-                                        in scene_to_update.scene_tags.all()
+                                    actor_tag.scene_tags.first()
+                                    in scene_to_update.scene_tags.all()
                                 ):
                                     scene_to_update.scene_tags.remove(
                                         actor_tag.scene_tags.first()
@@ -620,7 +646,7 @@ def tag_multiple_items (request):
                     print("permDelete true")
                     for x in scenes_to_update:
                         scene_to_update = Scene.objects.get(pk=x)
-                        permenatly_delete_scene_and_remove_from_db(scene_to_update)
+                        permanently_delete_scene_and_remove_from_db(scene_to_update)
                 else:
                     for x in scenes_to_update:
                         scene_to_update = Scene.objects.get(pk=x)
@@ -707,14 +733,14 @@ def tag_multiple_items (request):
         return Response(status=200)
 
 
-def clean_dir (type_of_model_to_clean):
+def clean_dir(type_of_model_to_clean):
     number_of_folders = len(
         os.listdir(os.path.join(const.MEDIA_PATH, type_of_model_to_clean))
     )
     index = 1
 
     for dir_in_path in os.listdir(
-            os.path.join(const.MEDIA_PATH, type_of_model_to_clean)
+        os.path.join(const.MEDIA_PATH, type_of_model_to_clean)
     ):
 
         print(f"Checking {type_of_model_to_clean} folder {index} out of {number_of_folders}\r", end="")
@@ -753,9 +779,21 @@ def clean_dir (type_of_model_to_clean):
             index += 1
             pass
 
+def sizeformat (b: int) -> str: # returns a human-readable filesize depending on the file's size
+    if b < 1000:
+        return f"{b} bytes"
+    elif b < 1000000:
+        return f"{b/1000:.1f} kilobytes"
+    elif b < 1000000000:
+        return f"{b/1000000:.1f} megabytes"
+    elif b < 1000000000000:
+        return f"{b/1000000000:.1f} gigabytes"
+    else:
+        return f"{b/1000000000000:.1f} terabytes"
+
 
 @api_view(["GET", "POST"])
-def settings (request):
+def settings(request):
     if request.method == "GET":
 
         if "pathToVlc" in request.query_params:
@@ -765,7 +803,7 @@ def settings (request):
 
                 return Response(serializer.data)
             else:
-                new_path_to_vlc = os.path.abspath(request.query_params["pathToVlc"]).replace("\\", "/")
+                new_path_to_vlc = os.path.abspath(request.query_params["pathToVlc"]).replace("\\","/")
 
                 if os.path.isfile(new_path_to_vlc):
                     Config().vlc_path = new_path_to_vlc
@@ -804,6 +842,8 @@ def settings (request):
         if "checkDupes" in request.query_params:
             if request.query_params["checkDupes"] == "True":
                 print("Checking database for duplicates by hash...")
+                total_saved = 0
+                total_deleted = 0
                 anumber = 0
                 for scene_1 in Scene.objects.all():
                     anumber += 1
@@ -819,12 +859,17 @@ def settings (request):
                                 #    "\nis duplicate of " +
                                 #    str(scene_2.id) + " - " + scene_2.name + "\nFile path: " + scene_2.path_to_file)
                                 if scene_2.hash == scene_1.hash:
-                                    print(
-                                        f"Confirmed! Duplicate scene info:\n {scene_2.id} - {scene_2.path_to_file}\nHash: {scene_2.hash}"
-                                    )
+                                    total_deleted += 1
+                                    total_saved = total_saved + scene_2.size
+                                    print(f"Confirmed! Duplicate scene info:\n {scene_2.id} - {scene_2.path_to_file}\nHash: {scene_2.hash}")
                                     # print("Passing ID " + str(scene_2.id) + " to delete function...")
-                                    permenatly_delete_scene_and_remove_from_db(scene_2)
+                                    permanently_delete_scene_and_remove_from_db(scene_2)
+                if total_deleted > 0:
+                    # print(f"Deleted {total_deleted} files, saving {sizeformat(total_saved)}")
+                    log.info(f"Deleted {total_deleted} files, saving {sizeformat(total_saved)}")
                 return Response(status=200)
+
+
         # populate_last_folder_name_in_virtual_folders()
         #    write_actors_to_file()
         #    clean_empty_folders()
@@ -844,7 +889,7 @@ def settings (request):
                         print(
                             f"File for scene {scene.name} does not exist in path {scene.path_to_file}"
                         )
-                        permenatly_delete_scene_and_remove_from_db(scene)
+                        permanently_delete_scene_and_remove_from_db(scene)
                     counter += 1
                 print("\nFinished cleaning scenes...")
 
@@ -882,7 +927,7 @@ def settings (request):
 
 
 @api_view(["GET"])
-def ffmpeg (request):
+def ffmpeg(request):
     if request.method == "GET":
         if "generateSampleVideo" in request.query_params:
             if request.query_params["generateSampleVideo"]:
@@ -905,7 +950,7 @@ def ffmpeg (request):
                     return Response(status=500)
 
 
-def add_comma_seperated_items_to_db (string_of_comma_seperated_items, type_of_item):
+def add_comma_seperated_items_to_db(string_of_comma_seperated_items, type_of_item):
     for x in string_of_comma_seperated_items.split(","):
 
         if type_of_item == "actor":
@@ -938,7 +983,7 @@ def add_comma_seperated_items_to_db (string_of_comma_seperated_items, type_of_it
 
 
 class AddItems(views.APIView):
-    def get (self, request, format=None):
+    def get(self, request, format=None):
 
         if request.query_params["folderToAddPath"] != "":
             folders_to_add_path = request.query_params["folderToAddPath"]
@@ -964,7 +1009,7 @@ class AddItems(views.APIView):
                         f"Added folder {local_scene_folder.name} to folder list..."
                     )
                 else:
-                    content = { "Path does not exist!": "Can't find path!" }
+                    content = {"Path does not exist!": "Can't find path!"}
                     return Response(
                         content, status=status.HTTP_500_INTERNAL_SERVER_ERROR
                     )
@@ -987,10 +1032,10 @@ class AddItems(views.APIView):
         return Response(status=200)
 
 
-def play_scene_vlc (scene, random):
+def play_scene_vlc(scene, random):
     file_path = os.path.normpath(scene.path_to_file)
     if platform.system() == "Windows":
-        vlc_path = Config().vlc_path  # os.path.normpath(const.VLC_PATH)
+        vlc_path = Config().vlc_path #os.path.normpath(const.VLC_PATH)
     else:
         vlc_path = "vlc"
     p = subprocess.Popen([vlc_path, file_path])
@@ -1035,7 +1080,7 @@ def play_scene_vlc (scene, random):
 
 
 @api_view(["GET", "POST"])
-def play_in_vlc (request):
+def play_in_vlc(request):
     scene = None
     random = True
 
@@ -1048,27 +1093,27 @@ def play_in_vlc (request):
             actor_id = request.query_params["actor"]
             scene = Scene.objects.filter(actors=actor_id).order_by("?").first()
         elif (
-                "sceneTag" in request.query_params
-                and request.query_params["sceneTag"] != "-6"
+            "sceneTag" in request.query_params
+            and request.query_params["sceneTag"] != "-6"
         ):
             scene_tag_id = request.query_params["sceneTag"]
             scene = Scene.objects.filter(scene_tags=scene_tag_id).order_by("?").first()
         elif (
-                "website" in request.query_params
-                and request.query_params["website"] != "-6"
+            "website" in request.query_params
+            and request.query_params["website"] != "-6"
         ):
             website_id = request.query_params["website"]
             scene = Scene.objects.filter(websites=website_id).order_by("?").first()
         elif (
-                "folder" in request.query_params and request.query_params["folder"] != "-6"
+            "folder" in request.query_params and request.query_params["folder"] != "-6"
         ):
             folder_id = request.query_params["folder"]
             scene = (
                 Scene.objects.filter(folders_in_tree=folder_id).order_by("?").first()
             )
         elif (
-                "playlist" in request.query_params
-                and request.query_params["playlist"] != "-6"
+            "playlist" in request.query_params
+            and request.query_params["playlist"] != "-6"
         ):
             playlist_id = request.query_params["playlist"]
             scene = Scene.objects.filter(playlists=playlist_id).order_by("?").first()
@@ -1083,7 +1128,7 @@ def play_in_vlc (request):
 
 
 class PlayInVlc(views.APIView):
-    def get (self, request, format=None):
+    def get(self, request, format=None):
         scene_id = request.query_params["sceneId"]
         scene = Scene.objects.get(pk=scene_id)
 
@@ -1092,7 +1137,7 @@ class PlayInVlc(views.APIView):
         return Response(status=200)
 
 
-def open_file_cross_platform (path):
+def open_file_cross_platform(path):
     if platform.system() == "Windows":
         os.startfile(path)
     else:
@@ -1101,7 +1146,7 @@ def open_file_cross_platform (path):
 
 
 class OpenFolder(views.APIView):
-    def get (self, request, format=None):
+    def get(self, request, format=None):
         path = request.query_params["path"]
         open_file_cross_platform(path)
         return Response(status=200)
@@ -1113,7 +1158,7 @@ class AssetAdd(views.APIView):
         FormParser,
     )
 
-    def post (self, request, format=None):
+    def post(self, request, format=None):
         my_file = "alala"
         # my_file = request.FILES['file']
         save_path = const.TEMP_PATH
@@ -1178,7 +1223,7 @@ class AssetAdd(views.APIView):
 class FileUploadView(views.APIView):
     parser_classes = (FileUploadParser,)
 
-    def put (self, request, filename, format=None):
+    def put(self, request, filename, format=None):
         file_obj = request.data["file"]
 
         print("got file")
@@ -1186,12 +1231,13 @@ class FileUploadView(views.APIView):
         return Response(status=204)
 
 
-def angualr_index (request):
-    return render(request, os.path.join("videos", "angular", "index.html"))
+def angualr_index(request):
+
+    return render(request, os.path.join("videos","angular","index.html"))
 
 
 @api_view(["GET"])
-def api_root (request, format=None):
+def api_root(request, format=None):
     return Response(
         {
             "actor_alias": reverse(
@@ -1206,7 +1252,7 @@ class ActorAliasHTMLRest(generics.GenericAPIView):
     queryset = ActorAlias.objects.all()
     renderer_classes = (renderers.StaticHTMLRenderer,)
 
-    def get (self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         alias = self.get_object()
         return Response(alias.name)
 
@@ -1214,7 +1260,7 @@ class ActorAliasHTMLRest(generics.GenericAPIView):
 class PlaylistViewSet(viewsets.ModelViewSet):
     queryset = Playlist.objects.all()
 
-    def get_serializer_class (self):
+    def get_serializer_class(self):
         if self.action == "list":
             return PlaylistListSerializer
         else:
@@ -1227,7 +1273,7 @@ class LocalSceneFoldersViewSet(viewsets.ModelViewSet):
 
 
 class FolderViewSet(viewsets.ModelViewSet):
-    def get_queryset (self):
+    def get_queryset(self):
         queryset = Folder.objects.all()
 
         return search_in_get_queryset(queryset, self.request)
@@ -1237,12 +1283,12 @@ class FolderViewSet(viewsets.ModelViewSet):
 
 
 class WebsiteViewSet(viewsets.ModelViewSet):
-    def get_queryset (self):
+    def get_queryset(self):
         queryset = Website.objects.all()
 
         return search_in_get_queryset(queryset, self.request)
 
-    def get_serializer_class (self):
+    def get_serializer_class(self):
         if self.action == "list":
             return WebsiteIdNameSerailzier
         else:
@@ -1256,12 +1302,12 @@ class WebsiteViewSet(viewsets.ModelViewSet):
 
 
 class SceneTagViewSet(viewsets.ModelViewSet):
-    def get_queryset (self):
+    def get_queryset(self):
         queryset = SceneTag.objects.all()
 
         return search_in_get_queryset(queryset, self.request)
 
-    def get_serializer_class (self):
+    def get_serializer_class(self):
         if self.action == "list":
             return SceneTagIdNameSerialzier
         else:
@@ -1277,13 +1323,13 @@ class SceneTagViewSet(viewsets.ModelViewSet):
 
 
 class SceneViewSet(viewsets.ModelViewSet):
-    def get_queryset (self):
+    def get_queryset(self):
         queryset = Scene.objects.all()
         # queryset = self.get_serializer_class().setup_eager_loading(queryset,queryset)
         queryset = SceneListSerializer.setup_eager_loading(queryset, queryset)
         return search_in_get_queryset(queryset, self.request)
 
-    def get_serializer_class (self):
+    def get_serializer_class(self):
         if self.action == "list":
             return SceneListSerializer
         else:
@@ -1297,12 +1343,12 @@ class SceneViewSet(viewsets.ModelViewSet):
 
 
 class ActorTagViewSet(viewsets.ModelViewSet):
-    def get_queryset (self):
+    def get_queryset(self):
         queryset = ActorTag.objects.all()
 
         return search_in_get_queryset(queryset, self.request)
 
-    def get_serializer_class (self):
+    def get_serializer_class(self):
         if self.action == "list":
             return ActorTagListSerializer
         else:
@@ -1324,7 +1370,7 @@ class ActorAliasViewSet(viewsets.ModelViewSet):
       Additionally we also provide an extra `highlight` action.
     """
 
-    def get_queryset (self):
+    def get_queryset(self):
         # random order
         # queryset = Actor.objects.all().order_by('?')
         term = "name"
@@ -1340,7 +1386,7 @@ class ActorAliasViewSet(viewsets.ModelViewSet):
 
 
 class ActorViewSet(viewsets.ModelViewSet):
-    def get_queryset (self):
+    def get_queryset(self):
         # random order
         # queryset = Actor.objects.all().order_by('?')
 
@@ -1350,7 +1396,7 @@ class ActorViewSet(viewsets.ModelViewSet):
         res_qs = search_in_get_queryset(queryset, self.request)
         return res_qs
 
-    def get_serializer_class (self):
+    def get_serializer_class(self):
         if self.action == "list":
             return ActorListSerializer
         else:
@@ -1361,18 +1407,18 @@ class ActorViewSet(viewsets.ModelViewSet):
     # search_fields = ('name',)
     queryset = Actor.objects.all()
     # serializer_class = ActorSerializer
+    
+def display_video(x):
 
-
-def display_video (x):
     from django.http import StreamingHttpResponse
     from wsgiref.util import FileWrapper
     from datetime import timedelta
     import mimetypes
-
+    
     cont = 0
-
-    def read_video (path):
-
+ 
+    def read_video(path):
+        
         with open(path, 'rb') as f:
             while True:
                 data = f.read(10 * 1024)
@@ -1382,37 +1428,35 @@ def display_video (x):
                 else:
                     break
 
-    # dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-    # if x is None:
-    # return HttpResponse("No Video")
+    #dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+    #if x is None:
+        #return HttpResponse("No Video")
     sceneid = x.path
     sceneid = sceneid.split('/')[-1]
-    print(f"Requesting scene ID {sceneid}...\r", end="")
+    print (f"Requesting scene ID {sceneid}...\r", end="")
     scene = Scene.objects.get(pk=sceneid)
     pathname = scene.path_to_file
     size = scene.size
-
+    
     now = datetime.datetime.now()
     if scene.date_last_played is not None:
         then = scene.date_last_played
     else:
-        then = datetime.datetime.now() - timedelta(hours=12)
+        then = datetime.datetime.now() - timedelta(hours = 12)
     if now > then + timedelta(hours=3):
-        print(f"Playback: [{pathname}] ({size // 1048576} MB)")  # 1048576 is 1024^2
-        scene.play_count += 1
-        scene.date_last_played = datetime.datetime.now()
+        print (f"Playback: [{pathname}] ({size//1048576} MB)")#1048576 is 1024^2
+        scene.play_count+=1
+        scene.date_last_played=datetime.datetime.now()
         scene.save()
-        print(
-            f"Play count for scene {scene.id} is now {scene.play_count} and the last played date and time is updated.")
+        print(f"Play count for scene {scene.id} is now {scene.play_count} and the last played date and time is updated.")
     try:
         response = StreamingHttpResponse(FileWrapper(open(pathname, 'rb'), 8192),
-                                         content_type=mimetypes.guess_type(pathname)[
-                                             0])  # (open(pathname, 'rb')) #(read_video(pathname), status=206)
-        # response = StreamingHttpResponse(read_video(pathname)) #(open(pathname, 'rb')) #(read_video(pathname), status=206)
+            content_type=mimetypes.guess_type(pathname)[0]) #(open(pathname, 'rb')) #(read_video(pathname), status=206)
+        #response = StreamingHttpResponse(read_video(pathname)) #(open(pathname, 'rb')) #(read_video(pathname), status=206)
         response['Content-Length'] = size
-        # response['Content-Disposition'] = "attachment; filename=%s" % filename
-    # response["Content-Range"] = 'bytes 0-%s' % (size)
-    # response['Content-Disposition'] = f'attachement; filename="{pathname}"'
+        #response['Content-Disposition'] = "attachment; filename=%s" % filename
+    #response["Content-Range"] = 'bytes 0-%s' % (size)
+    #response['Content-Disposition'] = f'attachement; filename="{pathname}"'
     except:
         print("Error")
     return response

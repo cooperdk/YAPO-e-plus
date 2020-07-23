@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!python
 
 """
 This script enables YAPO to create  video contact sheets.
@@ -1461,7 +1461,8 @@ def error_exit(message):
     sys.exit(-1)
 
 
-def main():
+def main(args):
+    sys.argv = args
     """Program entry point
     """
     # Argument parser before actual argument parser to let the user overwrite the config path
@@ -2050,5 +2051,5 @@ def process_file(path, args):
         error_exit(f"Unsupported image format: {args.image_format}.")
 
 
-if __name__ == "__main__":
-    main()
+#if __name__ == "__main__":
+#    main()

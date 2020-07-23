@@ -140,7 +140,10 @@ class Website(models.Model):
 
 class Scene(models.Model):
     name = models.CharField(max_length=500)
-    hash = models.CharField(max_length=32)
+    tpdb_id = models.CharField(null=True, default="", max_length=48, blank=True)
+    release_id = models.CharField(null=True, default="", max_length=64, blank=True)
+    release_date = models.DateTimeField(null=True, blank=True)
+    hash = models.CharField(default="", max_length=32, blank=True)
     path_to_file = models.CharField(max_length=500, unique=True)
     path_to_dir = models.CharField(max_length=500)
     date_added = models.DateTimeField(auto_now_add=True)
@@ -169,6 +172,9 @@ class Scene(models.Model):
     codec_name = models.CharField(null=True, blank=True, max_length=20)
     framerate = models.FloatField(null=True, blank=True)
     modified_date = models.DateTimeField(auto_now=True)
+    orig_name = models.CharField(null=True, max_length=500)
+    orig_path_to_file = models.CharField(null=True, default="", max_length=500, blank=True)
+
 
     def __str__(self):
         return f"{self.name} "

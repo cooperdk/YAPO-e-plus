@@ -1,23 +1,17 @@
 import os
 from os import path
 import sys
-import json
+#import json
 import shutil
 import requests
 
 from utils.printing import Logger
 from videos.models import Scene, Actor, ActorTag, SceneTag, Folder
-import videos.const as vc
 import videos.aux_functions as auxf
-import YAPO.settings as settings
 from configuration import Config
 log = Logger()
 
-def getSizeAll () -> str:
-    # queryset.aggregate(Sum('size')).get('column__sum')
-    # cursor = connection.cursor()
-    # cursor.execute("SELECT SUM(size) AS total FROM videos_scene")[0]
-    # row = cursor.fetchall()
+def getSizeAll () -> str: # Retrieves the total amount of bytes of registered scenes
     row = Scene.objects.raw(
         "SELECT SUM(size) AS total, id FROM videos_scene"
     )  # cursor.fetchone()
@@ -27,7 +21,7 @@ def getSizeAll () -> str:
         return "no space"
 
 
-def sizeFormat (b: int) -> str:
+def sizeFormat (b: int) -> str: # returns a human-readable filesize depending on the file's size
     if b < 1000:
         return f"{b}B"
     elif b < 1000000:
@@ -40,7 +34,8 @@ def sizeFormat (b: int) -> str:
         return f"{b/1000000000000:.1f}TB"
 
 
-def write_actors_to_file():
+
+def write_actors_to_file(): # Method to dump all actors alphabetically in a ready-to-insert manner.
     actortxt = os.path.join(Config().data_path, "actors_dump.txt")
     actors = Actor.objects.order_by("id")  # name
     actors_string = ",".join(actor.name for actor in actors)
@@ -54,7 +49,8 @@ def write_actors_to_file():
     print("To recover actor data, please consult the guide.")
 
 
-def verCheck ():
+def verCheck (): # Check the local version against Github
+
     #dirname of dirname of file results in parent directory
     update = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "VERSION.md"))
 
@@ -78,7 +74,7 @@ def verCheck ():
 
 
 
-def stats ():
+def stats (): # Prints statistics about your videos and metadata
     size = getSizeAll()
     row = Actor.objects.raw(
         "SELECT COUNT(*) AS total, id FROM videos_actor"
@@ -107,7 +103,7 @@ def stats ():
     print(f"\nThere are {act} actors in the database.\nThese actors have {acttag} usable tags.\n\n")
 
 
-def backupper ():
+def backupper (): # Generates a backup of the database
     src = Config().database_path
     dest = os.path.join(Config().database_dir, "db.sqlite3.backup")
     shutil.copy(src, dest)
