@@ -29,11 +29,11 @@ def watermark_with_transparency(input_image_path, watermark_image_path):
 if __name__ == "__main__":
     if len(sys.argv) <= 1:
         print("python watermark.py <the_image_name>")
-        exit(1)
+        sys.exit(0)
     the_image = sys.argv[1]
     if the_image is None or len(the_image) == 0:
         print("python watermark.py <the_image_name>")
-        exit(1)
+        sys.exit(0)
     else:
         # print("Watermarking " + the_image + " with " + os.path.dirname(__file__) + "/../static/yapo-wm.png")
         watermark_with_transparency(

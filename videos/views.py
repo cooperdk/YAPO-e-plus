@@ -17,6 +17,7 @@ import videos.scrapers.scanners as scanners
 from configuration import Config
 from videos import ffmpeg_process
 import urllib.request
+import YAPO.settings
 
 # For REST framework
 

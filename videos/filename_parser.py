@@ -7,6 +7,7 @@ import hashlib
 from configuration import Config
 from videos import const
 import videos.scrapers.filenames as filenames
+import YAPO.settings
 
 django.setup()
 

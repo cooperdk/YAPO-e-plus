@@ -1,17 +1,43 @@
 #!/usr/bin/env python
-import os
+
+import sys, os
+
+#os.environ("DJANGO_SETTINGS_MODULE", "YAPO.settings")
+#os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
+
 import platform
 import sys
-
 import YAPO.settings
+#import settings
 from configuration import Config
 
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
+
+def main_is_frozen():
+   return (hasattr(sys, "frozen")) # old py2exe
+
+def get_main_dir():
+   if main_is_frozen():
+       return os.path.dirname(sys.executable)
+   return os.path.dirname(os.path.realpath(__file__))
+
+
+SCRIPT_ROOT = get_main_dir()
+
+try:
+   if sys.frozen or sys.importers:
+      SCRIPT_ROOT = os.path.dirname(sys.executable)
+      compiled = True
+except AttributeError:
+   SCRIPT_ROOT = os.path.dirname(os.path.realpath(__file__))
+   compiled = False
+
 x = 0
-if os.name == 'nt':
-    os.system('mode con: cols=140 lines=4096')
-    os.system('cls')
-else:
-    os.system('clear')
+#if os.name == 'nt':
+#    os.system('mode con: cols=140 lines=4096')
+#    os.system('cls')
+#else:
+#    os.system('clear')
 
 if platform.system() == "Windows":
     from ctypes import windll, byref
@@ -25,15 +51,19 @@ if platform.system() == "Windows":
     bufsize = wintypes._COORD(140, 4096)  # rows, columns
     windll.kernel32.SetConsoleScreenBufferSize(hdl, bufsize)
 
+    bannerdisp = False
+
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 
-    #from videos import apps
-    #from YAPO import pagination
+    #import videos.apps
+    #import YAPO.pagination
+
+
 
     #a = apps
     #a = pagination
-    if x == 0:
+    if x==0:
         print("")
         print("____    ____  ___       ______     ______         _______        ")
         print("\   \  /   / /   \     |   _  \   /  __  \       |   ____|   _   ")
@@ -44,13 +74,19 @@ if __name__ == "__main__":
         print("")
         print("              YET ANOTHER PORN ORGANIZER - extended")
         print("=================================================================")
-        print("")
-        print(f"Database dir is:    {Config().database_dir}")
-        print(f"Config dir is:      {Config().config_path}")
-        print(f"Media files dir is: {Config().site_media_path}")
-        print("Consider making regular backup of these directories.\n")
-
+        print(f"Executing YAPO from: {SCRIPT_ROOT}",end="")
+        if compiled:
+            print(f" (frozen build)",end="")
+        else:
+            print(f" (Running with Python)",end="")
+        if x==1:
+            print(f" - listener")
+        print(f"Database dir is:     {Config().database_dir}")
+        print(f"Config dir is:       {Config().config_path}")
+        print(f"Media files dir is:  {Config().site_media_path}")
+        print("Consider making regular backup of the db, config and media directories.\n")
+        #bannerdisp = True
     from django.core.management import execute_from_command_line
 
-    #x = x + 1
+    x =+ 1
     execute_from_command_line(sys.argv)
