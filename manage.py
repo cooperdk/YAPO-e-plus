@@ -33,11 +33,11 @@ except AttributeError:
    compiled = False
 
 x = 0
-#if os.name == 'nt':
-#    os.system('mode con: cols=140 lines=4096')
-#    os.system('cls')
-#else:
-#    os.system('clear')
+if os.name == 'nt':
+    os.system('mode con: cols=140 lines=4096')
+    os.system('cls')
+else:
+    os.system('clear')
 
 if platform.system() == "Windows":
     from ctypes import windll, byref
@@ -76,11 +76,9 @@ if __name__ == "__main__":
         print("=================================================================")
         print(f"Executing YAPO from: {SCRIPT_ROOT}",end="")
         if compiled:
-            print(f" (frozen build)",end="")
+            print(f" (frozen build)")
         else:
-            print(f" (Running with Python)",end="")
-        if x==1:
-            print(f" - listener")
+            print(f" (Running with Python)")
         print(f"Database dir is:     {Config().database_dir}")
         print(f"Config dir is:       {Config().config_path}")
         print(f"Media files dir is:  {Config().site_media_path}")

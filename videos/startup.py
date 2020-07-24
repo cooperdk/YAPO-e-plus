@@ -4,7 +4,7 @@ import sys
 #import json
 import shutil
 import requests
-
+import platform
 from utils.printing import Logger
 from videos.models import Scene, Actor, ActorTag, SceneTag, Folder
 import videos.aux_functions as auxf
@@ -51,28 +51,37 @@ def write_actors_to_file(): # Method to dump all actors alphabetically in a read
 
 def verCheck (): # Check the local version against Github
 
-    #dirname of dirname of file results in parent directory
-    update = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "VERSION.md"))
+    try:
+        if sys.frozen or sys.importers:
+            SCRIPT_ROOT = os.path.dirname(sys.executable)
+            compiled = True
+    except AttributeError:
+        SCRIPT_ROOT = os.path.dirname(os.path.realpath(__file__))
+        compiled = False
 
-    if path.isfile(update):
-        with open(update, "r") as verfile:
-            ver = verfile.read()
-        ver = str(ver).strip()
-        print(f"--- Version {ver}")
-        try:
-            remoteVer = requests.get(
-                "https://raw.githubusercontent.com/cooperdk/YAPO-e-plus/develop/VERSION.md"
-            ).text
-            remoteVer = remoteVer.strip()
-        except:
-            remoteVer = "?REQUEST ERROR"
-            pass
+    if not compiled:
+        #dirname of dirname of file results in parent directory
+        update = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "VERSION.md"))
 
-        # print("Github version: "+str(remoteVer))
-        if str(ver) != str(remoteVer):
-            log.info(f'███ A new version of YAPO e+ is available ({remoteVer})! ███')
+        if path.isfile(update):
+            with open(update, "r") as verfile:
+                ver = verfile.read()
+            ver = str(ver).strip()
+            print(f"--- Version {ver}")
+            try:
+                remoteVer = requests.get(
+                    "https://raw.githubusercontent.com/cooperdk/YAPO-e-plus/develop/VERSION.md"
+                ).text
+                remoteVer = remoteVer.strip()
+            except:
+                remoteVer = "?REQUEST ERROR"
+                pass
 
-
+            # print("Github version: "+str(remoteVer))
+            if str(ver) != str(remoteVer):
+                log.info(f'███ A new version of YAPO e+ is available ({remoteVer})! ███')
+    else:
+        print("Since this build is frozen, an update check is nor performed.")
 
 def stats (): # Prints statistics about your videos and metadata
     size = getSizeAll()
@@ -109,7 +118,37 @@ def backupper (): # Generates a backup of the database
     shutil.copy(src, dest)
     print(f"Performed a database backup to {dest}\n")
 
-
+def ffmpeg_check():
+    import dload
+    if platform.system() == "Windows":
+        dir_to_check = os.path.join(Config().site_path, 'ffmpeg')
+        ffmpeg = os.path.exists(os.path.abspath(os.path.join(dir_to_check, 'ffmpeg.exe')))
+        ffplay = os.path.exists(os.path.abspath(os.path.join(dir_to_check, 'ffplay.exe')))
+        ffprobe = os.path.exists(os.path.abspath(os.path.join(dir_to_check, 'ffprobe.exe')))
+        if not all([ffmpeg, ffplay, ffprobe]):
+            print("You don't have a copy of FFMPEG in your YAPO system.")
+            print("I am going to install a copy of FFPMEG (4.3, static).")
+            print(f"It will be placed at ")
+            input("Press enter to acknowledge... >")
+            print("Getting https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-4.3-win64-static.zip...")
+            try:
+                print("Download... ",end="")
+                dload.save_unzip("https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-4.3-win64-static.zip", dir_to_check, True)
+                print("CP ffmpeg... ", end="")
+                print(os.path.abspath(os.path.join(dir_to_check, 'ffmpeg-4.3-win64-static', 'bin', 'ffmpeg.exe')))
+                shutil.move(os.path.abspath(os.path.join(dir_to_check, 'ffmpeg-4.3-win64-static', 'bin', 'ffmpeg.exe')), os.path.abspath(dir_to_check))
+                print("CP ffplay... ", end="")
+                shutil.move(os.path.abspath(os.path.join(dir_to_check, 'ffmpeg-4.3-win64-static', 'bin', 'ffplay.exe')), os.path.abspath(dir_to_check))
+                print("CP ffprobe... ", end="")
+                shutil.move(os.path.abspath(os.path.join(dir_to_check, 'ffmpeg-4.3-win64-static', 'bin', 'ffprobe.exe')), os.path.abspath(dir_to_check))
+                print("RM temp dir... ", end="")
+                shutil.rmtree(os.path.abspath(os.path.join(dir_to_check, 'ffmpeg-4.3-win64-static')))
+                print("Done.")
+            except:
+                print(f"An error occured, please download FFMPEG manually from the above link")
+                print(f"and place it in {dir_to_check}")
+                input("YAPO will exit now. Press enter to acknowledge... >")
+                sys.exit()
 def getStarted ():
 
     print("")
@@ -133,6 +172,9 @@ def getStarted ():
         Config().videoprocessing = False
         log.info("Video processing disabled, too low hardware specification")
     print("\n\n")
+
+    ffmpeg_check()
+
 class ready:
 
     try:

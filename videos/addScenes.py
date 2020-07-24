@@ -142,17 +142,17 @@ def create_scene(scene_path, make_sample_video):
                 "-o",
                 os.path.abspath(sheet_path),
             ]
+            try:
+                # sys.argv = args
+                videosheet.main(args)
 
-            # sys.argv = args
-            videosheet.main(args)
+                watermark(
+                    os.path.abspath(sheet_path), os.path.join(Config().site_path, 'static', 'yapo-wm.png')
+                )
 
-            watermark(
-                os.path.abspath(sheet_path), os.path.join(Config().site_path, 'static', 'yapo-wm.png')
-            )
-
-            print("Contact Sheet saved to %s" % (os.path.abspath(sheet_path)))
-        #               except:
-        #                   print("Error creating contact sheet!")
+                print("Contact Sheet saved to %s" % (os.path.abspath(sheet_path)))
+            except:
+                print("Error creating contact sheet!")
 
         if make_sample_video:
             video_filename_path = os.path.join(
@@ -216,18 +216,18 @@ def create_scene(scene_path, make_sample_video):
                         os.path.abspath(sheet_path),
                     ]
 
+                try:
+                    #sys.argv = args
+                    videosheet.main(args)
 
-                #sys.argv = args
-                videosheet.main(args)
-
-                watermark(
-                    os.path.abspath(sheet_path), os.path.join(Config().site_path, 'static', 'yapo-wm.png')
-                )
+                    watermark(
+                        os.path.abspath(sheet_path), os.path.join(Config().site_path, 'static', 'yapo-wm.png')
+                    )
 
 
-                print("Contact Sheet saved to %s"%(os.path.abspath(sheet_path)))
- #               except:
- #                   print("Error creating contact sheet!")
+                    print("Contact Sheet saved to %s"%(os.path.abspath(sheet_path)))
+                except:
+                   print("Error creating contact sheet!")
 
 
 
@@ -429,20 +429,22 @@ def populate_last_folder_name_in_virtual_folders():
             folder.save()
 
 def watermark(input_image_path, watermark_image_path):
-    base_image = Image.open(input_image_path).convert(
-        "RGBA"
-    )  # convert to RGBA is important
-    watermark = Image.open(watermark_image_path).convert("RGBA")
-    width, height = base_image.size
-    mark_width, mark_height = watermark.size
-    position = (width - mark_width - 32, 28)  # (height-mark_height-32 for lower-right)
-    transparent = Image.new("RGBA", (width, height), (0, 0, 0, 0))
-    transparent.paste(base_image, (0, 0))
-    transparent.paste(watermark, position, mask=watermark)
-    # transparent.show()
-    transparent = transparent.convert("RGB")
-    transparent.save(input_image_path)
-
+    if os.path.exists(input_image_path):
+        base_image = Image.open(input_image_path).convert(
+            "RGBA"
+        )  # convert to RGBA is important
+        watermark = Image.open(watermark_image_path).convert("RGBA")
+        width, height = base_image.size
+        mark_width, mark_height = watermark.size
+        position = (width - mark_width - 32, 28)  # (height-mark_height-32 for lower-right)
+        transparent = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+        transparent.paste(base_image, (0, 0))
+        transparent.paste(watermark, position, mask=watermark)
+        # transparent.show()
+        transparent = transparent.convert("RGB")
+        transparent.save(input_image_path)
+    else:
+        print("Not watermarking, as the image file doesn't exist.")
 def main():
     scenes = Scene.objects.all()
     for scene in scenes:

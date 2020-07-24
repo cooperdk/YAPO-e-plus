@@ -53,7 +53,7 @@ if not 'migrat' in str(sys.argv[1:]): # Check if the user runs migration. Don't 
         print("python manage.py makemigrations")
         print("python manage.py migrate\n")
         input("\nPress enter to exit YAPO and take care of the above. >")
-        quit()
+        sys.exit()
 
     if os.path.isfile(os.path.join(src, "db.sqlite3")):
         if not os.path.isfile(os.path.join(dest, "db.sqlite3")):
@@ -65,7 +65,7 @@ if not 'migrat' in str(sys.argv[1:]): # Check if the user runs migration. Don't 
                 print("There was an error moving the database to it's new location:")
                 print(f"{src} -> {dest}")
                 input("Please check the source and destination. Press enter to exit YAPO. >")
-                quit()
+                sys.exit()
         else:
             log.error("Databases at two locations")
             print(f"There is a database file at both the below listed locations. You need to delete the one")
@@ -75,7 +75,7 @@ if not 'migrat' in str(sys.argv[1:]): # Check if the user runs migration. Don't 
             print(f"SOURCE: {src}")
             print(f"DESTINATION: {src}")
             input("Press enter to exit YAPO, and start it again when the above is taken care of. >")
-            quit()
+            sys.exit()
         if okmoved:
             log.info(f"The database was moved to {dest}.")
 
