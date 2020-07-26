@@ -128,7 +128,7 @@ def ffmpeg_check():
         if not all([ffmpeg, ffplay, ffprobe]):
             print("You don't have a copy of FFMPEG in your YAPO system.")
             print("I am going to install a copy of FFPMEG (4.3, static).")
-            print(f"It will be placed at ")
+            print(f"It will be placed at {dir_to_check}")
             input("Press enter to acknowledge... >")
             print("Getting https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-4.3-win64-static.zip...")
             try:
