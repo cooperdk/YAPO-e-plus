@@ -81,6 +81,7 @@ def create_scene(scene_path, make_sample_video):
     current_scene.path_to_file = scene_path
     path_to_dir, filename = os.path.split(scene_path)
     current_scene.name = os.path.splitext(filename)[0]
+    # TODO: Insert website abbreviation function call here
     current_scene.path_to_dir = path_to_dir
     sheet_width = Config().sheet_width
     sheet_grid = Config().sheet_grid
