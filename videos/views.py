@@ -796,18 +796,19 @@ def sizeformat (b: int) -> str: # returns a human-readable filesize depending on
 def settings(request):
     if request.method == "GET":
 
-        print(f"REQ: {str(request.query_params)}")
+        #print(f"REQ: {str(request.query_params)}")
 
         if "pathToVlc" in request.query_params:
             if request.query_params["pathToVlc"] == "":
-                print("GET")
+
                 serializer = SettingsSerializer(Config().get_old_settings_as_json())
 
                 return Response(serializer.data)
 
             else:
-                print(f"New path to VLC: {request.query_params['pathToVlc']}")
+
                 new_path_to_vlc = os.path.abspath(request.query_params["pathToVlc"]).replace("\\","/")
+                log.info(f'TpDB set to {request.query_params["new_path_to_vlc"]}')
 
                 if os.path.isfile(new_path_to_vlc):
                     Config().vlc_path = new_path_to_vlc
@@ -830,21 +831,20 @@ def settings(request):
         if "tpdb_settings" in request.query_params:
 
             if "tpdb_enabled" in request.query_params:
-                print(f'Option TpDB enabled > {request.query_params["tpdb_enabled"]}')
+                log.info(f'TpDB set to {request.query_params["tpdb_enabled"]}')
                 Config().tpdb_enabled = request.query_params["tpdb_enabled"]
-                print(f"CONFIG: tbdb_enabled = {Config().tpdb_enabled}")
+                #print(f"CONFIG: tbdb_enabled = {Config().tpdb_enabled}")
                 if Config().tpdb_enabled == 'false':
                     Config().tpdb_website_logos  = 'false'
                     Config().tpdb_autorename  = 'false'
                     Config().tpdb_actors  = 'false'
                     Config().tpdb_photos  = 'false'
                 else:
-                    Config().tpdb_website_logos = request.query_params["tpdb_websitelogos"]
-                    Config().tpdb_autorename = request.query_params["tpdb_autorename"]
-                    Config().tpdb_actors = request.query_params["tpdb_actors"]
-                    Config().tpdb_photos = request.query_params["tpdb_photos"]
+                    if "tpdb_websitelogos" in request.query_params: Config().tpdb_website_logos = request.query_params["tpdb_websitelogos"]
+                    if "tpdb_autorename" in request.query_params: Config().tpdb_autorename = request.query_params["tpdb_autorename"]
+                    if "tpdb_actors" in request.query_params: Config().tpdb_actors = request.query_params["tpdb_actors"]
+                    if "tpdb_photos" in request.query_params: Config().tpdb_photos = request.query_params["tpdb_photos"]
                 Config().save()
-                print("Saved TPDB settings")
                 return Response(status=200)
 
 
