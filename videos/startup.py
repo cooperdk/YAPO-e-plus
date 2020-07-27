@@ -5,6 +5,7 @@ import sys
 import shutil
 import requests
 import platform
+import webbrowser
 from utils.printing import Logger
 from videos.models import Scene, Actor, ActorTag, SceneTag, Folder
 import videos.aux_functions as auxf
@@ -174,6 +175,18 @@ def getStarted ():
     print("\n\n")
 
     ffmpeg_check()
+
+    if "runserver" in sys.argv[1]:
+        site = Config().yapo_url
+        if ":" in site:
+            if not ("http://") in site:
+                site="http://" + site + "/"
+            print (f"Site to open: {site}\n")
+            webbrowser.get().open_new_tab(site)
+        else:
+            print('You\'re missing a defined port number in the /config/settings.yml variable "yapo_url".\n\
+If you want YAPO to open your browser automatically, this needs to be set in settings.\n')
+
 
 class ready:
 

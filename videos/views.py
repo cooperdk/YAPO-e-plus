@@ -820,6 +820,25 @@ def settings(request):
 
                     return Response(status=500)
 
+        if "pathToVlc" in request.query_params:
+
+            if request.query_params["yapoURL"]:
+
+                if request.query_params["yapoURL"] != "":
+
+                    new_yapo_url = os.path.abspath(request.query_params["yapoURL"])
+
+                else:
+
+                    new_yapo_url = "none"
+
+                log.info(f'YAPO URL set to {new_yapo_url}')
+                Config().yapo_url = new_yapo_url
+                Config().save()
+
+                return Response(status=200)
+
+
         '''
         if all(["pathToVlc" not in request.query_params, "enable_tpdb" not in request.query_params,
                 "tpdb_websitelogos" not in request.query_params, "tpdb_enable_autorename" not in request.query_params,

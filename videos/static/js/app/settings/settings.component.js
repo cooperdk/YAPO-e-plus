@@ -44,6 +44,7 @@ angular.module('settings').component('settings', {
                 self.settings = $http.get('settings/', {
                     params: {
                             pathToVlc: "",
+                            yapo_url: "",
                             tpdb_enabled: false,
                             tpdb_website_logos: false,
                             tpdb_autorename: false,
@@ -54,6 +55,7 @@ angular.module('settings').component('settings', {
                     //alert(angular.toJson(response));
                     //self.response = response.data.vlc_path;
                     self.pathToVLC = response.data.vlc_path;
+                    self.yapoURL = response.data.yapo_url;
                     self.tpdb_enabled = response.data.tpdb_enabled;
                     self.tpdb_website_logos = response.data.tpdb_website_logos;
                     self.tpdb_autorename = response.data.tpdb_autorename;
@@ -79,6 +81,23 @@ angular.module('settings').component('settings', {
                         self.addAlert('OK, the VLC path is now saved.', 'success', '3000');
                     }, function errorCallback(response) {
                         self.addAlert("There was an error changing the VLC path. Click to confirm.", 'danger', '1000000');
+                    });
+                };
+
+                self.updateYAPOurl = function () {
+
+                    $http.get('settings/', {
+                        params: {
+                            yapoURL: self.yapo_url
+                        }
+
+                    }).then(function (response) {
+                        // alert(angular.toJson(response));
+                        self.response = response.data.yapoURL;
+                        self.yapoURL = response.data.yapoURL;
+                        self.addAlert('OK, the URL is stored. If it is an address with a port specification, your browser will now open automatically on startup.', 'success', '3000');
+                    }, function errorCallback(response) {
+                        self.addAlert("There was an error changing the YAPO url. Click to confirm.", 'danger', '1000000');
                     });
                 };
 

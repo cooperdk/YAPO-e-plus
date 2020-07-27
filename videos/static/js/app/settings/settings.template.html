@@ -5,7 +5,7 @@
 <div class="container-fluid">
 <h3>Settings</h3>
 <p>
-  <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#paths" aria-expanded="false" aria-controls="paths">VLC path</button>
+  <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#paths" aria-expanded="false" aria-controls="paths">YAPO URL and VLC path</button>
   <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#tpdb" aria-expanded="true" aria-controls="tpdb">TpDB scanning</button>
   <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#scrapeclean" aria-expanded="true" aria-controls="scrapeclean">Scraping, dupecheck and cleaning</button>
   <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#rescan" aria-expanded="false" aria-controls="rescan">Folder re-scanning</button>
@@ -13,16 +13,32 @@
 </p>
     <div class="collapse multi-collapse" id="paths">
       <div class="card card-body toggle">
-    <h4>Paths</h4>
+    <h4>YAPO URL and VLC path</h4>
+          <div class="row">
+              <div class="col-lg-5">
+    <label>URL that YAPO should open on startup (blank if you don't wish your browser to open automatically)</label>
+    <input class="form-control" id="inputdefault" type="text"
+    ng-model="$ctrl.yapoURL">
+    <button style="background-color: #33ccff;" type="button" ng-click="$ctrl.updateYAPOurl()" class="btn btn-default btn-sm"
+            uib-popover-html="'If this is a conventional URL (ip.ip.ip.ip:port or host:port), YAPO will open this URL in your default browser on startup. You can edit the value (yapo_url) manually in the settings.yml file which is in the config directory (/config)'"
+            popover-trigger="mouseenter" popover-placement="right-top"
+
+<span style="width:10%" class="glyphicon glyphicon-cog"></span> Set YAPO URL
+    </button>
+              </div>
+              <div class="col-lg-1"></div>
+          <div class="col-lg-5">
     <label>Path to VLC player (Windows only. Always use / instead of \ in the path)</label>
     <input class="form-control" id="inputdefault" type="text"
     ng-model="$ctrl.pathToVLC">
     <button style="background-color: #33ccff;" type="button" ng-click="$ctrl.updateVlcPath()" class="btn btn-default btn-sm"
-            uib-popover-html="'Sets YAPO\'s VLC path to the path in the text input. Only for Windows, as we run vlc without specifying path on Linux. Replace any backslash in the path with a forward slash, otherwise it will break YAPO. You can edit the file manually from the config directory (settings.yml)'"
+            uib-popover-html="'Sets YAPO\'s VLC path to the path in the text input. Only for Windows, as we run vlc without specifying path on Linux. Replace any backslash in the path with a forward slash, otherwise it will break YAPO. You can edit the value (yapo_url) manually in the settings.yml file which is in the config directory (/config)'"
             popover-trigger="mouseenter" popover-placement="right-top"
     
         <span style="width:10%" class="glyphicon glyphicon-cog"></span> Set VLC Path
     </button>
+          </div>
+      </div>
             <div class="divider"></div>
       </div>
     </div>

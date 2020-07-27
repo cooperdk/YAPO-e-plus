@@ -14,6 +14,7 @@ __settings_keyword_none__ = "None"
 
 class Config(metaclass=Singleton):
   last_all_scene_tag: Optional[datetime]
+  yapo_url: str
   root_path: str
   yapo_path: str
   site_path: str
@@ -36,6 +37,7 @@ class Config(metaclass=Singleton):
   tpdb_actors: str
   tpdb_photos: str
   def __init__(self):
+    self.yapo_url = Constants().yapo_url
     self.root_path = os.path.abspath(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
     self.yapo_path = os.path.join(self.root_path, Constants().code_subdir)
     self.site_path = os.path.join(self.root_path, Constants().site_subdir)
@@ -95,7 +97,8 @@ class Config(metaclass=Singleton):
 
   def __update_settings__(self, settings_dict: Optional[Dict[str, Dict[str, str]]]) -> None:
     if settings_dict and settings_dict.get(__yaml_root_element__):
-      self.data_path = settings_dict[__yaml_root_element__].get("data_path") or self.data_path
+      self.yapo_url = settings_dict[__yaml_root_element__].get("yapo_url") or self.yapo_url
+      self.data_path = settings_dict[__yaml_root_element__].get("data_path") or self.yapo_url
       self.config_path = settings_dict[__yaml_root_element__].get("config_path") or self.config_path
       self.database_dir = settings_dict[__yaml_root_element__].get("db_dir") or self.database_dir
       self.timeprint_format = settings_dict[__yaml_root_element__].get("log_timeformat") or self.timeprint_format
@@ -114,6 +117,7 @@ class Config(metaclass=Singleton):
   def __settings_to_dict__(self):
     return {
       __yaml_root_element__: {
+        "yapo_url": self.yapo_url,
         "data_path": self.data_path,
         "config_path": self.config_path,
         "db_dir": self.database_dir,
@@ -145,7 +149,9 @@ class Config(metaclass=Singleton):
     #print(f'JSON: {{"settings_version": {self.current_setting_version}, "vlc_path": "{self.vlc_path}", "last_all_scene_tag": "{__nullable_time_to_string__(self.last_all_scene_tag)}", "tpdb_enabled": {str(self.tpdb_enabled).lower()}, "tpdb_website_logos": {str(self.tpdb_website_logos).lower()}, "tpdb_autorename": {str(self.tpdb_autorename).lower()}, "tpdb_add_actors": {str(self.tpdb_add_actors).lower()}, "tpdb_add_photo": {str(self.tpdb_add_photo).lower()}}}')
 
     #return f'{{"settings_version": {self.current_setting_version}, "vlc_path": "{self.vlc_path}", "last_all_scene_tag": "{__nullable_time_to_string__(self.last_all_scene_tag)}", "tpdb_enabled": {self.tpdb_enabled}, "tpdb_website_logos": {self.tpdb_website_logos}, "tpdb_autorename": {self.tpdb_autorename}, "tpdb_add_actors": {self.tpdb_add_actors}, "tpdb_add_photo": {self.tpdb_add_photo}}}'
-    return f'{{"settings_version": {self.current_setting_version}, "vlc_path": "{self.vlc_path}", "last_all_scene_tag": "{__nullable_time_to_string__(self.last_all_scene_tag)}", "tpdb_enabled": {str(self.tpdb_enabled).lower()}, "tpdb_website_logos": {str(self.tpdb_website_logos).lower()}, "tpdb_autorename": {str(self.tpdb_autorename).lower()}, "tpdb_actors": {str(self.tpdb_actors).lower()}, "tpdb_photos": {str(self.tpdb_photos).lower()}}}'
+    print (f'JSON: {{"settings_version": {self.current_setting_version}, "vlc_path": "{self.vlc_path}", "yapo_url": "{self.yapo_url}", "last_all_scene_tag": "{__nullable_time_to_string__(self.last_all_scene_tag)}", "tpdb_enabled": {str(self.tpdb_enabled).lower()}, "tpdb_website_logos": {str(self.tpdb_website_logos).lower()}, "tpdb_autorename": {str(self.tpdb_autorename).lower()}, "tpdb_actors": {str(self.tpdb_actors).lower()}, "tpdb_photos": {str(self.tpdb_photos).lower()}}}')
+
+    return f'{{"settings_version": {self.current_setting_version}, "vlc_path": "{self.vlc_path}", "yapo_url": "{self.yapo_url}", "last_all_scene_tag": "{__nullable_time_to_string__(self.last_all_scene_tag)}", "tpdb_enabled": {str(self.tpdb_enabled).lower()}, "tpdb_website_logos": {str(self.tpdb_website_logos).lower()}, "tpdb_autorename": {str(self.tpdb_autorename).lower()}, "tpdb_actors": {str(self.tpdb_actors).lower()}, "tpdb_photos": {str(self.tpdb_photos).lower()}}}'
 
 
 def __nullable_time_to_string__(time: Optional[datetime]) -> str:
