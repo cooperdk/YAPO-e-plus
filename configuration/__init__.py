@@ -30,6 +30,11 @@ class Config(metaclass=Singleton):
   current_setting_version: int
   sheet_width: int
   sheet_grid: str
+  tpdb_enabled: str
+  tpdb_website_logos: str
+  tpdb_autorename: str
+  tpdb_actors: str
+  tpdb_photos: str
   def __init__(self):
     self.root_path = os.path.abspath(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
     self.yapo_path = os.path.join(self.root_path, Constants().code_subdir)
@@ -45,6 +50,11 @@ class Config(metaclass=Singleton):
     self.videoprocessing = Constants().videoprocessing
     self.sheet_width = Constants().sheet_width
     self.sheet_grid = Constants().sheet_grid
+    self.tpdb_enabled = Constants().tpdb_enabled
+    self.tpdb_website_logos = Constants().tpdb_website_logos
+    self.tpdb_autorename = Constants().tpdb_autorename
+    self.tpdb_actors = Constants().tpdb_actors
+    self.tpdb_photos = Constants().tpdb_photos
     self.configfile_path = os.path.join(self.config_path, Constants().default_yaml_settings_filename)
     self.current_setting_version = 3
     if os.name == 'nt':
@@ -52,7 +62,7 @@ class Config(metaclass=Singleton):
     else:
         self.vlc_path = None
     self.last_all_scene_tag = None
-    self.autorename_scenes = False
+
     self.__update_config_from_file__()
 
   def __log__(self, message: str) -> None:  # should be utils.printing, but that leads to circular dependency
@@ -92,11 +102,15 @@ class Config(metaclass=Singleton):
       self.last_all_scene_tag = __string_to_nullable_time__(settings_dict[__yaml_root_element__].get("last_all_scene_tag")) or self.last_all_scene_tag
       self.site_media_path = settings_dict[__yaml_root_element__].get("site_media_path") or self.site_media_path
       self.unknown_person_image_path = settings_dict[__yaml_root_element__].get("unknown_person_image_path") or self.unknown_person_image_path
-      self.vlc_path = settings_dict[__yaml_root_element__].get("vlc_path")
+      self.vlc_path = settings_dict[__yaml_root_element__].get("vlc_path") or self.vlc_path
       self.current_setting_version = __string_to_nullable_int__(settings_dict[__yaml_root_element__].get("current_setting_version")) or self.current_setting_version
-      self.autorename_scenes = settings_dict[__yaml_root_element__].get("autorename_scenes") or self.autorename_scenes
       self.sheet_width = __string_to_nullable_int__(settings_dict[__yaml_root_element__].get("sheet_width")) or self.sheet_width
       self.sheet_grid = settings_dict[__yaml_root_element__].get("sheet_grid") or self.sheet_grid
+      self.tpdb_enabled = settings_dict[__yaml_root_element__].get("tpdb_enabled")or self.tpdb_enabled
+      self.tpdb_website_logos = settings_dict[__yaml_root_element__].get("tpdb_website_logos") or self.tpdb_website_logos
+      self.tpdb_autorename = settings_dict[__yaml_root_element__].get("tpdb_autorename") or self.tpdb_autorename
+      self.tpdb_actors = settings_dict[__yaml_root_element__].get("tpdb_actors") or self.tpdb_actors
+      self.tpdb_photos = settings_dict[__yaml_root_element__].get("tpdb_photos") or self.tpdb_photos
   def __settings_to_dict__(self):
     return {
       __yaml_root_element__: {
@@ -109,9 +123,13 @@ class Config(metaclass=Singleton):
         "unknown_person_image_path": self.unknown_person_image_path,
         "vlc_path": self.vlc_path,
         "current_setting_version": self.current_setting_version,
-        "autorename_scenes": self.autorename_scenes,
         "sheet_width": self.sheet_width,
-        "sheet_grid": self.sheet_grid
+        "sheet_grid": self.sheet_grid,
+        "tpdb_enabled": self.tpdb_enabled,
+        "tpdb_website_logos": self.tpdb_website_logos,
+        "tpdb_autorename": self.tpdb_autorename,
+        "tpdb_actors": self.tpdb_actors,
+        "tpdb_photos": self.tpdb_photos
       }
     }
 
@@ -122,7 +140,12 @@ class Config(metaclass=Singleton):
   def get_old_settings_as_json(self):
     # return f'{{"settings_version": 3, "vlc_path": "{os.path.normpath(self.vlc_path)}", "last_all_scene_tag": "{__nullable_time_to_string__(self.last_all_scene_tag)}"}}'
     # the given vlc_path somehow leads to a json error, it thinks the ':' should be escaped? Unclear, because a colon should just work fine
-    return f'{{"settings_version": {self.current_setting_version}, "vlc_path": "{self.vlc_path}", "last_all_scene_tag": "{__nullable_time_to_string__(self.last_all_scene_tag)}"}}'
+    #print (json.dumps(f'{{"settings_version": {self.current_setting_version}, "vlc_path": "{self.vlc_path}", "last_all_scene_tag": "{__nullable_time_to_string__(self.last_all_scene_tag)}", "tpdb_enabled": {self.tpdb_enabled}, "tpdb_website_logos": {self.tpdb_website_logos}, "tpdb_autorename": {self.tpdb_autorename}, "tpdb_add_actors": {self.tpdb_add_actors}, "tpdb_add_photo": {self.tpdb_add_photo}}}'))
+    #print('\n\n')
+    #print(f'JSON: {{"settings_version": {self.current_setting_version}, "vlc_path": "{self.vlc_path}", "last_all_scene_tag": "{__nullable_time_to_string__(self.last_all_scene_tag)}", "tpdb_enabled": {str(self.tpdb_enabled).lower()}, "tpdb_website_logos": {str(self.tpdb_website_logos).lower()}, "tpdb_autorename": {str(self.tpdb_autorename).lower()}, "tpdb_add_actors": {str(self.tpdb_add_actors).lower()}, "tpdb_add_photo": {str(self.tpdb_add_photo).lower()}}}')
+
+    #return f'{{"settings_version": {self.current_setting_version}, "vlc_path": "{self.vlc_path}", "last_all_scene_tag": "{__nullable_time_to_string__(self.last_all_scene_tag)}", "tpdb_enabled": {self.tpdb_enabled}, "tpdb_website_logos": {self.tpdb_website_logos}, "tpdb_autorename": {self.tpdb_autorename}, "tpdb_add_actors": {self.tpdb_add_actors}, "tpdb_add_photo": {self.tpdb_add_photo}}}'
+    return f'{{"settings_version": {self.current_setting_version}, "vlc_path": "{self.vlc_path}", "last_all_scene_tag": "{__nullable_time_to_string__(self.last_all_scene_tag)}", "tpdb_enabled": {str(self.tpdb_enabled).lower()}, "tpdb_website_logos": {str(self.tpdb_website_logos).lower()}, "tpdb_autorename": {str(self.tpdb_autorename).lower()}, "tpdb_actors": {str(self.tpdb_actors).lower()}, "tpdb_photos": {str(self.tpdb_photos).lower()}}}'
 
 
 def __nullable_time_to_string__(time: Optional[datetime]) -> str:

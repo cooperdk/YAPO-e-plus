@@ -12,7 +12,7 @@ class SettingsSerializer(serializers.Serializer):
         #         self.__dict__ = json.loads(j)
 
         x = json.loads(value)
-        # print (x)
+        #print ("SERIALIZER: " + str(x))
         return x
 
 

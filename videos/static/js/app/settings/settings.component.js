@@ -13,6 +13,12 @@ angular.module('settings').component('settings', {
                 self.itemsPerPage = 50;
                 self.mediaRootFolders = null;
                 self.forceScrape = false;
+                //self.tpdb_enabled = false;
+                //self.tpdb_website_logos = false;
+                //self.tpdb_autorename = false;
+                //self.tpdb_add_actors = false;
+                //self.tpdb_add_photo = false;
+                self.tpdb_force = false;
                 self.alerts = [];
                 self.addAlert = function (msg, type, timeout) {
                     self.alerts.push({msg: msg, type: type, timeout: timeout});
@@ -33,20 +39,31 @@ angular.module('settings').component('settings', {
                     // scopeWatchService.numberOfItemsPerPageChanged('a');
                 };
                 
-                
+
+
                 self.settings = $http.get('settings/', {
                     params: {
-                            pathToVlc: ""
+                            pathToVlc: "",
+                            tpdb_enabled: false,
+                            tpdb_website_logos: false,
+                            tpdb_autorename: false,
+                            tpdb_actors: false,
+                            tpdb_photos: false
                         }
                 }).then(function (response) {
-                    // alert(angular.toJson(response));
-                    self.response = response.data.vlc_path;
+                    //alert(angular.toJson(response));
+                    //self.response = response.data.vlc_path;
                     self.pathToVLC = response.data.vlc_path;
+                    self.tpdb_enabled = response.data.tpdb_enabled;
+                    self.tpdb_website_logos = response.data.tpdb_website_logos;
+                    self.tpdb_autorename = response.data.tpdb_autorename;
+                    self.tpdb_actors = response.data.tpdb_actors;
+                    self.tpdb_photos = response.data.tpdb_photos;
+
                     // alert("Got response from server: " + self.pathToFolderToAdd);
                 }, function errorCallback(response) {
                     alert("Something went wrong!");
                 });
-
 
                 self.updateVlcPath = function () {
 
@@ -59,40 +76,93 @@ angular.module('settings').component('settings', {
                         // alert(angular.toJson(response));
                         self.response = response.data.vlc_path;
                         self.pathToVLC = response.data.vlc_path;
-                        // alert("Got response from server: " + self.pathToFolderToAdd);
-						self.addAlert("OK.", 'success', '3000');
+                        self.addAlert('OK, the VLC path is now saved.', 'success', '3000');
                     }, function errorCallback(response) {
-                        self.addAlert("Please check that program location.", 'warning', '1000000');
+                        self.addAlert("There was an error changing the VLC path. Click to confirm.", 'danger', '1000000');
                     });
                 };
 
+                self.TpDB = function () {
 
-            self.checkDupe = function () {
- 
-            if (confirm("Are you sure? Any identical copies of your videos will be removed, leaving only one copy."))		{
-                        $http.get('settings/', {
+                    $http.get('settings/', {
                         params: {
-                            checkDupes: 'True'
+                            tpdb_settings: true,
+                            tpdb_enabled: self.tpdb_enabled,
+                            tpdb_websitelogos: self.tpdb_website_logos,
+                            tpdb_autorename: self.tpdb_autorename,
+                            tpdb_actors: self.tpdb_actors,
+                            tpdb_photos: self.tpdb_photos
                         }
 
-			        }).then(function (response) {
-
+                    }).then(function (response) {
                         // alert(angular.toJson(response));
-                        // self.response = response.data.vlc_path;
-                        // self.pathToVLC = response.data.vlc_path;
-                        // alert("Got response from server: " + self.pathToFolderToAdd);
-						//alert("Done checking for dupes, check the console.");
-						self.addAlert("Done checking for duplicate files.", 'success', '10000');
+                        self.response = response.data.tpdb_enabled;
+                        self.tpdb_enabled = response.data.tpdb_enabled;
+                        self.response = response.data.tpdb_website_logos;
+                        self.tpdb_website_logos = response.data.tpdb_website_logos;
+                        self.response = response.data.tpdb_autorename;
+                        self.tpdb_autorename = response.data.tpdb_autorename;
+                        self.response = response.data.tpdb_actors;
+                        self.tpdb_actors = response.data.tpdb_actors;
+                        self.response = response.data.tpdb_photos;
+                        self.tpdb_photos = response.data.tpdb_photos;
+                        //$window.location.reload(forceGet);
+                        //alert("Got response from server: " + self.pathToFolderToAdd);
+                        self.addAlert("OK, TpDB settings are changed.", 'success', '3000');
                     }, function errorCallback(response) {
-                        //alert("Something went wrong!");
-						self.addAlert("Something went wrong while checking for dupes!", 'warning', '10000');
+                        self.addAlert("There was an error changing this option. Click to confirm.", 'danger', '1000000');
                     });
-			}
                 };
+
+                self.tpdb_scan_all = function () {
+                    if(self.tpdb_enabled == false) { self.addAlert("TpDB scanning is disabled. Please enable it first.", 'warning', '3000'); }
+                    else if (confirm("Are you sure? This may take a long time. The process can only be interrupted by force quitting YAPO.")) {
+                        self.addAlert("Starting TpDB scan, please hold on...", 'info', '5000');
+                        $http.get('settings/', {
+                            params: {
+                                tpdb_scan_all: 'True',
+                                force: self.tpdb_force
+                            }
+
+                        }   ).then(function (response) {
+                            // alert(angular.toJson(response));
+                            // self.response = response.data.vlc_path;
+                            // self.pathToVLC = response.data.vlc_path;
+                            // alert("Got response from server: " + self.pathToFolderToAdd);
+                            self.addAlert("Done scanning with TpDB.", 'success', '1000000');
+                        }, function errorCallback(response) {
+                            self.addAlert("Something went wrong while scanning. Click to confirm.", 'danger', '1000000');
+                        });
+                    }
+                };
+
+                self.checkDupe = function () {
+
+                if (confirm("Are you sure? Any identical copies of your videos will be removed, leaving only one copy."))		{
+                            self.addAlert("Starting check, please hold on...", 'info', '5000');
+                            $http.get('settings/', {
+                            params: {
+                                checkDupes: 'True'
+                            }
+
+                        }).then(function (response) {
+
+                            // alert(angular.toJson(response));
+                            // self.response = response.data.vlc_path;
+                            // self.pathToVLC = response.data.vlc_path;
+                            // alert("Got response from server: " + self.pathToFolderToAdd);
+                            //alert("Done checking for dupes, check the console.");
+                            self.addAlert("Done checking for duplicate files.", 'success', '10000000');
+                        }, function errorCallback(response) {
+                            //alert("Something went wrong!");
+                            self.addAlert("Something went wrong while checking for dupes! Click to confirm.", 'danger', '10000');
+                        });
+                }
+                    };
                 
                 self.scrapAllActor = function () {
                     if (confirm("Are you sure? This may take a long time. The process can only be interrupted by force quitting YAPO.")) {
-                       self.addAlert("Starting scrape, please hold on...", 'success', '5000');
+                       self.addAlert("Starting scrape, please hold on...", 'info', '5000');
                         $http.get('settings/', {
                             params: {
                                 scrapAllActors: 'True',
@@ -104,9 +174,9 @@ angular.module('settings').component('settings', {
                         // self.response = response.data.vlc_path;
                         // self.pathToVLC = response.data.vlc_path;
                         // alert("Got response from server: " + self.pathToFolderToAdd);
-                        //self.addAlert("Done scraping actors.", 'success', '10000');
+                        self.addAlert("Done scraping actors.", 'success', '10000000');
                         }, function errorCallback(response) {
-                        self.addAlert("Something went wrong.", 'warning', '1000000');
+                        self.addAlert("Something went wrong. Click to confirm.", 'danger', '1000000');
                         });
                     }
                 };
@@ -115,7 +185,7 @@ angular.module('settings').component('settings', {
                 self.tagAllScenes = function () {
 
                     if (confirm("Are you sure? This may take a long time. The process can only be interrupted by force quitting YAPO.")) {
-                        self.addAlert("Beginning tagging ... this may take some time, check the console.", 'success', '5000');
+                        self.addAlert("Beginning tagging ... this may take some time, check the console.", 'info', '5000');
                         $http.get('settings/', {
                             params: {
                                 tagAllScenes: 'True',
@@ -128,8 +198,9 @@ angular.module('settings').component('settings', {
                             // self.pathToVLC = response.data.vlc_path;
                             // alert("Got response from server: " + self.pathToFolderToAdd);
                             //self.addAlert("Done tagging scenes.", 'success', '10000');
+                            self.addAlert("Re-tagging complete. Click to confirm.", 'success', '40000000');
                         }, function errorCallback(response) {
-                            self.addAlert("Something went wrong.", 'warning', '1000000');
+                            self.addAlert("Something went wrong. Click to confirm.", 'danger', '1000000');
                         });
                     }
                 };
@@ -147,8 +218,9 @@ angular.module('settings').component('settings', {
                         // self.response = response.data.vlc_path;
                         // self.pathToVLC = response.data.vlc_path;
                         // alert("Got response from server: " + self.pathToFolderToAdd);
+                        self.addAlert("Re-tagging complete. Click to confirm.", 'success', '40000000');
                     }, function errorCallback(response) {
-                        self.addAlert("Something went wrong.", 'warning', '1000000');
+                        self.addAlert("Something went wrong. Click to confirm.", 'danger', '1000000');
                     });
                 }  
                 };
@@ -219,7 +291,7 @@ angular.module('settings').component('settings', {
                         folder = folder.id
 						
                     }
-                    self.addAlert("Beginning scan...", 'success', '3000');
+                    self.addAlert("Beginning scan...", 'info', '3000');
                     $http.get('settings/', {
                         params: {
                             folderToScan: folder

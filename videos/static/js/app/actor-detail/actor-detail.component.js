@@ -160,7 +160,6 @@ angular.module('actorDetail').component('actorDetail', {
                     self.actor = res;
                     console.log("2 actor-detail self.actor is :" + angular.toJson(self.actor.name));
                     helperService.set2(self.actor);
-
                     scopeWatchService.actorLoaded(res);
                     $rootScope.actorLoaded = true;
                     $rootScope.loadedActor = res;

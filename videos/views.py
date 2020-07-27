@@ -796,13 +796,17 @@ def sizeformat (b: int) -> str: # returns a human-readable filesize depending on
 def settings(request):
     if request.method == "GET":
 
+        print(f"REQ: {str(request.query_params)}")
+
         if "pathToVlc" in request.query_params:
             if request.query_params["pathToVlc"] == "":
-
+                print("GET")
                 serializer = SettingsSerializer(Config().get_old_settings_as_json())
 
                 return Response(serializer.data)
+
             else:
+                print(f"New path to VLC: {request.query_params['pathToVlc']}")
                 new_path_to_vlc = os.path.abspath(request.query_params["pathToVlc"]).replace("\\","/")
 
                 if os.path.isfile(new_path_to_vlc):
@@ -815,6 +819,35 @@ def settings(request):
 
                     return Response(status=500)
 
+        '''
+        if all(["pathToVlc" not in request.query_params, "enable_tpdb" not in request.query_params,
+                "tpdb_websitelogos" not in request.query_params, "tpdb_enable_autorename" not in request.query_params,
+                "tpdb_enable_addactors" not in request.query_params, "tpdb_enable_addphoto" not in request.query_params]):
+
+
+        '''
+
+        if "tpdb_settings" in request.query_params:
+
+            if "tpdb_enabled" in request.query_params:
+                print(f'Option TpDB enabled > {request.query_params["tpdb_enabled"]}')
+                Config().tpdb_enabled = request.query_params["tpdb_enabled"]
+                print(f"CONFIG: tbdb_enabled = {Config().tpdb_enabled}")
+                if Config().tpdb_enabled == 'false':
+                    Config().tpdb_website_logos  = 'false'
+                    Config().tpdb_autorename  = 'false'
+                    Config().tpdb_actors  = 'false'
+                    Config().tpdb_photos  = 'false'
+                else:
+                    Config().tpdb_website_logos = request.query_params["tpdb_websitelogos"]
+                    Config().tpdb_autorename = request.query_params["tpdb_autorename"]
+                    Config().tpdb_actors = request.query_params["tpdb_actors"]
+                    Config().tpdb_photos = request.query_params["tpdb_photos"]
+                Config().save()
+                print("Saved TPDB settings")
+                return Response(status=200)
+
+
         if "scrapAllActors" in request.query_params:
             if request.query_params["scrapAllActors"] == "True":
                 if request.query_params["force"] == "true":
@@ -823,7 +856,7 @@ def settings(request):
                     force = False
                 threading.Thread(target=scrape_all_actors, args=(force,)).start()
 
-            return Response(status=200)
+                return Response(status=200)
 
         if "tagAllScenesIgnore" in request.query_params:
 
@@ -911,6 +944,7 @@ def settings(request):
                 clean_dir("actor")
                 print("Cleaning scene dirs that are no longer in database...")
                 clean_dir("scenes")
+                return Response(status=200)
 
         if "folderToScan" in request.query_params:
             if request.query_params["folderToScan"] != "":
@@ -922,8 +956,8 @@ def settings(request):
                 all_folders = LocalSceneFolders.objects.all()
                 for folder in all_folders:
                     videos.addScenes.get_files(folder.name, False)
-        print("\nDone.")
-        return Response(status=200)
+            print("\nDone.")
+            return Response(status=200)
 
 
 @api_view(["GET"])

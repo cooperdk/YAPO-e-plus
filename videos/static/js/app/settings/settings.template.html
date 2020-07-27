@@ -1,9 +1,21 @@
 <uib-alert ng-repeat="alert in $ctrl.alerts" class="enter" type="{{ alert.type }}" close="$ctrl.closeAlert($index)"
            dismiss-on-timeout="{{ alert.timeout }}">{{ alert.msg }}
 </uib-alert>
-<div class="container-fluid">
 
-    <label>Path to VLC player (Windows only. Always use / instead of \ in the path)</label><input class="form-control" id="inputdefault" type="text"
+<div class="container-fluid">
+<h3>Settings</h3>
+<p>
+  <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#paths" aria-expanded="false" aria-controls="paths">VLC path</button>
+  <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#tpdb" aria-expanded="true" aria-controls="tpdb">TpDB scanning</button>
+  <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#scrapeclean" aria-expanded="true" aria-controls="scrapeclean">Scraping, dupecheck and cleaning</button>
+  <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#rescan" aria-expanded="false" aria-controls="rescan">Folder re-scanning</button>
+  <button class="btn btn-primary" type="button" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false" aria-controls="paths tpdb scrapeclean rescan">Toggle all</button>
+</p>
+    <div class="collapse multi-collapse" id="paths">
+      <div class="card card-body toggle">
+    <h4>Paths</h4>
+    <label>Path to VLC player (Windows only. Always use / instead of \ in the path)</label>
+    <input class="form-control" id="inputdefault" type="text"
     ng-model="$ctrl.pathToVLC">
     <button style="background-color: #33ccff;" type="button" ng-click="$ctrl.updateVlcPath()" class="btn btn-default btn-sm"
             uib-popover-html="'Sets YAPO\'s VLC path to the path in the text input. Only for Windows, as we run vlc without specifying path on Linux. Replace any backslash in the path with a forward slash, otherwise it will break YAPO. You can edit the file manually from the config directory (settings.yml)'"
@@ -11,14 +23,63 @@
     
         <span style="width:10%" class="glyphicon glyphicon-cog"></span> Set VLC Path
     </button>
-    <div style="height: 10px; width: 100%";></div>
+            <div class="divider"></div>
+      </div>
+    </div>
+
+    <div class="collapse multi-collapse in" id="tpdb">
+      <div class="card card-body">
+          <h4>TpDB scanning</h4><p>You must reload to see the current variables. <b>Most of these are not implemented yet</b>.</p>
+
+    <input type="checkbox" ng-model="$ctrl.tpdb_enabled" ng-change="getdetails()"
+           uib-popover-html="'Override existing values while scraping with selected scraper'"
+           popover-trigger="mouseenter" popover-placement="top"> Enable TpDB functionality ({{ $ctrl.tpdb_enabled }})
+        <input type="checkbox" ng-model="$ctrl.tpdb_website_logos"
+               uib-popover-html="'When YAPO discovers a new website, enable downloading of a website logo'"
+               popover-trigger="mouseenter" popover-placement="top"> Enable website logos
+        <input type="checkbox" ng-model="$ctrl.tpdb_autorename"
+               uib-popover-html="'Will automatically change scene names to the <website> - <actors> - <title> naming convention'"
+               popover-trigger="mouseenter" popover-placement="top"> Automatically rename scenes
+        <input type="checkbox" ng-model="$ctrl.tpdb_actors"
+               uib-popover-html="'When YAPO discovers a new actor, enable auto-addition. Will add from TpDB, then scrape missing data from Freeones'"
+               popover-trigger="mouseenter" popover-placement="top"> Automatically add actors
+        <input type="checkbox" ng-model="$ctrl.tpdb_photos"
+               uib-popover-html="'During auto-addition, also try to get a photo (they\'re not as good as those TMDB provide)'"
+               popover-trigger="mouseenter" popover-placement="top"> Get actor photos
+
+
+        <button style="background-color: #33ccff;" type="button" ng-click="$ctrl.TpDB()"" class="btn btn-default btn-sm"
+            uib-popover-html="'Sets YAPO\'s VLC path to the path in the text input. Only for Windows, as we run vlc without specifying path on Linux. Replace any backslash in the path with a forward slash, otherwise it will break YAPO. You can edit the file manually from the config directory (settings.yml)'"
+            popover-trigger="mouseenter" popover-placement="right-top"
+
+        <span style="width:10%" class="glyphicon glyphicon-cog"></span> Save TpDB Settings
+        </button>
+
+    <span style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>
+    <button type="button" ng-click="$ctrl.tpdb_scan_all()" class="btn btn-default btn-sm"
+            uib-popover-html="'Checks all scenes in the database against all known Tags, Websites and Actors and adds all tags.<br>Will search for all  <b>Tag All Scenes</b>  Tags, Actors and Websites in all the scenes
+    as though they were never searched before.'" popover-trigger="mouseenter" popover-placement="right-top"
+    <span class="glyphicon glyphicon-tag"
+    ></span> Execute scan of all scenes with TpDB
+    </button>
+    <input type="checkbox" ng-model="$ctrl.tpdb_force"
+           uib-popover-html="'Override existing values when scanning with TpDB'"
+           popover-trigger="mouseenter" popover-placement="top"> Force
+  <div class="divider"></div>
+      </div>
+    </div>
+
+
+    <div class="collapse multi-collapse in" id="scrapeclean">
+      <div class="card card-body">
+    <h4>Scraping, dupecheck and cleaning</h4>
     <button type="button" ng-click="$ctrl.scrapAllActor()" class="btn btn-default btn-sm"
             uib-popover-html="'Scrapes <strong>all</strong> previously unscraped actors with the TMDb and Freeones scrapers.'"
             popover-trigger="mouseenter" popover-placement="right-top">
     <span class="glyphicon glyphicon-user"></span> Scrape All Actors
     </button>
     <input type="checkbox" ng-model="$ctrl.forceScrape"
-    uib-popover-html="'Override existing values while scraping with selected scraper'"
+    uib-popover-html="'Override existing values whien scraping with selected scraper'"
     popover-trigger="mouseenter" popover-placement="top"> Force
 	<span style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>
     <button type="button" ng-click="$ctrl.tagAllScenes()" class="btn btn-default btn-sm"
@@ -76,53 +137,60 @@
         <option> 250</option>
         <option> 500</option>
     </select>
-</div>
 
-<h4><strong>Rescan all root media paths:</strong>
+          <div class="divider"></div>
+    </div></div>
+
+    <div class="collapse multi-collapse" id="rescan">
+      <div class="card card-body">
+
+<h4>Folder re-scanning</h4>
+<strong>Rescan all root media paths:</strong>
 <button
-                ng-click="$ctrl.rescanFolders('')"
-                class="btn btn-success btn-sm"
-                popover-trigger="mouseenter"
-                uib-popover-html="'Rescan all folders in list for new scenes.'"
-                popover-append-to-body="true"
-                popover-placement="top"
-                type="button">
-                                    <span class="glyphicon glyphicon-refresh"></span>
-        </button>
-</h4>
-<h4><strong>Rescan specific root media path:</strong></h4>
+        ng-click="$ctrl.rescanFolders('')"
+        class="btn btn-success btn-sm"
+        popover-trigger="mouseenter"
+        uib-popover-html="'Rescan all folders in list for new scenes.'"
+        popover-append-to-body="true"
+        popover-placement="top"
+        type="button">
+    <span class="glyphicon glyphicon-refresh"></span>
+</button>
+<br>
+<strong>Rescan specific root media path:</strong>
 <div style="position: relative; left: 16px; line-height: 0.5 !important;">
-<table class="table-striped table-hover thin" style="line-height: 0.5 !important;">
-<tbody class="">
-	<tr ng-repeat="folder in $ctrl.mediaRootFolders | orderBy : 'name'">
-		<td>
-			{{ folder.name }}
-		</td>
-		<td>
-		    <button
-            ng-click="$ctrl.rescanFolders(folder)"
-            class="btn btn-success btn-xs vertically-centered"
-            popover-trigger="mouseenter"
-            uib-popover-html="'Rescan this folder for new scenes.'"
-            popover-append-to-body="true"
-            popover-placement="top"
-            type="button">
-                <span class="glyphicon glyphicon-refresh"></span>
-			</button>
-		</td>
-		<td>
-		    <button
-            ng-click="$ctrl.removeFolderFromList(folder)"
-            class="btn btn-danger btn-xs vertically-centered"
-            popover-trigger="mouseenter"
-            uib-popover-html="'Remove Folder from this list. Applies to this list only, doesnt do anything else except removing the folder entry from this list.'"
-            popover-append-to-body="true"
-            popover-placement="top"
-            type="button">
-				<span class="glyphicon glyphicon-remove"></span>
-			</button>
-		</td>
-	</tr>
-</tbody>
-</table>
+    <table class="table-striped table-hover thin" style="line-height: 0.5 !important;">
+        <tbody class="">
+        <tr ng-repeat="folder in $ctrl.mediaRootFolders | orderBy : 'name'">
+            <td>
+                {{ folder.name }}
+            </td>
+            <td>
+                <button
+                        ng-click="$ctrl.rescanFolders(folder)"
+                        class="btn btn-success btn-xs vertically-centered"
+                        popover-trigger="mouseenter"
+                        uib-popover-html="'Rescan this folder for new scenes.'"
+                        popover-append-to-body="true"
+                        popover-placement="top"
+                        type="button">
+                    <span class="glyphicon glyphicon-refresh"></span>
+                </button>
+            </td>
+            <td>
+                <button
+                        ng-click="$ctrl.removeFolderFromList(folder)"
+                        class="btn btn-danger btn-xs vertically-centered"
+                        popover-trigger="mouseenter"
+                        uib-popover-html="'Remove Folder from this list. Applies to this list only, doesnt do anything else except removing the folder entry from this list.'"
+                        popover-append-to-body="true"
+                        popover-placement="top"
+                        type="button">
+                    <span class="glyphicon glyphicon-remove"></span>
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 </div>
+      </div></div>
