@@ -331,7 +331,7 @@ def tpdb (scene_id: int, force: bool):
                 newtitle = f"{perflist}"
 
             print(newtitle)
-            if Config().autorename_scenes == True or force == True:
+            if Config().tpdb_autorename == True or force == True:
                 current_scene.name = newtitle
 
             current_scene.save()
