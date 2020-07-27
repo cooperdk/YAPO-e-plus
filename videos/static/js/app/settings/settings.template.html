@@ -32,19 +32,19 @@
           <h4>TpDB scanning</h4><p>You must reload to see the current variables. <b>Most of these are not implemented yet</b>.</p>
 
     <input type="checkbox" ng-model="$ctrl.tpdb_enabled" ng-change="getdetails()"
-           uib-popover-html="'Override existing values while scraping with selected scraper'"
+           uib-popover-html="'Enable the TpDB (metadataapi.net) scanning functions'"
            popover-trigger="mouseenter" popover-placement="top"> Enable TpDB functionality ({{ $ctrl.tpdb_enabled }})
         <input type="checkbox" ng-model="$ctrl.tpdb_website_logos"
                uib-popover-html="'When YAPO discovers a new website, enable downloading of a website logo'"
                popover-trigger="mouseenter" popover-placement="top"> Enable website logos
         <input type="checkbox" ng-model="$ctrl.tpdb_autorename"
-               uib-popover-html="'Will automatically change scene names to the <website> - <actors> - <title> naming convention'"
+               uib-popover-html="'Will automatically change scene names to the \'website - actor(s) - title\' naming convention. The actual filename will be untouched. A tag will be added to the scene (_tpdb-sure or _tpdb_unsure) depending on the quality of the result.'"
                popover-trigger="mouseenter" popover-placement="top"> Automatically rename scenes
         <input type="checkbox" ng-model="$ctrl.tpdb_actors"
-               uib-popover-html="'When YAPO discovers a new actor, enable auto-addition. Will add from TpDB, then scrape missing data from Freeones'"
+               uib-popover-html="'When YAPO recognizes an actor that YAPO doesn\'t know (only females), it will register the information TpDB has on the actor, and then initiate a TMDB/Freeones scrape of the actor. This way, any profile photo from TMDB will take precedence over any other photos.'"
                popover-trigger="mouseenter" popover-placement="top"> Automatically add actors
         <input type="checkbox" ng-model="$ctrl.tpdb_photos"
-               uib-popover-html="'During auto-addition, also try to get a photo (they\'re not as good as those TMDB provide)'"
+               uib-popover-html="'During auto-addition, also try to get actor photos (they\'re not as good as those TMDB provide, so if a photo already exists, it will not be saved)'"
                popover-trigger="mouseenter" popover-placement="top"> Get actor photos
 
 

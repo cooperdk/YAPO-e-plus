@@ -1487,7 +1487,7 @@ def display_video(x):
         response = StreamingHttpResponse(FileWrapper(open(pathname, 'rb'), 8192),
             content_type=mimetypes.guess_type(pathname)[0]) #(open(pathname, 'rb')) #(read_video(pathname), status=206)
         #response = StreamingHttpResponse(read_video(pathname)) #(open(pathname, 'rb')) #(read_video(pathname), status=206)
-        response['Content-Length'] = size
+        #response['Content-Length'] = size
         #response['Content-Disposition'] = "attachment; filename=%s" % filename
     #response["Content-Range"] = 'bytes 0-%s' % (size)
     #response['Content-Disposition'] = f'attachement; filename="{pathname}"'
