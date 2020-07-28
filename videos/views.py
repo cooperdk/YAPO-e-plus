@@ -808,7 +808,7 @@ def settings(request):
             else:
 
                 new_path_to_vlc = os.path.abspath(request.query_params["pathToVlc"]).replace("\\","/")
-                log.info(f'TpDB set to {request.query_params["new_path_to_vlc"]}')
+                log.info(f'VLC path set to {request.query_params["pathToVlc"]}')
 
                 if os.path.isfile(new_path_to_vlc):
                     Config().vlc_path = new_path_to_vlc
@@ -820,13 +820,13 @@ def settings(request):
 
                     return Response(status=500)
 
-        if "pathToVlc" in request.query_params:
+        if "yapo_url" in request.query_params:
 
-            if request.query_params["yapoURL"]:
+            if request.query_params["yapo_url"]:
 
-                if request.query_params["yapoURL"] != "":
+                if request.query_params["yapo_url"] != "":
 
-                    new_yapo_url = os.path.abspath(request.query_params["yapoURL"])
+                    new_yapo_url = request.query_params["yapo_url"]
 
                 else:
 

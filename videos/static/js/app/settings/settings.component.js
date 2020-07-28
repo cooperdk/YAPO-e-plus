@@ -44,7 +44,7 @@ angular.module('settings').component('settings', {
                 self.settings = $http.get('settings/', {
                     params: {
                             pathToVlc: "",
-                            yapo_url: "",
+                            yapoURL: "",
                             tpdb_enabled: false,
                             tpdb_website_logos: false,
                             tpdb_autorename: false,
@@ -88,15 +88,16 @@ angular.module('settings').component('settings', {
 
                     $http.get('settings/', {
                         params: {
-                            yapoURL: self.yapo_url
+                            yapo_url: self.yapoURL
                         }
 
                     }).then(function (response) {
                         // alert(angular.toJson(response));
-                        self.response = response.data.yapoURL;
-                        self.yapoURL = response.data.yapoURL;
+                        self.response = response.data.yapo_url;
+                        self.yapoURL = response.data.yapo_url;
                         self.addAlert('OK, the URL is stored. If it is an address with a port specification, your browser will now open automatically on startup.', 'success', '3000');
                     }, function errorCallback(response) {
+                        //alert(self.yapoURL);
                         self.addAlert("There was an error changing the YAPO url. Click to confirm.", 'danger', '1000000');
                     });
                 };
