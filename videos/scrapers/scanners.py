@@ -5,7 +5,7 @@ import _thread
 import requests
 import json
 import django.db
-import datetime
+from datetime import datetime
 import pprint
 import urllib
 import re
@@ -23,7 +23,10 @@ from videos.models import Actor, Scene, ActorAlias, ActorTag, SceneTag
 
 
 def tpdb (scene_id: int, force: bool):
-
+    title = ""
+    site = ""
+    date = ""
+    perflist = ""
     success = False
     found = 0
 
@@ -31,6 +34,11 @@ def tpdb (scene_id: int, force: bool):
     scene_name = current_scene.name
     print(f'Scanning for "{scene_name}" on TpDB...')
     # scene_name = scene_name.replace(" ", "%20")
+
+    TpDB: Scanned
+    if "tpdb: scanned" in str(current_scene.scene_tags.all()).lower():
+        print ("WARNING: Already searched.\n")
+
 
     try:
         parsetext = scene_name
@@ -118,7 +126,17 @@ def tpdb (scene_id: int, force: bool):
             if "id" in response['data'][0].keys():
                 tpdb_id = response['data'][0]['id']
             if description is not None: current_scene.description = description
-            if release_date is not None: current_scene.release_date = release_date
+            if release_date is not None:
+                #print(release_date)
+                try:
+                    release_date=datetime.strptime(release_date, "%Y-%m-%d").date()
+                #release_date = strftime(release_date) + " 00:00:00"
+                #release_date = datetime.strptime(release_date, "%Y-%m-%d %H:%M:%S")
+                    print(release_date)
+                except:
+                    release_date = None
+                if release_date is not None:
+                    current_scene.release_date = release_date
 
 
             if tpdb_id is not None:
@@ -142,7 +160,7 @@ def tpdb (scene_id: int, force: bool):
                         # print(performer_extras['gender'])
 
                         if performer_extras['gender'] is not None and "f" in performer_extras['gender'].lower():
-                            print(f"({ite}) - TpDB PERFORMER -> {performer['name']}")
+                            print(f"  --> TpDB PERFORMER -> Checking #{{ite}} ({performer['name'].strip()})...")
                             for scene_performer in current_scene.actors.all():
 
                                 keyname=""
@@ -152,11 +170,17 @@ def tpdb (scene_id: int, force: bool):
                                     keyname = scene_performer.name
                                     print(f"  --> YAPO_PERF {scene_performer.name} is keyname")
 
-                                if performer['parent']['name']:
+                                if performer['parent']['name'] and not keyname:
                                     perpn = performer['parent']['name'].lower().strip()
                                     if sp in perpn and not keyname:
                                         keyname = performer['parent']['name']
-                                        print(f"  -- TpDB SECONDARY {performer['parent']['name']} is keyname")
+                                        print(f"  --> TpDB SECONDARY {keyname} is keyname")
+                                    else:
+                                        perpn2 = namecheck(perpn)
+                                        if sp in perpn2.lower().strip():
+                                            keyname = perpn2.strip()
+                                            print(f"  --> TpDB REPLACED {performer['parent']['name']} -> {keyname} is keyname")
+
 
                                 if 'aliases' in performer.keys():
                                     alia= str(performer['aliases'].lower().strip())
@@ -173,19 +197,21 @@ def tpdb (scene_id: int, force: bool):
                                         #print(f"Testing alias: {alias.name} ... ",end="")
                                         if (alias.name.lower() in perf) or (alia and (alias.name.lower() in alia)):
                                             keyname = alias.name
-                                            print(f"  -- YAPO Alias {alias.name} is keyname")
+                                            print(f"  --> YAPO Alias {alias.name} is keyname")
 
                                 if not keyname:
                                     #actor_to_add = Actor.objects.get(pk=actor_id)
-                                    print(f"--SCENE ACTORS: {str(current_scene.actors.all())}")
+                                    print(f"  -- CHECKING SCENE ACTORS: {str(current_scene.actors.all())}")
                                     if (performer['name'].lower() not in str(current_scene.actors.all()).lower()) and (Actor.objects.filter(name=performer['name']).exists()):
                                         actor_to_add = Actor.objects.get(name=performer['name'])
                                         current_scene.actors.add(actor_to_add)
                                         keyname = actor_to_add.name
                                         print(f" --> ACTOR ADDED TO SCENE: {keyname}")
 
+                                # TODO: Code to add actor to scene
+
                                 if not keyname:
-                                    print("No actor found")
+                                    #print("No actor found")
                                     continue
 
                                 if keyname:
@@ -250,9 +276,9 @@ def tpdb (scene_id: int, force: bool):
                                     if not actor.country_of_origin or actor.country_of_origin == "":
                                         if "birthplace" in performer_extras.keys():
                                             birthplace = performer_extras['birthplace']
-                                            if "united states" in birthplace.lower():
-                                                birthplace = "United States"
                                             if birthplace is not None:
+                                                if "united states" in birthplace.lower():
+                                                    birthplace = "United States"
                                                 if actor.country_of_origin == None or actor.country_of_origin == "":
                                                     actor.country_of_origin = birthplace
                                                     print(f"Birthplace: {birthplace}")
@@ -315,43 +341,61 @@ def tpdb (scene_id: int, force: bool):
                                         added = True
 
                                     if added == True:
-                                        actor.last_lookup = datetime.datetime.now()
+                                        actor.last_lookup = datetime.now()
                                     actor.save()
             newtitle = ""
-            if site:
-                newtitle = site
-            if title and not site and not perflist:
-                newtitle = f"{title}"
-            if perflist and not site and not title:
-                newtitle = f"{perflist}"
-            if site and not perflist and not title:
-                newtitle = f"{site}"
-            if perflist and title and not site:
-                newtitle = f"{newtitle} - {title}"
-            if site and title and not perflist:
-                newtitle = f"{newtitle} - {title}"
-            if perflist and site and title:
-                newtitle = f"{site} - {perflist} - {title}"
-            if site and perflist == title:
-                newtitle = f"{site} - {perflist}"
-            if not site and perflist == title:
-                newtitle = f"{perflist}"
+            if title:
+                newtitle = title
+                print(newtitle)
 
-            print(newtitle)
+           # if any([release_date, perflist, site]):
+            #    newtitle = f"{newtitle} - "
+            #    print (newtitle)
+
+            if (perflist and len(perflist) > 4) and newtitle and not perflist.lower().strip() == newtitle.lower().strip():
+                newtitle = f"{perflist} - {newtitle}"
+            elif perflist.lower() and not newtitle:
+                newtitle = f"{perflist}"
+            elif newtitle and not perflist.lower():
+                newtitle = f"{newtitle}"
+
+            if release_date:
+                newtitle = f"{release_date} - {newtitle}"
+                print(newtitle)
+
+            if site:
+                newtitle = f"{site} - {newtitle}"
+                print(newtitle)
+
+            print(f"New scene name: {newtitle}")
             #print(Config().tpdb_autorename.lower())
             if "true" in Config().tpdb_autorename.lower():
+                if not current_scene.orig_name:
+                    current_scene.orig_name = current_scene.name
                 current_scene.name = newtitle
                 print("Scene name changed.")
+            else:
+                print("Renaming is disabled, so the scene name won't be changed.")
 
             current_scene.save()
             success = True
             # print(f"Description:\n{description}")
+
             log.info(f"Found and registered data for scene ID {scene_id}")
 
     except KeyError:
         success = False
         print(f"Issue(s) occured:\n{sys.exc_info()}")
         #pass
+
+    if found == 1:
+        insert_scene_tag(current_scene, "TpDB: Match: Good")
+    elif found == 2:
+        insert_scene_tag(current_scene, "TpDB: Match: Questionable")
+    elif success == False:
+        insert_scene_tag(current_scene, "TpDB: No Match")
+    insert_scene_tag(current_scene, "TpDB: Scanned")
+    print("Tagged the scene with a TpDB tag.")
 
     return success
 
@@ -364,6 +408,13 @@ def strip_bad_chars(name):
             name = name.replace(char, "")
             #print("Adding Data: " + name)
     return name
+
+def insert_scene_tag(current_scene, tagname):
+    if not SceneTag.objects.filter(name=tagname):
+        SceneTag.objects.create(name=tagname)
+
+    scene_tag_to_add = SceneTag.objects.get(name=tagname)
+    current_scene.scene_tags.add(scene_tag_to_add)
 
 def insert_actor_tag(actor_to_insert, actor_tag_name):
     actor_tag_name = strip_bad_chars(actor_tag_name)
