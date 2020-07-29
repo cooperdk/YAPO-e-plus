@@ -32,6 +32,18 @@ div.a, td.a, li.a, a {
 	text-color: sea blue;
 }
 
+#scene-info {
+    text-indent: 0px;
+    margin-left: 0px;
+}
+
+#scene-info ul, li {
+    list-style-type: none;
+    text-indent: 0px;
+    margin-left: 0px;
+    text-align: justify;
+}
+
 #actor-list-row{
     white-space: nowrap;
     list-style: none;
@@ -51,7 +63,6 @@ div.a, td.a, li.a, a {
 }
 #actor-list-row li{
     display: inline-block;
-    list-style: none;
     margin: 1em;
 	vertical-align: middle;
 
@@ -238,6 +249,7 @@ div.a, td.a, li.a, a {
 	border-radius: 8px;
     border: 2px solid black;
 	vertical-align: middle;
+    width: 100px;
 }
 
 .on-hover-red-cursor-pointer:hover {

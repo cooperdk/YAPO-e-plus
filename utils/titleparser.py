@@ -13,7 +13,10 @@ def search(title):
     for trash in trashTitle:
         title = re.sub(r'\b%s\b' % trash, '', title, flags=re.IGNORECASE)
     title = ' '.join(title.split())
-
+    searchSiteID = 0
+    fullsitename = ""
+    searchTitle = ""
+    searchDate = ""
     print("Siteparser: " + title)
     searchSettings = getSearchSettings(title)
     searchSiteID = searchSettings[0]
@@ -1209,14 +1212,16 @@ def getSearchSettings(mediaTitle: str):
         ('^ztod ', 'Zero Tolerance '),
         ('^zzs ', 'ZZ series '),
     )
-
+    abbFixed = False
     for abbreviation, full in abbreviations:
         r = re.compile(abbreviation, flags=re.IGNORECASE)
         if r.match(mediaTitle):
             mediaTitle = r.sub(full, mediaTitle, 1)
+            abbFixed = True
             break
 
-    print("Possible abbreviation fixed: " + mediaTitle)
+    if abbFixed:
+        print(f"Possible abbreviation fixed: {mediaTitle}")
 
     # Search Site ID
     searchSiteID = None
@@ -1228,15 +1233,13 @@ def getSearchSettings(mediaTitle: str):
     searchDate = None
     # Actors search
     searchActors = None
-
+    fullsitename = ""
     # Remove Site from Title
     searchSiteID = getSearchSiteIDByFilter(mediaTitle)
     if searchSiteID:
         print(f"siteID: {searchSiteID} - {searchSites[searchSiteID][0]}")
         if searchSites[searchSiteID][0]:
             fullsitename = searchSites[searchSiteID][0]
-        else:
-            fullsitename = None
         # searchSites [0] matches madiaTitle
         if mediaTitle[:len(searchSites[searchSiteID][0])].lower() == searchSites[searchSiteID][0].lower():
             searchTitle = mediaTitle[len(searchSites[searchSiteID][0]) + 1:]

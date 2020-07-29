@@ -8,94 +8,107 @@
                                               false, false, null)" style="cursor:text">
         {{ $ctrl.scene.name || 'N/A' }}
     </a>
-
-
-
-
 </h1>
 <h5 align="center">{{$ctrl.scene.path_to_dir}}</h5>
 <h5 align="center" style="color: #aa6666;" ng-if="$ctrl.scene.path_to_file.toLowerCase().indexOf('mp4') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('webm') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('ogg') == -1">This is an incompatible video file, you need to generate a sample or transcode it to be able to play it in YAPO e+.</h5>
-<h2 align="center">
-    <uib-rating ng-model="$ctrl.scene.rating" max="10" read-only="isReadonly" on-hover="hoveringOver(value)"
-                on-leave="overStar = null" titles="['one','two','three']"
-                aria-labelledby="default-rating" ng-change="$root.patchEntity('scene', $ctrl.scene.id, 'rating', $ctrl.scene.rating, 'add',
-                                              false, false, null)"></uib-rating>
-    <br>
-    <a href="#!/scene/{{ $ctrl.prev }}"><span uib-popover-html="'Previous Scene in list.'" popover-trigger="mouseenter" popover-placement="bottom" class="glyphicon glyphicon-step-backward"></span></a>
-
-    <a href="{{$ctrl.sheetPath}}" data-toggle="lightbox">
-		<button type="button" class="btn btn-default btn-sm" uib-popover-html="'Will open a contact sheet with 16 images from the video, if it has been generated. This resides in the videos/media/scenes/ folder together with the video thumbnail and video preview.<br>Click outside the box to close it.'" popover-trigger="mouseenter" popover-placement="right">
-        <span class="glyphicon glyphicon glyphicon-th"></span>  View Contact Sheet</button></a>
-
-    <button type="button" ng-click="$ctrl.playScene()" class="btn btn-default btn-sm">
-        <span class="glyphicon glyphicon-play-circle"></span>  Play with VLC
-    </button>
-    <button type="button" ng-click="$ctrl.openFolder()" class="btn btn-default btn-sm">
-        <span class="glyphicon glyphicon-folder-open"></span>  Open Folder
-    </button>
-    <button type="button" ng-if="$ctrl.scene.path_to_file.toLowerCase().indexOf('mp4') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('webm') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('ogg') == -1" ng-click="$ctrl.generateSampleVideo($ctrl.scene)" class="btn btn-default btn-sm"
-            uib-popover-html="'This video format cannot be played in a browser. Click here to generate a sample. <br>The sample size is about 10MB and its duration is between 30 and 90 seconds
-            , depending on the source duration. You will be notified when it is created if you stay on this page. The sample is stored in media/scenes/(sceneid)/sample.'"
-            popover-trigger="mouseenter" popover-placement="right"
-    >
-        <span class="glyphicon glyphicon-facetime-video"></span>  Generate a sample
-    </button>
-
-    <button
-
-                                class="btn btn-default btn-sm"
-                                popover-trigger="outsideClick"
-                                uib-popover-template="'static/partials/popover-templates/popover-playlist.template.html'"
-                                popover-append-to-body="true"
-                                popover-placement="top"
-                                type="button">
-                                    <span
-                                            popover-trigger="mouseenter"
-                                            uib-popover-html="'Add this scene to a playlist.'"
-                                            popover-append-to-body="true"
-                                            popover-placement="top"
-
-                                            class="glyphicon glyphicon-plus"></span>
-                        </button>
-
-
-    <a href="#!/scene/{{ $ctrl.next }}"><span
-            uib-popover-html="'Next Scene in list.'"
-            popover-trigger="mouseenter" popover-placement="bottom"
-            class="glyphicon glyphicon-step-forward"></span></a>
-
-
-</h2>
-
 
 <div class="row">
 
-    <div ng-if="$ctrl.scene.path_to_file.toLowerCase().indexOf('mp4') > -1 || $ctrl.scene.path_to_file.toLowerCase().indexOf('webm') > -1 || $ctrl.scene.path_to_file.toLowerCase().indexOf('ogg') > -1" id="videoDiv" class="col-md-6">
-	
+    <div class="col-md-6" style="text-align: center; vertical-align: middle; height: 22px;">
+<span style="vertical-align: middle;">
+    <a href="#!/scene/{{ $ctrl.prev }}"><span uib-popover-html="'Go to previous scene in list'"
+             popover-trigger="mouseenter" popover-placement="bottom" class="glyphicon glyphicon-step-backward"></span></a>
+
+        <a href="{{$ctrl.sheetPath}}" data-toggle="lightbox">
+            <button type="button" class="btn btn-default btn-sm" uib-popover-html="'Will open a contact sheet with 16 images from the video, if it has been generated. This resides in the videos/media/scenes/ folder together with the video thumbnail and video preview.<br>Click outside the box to close it.'" popover-trigger="mouseenter" popover-placement="right">
+            <span class="glyphicon glyphicon glyphicon-th"></span>  View Contact Sheet</button></a>
+
+        <button type="button" ng-click="$ctrl.playScene()" class="btn btn-default btn-sm">
+            <span class="glyphicon glyphicon-play-circle"></span>  Play with VLC
+        </button>
+        <button type="button" ng-click="$ctrl.openFolder()" class="btn btn-default btn-sm">
+            <span class="glyphicon glyphicon-folder-open"></span>  Open Folder
+        </button>
+        <button type="button" ng-if="$ctrl.scene.path_to_file.toLowerCase().indexOf('mp4') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('webm') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('ogg') == -1" ng-click="$ctrl.generateSampleVideo($ctrl.scene)" class="btn btn-default btn-sm"
+                uib-popover-html="'This video format cannot be played in a browser. Click here to generate a sample. <br>The sample size is about 10MB and its duration is between 30 and 90 seconds
+                , depending on the source duration. You will be notified when it is created if you stay on this page. The sample is stored in media/scenes/(sceneid)/sample.'"
+                popover-trigger="mouseenter" popover-placement="right">
+        <span class="glyphicon glyphicon-facetime-video"></span>  Generate a sample
+        </button>
+
+        <button type="button" ng-click="$ctrl.scanScene('TPDB')" class="btn btn-default btn-sm">
+            <span class="glyphicon glyphicon-play-circle"></span>  Scan The Porn DB
+        </button>
+        <input type="checkbox" ng-model="$ctrl.forceScan"
+            uib-popover-html="Force scanning."
+
+            popover-trigger="mouseenter" popover-placement="top"> Force
+
+            <button class="btn btn-default btn-sm"
+            popover-trigger="outsideClick"
+            uib-popover-template="'static/partials/popover-templates/popover-playlist.template.html'"
+            popover-append-to-body="true"
+            popover-placement="top"
+            type="button">
+            <span
+            popover-trigger="mouseenter"
+            uib-popover-html="'Add this scene to a playlist.'"
+            popover-append-to-body="true"
+            popover-placement="top"
+
+            class="glyphicon glyphicon-plus"></span>
+            </button>
+            <a href="#!/scene/{{ $ctrl.next }}"><span uib-popover-html="'Go to next scene in list'"
+        popover-trigger="mouseenter" popover-placement="bottom"class="glyphicon glyphicon-step-forward"></a>
+        </span>
+</span>
+    </div>
+    <div class="col-md-6" style="top: -22px; text-align: center; vertical-align: middle; height: 22px;">
+        <h2 align="center">
+    <uib-rating ng-model="$ctrl.scene.rating" max="10" read-only="isReadonly" on-hover="hoveringOver(value)"
+                on-leave="overStar = null" titles="['one','two','three']"
+                aria-labelledby="default-rating" ng-change="$root.patchEntity('scene', $ctrl.scene.id, 'rating', $ctrl.scene.rating, 'add',
+                false, false, null)"></uib-rating></h2>
+    </div>
+
+</div>
+
+
+<!--</h2>-->
+<div class="clearfix" style="height: 20px;">&nbsp;</div>
+
+<div class="row">
+
+    <div style="left: -16px;" class="col-md-6" ng-if="$ctrl.scene.path_to_file.toLowerCase().indexOf('mp4') > -1 || $ctrl.scene.path_to_file.toLowerCase().indexOf('webm') > -1 || $ctrl.scene.path_to_file.toLowerCase().indexOf('ogg') > -1" id="videoDiv" class="col-md-6">
+
         <span><video controls id="video" class="video-box" poster="{{ $ctrl.scene.thumbnail }}" ng-src="/play/{{ $ctrl.scene.id }}"
                width="720" height="405"></video>
         </span>
 	</div>
-    <div ng-if="$ctrl.scene.path_to_file.toLowerCase().indexOf('mp4') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('webm') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('ogg') == -1" id="videoDiv" class="col-md-6">
+
+    <div style="left: -16px;" ng-if="$ctrl.scene.path_to_file.toLowerCase().indexOf('mp4') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('webm') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('ogg') == -1" id="videoDiv" class="col-md-6">
 		<span><video ng-click="$ctrl.generateSampleVideo($ctrl.scene)" id="video" class="video-box" ng-if="$ctrl.updatedSample" poster="{{ $ctrl.scene.thumbnail }}" ng-src="{{ $ctrl.samplePath }}"
                width="720" height="405" controls></video>
         </span>
     </div>
 
 
+    <div class="scene-info col-md-6" style="text-align: justify; left: -32px;">
 
-    <div class="col-md-6">
-        <div class="alcenter">Scrape info from:<br>
-                        <p>
-                                    <button type="button" ng-click="$ctrl.scanScene('TPDB')" class="btn btn-default btn-sm">
-        <span class="glyphicon glyphicon-play-circle"></span>  Scan The Porn DB
-    </button>
-                            <input type="checkbox" ng-model="$ctrl.forceScan"
-                                   uib-popover-html="Force scanning."
-                                   popover-trigger="mouseenter" popover-placement="top"> Force
+        <ul class="nav nav-tabs">
+    <li class="nav-item active">
+        <a data-target="#main" class="nav-link" style="cursor: pointer;" data-toggle="tab">Main info</a>
+    </li>
+    <li class="nav-item">
+        <a data-target="#actors" class="nav-link" style="cursor: pointer;" data-toggle="tab">Actors</a>
+    </li>
+    <li class="nav-item">
+        <a data-target="#file" class="nav-link" style="cursor: pointer;" data-toggle="tab">File details</a>
+    </li>
 
-                        </p>
-        </div>
+</ul>
+<div class="tab-content clearfix">
+    <div class="tab-pane active" id="main">
          <ul>
     <li><span>Favorite:
         <!-- Rounded switch -->
@@ -179,10 +192,47 @@
             </li>
 
         </ul>
-
     </div>
-<div class="row">
-    <div class="col-md-3">
+ <!-- </div>
+</div>
+<div class="row clearfix">
+    <div class="col-md-6 overflow-x: scroll">
+
+        <div id="actor-list-row" style="margin-left: 16px; display: flex; flex-wrap: wrap;">
+        <div id="actor-list-row" style="display: flex; flex-wrap: wrap">-->
+<div class="tab-pane table-cell" style="width:45%;" id="actors">
+    <div id="actor-list-row" width="540px;" style="display: flex; flex-wrap: wrap">
+            <ul>
+			    <h3>Actors in this scene:</h3>
+                    <li ng-repeat="actor in $ctrl.scene.actors | orderBy:actor.name">
+                    <a href="/#!/actor/{{ actor.id }}">
+
+                        <img class="sceneactorthumb img-responsive" ng-src="{{ actor.thumbnail }}"
+                             alt="{{ actor.name }}">
+                    </a>
+                    <div id="actor-name-text">
+                        <h5><a href="/#!/actor/{{ actor.id }}">{{$index + 1}}) {{ actor.name }}</a>
+                            <span
+                                    ng-click="$ctrl.removeItem(actor,'actors')"
+                                    class="glyphicon glyphicon-remove"
+                                    uib-popover="Remove Actor from current scene." popover-trigger="mouseenter">
+
+                            </span>
+                        </h5>
+                    </div>
+
+
+                </li>
+            </ul>
+    </div>
+</div>
+        <!--</div>-->
+<!--    </div>
+
+   </div>
+
+    <div class="col-md-6" style="text-align: left;">-->
+    <div class="tab-pane" id="file">
             <ul>
             <br>
             <b>File Info:</b><hr>
@@ -212,40 +262,7 @@
             </li>
         </ul>
     </div>
-
-    <div style="margin-left: 16px;" class="col-md-8">
-        <div id="actor-list-row">
-
-            <ul>
-			    <h3>Actors in this scene:</h3>
-                    <li ng-repeat="actor in $ctrl.scene.actors | orderBy:actor.name"
-
-
-                >
-
-                    <a href="/#!/actor/{{ actor.id }}">
-
-                        <img class="sceneactorthumb" ng-src="{{ actor.thumbnail }}"
-                             alt="{{ actor.name }}"
-                             style="width: 150px;"/>
-                    </a>
-                    <div id="actor-name-text">
-                        <h4><a href="/#!/actor/{{ actor.id }}">{{$index + 1}}) {{ actor.name }}</a>
-                            <span
-                                    ng-click="$ctrl.removeItem(actor,'actors')"
-                                    class="glyphicon glyphicon-remove"
-                                    uib-popover="Remove Actor from current scene." popover-trigger="mouseenter">
-
-                            </span>
-                        </h4>
-                    </div>
-
-
-                </li>
-            </ul>
-
-        </div>
-    </div>
-
+ <!--   </div>-->
 </div>
-
+    </div>
+</div>
