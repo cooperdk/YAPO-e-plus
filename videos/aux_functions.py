@@ -275,7 +275,7 @@ def save_website_logo (image_link, website, force, *args):
         success = False
         return
     save_file_name = os.path.join(save_path, "logo" + ext)
-    if (not os.path.isfile(save_file_name) and not ws.thumbnail and Config().tpdb_website_logos) or force:
+    if (not os.path.isfile(save_file_name) and Config().tpdb_website_logos) or force:
         maxretries = 3
         attempt = 0
         while attempt < maxretries:
