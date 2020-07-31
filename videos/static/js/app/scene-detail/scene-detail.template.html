@@ -22,10 +22,14 @@
         <a href="{{$ctrl.sheetPath}}" data-toggle="lightbox">
             <button type="button" class="btn btn-default btn-sm" uib-popover-html="'Will open a contact sheet with 16 images from the video, if it has been generated. This resides in the videos/media/scenes/ folder together with the video thumbnail and video preview.<br>Click outside the box to close it.'" popover-trigger="mouseenter" popover-placement="right">
             <span class="glyphicon glyphicon glyphicon-th"></span>  View Contact Sheet</button></a>
-
+            <button style="right: 64px; down: 20px;" type="button" onclick="capture()" class="btn btn-default btn-sm"
+            popover-trigger="mouseenter" popover-placement="right" uib-popover-html="'Draws a capture of the video and downloads it to your current download folder. You must replace it manually for now.<br>Copy the image to the scene folder with the ID of the scene (you can see it in the URL).<br>You have to pause the video to generate the thumbnail.'">
+            <span class="glyphicon glyphicon-camera"></span>  Get a new thumbnail
+        </button>
         <button type="button" ng-click="$ctrl.playScene()" class="btn btn-default btn-sm">
             <span class="glyphicon glyphicon-play-circle"></span>  Play with VLC
         </button>
+
         <button type="button" ng-click="$ctrl.openFolder()" class="btn btn-default btn-sm">
             <span class="glyphicon glyphicon-folder-open"></span>  Open Folder
         </button>
@@ -73,7 +77,7 @@
 
 </div>
 
-
+<div style="display: none;" id="mediaID">{{ $ctrl.scene.id }}</div>
 <!--</h2>-->
 <div class="clearfix" style="height: 20px;">&nbsp;</div>
 
@@ -83,9 +87,30 @@
 
         <span><video controls preload="none" id="video" class="video-box" poster="{{ $ctrl.scene.thumbnail }}" ng-src="/play/{{ $ctrl.scene.id }}"
                width="720" height="405"></video>
+
+
         </span>
+<canvas id="canvas" width="720" height="405" style="right: 32px;"></canvas>
 	</div>
 
+
+<script>
+    function capture() {
+  var canvas = document.getElementById("canvas");
+  var video = document.getElementById("video");
+
+  if (video.paused) {
+
+      canvas.getContext('2d').drawImage(video, 0, 0);
+      //var img    = canvas.toDataURL("image/jpeg");
+      var link = document.createElement('a');
+      link.download = 'thumb.jpg';
+      link.href = document.getElementById('canvas').toDataURL("image/jpeg");
+      link.click();
+      canvas.style.display="none";
+  }
+}
+</script>
     <div style="left: -16px;" ng-if="$ctrl.scene.path_to_file.toLowerCase().indexOf('mp4') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('webm') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('ogg') == -1" id="videoDiv" class="col-md-6">
 		<span><video controls preload="none" ng-click="$ctrl.generateSampleVideo($ctrl.scene)" id="video" class="video-box" ng-if="$ctrl.updatedSample" poster="{{ $ctrl.scene.thumbnail }}" ng-src="{{ $ctrl.samplePath }}"
                width="720" height="405"></video>
@@ -260,6 +285,7 @@
             <li>
                 Video Duration: {{ $ctrl.scene.duration / 60 | number:0 }} Minutes
             </li>
+            <li>Thumb: /{{ $ctrl.scene.thumbnail }}</li>
         </ul>
     </div>
  <!--   </div>-->

@@ -347,6 +347,7 @@ angular.module('sceneDetail').component('sceneDetail', {
                 return $http.get('play-scene/', {
                     params: {
                         sceneId: self.scene.id
+
                     }
                 })
             };

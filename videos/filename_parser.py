@@ -2,13 +2,14 @@ import os
 import re
 import datetime
 import django
-import hashlib
-
+#import hashlib
+import struct
 from configuration import Config
 from videos import const
 import videos.scrapers.filenames as filenames
 import YAPO.settings
-
+from utils.printing import Logger
+log = Logger()
 django.setup()
 
 from videos.models import Actor, Scene, ActorAlias, SceneTag, Website
@@ -16,18 +17,55 @@ from videos.models import Actor, Scene, ActorAlias, SceneTag, Website
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 
 
-def get_hash(name):
-  readsize = 64 * 1024
+def get_hash(path: str):
+  '''
+  This function produces a hash for a video file: size + 64bit chksum of the first and
+  last 64k (even if they overlap because the file is smaller than 128k)
+  It will take approx. 30 seconds to generate 100 hashes on a regular hard disk.
+  This is the OSO/ISDB hasher which is also used by opensubtitles.
+  '''
   try:
-    with open(name, "rb") as f:
-      size = os.path.getsize(name)
-      data = f.read(readsize)
-      f.seek(-readsize, os.SEEK_END)
-      data += f.read(readsize)
-      return hashlib.md5(data).hexdigest()
+    longlongformat = 'Q'  # unsigned long long little endian
+    bytesize = struct.calcsize(longlongformat)
+    fmt = "<%d%s" % (65536 // bytesize, longlongformat)
+
+    f = open(path, "rb")
+
+    filesize = os.fstat(f.fileno()).st_size
+    filehash = filesize
+
+    if filesize < 65536 * 2:
+      log.error(f"File size error: {path}")
+      return "SizeError"
+
+    buf = f.read(65536)
+    longlongs = struct.unpack(fmt, buf)
+    filehash += sum(longlongs)
+
+    f.seek(-65536, os.SEEK_END)  # size is always > 131072
+    buf = f.read(65536)
+    longlongs = struct.unpack(fmt, buf)
+    filehash += sum(longlongs)
+    filehash &= 0xFFFFFFFFFFFFFFFF
+
+    f.close()
+    returnedhash = "%016x" % filehash
+    return returnedhash
   except:
-    print("File was not found, cannot hash")
+    log.error(f"File not found, cannot hash: {path}")
     return "Error"
+
+
+def rehash ():
+  print("\n\n")
+  num = 0
+  scenes = Scene.objects.order_by("id")  # name
+  for scene in scenes:
+    #if len(scene.hash) is not 16:
+    scene.hash = get_hash(scene.path_to_file)
+    scene.save()
+    num += 1
+    print(f"{num} hashes checked/regenerated...\r", end="")
 
 
 def filter_alias(actor_alias):

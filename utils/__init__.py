@@ -31,3 +31,5 @@ class Constants(metaclass=Singleton):
     self.tpdb_autorename = 'false'
     self.tpdb_actors = 'false'
     self.tpdb_photos = 'false'
+    self.tpdb_websites = 'false'
+    self.tpdb_tags = 0

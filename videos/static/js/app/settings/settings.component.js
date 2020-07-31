@@ -49,7 +49,9 @@ angular.module('settings').component('settings', {
                             tpdb_website_logos: false,
                             tpdb_autorename: false,
                             tpdb_actors: false,
-                            tpdb_photos: false
+                            tpdb_photos: false,
+                            tpdb_websites: false,
+                            tpdb_tags: 0
                         }
                 }).then(function (response) {
                     //alert(angular.toJson(response));
@@ -61,6 +63,8 @@ angular.module('settings').component('settings', {
                     self.tpdb_autorename = response.data.tpdb_autorename;
                     self.tpdb_actors = response.data.tpdb_actors;
                     self.tpdb_photos = response.data.tpdb_photos;
+                    self.tpdb_websites = response.data.tpdb_websites;
+                    self.tpdb_tags = response.data.tpdb_tags;
 
                     // alert("Got response from server: " + self.pathToFolderToAdd);
                 }, function errorCallback(response) {
@@ -111,7 +115,9 @@ angular.module('settings').component('settings', {
                             tpdb_websitelogos: self.tpdb_website_logos,
                             tpdb_autorename: self.tpdb_autorename,
                             tpdb_actors: self.tpdb_actors,
-                            tpdb_photos: self.tpdb_photos
+                            tpdb_photos: self.tpdb_photos,
+                            tpdb_websites: self.tpdb_websites,
+                            tpdb_tags
                         }
 
                     }).then(function (response) {

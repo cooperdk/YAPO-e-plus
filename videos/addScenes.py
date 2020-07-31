@@ -256,6 +256,8 @@ def create_scene(scene_path, make_sample_video):
                 select={"length": "Length(name)"}
             ).order_by("-length")
 
+            # TODO: Insert TpDB scanner here and only parse the scene if necessary
+
             filename_parser.parse_scene_all_metadata(
                 current_scene, actors, actors_alias, scene_tags, websites
             )

@@ -36,6 +36,8 @@ class Config(metaclass=Singleton):
   tpdb_autorename: str
   tpdb_actors: str
   tpdb_photos: str
+  tpdb_websites: str
+  tpdb_tags: int
   def __init__(self):
     self.yapo_url = Constants().yapo_url
     self.root_path = os.path.abspath(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
@@ -47,6 +49,7 @@ class Config(metaclass=Singleton):
     self.database_path = os.path.join(self.database_dir, Constants().db_filename)
     self.site_static_path = os.path.join(self.site_path, Constants().site_static_subdir)
     self.site_media_path = os.path.join(self.site_path, Constants().site_media_subdir)
+    self.site_media_url = "/media/"
     self.unknown_person_image_path = Constants().unknown_person_image_path
     self.timeprint_format = Constants().default_timeprint_format
     self.videoprocessing = Constants().videoprocessing
@@ -57,6 +60,8 @@ class Config(metaclass=Singleton):
     self.tpdb_autorename = Constants().tpdb_autorename
     self.tpdb_actors = Constants().tpdb_actors
     self.tpdb_photos = Constants().tpdb_photos
+    self.tpdb_websites = Constants().tpdb_websites
+    self.tpdb_tags = Constants().tpdb_tags
     self.configfile_path = os.path.join(self.config_path, Constants().default_yaml_settings_filename)
     self.current_setting_version = 3
     if os.name == 'nt':
@@ -114,6 +119,8 @@ class Config(metaclass=Singleton):
       self.tpdb_autorename = settings_dict[__yaml_root_element__].get("tpdb_autorename") or self.tpdb_autorename
       self.tpdb_actors = settings_dict[__yaml_root_element__].get("tpdb_actors") or self.tpdb_actors
       self.tpdb_photos = settings_dict[__yaml_root_element__].get("tpdb_photos") or self.tpdb_photos
+      self.tpdb_websites = settings_dict[__yaml_root_element__].get("tpdb_websites") or self.tpdb_websites
+      self.tpdb_tags = settings_dict[__yaml_root_element__].get("tpdb_tags") or self.tpdb_tags
   def __settings_to_dict__(self):
     return {
       __yaml_root_element__: {
@@ -133,7 +140,9 @@ class Config(metaclass=Singleton):
         "tpdb_website_logos": self.tpdb_website_logos,
         "tpdb_autorename": self.tpdb_autorename,
         "tpdb_actors": self.tpdb_actors,
-        "tpdb_photos": self.tpdb_photos
+        "tpdb_photos": self.tpdb_photos,
+        "tpdb_websites": self.tpdb_websites,
+        "tpdb_tags": self.tpdb_tags
       }
     }
 
@@ -149,9 +158,9 @@ class Config(metaclass=Singleton):
     #print(f'JSON: {{"settings_version": {self.current_setting_version}, "vlc_path": "{self.vlc_path}", "last_all_scene_tag": "{__nullable_time_to_string__(self.last_all_scene_tag)}", "tpdb_enabled": {str(self.tpdb_enabled).lower()}, "tpdb_website_logos": {str(self.tpdb_website_logos).lower()}, "tpdb_autorename": {str(self.tpdb_autorename).lower()}, "tpdb_add_actors": {str(self.tpdb_add_actors).lower()}, "tpdb_add_photo": {str(self.tpdb_add_photo).lower()}}}')
 
     #return f'{{"settings_version": {self.current_setting_version}, "vlc_path": "{self.vlc_path}", "last_all_scene_tag": "{__nullable_time_to_string__(self.last_all_scene_tag)}", "tpdb_enabled": {self.tpdb_enabled}, "tpdb_website_logos": {self.tpdb_website_logos}, "tpdb_autorename": {self.tpdb_autorename}, "tpdb_add_actors": {self.tpdb_add_actors}, "tpdb_add_photo": {self.tpdb_add_photo}}}'
-    print (f'JSON: {{"settings_version": {self.current_setting_version}, "vlc_path": "{self.vlc_path}", "yapo_url": "{self.yapo_url}", "last_all_scene_tag": "{__nullable_time_to_string__(self.last_all_scene_tag)}", "tpdb_enabled": {str(self.tpdb_enabled).lower()}, "tpdb_website_logos": {str(self.tpdb_website_logos).lower()}, "tpdb_autorename": {str(self.tpdb_autorename).lower()}, "tpdb_actors": {str(self.tpdb_actors).lower()}, "tpdb_photos": {str(self.tpdb_photos).lower()}}}')
+    print (f'JSON: {{"settings_version": {self.current_setting_version}, "vlc_path": "{self.vlc_path}", "yapo_url": "{self.yapo_url}", "last_all_scene_tag": "{__nullable_time_to_string__(self.last_all_scene_tag)}", "tpdb_enabled": {str(self.tpdb_enabled).lower()}, "tpdb_website_logos": {str(self.tpdb_website_logos).lower()}, "tpdb_autorename": {str(self.tpdb_autorename).lower()}, "tpdb_actors": {str(self.tpdb_actors).lower()}, "tpdb_photos": {str(self.tpdb_photos).lower()}, "tpdb_websites": {str(self.tpdb_websites)}, "tpdb_tags": {self.tpdb_tags}}}')
 
-    return f'{{"settings_version": {self.current_setting_version}, "vlc_path": "{self.vlc_path}", "yapo_url": "{self.yapo_url}", "last_all_scene_tag": "{__nullable_time_to_string__(self.last_all_scene_tag)}", "tpdb_enabled": {str(self.tpdb_enabled).lower()}, "tpdb_website_logos": {str(self.tpdb_website_logos).lower()}, "tpdb_autorename": {str(self.tpdb_autorename).lower()}, "tpdb_actors": {str(self.tpdb_actors).lower()}, "tpdb_photos": {str(self.tpdb_photos).lower()}}}'
+    return f'{{"settings_version": {self.current_setting_version}, "vlc_path": "{self.vlc_path}", "yapo_url": "{self.yapo_url}", "last_all_scene_tag": "{__nullable_time_to_string__(self.last_all_scene_tag)}", "tpdb_enabled": {str(self.tpdb_enabled).lower()}, "tpdb_website_logos": {str(self.tpdb_website_logos).lower()}, "tpdb_autorename": {str(self.tpdb_autorename).lower()}, "tpdb_actors": {str(self.tpdb_actors).lower()}, "tpdb_photos": {str(self.tpdb_photos).lower()}, "tpdb_websites": {str(self.tpdb_websites)}, "tpdb_tags": {self.tpdb_tags}}}'
 
 
 def __nullable_time_to_string__(time: Optional[datetime]) -> str:

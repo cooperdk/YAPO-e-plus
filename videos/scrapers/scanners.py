@@ -49,6 +49,8 @@ def tpdb (scene_id: int, force: bool):
             parsetext = parsedict[1] + " " + parsedict[2]
         else:
             parsetext = parsedict[2]
+
+        print(f"Parse: {parsetext}")
         # if current_scene.tpdb_id is not None and current_scene.tpdb_id != "" and len(current_scene.tpdb_id) > 12:
         #     parsetext = current_scene.tpdb_id
         url = 'https://metadataapi.net/api/scenes'
@@ -77,6 +79,7 @@ def tpdb (scene_id: int, force: bool):
             found = 1
 
         else:
+            aux.remove_text_inside_brackets(scene_name, brackets="[]")
             scene_name_formatted = aux.tpdb_formatter(scene_name)
             '''
             for actor in current_scene.actors.all():
@@ -112,7 +115,7 @@ def tpdb (scene_id: int, force: bool):
         if found == 1 or found == 2:
 
             print(f"A result was returned using method {found}. Parsing JSON...")
-
+            site_logo = ""
             if "title" in response['data'][0].keys():
                 title = response['data'][0]['title']
                 print(f"Title is {title}")
@@ -121,6 +124,7 @@ def tpdb (scene_id: int, force: bool):
             if "site" in response['data'][0].keys():
                 if "name" in response['data'][0]['site'].keys():
                     site = response['data'][0]['site']['name']
+                    site_logo = response['data'][0]['site']['logo']
             if "date" in response['data'][0].keys():
                 release_date = response['data'][0]['date']
             if "id" in response['data'][0].keys():
@@ -153,200 +157,225 @@ def tpdb (scene_id: int, force: bool):
                 #pp = pprint.PrettyPrinter(indent=4)
                 #pp.pprint(performer)
                 #print(f"Performers: {perflist}")
-                print(f"perfname: {performer['name'].lower().strip()} - perflist: {perflist.lower().strip()}")
+                print(f"----> PERFORMER: {performer['name'].lower().strip()} - perflist: {perflist.lower().strip()}")
                 if not performer['name'].lower().strip() in perflist.lower().strip():
                     if performer['parent'] is not None and performer['parent']['extras'] is not None:
                         performer_extras = performer['parent']['extras']
                         # print(performer_extras['gender'])
-
+                        keyname = ""
+                        sp = ""
                         if performer_extras['gender'] is not None and "f" in performer_extras['gender'].lower():
                             print(f"  --> TpDB PERFORMER -> Checking #{{ite}} ({performer['name'].strip()})...")
-                            for scene_performer in current_scene.actors.all():
+                            actors = list(Actor.objects.extra(select={ "length": "Length(name)" }).order_by("-length"))
+                            sp = ""
+                            for scene_performer in actors:
 
                                 keyname=""
+                                primary=0
                                 sp=scene_performer.name.lower().strip()
                                 perf=performer['name'].lower().strip()
                                 if sp == perf:
                                     keyname = scene_performer.name
-                                    print(f"  --> YAPO_PERF {scene_performer.name} is keyname")
-
-                                if performer['parent']['name'] and not keyname:
-                                    perpn = performer['parent']['name'].lower().strip()
-                                    if sp in perpn and not keyname:
-                                        keyname = performer['parent']['name']
-                                        print(f"  --> TpDB SECONDARY {keyname} is keyname")
-                                    else:
-                                        perpn2 = namecheck(perpn)
-                                        if sp in perpn2.lower().strip():
-                                            keyname = perpn2.strip()
-                                            print(f"  --> TpDB REPLACED {performer['parent']['name']} -> {keyname} is keyname")
+                                    primary = 1
+                                    print(f"  --> SM 1: YAPO performer name {scene_performer.name} is keyname")
+                                    break
 
 
-                                if 'aliases' in performer.keys():
-                                    alia= str(performer['aliases'].lower().strip())
-                                else:
-                                    alia=""
                                 #print (f"SC PERF: {sp} - JSON PERF: {perf} - JSON AKA: {alia} - JSON PERF2: {perpn}")
 
 
                                 #elif "aliases" in performer.keys() and scene_performer.name.lower().strip() in str(performer['aliases'].lower()):
                                     #print(f"{performer['name']} is an alias to an actor already registered to this scene.")
                                 #else:
-                                if not keyname:
-                                    for alias in scene_performer.actor_aliases.all():
-                                        #print(f"Testing alias: {alias.name} ... ",end="")
-                                        if (alias.name.lower() in perf) or (alia and (alias.name.lower() in alia)):
+                            if not keyname:
+
+                                akaroot = Actor.objects.all()
+
+
+                                if 'aliases' in performer.keys():
+                                    alia = str(performer['aliases']).lower().strip()
+
+                                    for alias in akaroot:
+                                        akanames = [sub.name for sub in alias.actor_aliases.all()]
+                                        #print(f"GETTING {alias.name} -> {akanames}")
+
+                                        #print(f"Testing alias: {alias.name} ... \r",end="")
+                                        if (alias.name.lower() in perf) or (alias.name.lower() in performer['parent']['name']) or (alias.name.lower() in alia):
                                             keyname = alias.name
-                                            print(f"  --> YAPO Alias {alias.name} is keyname")
+                                            primary = 3
+                                            print(f"  --> SM 3: YAPO performer {keyname} is keyname (by alias)")
+                                elif 'aliases' in performer['parent'].keys():
+                                    alia = str(performer['parent']['aliases']).lower().strip()
 
-                                if not keyname:
-                                    #actor_to_add = Actor.objects.get(pk=actor_id)
-                                    print(f"  -- CHECKING SCENE ACTORS: {str(current_scene.actors.all())}")
-                                    if (performer['name'].lower() not in str(current_scene.actors.all()).lower()) and (Actor.objects.filter(name=performer['name']).exists()):
-                                        actor_to_add = Actor.objects.get(name=performer['name'])
-                                        current_scene.actors.add(actor_to_add)
-                                        keyname = actor_to_add.name
-                                        print(f" --> ACTOR ADDED TO SCENE: {keyname}")
+                                    for alias in akaroot:
+                                        akanames = [sub.name for sub in alias.actor_aliases.all()]
+                                        #print(f"GETTING {alias.name} -> {akanames}")
 
-                                # TODO: Code to add actor to scene
+                                        #print(f"Testing alias: {alias.name} ... \r",end="")
+                                        if (alias.name.lower() in perf) or (alias.name.lower() in performer['parent']['name']) or (alias.name.lower() in alia):
+                                            keyname = alias.name
+                                            primary = 4
+                                            print(f"  --> SM 4: YAPO performer {keyname} is keyname (by alias)")
+                                else:
+                                    alia = ""
 
-                                if not keyname:
-                                    #print("No actor found")
-                                    continue
 
-                                if keyname:
-                                    print("Checking for additional data...")
+                            if keyname:
+                                #actor_to_add = Actor.objects.get(pk=actor_id)
+                                print(f"----> CHECKING SCENE ACTORS")
+                                if (keyname not in str(current_scene.actors.all()).lower()) and (Actor.objects.filter(name=performer['name']).exists()):
+                                    print("  --> ACTOR MATCH")
+                                    actor_to_add = Actor.objects.get(name=performer['name'])
+                                    keyname = actor_to_add.name
+                                    if not current_scene.actors.filter(name=keyname):
+                                        aux.addactor(current_scene, actor_to_add)
+                                        print(f"  --> ACTOR ADDED TO SCENE: {keyname}")
+                                    else:
+                                        print(f"  --> ACTOR already in scene.")
 
-                                #
-                            # TODO: Code to add actor to scene
-                            #
-                            #    else:
-                            #        current_scene.actors.add(name=performer['name'])
-                            #        current_scene.save()
-                                if Actor.objects.filter(name=keyname).exists():
-                                    actor = Actor.objects.get(name=keyname)
-                                    if len(perflist) > 3 and not actor.name.lower() in perflist.lower():
-                                        perflist = perflist + ", " + actor.name
-                                    elif len(perflist) < 3:
-                                        perflist = actor.name
-                                    print(f"Got actor {actor.name} from db...")
-                                    added = False
 
-                                    if actor.date_of_birth == None or actor.date_of_birth == "" or actor.date_of_birth == "1970-01-01":
-                                        if "birthday" in performer_extras.keys():
-                                            dob = performer_extras["birthday"]
-                                            if dob is not None:
-                                                actor.date_of_birth = performer_extras["birthday"]
-                                                print(f"Added info: Birthday: {actor.date_of_birth}")
-                                                added = True
-                                                # actor.save()
-                                            # print(performer_extras.keys())
+                        if performer['parent']['name'] and not keyname:
+                            perpn = performer['parent']['name'].lower().strip()
+                            if sp == perpn and not keyname:
+                                keyname = performer['parent']['name']
+                                secondary = 2
+                                print(f"  --> SM 2: {keyname} is keyname")
+                                break
 
-                                    if "fakeboobs" in performer_extras.keys():
-                                        faketits = performer_extras['fakeboobs']
+                            if not keyname:
+                                perpn2 = namecheck(perpn)
+                                secondary = 3
+                                if sp == perpn2.lower().strip():
+                                    keyname = perpn2.strip()
+                                    print(f"  --> SM 3: TpDB REPLACED {performer['parent']['name']} -> {keyname} is keyname")
+                                    break
 
-                                        if faketits is not None:
-                                            print(f"Fake tits: {faketits}")
-                                            if faketits == True:
-                                                print("Yes...")
-                                                if not "fake tits" in str(actor.actor_tags.all().lower()):
-                                                    actor.actor_tags.add("Fake tits")
-                                                    print("Added tag: Fake tits")
-                                                    added = True
-                                            elif faketits == False:
-                                                print("No...")
-                                                if not "natural tits" in str(actor.actor_tags.all().lower()):
-                                                    actor.actor_tags.add("Natural tits")
-                                                    print("Added tag: Natural tits")
-                                                    added = True
-                                            # actor.save()
-                                        else:
-                                            print("No info on this actor's tits...")
+                        # TODO: Code to add actor to scene
 
-                                    if not actor.ethnicity or actor.ethnicity == "":
-                                        if "ethnicity" in performer_extras.keys():
-                                            ethnicity = performer_extras['ethnicity']
-                                            if ethnicity is not None:
-                                                if actor.ethnicity == None or actor.ethnicity == "":
-                                                    actor.ethnicity = ethnicity
-                                                    print(f"Ethnicity: {ethnicity}")
-                                                    added = True
-                                                    # actor.save()
 
-                                    if not actor.country_of_origin or actor.country_of_origin == "":
-                                        if "birthplace" in performer_extras.keys():
-                                            birthplace = performer_extras['birthplace']
-                                            if birthplace is not None:
-                                                if "united states" in birthplace.lower():
-                                                    birthplace = "United States"
-                                                if actor.country_of_origin == None or actor.country_of_origin == "":
-                                                    actor.country_of_origin = birthplace
-                                                    print(f"Birthplace: {birthplace}")
-                                                    added = True
-                                                    # actor.save()
-                                    if not actor.weight or actor.weight == 0:
-                                        if "weight" in performer_extras.keys():
-                                            weight = performer_extras['weight']
-                                            if weight is not None:
-                                                weight = re.findall(r'[\d]+', weight)
-                                                weight = weight[0]
-                                                actor.weight = weight
-                                                print(f"Weight: {weight} kg")
-                                                added = True
+                        if Actor.objects.filter(name=keyname).exists():
+                            actor = Actor.objects.get(name=keyname)
+                            if len(perflist) > 3 and not actor.name.lower() in perflist.lower():
+                                perflist = perflist + ", " + actor.name
+                            elif len(perflist) < 3:
+                                perflist = actor.name
+                            print(f"Got actor {actor.name} from db...")
+                            added = False
 
-                                    if not actor.height or actor.height == 0:
-                                        if "height" in performer_extras.keys():
-                                            height = performer_extras['height']
-                                            if height is not None:
-                                                if "cm" in height:
-                                                    height = re.findall(r'[\d]+', height)
-                                                elif "in" in height:
-                                                    height = re.findall(r'[\d]+', height)
-                                                    height = int(round(height * 2.54))
-                                                else:
-                                                    height = int(round(height * 2.54))
-                                                height=height[0]
-                                                actor.height = height
-                                                print(f"Height: {height} cm")
-                                                added = True
-
-                                    if "hair_colour" in performer_extras.keys():
-                                        hair = performer_extras['hair_colour']
-                                        if hair is not None:
-                                            hair = hair.replace("Brunette, ", "")
-                                            hair = hair.replace("Blonde, ", "")
-                                            hair = hair.replace("Redhead, ", "")
-
-                                            print(f"Hair color: {hair}")
-                                            if hair is not None:
-                                                tags = str(actor.actor_tags.all())
-                                                if not hair.lower() in tags.lower():
-                                                    if actor.actor_tags.filter(name__contains=" hair"):
-                                                        remtag = actor.actor_tags.filter(name__contains=" hair").values('id')[0]['id']
-                                                        print(f"TO REMOVE --> {remtag}")
-                                                        actor.actor_tags.remove(remtag)
-                                                    insert_actor_tag(actor, hair + " hair")
-                                                    print(f"Added tag: {hair} hair")
-                                                    added = True
-                                                else:
-                                                    print(f"Didn't add tag: {hair} hair - it exists already.")
-
-                                    if performer["parent"]["bio"] is not None and len(performer["parent"]["bio"]) > 72:
-                                        actor.description = performer["parent"]["bio"]
+                            if actor.date_of_birth == None or actor.date_of_birth == "" or actor.date_of_birth == "1970-01-01":
+                                if "birthday" in performer_extras.keys():
+                                    dob = performer_extras["birthday"]
+                                    if dob is not None:
+                                        actor.date_of_birth = performer_extras["birthday"]
+                                        print(f"Added info: Birthday: {actor.date_of_birth}")
                                         added = True
                                         # actor.save()
+                                    # print(performer_extras.keys())
 
-                                    if not actor.gender:
-                                        actor.gender = "F"
+                            if "fakeboobs" in performer_extras.keys():
+                                faketits = performer_extras['fakeboobs']
+
+                                if faketits is not None:
+                                    print(f"Fake tits: {faketits}")
+                                    if faketits == True:
+                                        print("Yes...")
+                                        if not "tits" in str(actor.actor_tags.all().lower()):
+                                            actor.actor_tags.add("Fake tits")
+                                            print("Added tag: Fake tits")
+                                            added = True
+                                    elif faketits == False:
+                                        print("No...")
+                                        if not "tits" in str(actor.actor_tags.all().lower()):
+                                            actor.actor_tags.add("Natural tits")
+                                            print("Added tag: Natural tits")
+                                            added = True
+                                    # actor.save()
+                                else:
+                                    print("No info on this actor's tits...")
+
+                            if not actor.ethnicity or actor.ethnicity == "":
+                                if "ethnicity" in performer_extras.keys():
+                                    ethnicity = performer_extras['ethnicity']
+                                    if ethnicity is not None:
+                                        if actor.ethnicity == None or actor.ethnicity == "":
+                                            actor.ethnicity = ethnicity
+                                            print(f"Ethnicity: {ethnicity}")
+                                            added = True
+                                            # actor.save()
+
+                            if not actor.country_of_origin or actor.country_of_origin == "":
+                                if "birthplace" in performer_extras.keys():
+                                    birthplace = performer_extras['birthplace']
+                                    if birthplace is not None:
+                                        if "united states" in birthplace.lower():
+                                            birthplace = "United States"
+                                        if actor.country_of_origin == None or actor.country_of_origin == "":
+                                            actor.country_of_origin = birthplace
+                                            print(f"Birthplace: {birthplace}")
+                                            added = True
+                                            # actor.save()
+                            if not actor.weight or actor.weight == 0:
+                                if "weight" in performer_extras.keys():
+                                    weight = performer_extras['weight']
+                                    if weight is not None:
+                                        weight = re.findall(r'[\d]+', weight)
+                                        weight = weight[0]
+                                        actor.weight = weight
+                                        print(f"Weight: {weight} kg")
                                         added = True
 
-                                    if added == True:
-                                        actor.last_lookup = datetime.now()
-                                    actor.save()
+                            if not actor.height or actor.height == 0:
+                                if "height" in performer_extras.keys():
+                                    height = performer_extras['height']
+                                    if height is not None:
+                                        if "cm" in height:
+                                            height = re.findall(r'[\d]+', height)
+                                        elif "in" in height:
+                                            height = re.findall(r'[\d]+', height)
+                                            height = int(round(height * 2.54))
+                                        else:
+                                            height = int(round(height * 2.54))
+                                        height=height[0]
+                                        actor.height = height
+                                        print(f"Height: {height} cm")
+                                        added = True
+
+                            if "hair_colour" in performer_extras.keys():
+                                hair = performer_extras['hair_colour']
+                                if hair is not None:
+                                    hair = hair.replace("Brunette, ", "")
+                                    hair = hair.replace("Blonde, ", "")
+                                    hair = hair.replace("Redhead, ", "")
+                                    #print(f"Hair color: {hair}")
+                                    if hair is not None:
+                                        tags = str(actor.actor_tags.all())
+                                        if not actor.actor_tags.filter(name__contains=" hair"):
+                                            #if actor.actor_tags.filter(name__contains=" hair"):
+                                            #    remtag = actor.actor_tags.filter(name__contains=" hair").values('id')[0]['id']
+                                            #    print(f"TO REMOVE --> {remtag}")
+                                            #    actor.actor_tags.remove(remtag)
+                                            insert_actor_tag(actor, hair + " hair")
+                                            print(f"Added tag: {hair} hair")
+                                            added = True
+
+
+                            if performer["parent"]["bio"] is not None and len(performer["parent"]["bio"]) > 72:
+                                actor.description = performer["parent"]["bio"]
+                                added = True
+                                # actor.save()
+
+                            if not actor.gender:
+                                actor.gender = "F"
+                                added = True
+
+                            if added == True:
+                                insert_actor_tag(actor, "TpDB: Tagged")
+                                actor.last_lookup = datetime.now()
+                            actor.save()
             newtitle = ""
             if title:
                 newtitle = title
-                print(newtitle)
+                #print(newtitle)
 
            # if any([release_date, perflist, site]):
             #    newtitle = f"{newtitle} - "
@@ -361,21 +390,20 @@ def tpdb (scene_id: int, force: bool):
 
             if release_date:
                 newtitle = f"{release_date} - {newtitle}"
-                print(newtitle)
+                #print(newtitle)
 
             if site:
                 newtitle = f"{site} - {newtitle}"
-                print(newtitle)
+                #print(newtitle)
 
-            print(f"New scene name: {newtitle}")
             #print(Config().tpdb_autorename.lower())
             if "true" in Config().tpdb_autorename.lower():
                 if not current_scene.orig_name:
                     current_scene.orig_name = current_scene.name
                 current_scene.name = newtitle
-                print("Scene name changed.")
+                print(f"Scene name changed: {newtitle}")
             else:
-                print("Renaming is disabled, so the scene name won't be changed.")
+                print('"Renaming is disabled, but we suggest "{newtitle}".')
 
             current_scene.save()
             success = True
@@ -387,15 +415,32 @@ def tpdb (scene_id: int, force: bool):
         success = False
         print(f"Issue(s) occured:\n{sys.exc_info()}")
         #pass
-
+    try:
+        tg=SceneTag.objects.get(name="TpDB: Match: Good")
+        tq=SceneTag.objects.get(name="TpDB: Match: Questionable")
+        tn=SceneTag.objects.get(name="TpDB: Match: None")
+        current_scene.scene_tags.remove(tg)
+        current_scene.scene_tags.remove(tq)
+        current_scene.scene_tags.remove(tn)
+        current_scene.save()
+            #tpdbtag.  current_scene.scene_tags.remove(tpdbtag.id)
+    except:
+        pass
     if found == 1:
-        insert_scene_tag(current_scene, "TpDB: Match: Good")
+            insert_scene_tag(current_scene, "TpDB: Match: Good")
     elif found == 2:
         insert_scene_tag(current_scene, "TpDB: Match: Questionable")
     elif success == False:
-        insert_scene_tag(current_scene, "TpDB: No Match")
+        insert_scene_tag(current_scene, "TpDB: Match: None")
+
     insert_scene_tag(current_scene, "TpDB: Scanned")
     print("Tagged the scene with a TpDB tag.")
+
+    # TODO: Website logo downloader
+
+    if found:
+        if Config().tpdb_website_logos:
+            aux.save_website_logo(site_logo, site, False, current_scene)
 
     return success
 

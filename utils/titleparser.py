@@ -50,7 +50,7 @@ def getSearchSiteName(siteID):
 
 def siteValues():
 
-    searchSites = [None] * 881
+    searchSites = [None] * 885
 
     searchSites[0] = ("BlackedRaw", "BlackedRaw", "https://www.blackedraw.com", "https://www.blackedraw.com/api")
     searchSites[1] = ("Blacked", "Blacked", "https://www.blacked.com", "https://www.blacked.com/api")
@@ -929,6 +929,10 @@ def siteValues():
     searchSites[878] = ("Adult Time", "Adult Time", "https://freetour.adulttime.com", "https://tsmkfa364q-dsn.algolia.net/1/indexes/*/queries")
     searchSites[879] = ("RealJamVR", "RealJamVR", "https://www.realjamvr.com", "https://realjamvr.com/virtualreality/scene/id/")
     searchSites[880] = ("BBC Paradise", "BBC Paradise", "https://www.bbcparadise.com/", "https://www.bbcparadise.com/movies/")
+    searchSites[881] = ("Jesse Loads Monster Facials", "Jesse Loads Monster Facials", "https://jesseloadsmonsterfacials.com//", "https://jesseloadsmonsterfacials.com/visitors/tour_01.html")
+    searchSites[882] = ("Assylum", "Assylum", "https://www.assylum.com/", "https://www.assylum.com/?home")
+    searchSites[883] = ("Big Gulp Girls", "Big Gulp Girls", "https://tour.biggulpgirls.com/", "https://tour.biggulpgirls.com/videos/")
+    searchSites[884] = ("Deepthroat Sirens", "Deepthroat Sirens", "https://tour.deepthroatsirens.com/", "https://tour.deepthroatsirens.com/videos/")
     return searchSites
 
 def getSearchSiteIDByFilter(searchFilter):
@@ -1099,6 +1103,7 @@ def getSearchSettings(mediaTitle: str):
         ('^iktg ', 'IKnowThatGirl '),
         ('^il ', 'ImmoralLive '),
         ('^jp ', 'JaysPOV '),
+        ('^jlmf ', 'JesseLoadsMonsterFacials '),
         ('^kha ', 'KarupsHA '),
         ('^kow ', 'KarupsOW '),
         ('^kpc ', 'KarupsPC '),
@@ -1215,9 +1220,15 @@ def getSearchSettings(mediaTitle: str):
     abbFixed = False
     for abbreviation, full in abbreviations:
         r = re.compile(abbreviation, flags=re.IGNORECASE)
-        if r.match(mediaTitle):
-            mediaTitle = r.sub(full, mediaTitle, 1)
+        mediatitle2 = ""
+        mediatitle2 = mediaTitle.replace("_", " ")
+        mediatitle2 = mediatitle2.replace("-", " ")
+        mediatitle2 = mediatitle2.replace(".", " ")
+        #print(mediatitle2)
+        if r.match(mediatitle2):
+            mediaTitle = r.sub(full, mediatitle2, 1)
             abbFixed = True
+            #print(mediaTitle)
             break
 
     if abbFixed:

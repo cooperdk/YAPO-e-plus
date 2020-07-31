@@ -6,23 +6,28 @@ import shutil
 import requests
 import platform
 import webbrowser
-from utils.printing import Logger
+
 from videos.models import Scene, Actor, ActorTag, SceneTag, Folder
-import videos.aux_functions as auxf
+import videos.aux_functions as aux
 from configuration import Config
+from utils import Constants
+from colorama import init
+from utils.printing import Logger
+
+init()
 log = Logger()
 
-def getSizeAll () -> str: # Retrieves the total amount of bytes of registered scenes
+def getsizeall () -> str: # Retrieves the total amount of bytes of registered scenes
     row = Scene.objects.raw(
         "SELECT SUM(size) AS total, id FROM videos_scene"
     )  # cursor.fetchone()
     if row[0].total is not None:
-        return sizeFormat(row[0].total)
+        return sizeformat(row[0].total)
     else:
         return "no space"
 
 
-def sizeFormat (b: int) -> str: # returns a human-readable filesize depending on the file's size
+def sizeformat (b: int) -> str: # returns a human-readable filesize depending on the file's size
     if b < 1000:
         return f"{b}B"
     elif b < 1000000:
@@ -50,7 +55,14 @@ def write_actors_to_file(): # Method to dump all actors alphabetically in a read
     print("To recover actor data, please consult the guide.")
 
 
-def verCheck (): # Check the local version against Github
+def configcheck ():
+    settings = os.path.join(Config().config_path, Constants().default_yaml_settings_filename)
+    if not path.isfile(settings):
+        log.info("There is no config file, so one has been generated.")
+        Config().save()
+
+
+def vercheck (): # Check the local version against Github
 
     try:
         if sys.frozen or sys.importers:
@@ -85,7 +97,7 @@ def verCheck (): # Check the local version against Github
         print("Since this build is frozen, an update check is nor performed.")
 
 def stats (): # Prints statistics about your videos and metadata
-    size = getSizeAll()
+    size = getsizeall()
     row = Actor.objects.raw(
         "SELECT COUNT(*) AS total, id FROM videos_actor"
     )  # cursor.fetchone()
@@ -127,6 +139,7 @@ def ffmpeg_check():
         ffplay = os.path.exists(os.path.abspath(os.path.join(dir_to_check, 'ffplay.exe')))
         ffprobe = os.path.exists(os.path.abspath(os.path.join(dir_to_check, 'ffprobe.exe')))
         if not all([ffmpeg, ffplay, ffprobe]):
+            print("\n\n")
             print("You don't have a copy of FFMPEG in your YAPO system.")
             print("I am going to install a copy of FFPMEG (4.3, static).")
             print(f"It will be placed at {dir_to_check}")
@@ -150,17 +163,21 @@ def ffmpeg_check():
                 print(f"and place it in {dir_to_check}")
                 input("YAPO will exit now. Press enter to acknowledge... >")
                 sys.exit()
-def getStarted ():
+
+
+def startup_sequence ():
 
     print("")
-    verCheck()
+    configcheck()
+    print("")
+    vercheck()
     print("")
     stats()
     backupper()
     write_actors_to_file()
-    mem = int(auxf.getMemory())
-    cpu = auxf.getCPU()
-    cpucnt = auxf.getCPUCount()
+    mem = int(aux.getMemory())
+    cpu = aux.getCPU()
+    cpucnt = aux.getCPUCount()
     global videoProcessing
     print(f"\nYou have {mem} GB available. CPU speed is {cpu} GHz and you have {cpucnt} cores available.")
 
@@ -172,7 +189,6 @@ def getStarted ():
         print("Since you have insufficient hardware, video processing will be disabled.")
         Config().videoprocessing = False
         log.info("Video processing disabled, too low hardware specification")
-    print("\n\n")
 
     ffmpeg_check()
 
@@ -193,7 +209,7 @@ class ready:
     try:
         if not 'migrat' in str(sys.argv[1:]):
             print("Not in migration mode. Executing startup sequence.")
-            getStarted()
+            startup_sequence()
         else:
             log.info(f'User entered migration mode with the "{sys.argv[1]}" command.')
             print("\n")

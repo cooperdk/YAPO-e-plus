@@ -13,8 +13,6 @@ There's also a Docker image which is described further down.
 
 A copy of the setup with pre-registered actors, websites and tags (thousands of them) is available. It will be available on Patreon shortly. Until then, contact me here to gain access to it.
 
-ATTENTION - The program directory should be renamed to "YAPO" (upper case) as some functions depend on this! 
-
 There is a **set of logos** available for websites, thanks to @GernBlanston#0168 from Porn Organizing (https://discord.gg/6TvpGA) - get them here: https://gitea.unknown.name/Trizkat/site-logos - they should be unpacked to your YAPO root. YAPO simply matches the website name in your installation with a PNG image in videos/media/logos and if there's a name match, the logo will be shown on the website view. Currently, the filename MUST match the  website name (not case-sensitive). This means that you should rename the logos to whatever you call your websites, or vice versa. I will be working on an automatic website addition tool in the future.
 
 Requirements: FFMPEG, VLC (for out-of-browser playback, if you prefer that) and Python 3.7+ installed. If you use the installer, everything is pre-installed for you.
@@ -27,6 +25,8 @@ If something is not working, it is generally enough to make sure all dependencie
 
 #### NEW FEATURES:
 
+- Automatic scene discovery (with TpDB). This will automatically rename your scene titles if you allow it.
+  Will also automatically connect actors to scenes (auto-addition of non-existing actors, websites and tags to come).
 - Streaming scene playback from within YAPO e+ (with working seek bar).
 - Working dockerfile
 - Contact sheets.
@@ -50,8 +50,7 @@ If something is not working, it is generally enough to make sure all dependencie
 - On startup, the total disk usage for the video collection and other information is reported. Also, the database is backed up and your actor collection is exported to a text file in the main YAPO dir.
 
 - YAPO e+ will now strip the measurements field for a bra cup size, tag the actor with the cup size, and also tag with a breast size grouping (fx large or huge).
-
-- YAPO e+ will also tag an actor based on height. Actors of normal height (161-178 cm) won't be tagged.
+  It will also tag an actor based on height. Actors of normal height (161-178 cm) won't be tagged.
 
 - Tatto information shows up in the actor details, and a group tag for tattoo amounts is added.
 
@@ -60,7 +59,7 @@ If something is not working, it is generally enough to make sure all dependencie
 - YAPO e+ scrapes actor information from IMDB first (best biographies), then from TMDB (next best profiles and best profile pictures) and then from Freeones (best all-round information). If there's a photo in the system and it's taken from TMDB or added by the user, the system no longer downloads a new one, even if you force scrape to update the actor.
   This also ensures that your manually added photos won't be overwritten. A button will be added later, so you can delete the profile photo.
 
-- YAPO e+ hashes all scenes (don't worry, it's FAST!) and adds the hash checksum to the scenes table.
+- YAPO e+ hashes all scenes and adds the hash to the scenes table. This will make it easier and faster to discover scenes with TpDB, when they start supporting it.
   When requested in settings, it will perform a dupe check after confirmation, and delete all duplicates so only one copy remains.
 
 - A lot of uninteresting console log text has been silenced.

@@ -25,6 +25,7 @@ import videos.const
 import YAPO.settings
 import videos.aux_functions
 from videos import views
+from configuration import Config
 
 # from django.contrib import admin
 # admin.autodiscover()
@@ -73,7 +74,7 @@ urlpatterns = [
                   url(r'^admin/', admin.site.urls),
                   url(r'^videos/', include('videos.urls')),
                   url(r'^api/', include(router.urls)),
-                  url(r'^$', views.angualr_index, name='angular-index'),
+                  url(r'^$', views.angular_index, name='angular-index'),
                   url(r'^upload/', views.AssetAdd.as_view()),
                   url(r'^scrape-actor/', views.ScrapeActor.as_view()),
                   url(r'^play-scene/', views.play_in_vlc),
@@ -83,8 +84,8 @@ urlpatterns = [
                   url(r'^ffmpeg/', views.ffmpeg),
                   url(r'^tag-multiple-items/', views.tag_multiple_items),
                   url(r'^play/', views.display_video),
-                  url(r'^scan-scene/', views.scanScene.as_view())
-                  # url(r'^admin/', admin.site.urls, name='admin')
-              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+                  url(r'^scan-scene/', views.scanScene.as_view()),
+              ] + static(Config().site_media_url, document_root=Config().site_media_path)
+
 
 # urlpatterns = format_suffix_patterns(urlpatterns, allowed=['json'])

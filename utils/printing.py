@@ -9,13 +9,13 @@ class Logger(metaclass=Singleton):
     timeprint(message)
 
   def debug(self, message: str):
-    timeprint(f"[DEBUG] {message}")
+    timeprint(f"\033[34m[DEBUG]\033[39m {message}")
 
   def info(self, message: str):
-    timeprint(f"[INFO ] {message}")
+    timeprint(f"\033[33m[INFO ]\033[39m {message}")
 
   def error(self, message: str):
-    timeprint(f"[ERROR] {message}")
+    timeprint(f"\033[31m[ERROR]\033[39m {message}")
 
 def timeprint(message: str):
   print(f"{datetime.now().strftime(Config().timeprint_format)}-> {message}")

@@ -1,4 +1,5 @@
 import os
+import re
 import os.path
 import subprocess
 import _thread
@@ -18,6 +19,10 @@ from configuration import Config
 from videos import ffmpeg_process
 import urllib.request
 import YAPO.settings
+from wsgiref.util import FileWrapper
+from django.http import StreamingHttpResponse
+import mimetypes
+from datetime import timedelta
 
 # For REST framework
 
@@ -302,7 +307,7 @@ def scrape_all_actors(force):
                     scraper_freeones.search_freeones_with_force_flag(actor, True)
                     print("Finished Freeones search")
             else:
-                print("{actor.name} was already searched...                                                                        \r",end="")
+                print(f"{actor.name} was already searched...                                                                        \r",end="")
         else:
 
             print("Searching in TMDb")
@@ -1284,7 +1289,7 @@ class FileUploadView(views.APIView):
         return Response(status=204)
 
 
-def angualr_index(request):
+def angular_index(request):
 
     return render(request, os.path.join("videos","angular","index.html"))
 
@@ -1460,9 +1465,72 @@ class ActorViewSet(viewsets.ModelViewSet):
     # search_fields = ('name',)
     queryset = Actor.objects.all()
     # serializer_class = ActorSerializer
-    
-def display_video(x):
 
+
+def file_iterator(file_name, chunk_size=8192, offset=0, length=None):
+    with open(file_name, "rb") as f:
+        f.seek(offset, os.SEEK_SET)
+        remaining = length
+        while True:
+            bytes_length = chunk_size if remaining is None else min(remaining, chunk_size)
+            data = f.read(bytes_length)
+            if not data:
+                break
+            if remaining:
+                remaining -= len(data)
+            yield data
+
+@api_view(["GET", "POST"])
+def display_video(request):
+
+    sceneid = request.path
+    sceneid = sceneid.split('/')[-1]
+
+    #print(request.headers)
+    #print(request.META)
+    #print(request.GET)
+
+    scene = Scene.objects.get(pk=sceneid)
+    pathname = scene.path_to_file
+    path = pathname
+    size = os.path.getsize(path)
+    now = datetime.datetime.now()
+    if scene.date_last_played is not None:
+        then = scene.date_last_played
+    else:
+        then = datetime.datetime.now() - timedelta(hours = 12)
+    if now > then + timedelta(hours=3):
+        print(f"Requesting scene ID {sceneid}...\r", end="")
+        print (f"Playback: [{pathname}] ({size//1048576} MB)")#1048576 is 1024^2
+        scene.play_count+=1
+        scene.date_last_played=datetime.datetime.now()
+        scene.save()
+        print(f"Play count for scene {scene.id} is now {scene.play_count} and the last played date and time is updated.")
+
+
+    range_header = request.META.get('HTTP_RANGE', '').strip()     #request.META.get('HTTP_RANGE', '').strip()
+    range_re = re.compile(r'bytes\s*=\s*(\d+)\s*-\s*(\d*)', re.I)
+    range_match = range_re.match(range_header)
+    content_type, encoding = mimetypes.guess_type(path)
+    content_type = content_type or 'application/octet-stream'
+    if range_match:
+        first_byte, last_byte = range_match.groups()
+        first_byte = int(first_byte) if first_byte else 0
+        last_byte = first_byte + 1024 * 1024 * 8 # 8M per piece, the maximum volume of the response body
+        if last_byte >= size:
+            last_byte = size - 1
+        length = last_byte - first_byte + 1
+        resp = StreamingHttpResponse(file_iterator(path, offset=first_byte, length=length), status=206, content_type=content_type)
+        resp['Content-Length'] = str(length)
+        resp['Content-Range'] = 'bytes %s-%s/%s' % (first_byte, last_byte, size)
+    else:
+                 # When the video stream is not obtained, the entire file is returned in the generator mode to save memory.
+        resp = StreamingHttpResponse(FileWrapper(open(path, 'rb')), content_type=content_type)
+        resp['Content-Length'] = str(size)
+    resp['Accept-Ranges'] = 'bytes'
+    return resp
+
+'''
     from django.http import StreamingHttpResponse
     from wsgiref.util import FileWrapper
     from datetime import timedelta
@@ -1513,3 +1581,4 @@ def display_video(x):
     except:
         print("Error")
     return response
+'''

@@ -19,7 +19,7 @@
     <label>URL that YAPO should open on startup (blank if you don't wish your browser to open automatically)</label>
     <input class="form-control" id="inputdefault" type="text"
     ng-model="$ctrl.yapoURL">
-    <button style="background-color: #33ccff;" type="button" ng-click="$ctrl.updateYAPOurl()" class="btn btn-default btn-sm"
+    <button style="color: #33ccff;" type="button" ng-click="$ctrl.updateYAPOurl()" class="btn btn-default btn-sm"
             uib-popover-html="'If this is a conventional URL (ip.ip.ip.ip:port or host:port), YAPO will open this URL in your default browser on startup. You can edit the value (yapo_url) manually in the settings.yml file which is in the config directory (/config)'"
             popover-trigger="mouseenter" popover-placement="right-top"
 
@@ -31,7 +31,7 @@
     <label>Path to VLC player (Windows only. Always use / instead of \ in the path)</label>
     <input class="form-control" id="inputdefault" type="text"
     ng-model="$ctrl.pathToVLC">
-    <button style="background-color: #33ccff;" type="button" ng-click="$ctrl.updateVlcPath()" class="btn btn-default btn-sm"
+    <button style="color: #33ccff;" type="button" ng-click="$ctrl.updateVlcPath()" class="btn btn-default btn-sm"
             uib-popover-html="'Sets YAPO\'s VLC path to the path in the text input. Only for Windows, as we run vlc without specifying path on Linux. Replace any backslash in the path with a forward slash, otherwise it will break YAPO. You can edit the value (yapo_url) manually in the settings.yml file which is in the config directory (/config)'"
             popover-trigger="mouseenter" popover-placement="right-top"
     
@@ -48,35 +48,44 @@
           <h4>TpDB scanning</h4><p>You must reload to see the current variables. <b>Most of these are not implemented yet</b>.</p>
 
     <input type="checkbox" ng-model="$ctrl.tpdb_enabled" ng-change="getdetails()"
-           uib-popover-html="'Enable the TpDB (metadataapi.net) scanning functions'"
-           popover-trigger="mouseenter" popover-placement="top"> Enable TpDB functionality
-        <input type="checkbox" ng-model="$ctrl.tpdb_website_logos"
-               uib-popover-html="'When YAPO discovers a new website, enable downloading of a website logo'"
-               popover-trigger="mouseenter" popover-placement="top"> Enable website logos
-        <input type="checkbox" ng-model="$ctrl.tpdb_autorename"
-               uib-popover-html="'Will automatically change scene names to the \'website - actor(s) - title\' naming convention. The actual filename will be untouched. A tag will be added to the scene (_tpdb-sure or _tpdb_unsure) depending on the quality of the result.'"
-               popover-trigger="mouseenter" popover-placement="top"> Automatically rename scenes
-        <input type="checkbox" ng-model="$ctrl.tpdb_actors"
-               uib-popover-html="'When YAPO recognizes an actor that YAPO doesn\'t know (only females), it will register the information TpDB has on the actor, and then initiate a TMDB/Freeones scrape of the actor. This way, any profile photo from TMDB will take precedence over any other photos.'"
-               popover-trigger="mouseenter" popover-placement="top"> Automatically add actors
-        <input type="checkbox" ng-model="$ctrl.tpdb_photos"
-               uib-popover-html="'During auto-addition, also try to get actor photos (they\'re not as good as those TMDB provide, so if a photo already exists, it will not be saved)'"
-               popover-trigger="mouseenter" popover-placement="top"> Get actor photos
-
-
-        <button style="background-color: #33ccff;" type="button" ng-click="$ctrl.TpDB()"" class="btn btn-default btn-sm"
-            uib-popover-html="'Sets YAPO\'s VLC path to the path in the text input. Only for Windows, as we run vlc without specifying path on Linux. Replace any backslash in the path with a forward slash, otherwise it will break YAPO. You can edit the file manually from the config directory (settings.yml)'"
-            popover-trigger="mouseenter" popover-placement="right-top"
-
-        <span style="width:10%" class="glyphicon glyphicon-cog"></span> Save TpDB Settings
-        </button>
+        uib-popover-html="'Enable the TpDB (metadataapi.net) scanning functions'"
+        popover-trigger="mouseenter" popover-placement="top"> Enable TpDB functionality
 
     <span style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>
+
+    <input type="checkbox" ng-model="$ctrl.tpdb_autorename"
+    uib-popover-html="'Will automatically change scene names to the \'website - actor(s) - title\' naming convention. The actual filename will be untouched. A tag will be added to the scene (_tpdb-sure or _tpdb_unsure) depending on the quality of the result.'"
+    popover-trigger="mouseenter" popover-placement="top"> Automatically rename scenes
+
+    <span style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>
+Enable registration of:&nbsp;&nbsp;
+    <input type="checkbox" ng-model="$ctrl.tpdb_website_logos"
+        uib-popover-html="'When YAPO discovers a new website, enable downloading of a website logo'"
+        popover-trigger="mouseenter" popover-placement="top"> Website logos
+
+    <input type="checkbox" ng-model="$ctrl.tpdb_actors"
+        uib-popover-html="'When YAPO recognizes an actor that YAPO doesn\'t know (only females), it will register the information TpDB has on the actor, and then initiate a TMDB/Freeones scrape of the actor. This way, any profile photo from TMDB will take precedence over any other photos.'"
+        popover-trigger="mouseenter" popover-placement="top"> Actors
+
+    <input type="checkbox" ng-model="$ctrl.tpdb_photos"
+        uib-popover-html="'During auto-addition, also try to get actor photos (they\'re not as good as those TMDB provide, so if a photo already exists, it will not be saved)'"
+        popover-trigger="mouseenter" popover-placement="top"> Actor photos
+
+    <button style="color: #33ccff;" type="button" ng-click="$ctrl.TpDB()"" class="btn btn-default btn-sm"
+        uib-popover-html="'Sets YAPO\'s VLC path to the path in the text input. Only for Windows, as we run vlc without specifying path on Linux. Replace any backslash in the path with a forward slash, otherwise it will break YAPO. You can edit the file manually from the config directory (settings.yml)'"
+        popover-trigger="mouseenter" popover-placement="right-top"
+
+    <span style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>
+
+    <span style="width:10%" class="glyphicon glyphicon-cog"></span> Save TpDB Settings
+    </button>
+
+    <span style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>
+
     <button type="button" ng-click="$ctrl.tpdb_scan_all()" class="btn btn-default btn-sm"
-            uib-popover-html="'Checks all scenes in the database against all known Tags, Websites and Actors and adds all tags.<br>Will search for all  <b>Tag All Scenes</b>  Tags, Actors and Websites in all the scenes
-    as though they were never searched before.'" popover-trigger="mouseenter" popover-placement="right-top"
-    <span class="glyphicon glyphicon-tag"
-    ></span> Execute scan of all scenes with TpDB
+        uib-popover-html="'Checks all scenes in the database against all known Tags, Websites and Actors and adds all tags.<br>Will search for all  <b>Tag All Scenes</b>  Tags, Actors and Websites in all the scenes
+        as though they were never searched before.'" popover-trigger="mouseenter" popover-placement="right-top"
+    <span class="glyphicon glyphicon-tag"></span> Execute scan of all scenes with TpDB
     </button>
     <input type="checkbox" ng-model="$ctrl.tpdb_force"
            uib-popover-html="'Override existing values when scanning with TpDB'"

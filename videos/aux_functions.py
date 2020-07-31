@@ -2,9 +2,16 @@ import os
 import sys
 import re
 import urllib.request
-from videos.models import Actor, Scene, ActorTag
+from videos.models import *
 from configuration import Config, Constants
 from dateutil.parser import parse
+import datetime
+import requests.packages.urllib3
+import http.client
+import urllib3
+import shutil
+from utils.printing import Logger
+log = Logger()
 
 def progress (count: int, total: int, suffix=''):
     bar_len = 42
@@ -99,6 +106,24 @@ def send_piercings_to_actortag (actor):
         if any([piercings.lower() == "none", piercings.lower() == "no piercings", piercings.lower() == "no"]):
             insert_actor_tag(actor, "No piercings")
 
+def addactor (current_scene, actor_to_add):
+
+    if not current_scene.actors.filter(name=actor_to_add):
+        current_scene.actors.add(actor_to_add)
+        print(f"Added Actor '{actor_to_add.name}' to scene '{current_scene.name}'")
+
+    if actor_to_add.actor_tags.count() > 0:
+        for actor_tag in actor_to_add.actor_tags.all():
+            if not current_scene.scene_tags.filter(name=actor_tag.name):
+                current_scene.scene_tags.add(
+                    actor_tag.scene_tags.first()
+                )
+                print(
+                    f"Added Scene Tag '{actor_tag.scene_tags.first().name}' to scene '{current_scene.name}'"
+                )
+
+    current_scene.save()
+
 
 def insert_actor_tag (actor_to_insert, actor_tag_name):
     actor_tag_name = strip_bad_chars(actor_tag_name)
@@ -153,10 +178,11 @@ def remove_text_inside_brackets(text, brackets="()[]"):
 def tpdb_formatter (name):
     trashTitle = (
         'RARBG', 'COM', '\d{3,4}x\d{3,4}', 'HEVC', 'H265', 'AVC', '\dK', '\d{3,4}p', 'TOWN.AG_', 'XXX', 'MP4',
-        'KLEENEX', 'SD', 'H264', 'repack', '1500k', '500k', '1000k', 'rq'
+        'KLEENEX', 'SD', 'H264', 'repack', '1500k', '500k', '1000k', 'rq', 'NEW', 'APT'
     )
 
-    name = re.sub(r'(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s\d{2}\s\d{4}', '', name)
+    name = re.sub(r'(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s\d{2},\s\d{4}', '', name)
+    name = re.sub(r'(January|February|March|April|May|June|July|August|September|October|November|December)\s\d{2},\s\d{4}', '', name)
     name = re.sub(r'(\d+)[/\.-](\d+)[/\.-](\d+)', '', name)
     name = re.sub(r'\W', ' ', name)
     for trash in trashTitle:
@@ -189,6 +215,104 @@ def strip_bad_chars (name):
     return name
 
 
+def save_website_logo (image_link, website, force, *args):
+    website = website.strip()
+    if image_link:
+        if image_link.lower() == "null" or image_link == "":
+            print(f"There is no logo registered for {website}.")
+            success = False
+            return
+    else:
+        print(f"There is no logo registered for {website}.")
+        success = False
+        return
+
+    try:
+        hasarg = 0
+        ws = None
+        print("Website scan, method 1...")
+        ws = Website.objects.filter(name=website)
+        if not ws:
+            print("Method unsuccesful, trying method 2...")
+            ws = Website.objects.filter(name__iexact=website.replace(" ",""))
+
+        if not ws and Config().tpdb_websites:
+            print(f"{website} doesn't exist, and auto-addition is enabled...")
+            for arg in args:
+                hasarg += 1
+                scene = arg
+                if hasarg == 1: break
+
+            ws = Website()
+            ws.name = website
+            ws.website_alias = website.replace(" ","").lower()
+            ws.date_added = datetime.datetime.now()
+            ws.save()
+            log.info(f"Added website: {website.name}")
+            ws = Website.objects.get(name=website)
+            if hasarg == 1:
+                scene.websites.add(ws)
+                scene.save()
+                log.info(f"A scene was added to {website.name}: {scene.name}")
+
+    except:
+        pass
+    print(f"Automatic addition of website logos is set to {Config().tpdb_website_logos}...")
+    if not Config().tpdb_website_logos:
+        return
+    if not ws and not Config().tpdb_websites:
+        log.warn(f'LOGO ERROR: No website "{website}", and auto-registration of websites is disabled!')
+        return
+    ws = Website.objects.get(name=website)
+    save_path = os.path.join(Config().site_media_path, "websites", str(ws.id))
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+        print(f"Created website directory: {save_path}")
+    if os.path.splitext(image_link)[1]:
+        ext = os.path.splitext(image_link)[1]
+    else:
+        print("Error in logo filename!")
+        success = False
+        return
+    save_file_name = os.path.join(save_path, "logo" + ext)
+    if (not os.path.isfile(save_file_name) and not ws.thumbnail and Config().tpdb_website_logos) or force:
+        maxretries = 3
+        attempt = 0
+        while attempt < maxretries:
+            try:
+                user_agent = {'user-agent': 'YAPO e+ 0.7'}
+                http=urllib3.PoolManager(10,headers=user_agent)
+                r1=http.urlopen('GET', image_link)
+                if r1.status == 200:
+                    #if os.path.exists(save_file_name):
+                    #    os.remove(save_file_name)
+                    with open(save_file_name, 'w+b') as f:
+                        f.write(r1.data)
+                        f.close()
+            #urllib.request.urlretrieve(image_link, save_file_name)
+            except:
+                attempt += 1
+                dlerror = 1
+            else:
+                dlerror = 0
+                break
+
+        if dlerror == 0:
+            print(f"Downloaded website logo for website {ws.id} - {ws.name}")
+            rel_path = os.path.relpath(save_file_name, start="videos")
+            as_uri = urllib.request.pathname2url(rel_path)
+            ws.thumbnail = as_uri
+            ws.save()
+            success = True
+            return success
+        else:
+            log.error(f"DOWNLOAD ERROR: Logo: {image_link}")
+
+    else:
+        log.info(f"LOGO: {ws.name}: Skipping download, because the website already has a logo.")
+
+
+
 def save_actor_profile_image_from_web (image_link, actor, force):
     save_path = os.path.join(
         Config().site_media_path, "actor", str(actor.id),"profile/"
@@ -213,15 +337,15 @@ def save_actor_profile_image_from_web (image_link, actor, force):
 
         if dlerror == 0:
             print("Downloaded photo.")
+            rel_path = os.path.relpath(save_file_name, start="videos")
+            as_uri = urllib.request.pathname2url(rel_path)
+            actor.thumbnail = as_uri
         else:
             print("Download error, you need to try again or insert a photo manually.")
 
     else:
         print("Skipping, because there's already a usable photo.")
-    rel_path = os.path.relpath(save_file_name, start="videos")
-    as_uri = urllib.request.pathname2url(rel_path)
 
-    actor.thumbnail = as_uri
 
 
 def actor_folder_from_name_to_id ():
