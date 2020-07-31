@@ -14,17 +14,17 @@
 
 <div class="row">
 
-    <div class="col-md-6" style="text-align: center; vertical-align: middle; height: 22px;">
+    <div class="col-md-7" style="text-align: center; vertical-align: middle; height: 22px;">
 <span style="vertical-align: middle;">
     <a href="#!/scene/{{ $ctrl.prev }}"><span uib-popover-html="'Go to previous scene in list'"
              popover-trigger="mouseenter" popover-placement="bottom" class="glyphicon glyphicon-step-backward"></span></a>
 
         <a href="{{$ctrl.sheetPath}}" data-toggle="lightbox">
             <button type="button" class="btn btn-default btn-sm" uib-popover-html="'Will open a contact sheet with 16 images from the video, if it has been generated. This resides in the videos/media/scenes/ folder together with the video thumbnail and video preview.<br>Click outside the box to close it.'" popover-trigger="mouseenter" popover-placement="right">
-            <span class="glyphicon glyphicon glyphicon-th"></span>  View Contact Sheet</button></a>
+            <span class="glyphicon glyphicon glyphicon-th"></span>  Contact Sheet</button></a>
             <button style="right: 64px; down: 20px;" type="button" onclick="capture()" class="btn btn-default btn-sm"
             popover-trigger="mouseenter" popover-placement="right" uib-popover-html="'Draws a capture of the video and downloads it to your current download folder. You must replace it manually for now.<br>Copy the image to the scene folder with the ID of the scene (you can see it in the URL).<br>You have to pause the video to generate the thumbnail.'">
-            <span class="glyphicon glyphicon-camera"></span>  Get a new thumbnail
+            <span class="glyphicon glyphicon-camera"></span>  New thumbnail
         </button>
         <button type="button" ng-click="$ctrl.playScene()" class="btn btn-default btn-sm">
             <span class="glyphicon glyphicon-play-circle"></span>  Play with VLC
@@ -67,7 +67,7 @@
         </span>
 </span>
     </div>
-    <div class="col-md-6" style="top: -22px; text-align: center; vertical-align: middle; height: 22px;">
+    <div class="col-md-5" style="top: -22px; text-align: center; vertical-align: middle; height: 22px;">
         <h2 align="center">
     <uib-rating ng-model="$ctrl.scene.rating" max="10" read-only="isReadonly" on-hover="hoveringOver(value)"
                 on-leave="overStar = null" titles="['one','two','three']"
