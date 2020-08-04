@@ -117,7 +117,7 @@ angular.module('settings').component('settings', {
                             tpdb_actors: self.tpdb_actors,
                             tpdb_photos: self.tpdb_photos,
                             tpdb_websites: self.tpdb_websites,
-                            tpdb_tags
+                            tpdb_tags: self.tpdb_tags
                         }
 
                     }).then(function (response) {
@@ -132,6 +132,8 @@ angular.module('settings').component('settings', {
                         self.tpdb_actors = response.data.tpdb_actors;
                         self.response = response.data.tpdb_photos;
                         self.tpdb_photos = response.data.tpdb_photos;
+                        self.tpdb_websites = response.data.tpdb_websites;
+                        self.tpdb_tags = response.data.tpdb_tags;
                         //$window.location.reload(forceGet);
                         //alert("Got response from server: " + self.pathToFolderToAdd);
                         self.addAlert("OK, TpDB settings are changed.", 'success', '3000');

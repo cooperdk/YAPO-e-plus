@@ -9,6 +9,7 @@ import datetime
 import requests.packages.urllib3
 import http.client
 import urllib3
+import socket
 import shutil
 from utils.printing import Logger
 log = Logger()
@@ -178,7 +179,7 @@ def remove_text_inside_brackets(text, brackets="()[]"):
 def tpdb_formatter (name):
     trashTitle = (
         'RARBG', 'COM', '\d{3,4}x\d{3,4}', 'HEVC', 'H265', 'AVC', '\dK', '\d{3,4}p', 'TOWN.AG_', 'XXX', 'MP4',
-        'KLEENEX', 'SD', 'H264', 'repack', '1500k', '500k', '1000k', 'rq', 'NEW', 'APT'
+        'KLEENEX', 'SD', 'H264', 'repack', '1500k', '500k', '1000k', 'rq', 'NEW', 'APT', "[TK]", " TK "
     )
 
     name = re.sub(r'(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s\d{2},\s\d{4}', '', name)
@@ -200,7 +201,7 @@ def tpdb_formatter (name):
 
     #name = name.replace(" ","+")
     #name = name.replace(".","+")
-    print(f"New name to use for searching: {name}")
+    #print(f"New name to use for searching: {name}")
     return name
 
 
@@ -215,17 +216,22 @@ def strip_bad_chars (name):
     return name
 
 
+def is_website_online(host):
+    """ This function checks to see if a host name has a DNS entry by checking
+        for socket info. If the website gets something in return,
+        we know it's available to DNS.
+    """
+    try:
+        socket.gethostbyname(host)
+    except socket.gaierror:
+        return False
+    else:
+        return True
+
+
+
 def save_website_logo (image_link, website, force, *args):
     website = website.strip()
-    if image_link:
-        if image_link.lower() == "null" or image_link == "":
-            print(f"There is no logo registered for {website}.")
-            success = False
-            return
-    else:
-        print(f"There is no logo registered for {website}.")
-        success = False
-        return
 
     try:
         hasarg = 0
@@ -237,31 +243,46 @@ def save_website_logo (image_link, website, force, *args):
             ws = Website.objects.filter(name__iexact=website.replace(" ",""))
 
         if not ws and Config().tpdb_websites:
-            print(f"{website} doesn't exist, and auto-addition is enabled...")
             for arg in args:
                 hasarg += 1
-                scene = arg
-                if hasarg == 1: break
+                sceneid = arg
+                if hasarg == 1:
+                    break
 
+            scene = Scene.objects.get(pk=sceneid)
             ws = Website()
             ws.name = website
             ws.website_alias = website.replace(" ","").lower()
             ws.date_added = datetime.datetime.now()
             ws.save()
-            log.info(f"Added website: {website.name}")
+            log.info(f"Auto-added website: {ws.name}")
             ws = Website.objects.get(name=website)
             if hasarg == 1:
                 scene.websites.add(ws)
                 scene.save()
-                log.info(f"A scene was added to {website.name}: {scene.name}")
-
+                log.sinfo(f"A scene was added to {ws.name}: {scene.name}")
+        if not ws and not Config().tpdb_websites:
+                log.info(f"We could add the website {website}, but auto-adding is disabled.")
     except:
         pass
-    print(f"Automatic addition of website logos is set to {Config().tpdb_website_logos}...")
+
+
+    if image_link:
+        if image_link.lower() == "null" or image_link == "":
+            print(f"TpDB has no logo registered for {website}.")
+            success = False
+            return
+    else:
+        print(f"TpDB has no logo registered for {website}.")
+        success = False
+        return
+
+
+
     if not Config().tpdb_website_logos:
         return
     if not ws and not Config().tpdb_websites:
-        log.warn(f'LOGO ERROR: No website "{website}", and auto-registration of websites is disabled!')
+        log.warn(f'LOGO: No website "{website}", and we cannot add it because you didn\'t allow it!')
         return
     ws = Website.objects.get(name=website)
     save_path = os.path.join(Config().site_media_path, "websites", str(ws.id))
@@ -298,7 +319,7 @@ def save_website_logo (image_link, website, force, *args):
                 break
 
         if dlerror == 0:
-            print(f"Downloaded website logo for website {ws.id} - {ws.name}")
+            log.info(f"Downloaded website logo for website {ws.id} - {ws.name}")
             rel_path = os.path.relpath(save_file_name, start="videos")
             as_uri = urllib.request.pathname2url(rel_path)
             ws.thumbnail = as_uri
@@ -309,7 +330,7 @@ def save_website_logo (image_link, website, force, *args):
             log.error(f"DOWNLOAD ERROR: Logo: {image_link}")
 
     else:
-        log.info(f"LOGO: {ws.name}: Skipping download, because the website already has a logo.")
+        log.sinfo(f"LOGO: {ws.name}: Skipping download, because the website already has a logo.")
 
 
 

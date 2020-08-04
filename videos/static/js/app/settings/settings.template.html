@@ -57,8 +57,14 @@
     uib-popover-html="'Will automatically change scene names to the \'website - actor(s) - title\' naming convention. The actual filename will be untouched. A tag will be added to the scene (_tpdb-sure or _tpdb_unsure) depending on the quality of the result.'"
     popover-trigger="mouseenter" popover-placement="top"> Automatically rename scenes
 
-    <span style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>
+            <div class="divider"></div>
 Enable registration of:&nbsp;&nbsp;
+
+    <input type="checkbox" ng-model="$ctrl.tpdb_websites"
+    uib-popover-html="'When YAPO discovers a new website on TpDB, then add it'"
+    popover-trigger="mouseenter" popover-placement="top"> Websites
+
+
     <input type="checkbox" ng-model="$ctrl.tpdb_website_logos"
         uib-popover-html="'When YAPO discovers a new website, enable downloading of a website logo'"
         popover-trigger="mouseenter" popover-placement="top"> Website logos
@@ -71,11 +77,23 @@ Enable registration of:&nbsp;&nbsp;
         uib-popover-html="'During auto-addition, also try to get actor photos (they\'re not as good as those TMDB provide, so if a photo already exists, it will not be saved)'"
         popover-trigger="mouseenter" popover-placement="top"> Actor photos
 
-    <button style="color: #33ccff;" type="button" ng-click="$ctrl.TpDB()"" class="btn btn-default btn-sm"
-        uib-popover-html="'Sets YAPO\'s VLC path to the path in the text input. Only for Windows, as we run vlc without specifying path on Linux. Replace any backslash in the path with a forward slash, otherwise it will break YAPO. You can edit the file manually from the config directory (settings.yml)'"
-        popover-trigger="mouseenter" popover-placement="right-top"
+              <span style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>
+
+          <label># tags to auto-add</label>
+    <select ng-model="$ctrl.tpdb_tags">
+        <option>0</option>
+        <option>5</option>
+        <option>10</option>
+        <option>100</option>
+
+    </select>
 
     <span style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>
+
+
+    <button style="color: #33ccff;" type="button" ng-click="$ctrl.TpDB()"" class="btn btn-default btn-sm"
+        uib-popover-html="'Save these settings'"
+        popover-trigger="mouseenter" popover-placement="right-top"
 
     <span style="width:10%" class="glyphicon glyphicon-cog"></span> Save TpDB Settings
     </button>
@@ -83,12 +101,11 @@ Enable registration of:&nbsp;&nbsp;
     <span style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>
 
     <button type="button" ng-click="$ctrl.tpdb_scan_all()" class="btn btn-default btn-sm"
-        uib-popover-html="'Checks all scenes in the database against all known Tags, Websites and Actors and adds all tags.<br>Will search for all  <b>Tag All Scenes</b>  Tags, Actors and Websites in all the scenes
-        as though they were never searched before.'" popover-trigger="mouseenter" popover-placement="right-top"
-    <span class="glyphicon glyphicon-tag"></span> Execute scan of all scenes with TpDB
+        uib-popover-html="'Parse all scenes without a \'TpDB: Scanned\' tag and ask TpDB for information.'" popover-trigger="mouseenter" popover-placement="right-top"
+    <span class="glyphicon glyphicon-tag"></span> Scan all scenes
     </button>
     <input type="checkbox" ng-model="$ctrl.tpdb_force"
-           uib-popover-html="'Override existing values when scanning with TpDB'"
+           uib-popover-html="'Override the \'TpDB: Scanned\' tag when scanning with TpDB'"
            popover-trigger="mouseenter" popover-placement="top"> Force
   <div class="divider"></div>
       </div>

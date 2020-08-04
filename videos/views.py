@@ -286,6 +286,11 @@ def search_in_get_queryset(original_queryset, request):
         else:
             return original_queryset.order_by(sort_by)
 
+def tpdb_scanner(force):
+    scenes = Scene.objects.all()
+    for scene in scenes:
+        scanners.tpdb(scene.id, force)
+
 
 def scrape_all_actors(force):
     actors = Actor.objects.all()
@@ -863,14 +868,27 @@ def settings(request):
                     Config().tpdb_autorename  = 'false'
                     Config().tpdb_actors  = 'false'
                     Config().tpdb_photos  = 'false'
+                    Config().tpdb_websites = 'false'
+                    Config().tpdb_tags = 0
                 else:
                     if "tpdb_websitelogos" in request.query_params: Config().tpdb_website_logos = request.query_params["tpdb_websitelogos"]
                     if "tpdb_autorename" in request.query_params: Config().tpdb_autorename = request.query_params["tpdb_autorename"]
                     if "tpdb_actors" in request.query_params: Config().tpdb_actors = request.query_params["tpdb_actors"]
                     if "tpdb_photos" in request.query_params: Config().tpdb_photos = request.query_params["tpdb_photos"]
+                    if "tpdb_websites" in request.query_params: Config().tpdb_websites = request.query_params["tpdb_websites"]
+                    if "tpdb_tags" in request.query_params: Config().tpdb_tags = request.query_params["tpdb_tags"]
                 Config().save()
                 return Response(status=200)
 
+        if "tpdb_scan_all" in request.query_params:
+            if request.query_params["tpdb_scan_all"] == "True":
+                if request.query_params["force"] == "true":
+                    force = True
+                else:
+                    force = False
+                threading.Thread(target=tpdb_scanner, args=(force,)).start()
+
+                return Response(status=200)
 
         if "scrapAllActors" in request.query_params:
             if request.query_params["scrapAllActors"] == "True":

@@ -17,16 +17,16 @@ def search(title):
     fullsitename = ""
     searchTitle = ""
     searchDate = ""
-    print("Siteparser: " + title)
+    print("----> Siteparser: " + title)
     searchSettings = getSearchSettings(title)
     searchSiteID = searchSettings[0]
     fullsitename = searchSettings[1]
     searchTitle = searchSettings[2]
     searchDate = searchSettings[3]
-    print("Title: " + searchTitle)
-    print("Site:  " + fullsitename)
+    print("  --> Title: " + searchTitle)
+    print("  --> Site:  " + fullsitename)
     if searchDate:
-        print("Date:  " + searchDate)
+        print("  --> Date:  " + searchDate)
 
     return searchSiteID, fullsitename, searchTitle, searchDate
 
@@ -50,7 +50,7 @@ def getSearchSiteName(siteID):
 
 def siteValues():
 
-    searchSites = [None] * 885
+    searchSites = [None] * 888
 
     searchSites[0] = ("BlackedRaw", "BlackedRaw", "https://www.blackedraw.com", "https://www.blackedraw.com/api")
     searchSites[1] = ("Blacked", "Blacked", "https://www.blacked.com", "https://www.blacked.com/api")
@@ -933,6 +933,8 @@ def siteValues():
     searchSites[882] = ("Assylum", "Assylum", "https://www.assylum.com/", "https://www.assylum.com/?home")
     searchSites[883] = ("Big Gulp Girls", "Big Gulp Girls", "https://tour.biggulpgirls.com/", "https://tour.biggulpgirls.com/videos/")
     searchSites[884] = ("Deepthroat Sirens", "Deepthroat Sirens", "https://tour.deepthroatsirens.com/", "https://tour.deepthroatsirens.com/videos/")
+    searchSites[886] = ("Bathroom Creepers", "Bathroom Creepers", "https://www.bathroomcreepers.com/creeper/", "https://www.bathroomcreepers.com/creeper/categories/movies/1/latest/")
+    searchSites[887] = ("Killergram", "Killergram", "http://www.killergram.com/home.asp?page=home", "http://www.killergram.com/episodes.asp?page=episodes&ct=all")
     return searchSites
 
 def getSearchSiteIDByFilter(searchFilter):
@@ -954,7 +956,7 @@ def getSearchSiteIDByFilter(searchFilter):
     if searchResults:
         from operator import itemgetter
 
-        print('Site found with method #3 - ',end='')
+        print('  --> Site found with method #3 - ',end='')
         return max(searchResults, key=itemgetter(1))[0]
 
     # Method #2
@@ -965,7 +967,7 @@ def getSearchSiteIDByFilter(searchFilter):
             siteNameF = sites[0].lower().replace(" ", "").replace("'", "")
 
             if searchFilterF == siteNameF:
-                print('Site found with method #2 - ',end='')
+                print('  --> Site found with method #2 - ',end='')
                 return searchID
         except:
             pass
@@ -986,12 +988,12 @@ def getSearchSiteIDByFilter(searchFilter):
             siteNameF = sites[0].lower().replace(" ", "").replace("'", "")
 
             if siteNameF in searchFilterF[0] or siteNameF in searchFilterF[1]:
-                print('Site found with method #1 - ',end='')
+                print('  --> Site found with method #1 - ',end='')
                 return searchID
         except:
             pass
 
-    print(searchFilterF)
+    print(f'Search Filter: {searchFilterF}')
 
     return None
 
@@ -1039,6 +1041,7 @@ def getSearchSettings(mediaTitle: str):
         ('^bgonzo ', 'BangGonzo '),
         ('^bin ', 'BigNaturals '),
         ('^bjf ', 'BlowjobFridays '),
+        ('^bmf ', 'BigMouthfuls '),
         ('^bp ', 'ButtPlays '),
         ('^brealteens ', 'BangRealTeens '),
         ('^btas ', 'BigTitsatSchool '),
@@ -1053,6 +1056,7 @@ def getSearchSettings(mediaTitle: str):
         ('^cfnm ', 'ClothedFemaleNudeMale '),
         ('^clip ', 'LegalPorno '),
         ('^cps ', 'CherryPimps '),
+        ('^creepers ', 'BathroomCreepers '),
         ('^css ', 'CzechStreets '),
         ('^cuf ', 'CumFiesta '),
         ('^cws ', 'CzechWifeSwap '),
@@ -1068,6 +1072,7 @@ def getSearchSettings(mediaTitle: str):
         ('^dsw ', 'DaughterSwap '),
         ('^dwc ', 'DirtyWivesClub '),
         ('^dwp ', 'DayWithAPornstar '),
+        ('^dontbreakme ', "DontBreakMe "),
         ('^esp ', 'EuroSexParties '),
         ('^ete ', 'EuroTeenErotica '),
         ('^ext ', 'ExxxtraSmall '),
@@ -1214,6 +1219,7 @@ def getSearchSettings(mediaTitle: str):
         ('^wov ', 'Wives On Vacation '),
         ('^wowg ', 'Wow Girls '),
         ('^wy ', 'Web Young '),
+        ('^zl ', 'Zoliboy'),
         ('^ztod ', 'Zero Tolerance '),
         ('^zzs ', 'ZZ series '),
     )
@@ -1232,7 +1238,7 @@ def getSearchSettings(mediaTitle: str):
             break
 
     if abbFixed:
-        print(f"Possible abbreviation fixed: {mediaTitle}")
+        print(f" ---> Possible abbreviation fixed: {mediaTitle}")
 
     # Search Site ID
     searchSiteID = None
@@ -1248,7 +1254,7 @@ def getSearchSettings(mediaTitle: str):
     # Remove Site from Title
     searchSiteID = getSearchSiteIDByFilter(mediaTitle)
     if searchSiteID:
-        print(f"siteID: {searchSiteID} - {searchSites[searchSiteID][0]}")
+        print(f"  --> siteID: {searchSiteID} - {searchSites[searchSiteID][0]}")
         if searchSites[searchSiteID][0]:
             fullsitename = searchSites[searchSiteID][0]
         # searchSites [0] matches madiaTitle

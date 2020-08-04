@@ -8,6 +8,7 @@ from videos import filename_parser
 from configuration import Config, Constants
 import videos.videosheet as videosheet
 from PIL import Image
+import videos.scrapers.scanners as scanners
 
 django.setup()
 
@@ -256,8 +257,19 @@ def create_scene(scene_path, make_sample_video):
                 select={"length": "Length(name)"}
             ).order_by("-length")
 
-            # TODO: Insert TpDB scanner here and only parse the scene if necessary
+            # This is the TpDB scanner invoker. Now, YAPO will only slowparse the scene if necessary
+            succ = False
+            succ = scanners.tpdb(current_scene.id, True) if Config().tpdb_enabled else False
+            if succ:
+                scene_tags = list(
+                    SceneTag.objects.extra(select={ "length": "Length(name)" }).order_by("-length")
+                )
+                print("Looking for scene tags...")
+                scene_path = current_scene.path_to_file.lower()
+                filename_parser.parse_scene_tags_in_scene(current_scene, scene_path, scene_tags)
 
+            else:
+                print("Scene was not found on TpDB, parsing it internally...")
             filename_parser.parse_scene_all_metadata(
                 current_scene, actors, actors_alias, scene_tags, websites
             )
