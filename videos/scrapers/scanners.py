@@ -281,7 +281,7 @@ def tpdb (scene_id: int, force: bool):
                             if performer['parent']['name'] and not keyname:
                                 perpn = performer['parent']['name']
                                 perpn = namecheck(perpn)
-                                print("perpn thd " + perpn + " sp lwr " + sp)
+                                #print("perpn thd " + perpn + " sp lwr " + sp)
                                 if sp.lower() == perpn.lower():
 
                                     secondary = 3
