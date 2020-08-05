@@ -50,7 +50,7 @@ def getSearchSiteName(siteID):
 
 def siteValues():
 
-    searchSites = [None] * 892
+    searchSites = [None] * 893
 
     searchSites[0] = ("BlackedRaw", "BlackedRaw", "https://www.blackedraw.com", "https://www.blackedraw.com/api")
     searchSites[1] = ("Blacked", "Blacked", "https://www.blacked.com", "https://www.blacked.com/api")
@@ -939,6 +939,8 @@ def siteValues():
     searchSites[889] = ("Premium Bukkake", "Premium Bukkake", "free.premiumbukkake.com", "https://free.premiumbukkake.com/search/")
     searchSites[890] = ("Horny DreamBabez", "Horny DreamBabez", "https://hornydreambabez.com/", "https://hornydreambabez.com/")
     searchSites[891] = ("Shot Her First", "Shot Her First", "https://hushpass.com/t1/", "https://hushpass.com/t1/search.php?query=shot+her+first+")
+    searchSites[892] = ("Push Her Limits", "Push Her Limits", "http://pushherlimits.com/", "http://pushherlimits.com/")
+
     return searchSites
 
 def getSearchSiteIDByFilter(searchFilter):
