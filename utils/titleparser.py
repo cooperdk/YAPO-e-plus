@@ -50,7 +50,7 @@ def getSearchSiteName(siteID):
 
 def siteValues():
 
-    searchSites = [None] * 888
+    searchSites = [None] * 891
 
     searchSites[0] = ("BlackedRaw", "BlackedRaw", "https://www.blackedraw.com", "https://www.blackedraw.com/api")
     searchSites[1] = ("Blacked", "Blacked", "https://www.blacked.com", "https://www.blacked.com/api")
@@ -935,6 +935,10 @@ def siteValues():
     searchSites[884] = ("Deepthroat Sirens", "Deepthroat Sirens", "https://tour.deepthroatsirens.com/", "https://tour.deepthroatsirens.com/videos/")
     searchSites[886] = ("Bathroom Creepers", "Bathroom Creepers", "https://www.bathroomcreepers.com/creeper/", "https://www.bathroomcreepers.com/creeper/categories/movies/1/latest/")
     searchSites[887] = ("Killergram", "Killergram", "http://www.killergram.com/home.asp?page=home", "http://www.killergram.com/episodes.asp?page=episodes&ct=all")
+    searchSites[888] = ("Czech Casting", "Czech Casting", "https://czechcasting.com", "https://czechcasting.com/tour/search/?q=")
+    searchSites[889] = ("Premium Bukkake", "Premium Bukkake", "free.premiumbukkake.com", "https://free.premiumbukkake.com/search/")
+    searchSites[890] = ("Horny DreamBabez", "Horny DreamBabez", "https://hornydreambabez.com/", "https://hornydreambabez.com/")
+    searchSites[891] = ("Shot Her First", "Shot Her First", "https://hushpass.com/t1/", "https://hushpass.com/t1/search.php?query=shot+her+first+")
     return searchSites
 
 def getSearchSiteIDByFilter(searchFilter):
@@ -1053,6 +1057,7 @@ def getSearchSettings(mediaTitle: str):
         ('^btra ', 'BigTitsRoundAsses '),
         ('^burna ', 'BurningAngel '),
         ('^bwb ', 'BigWetButts '),
+        ('^cc ', 'CzechCasting'),
         ('^cfnm ', 'ClothedFemaleNudeMale '),
         ('^clip ', 'LegalPorno '),
         ('^cps ', 'CherryPimps '),
@@ -1099,6 +1104,7 @@ def getSearchSettings(mediaTitle: str):
         ('^ham ', 'HotAndMean '),
         ('^hart ', 'Hegre '),
         ('^hcm ', 'HotCrazyMess '),
+        ('^hdb ', 'HornyDreamBabez '),
         ('^hegre-art ', 'Hegre '),
         ('^hoh ', 'HandsOnHardcore '),
         ('^hotab ', 'HouseofTaboo '),
@@ -1125,6 +1131,7 @@ def getSearchSettings(mediaTitle: str):
         ('^mbt ', 'MomsBangTeens '),
         ('^mc ', 'MassageCreep '),
         ('^mcu ', 'MonsterCurves '),
+        ('^mda ', 'MyDirtyMaid'),
         ('^mdhf ', 'MyDaughtersHotFriend '),
         ('^mdhg ', 'MyDadsHotGirlfriend '),
         ('^mfa ', 'ManuelFerrara '),
@@ -1179,6 +1186,7 @@ def getSearchSettings(mediaTitle: str):
         ('^ps ', 'PropertySex '),
         ('^ptt ', 'Petite '),
         ('^pud ', 'PublicDisgrace '),
+        ('^pup ', 'PublicPickups'),
         ('^reg ', 'RealExGirlfriends '),
         ('^rkp ', 'RKPrime '),
         ('^rws ', 'RealWifeStories '),

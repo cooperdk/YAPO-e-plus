@@ -287,10 +287,101 @@ def search_in_get_queryset(original_queryset, request):
             return original_queryset.order_by(sort_by)
 
 def tpdb_scanner(force):
+
+    ### This is the TpDB scanner. It calls the TpDB function in videos.scanners
+
     scenes = Scene.objects.all()
     for scene in scenes:
         scanners.tpdb(scene.id, force)
+    return Response(status=200)
 
+def populate_websites(force):
+
+    ### Populates website logos, URLs and checks YAPO website names against TpDB names.
+    ### Force will re-download logos.
+
+    import videos.aux_functions as aux
+    online = aux.is_website_online("metadataapi.net")
+    if not online:
+        log.warn("TpDB is down, cannot check websites using their API!")
+        return Response(status=500)
+
+    log.sinfo(f"Traversing websites for logos...")
+
+    # if current_scene.tpdb_id is not None and current_scene.tpdb_id != "" and len(current_scene.tpdb_id) > 12:
+    #     parsetext = current_scene.tpdb_id
+    url = 'https://metadataapi.net/api/sites'
+
+    params = {'limit': 99999}
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'User-Agent': 'YAPO e+ 0.7',
+    }
+    print("Downloading site information... ", end="")
+    response = requests.request('GET', url, headers=headers, params=params) #, params=params
+    print("\n")
+
+    try:
+        response = response.json()
+    except:
+        pass
+    print("\n")
+    websites = Website.objects.all()
+    for site in websites:
+        oldname = site.name
+        found = False
+        #print (response['data'].keys())
+        #print(response['data'][0].keys())
+        for tpdb in response['data']: #[0]:
+            found = False
+            tsid = tpdb['id']
+            tsn = tpdb['name']
+            tss = tpdb['short_name']
+            tsurl = tpdb['url']
+            tslogo = tpdb['logo']
+
+            print (f"Site: {site.name} - {tsn}                    \r", end="")
+
+            if site.name == tsn:
+                found = True
+
+            if (site.name != tsn) and (site.name.lower() == tsn.lower()):
+                log.info(f'Renaming site "{site.name}" to "{tsn}" for consistency')
+                site.name = tsn
+                found = True
+
+            if (site.name.lower() == tss.lower()) and (site.name.lower() != tsn.lower()):
+                log.info(f'Renaming site "{site.name}" to "{tsn}" because it is truncated')
+                site.name = tsn
+                found = True
+
+
+            if found:
+                try:
+                    newname = site.name
+                    if not tss.lower() in site.website_alias.lower():
+                        if len(site.website_alias) > 1:
+                            site.website_alias += f",{tss.lower()}"
+                        else:
+                            site.website_alias = tss.lower()
+                    if not site.url:
+                        site.url = tsurl
+                    if not site.tpdb_id:
+                        site.tpdb_id = int(tsid)
+
+                    site.save()
+                except:
+                    log.error(
+                        f'Attempting to rename {oldname} to {newname} resulted in an error. New name probably already exists!')
+                    break
+                print("\n")
+                aux.save_website_logo(tslogo, site.name, force)
+                break
+
+    print("Done.")
+
+    return Response(status=200)
 
 def scrape_all_actors(force):
     actors = Actor.objects.all()
@@ -878,6 +969,15 @@ def settings(request):
                     if "tpdb_websites" in request.query_params: Config().tpdb_websites = request.query_params["tpdb_websites"]
                     if "tpdb_tags" in request.query_params: Config().tpdb_tags = request.query_params["tpdb_tags"]
                 Config().save()
+                return Response(status=200)
+
+        if "populate_websites" in request.query_params:
+            if request.query_params["populate_websites"] == "True":
+                if request.query_params["force"] == "true":
+                    force = True
+                else:
+                    force = False
+                threading.Thread(target=populate_websites, args=(force,)).start()
                 return Response(status=200)
 
         if "tpdb_scan_all" in request.query_params:

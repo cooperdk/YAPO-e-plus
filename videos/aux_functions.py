@@ -178,12 +178,14 @@ def remove_text_inside_brackets(text, brackets="()[]"):
 
 def tpdb_formatter (name):
     trashTitle = (
-        'RARBG', 'COM', '\d{3,4}x\d{3,4}', 'HEVC', 'H265', 'AVC', '\dK', '\d{3,4}p', 'TOWN.AG_', 'XXX', 'MP4',
-        'KLEENEX', 'SD', 'H264', 'repack', '1500k', '500k', '1000k', 'rq', 'NEW', 'APT', "[TK]", " TK "
+        'RARBG', 'COM', '\d{3,4}x\d{3,4}', 'HEVC', 'H265', 'AVC', '\d{2,4}K', '\d{3,4}p', 'TOWN.AG_', 'XXX', 'MP4',
+        'KLEENEX', 'SD', 'H264', 'repack', '1500k', '500k', '1000k', 'rq', 'NEW', 'APT', '[TK]', 'TK', 'hd\d{3,4}p',
+        '1500', '1000'
     )
 
     name = re.sub(r'(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s\d{2},\s\d{4}', '', name)
     name = re.sub(r'(January|February|March|April|May|June|July|August|September|October|November|December)\s\d{2},\s\d{4}', '', name)
+    name = re.sub(r'\d{1,2}\.{0,1}\s{0,1}(January|February|March|April|May|June|July|August|September|October|November|December)\s{0,1}.\d{4}', '', name)
     name = re.sub(r'(\d+)[/\.-](\d+)[/\.-](\d+)', '', name)
     name = re.sub(r'\W', ' ', name)
     for trash in trashTitle:
@@ -238,11 +240,20 @@ def save_website_logo (image_link, website, force, *args):
         ws = None
         print("Website scan, method 1...")
         ws = Website.objects.filter(name=website)
+
+        if ws:
+            #print("Found 1")
+            ws = Website.objects.get(name=website)
+            website = ws.name
         if not ws:
             print("Method unsuccesful, trying method 2...")
             ws = Website.objects.filter(name__iexact=website.replace(" ",""))
-
+            if ws:
+                #print("Found 2")
+                ws = Website.objects.get(name__iexact=website.replace(" ",""))
+                website = ws.name
         if not ws and Config().tpdb_websites:
+            #print("Adding site")
             for arg in args:
                 hasarg += 1
                 sceneid = arg
@@ -284,6 +295,7 @@ def save_website_logo (image_link, website, force, *args):
     if not ws and not Config().tpdb_websites:
         log.warn(f'LOGO: No website "{website}", and we cannot add it because you didn\'t allow it!')
         return
+
     ws = Website.objects.get(name=website)
     save_path = os.path.join(Config().site_media_path, "websites", str(ws.id))
     if not os.path.exists(save_path):

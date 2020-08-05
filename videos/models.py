@@ -133,7 +133,8 @@ class Website(models.Model):
     website_alias = models.TextField(default="", blank=True)
     exclusions = models.TextField(default="", null=True, blank=True)
     modified_date = models.DateTimeField(auto_now=True)
-
+    url = models.TextField(max_length=256, default="", null=True, blank=True)
+    tpdb_id = models.IntegerField(default=0)
     def __str__(self):
         return f"{self.name} "
 

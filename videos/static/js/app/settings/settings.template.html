@@ -45,7 +45,7 @@
 
     <div class="collapse multi-collapse in" id="tpdb">
       <div class="card card-body">
-          <h4>TpDB scanning</h4><p>You must reload to see the current variables. <b>Most of these are not implemented yet</b>.</p>
+          <h4>TpDB scanning</h4><p><i>You must reload the page to see the current variables.</i></p>
 
     <input type="checkbox" ng-model="$ctrl.tpdb_enabled" ng-change="getdetails()"
         uib-popover-html="'Enable the TpDB (metadataapi.net) scanning functions'"
@@ -53,34 +53,34 @@
 
     <span style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>
 
-    <input type="checkbox" ng-model="$ctrl.tpdb_autorename"
+    <input type="checkbox" ng-if="$ctrl.tpdb_enabled" ng-model="$ctrl.tpdb_autorename"
     uib-popover-html="'Will automatically change scene names to the \'website - actor(s) - title\' naming convention. The actual filename will be untouched. A tag will be added to the scene (_tpdb-sure or _tpdb_unsure) depending on the quality of the result.'"
-    popover-trigger="mouseenter" popover-placement="top"> Automatically rename scenes
+           popover-trigger="mouseenter" popover-placement="top"> <label ng-if="$ctrl.tpdb_enabled">Automatically rename scenes</label>
 
-            <div class="divider"></div>
-Enable registration of:&nbsp;&nbsp;
+            <div ng-if="$ctrl.tpdb_enabled" class="divider"></div>
+          <label ng-if="$ctrl.tpdb_enabled">Enable registration of:</label>
 
-    <input type="checkbox" ng-model="$ctrl.tpdb_websites"
+    <input type="checkbox" ng-if="$ctrl.tpdb_enabled" ng-model="$ctrl.tpdb_websites"
     uib-popover-html="'When YAPO discovers a new website on TpDB, then add it'"
-    popover-trigger="mouseenter" popover-placement="top"> Websites
+           popover-trigger="mouseenter" popover-placement="top"> <label ng-if="$ctrl.tpdb_enabled">Websites</label>
 
 
-    <input type="checkbox" ng-model="$ctrl.tpdb_website_logos"
+    <input type="checkbox" ng-if="$ctrl.tpdb_enabled" ng-model="$ctrl.tpdb_website_logos"
         uib-popover-html="'When YAPO discovers a new website, enable downloading of a website logo'"
-        popover-trigger="mouseenter" popover-placement="top"> Website logos
+           popover-trigger="mouseenter" popover-placement="top"> <label ng-if="$ctrl.tpdb_enabled">Website logos</label>
 
-    <input type="checkbox" ng-model="$ctrl.tpdb_actors"
+    <input type="checkbox" ng-if="$ctrl.tpdb_enabled" ng-model="$ctrl.tpdb_actors"
         uib-popover-html="'When YAPO recognizes an actor that YAPO doesn\'t know (only females), it will register the information TpDB has on the actor, and then initiate a TMDB/Freeones scrape of the actor. This way, any profile photo from TMDB will take precedence over any other photos.'"
-        popover-trigger="mouseenter" popover-placement="top"> Actors
+           popover-trigger="mouseenter" popover-placement="top"> <label ng-if="$ctrl.tpdb_enabled">Actors</label>
 
-    <input type="checkbox" ng-model="$ctrl.tpdb_photos"
+    <input type="checkbox" ng-if="$ctrl.tpdb_enabled" ng-model="$ctrl.tpdb_photos"
         uib-popover-html="'During auto-addition, also try to get actor photos (they\'re not as good as those TMDB provide, so if a photo already exists, it will not be saved)'"
-        popover-trigger="mouseenter" popover-placement="top"> Actor photos
+           popover-trigger="mouseenter" popover-placement="top"> <label ng-if="$ctrl.tpdb_enabled">Actor photos</label>
 
-              <span style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>
+              <span ng-if="$ctrl.tpdb_enabled" style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>
 
-          <label># tags to auto-add</label>
-    <select ng-model="$ctrl.tpdb_tags">
+          <label ng-if="$ctrl.tpdb_enabled"># tags to auto-add: </label>
+    <select ng-if="$ctrl.tpdb_enabled" ng-model="$ctrl.tpdb_tags">
         <option>0</option>
         <option>5</option>
         <option>10</option>
@@ -88,25 +88,34 @@ Enable registration of:&nbsp;&nbsp;
 
     </select>
 
-    <span style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>
+    <span ng-if="$ctrl.tpdb_enabled" style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>
 
 
-    <button style="color: #33ccff;" type="button" ng-click="$ctrl.TpDB()"" class="btn btn-default btn-sm"
+    <button style="color: #33ccff;" ng-if="$ctrl.tpdb_enabled" type="button" ng-click="$ctrl.TpDB()"" class="btn btn-default btn-sm"
         uib-popover-html="'Save these settings'"
         popover-trigger="mouseenter" popover-placement="right-top"
 
-    <span style="width:10%" class="glyphicon glyphicon-cog"></span> Save TpDB Settings
+    <span ng-if="$ctrl.tpdb_enabled" style="width:10%" class="glyphicon glyphicon-cog"></span> Save TpDB Settings
     </button>
 
-    <span style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>
+    <span ng-if="$ctrl.tpdb_enabled" style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>
 
-    <button type="button" ng-click="$ctrl.tpdb_scan_all()" class="btn btn-default btn-sm"
+    <button type="button" ng-if="$ctrl.tpdb_enabled" ng-click="$ctrl.tpdb_scan_all()" class="btn btn-default btn-sm"
         uib-popover-html="'Parse all scenes without a \'TpDB: Scanned\' tag and ask TpDB for information.'" popover-trigger="mouseenter" popover-placement="right-top"
     <span class="glyphicon glyphicon-tag"></span> Scan all scenes
     </button>
-    <input type="checkbox" ng-model="$ctrl.tpdb_force"
+    <input type="checkbox" ng-if="$ctrl.tpdb_enabled" ng-model="$ctrl.tpdb_force"
            uib-popover-html="'Override the \'TpDB: Scanned\' tag when scanning with TpDB'"
-           popover-trigger="mouseenter" popover-placement="top"> Force
+           popover-trigger="mouseenter" popover-placement="top"> <label ng-if="$ctrl.tpdb_enabled">Force</label>
+
+    <span ng-if="$ctrl.tpdb_enabled" style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>
+    <button type="button" ng-if="$ctrl.tpdb_enabled" ng-click="$ctrl.populate_websites()" class="btn btn-default btn-sm"
+        uib-popover-html="'Populates all websites with URLs and logos from TpDB.<br>Also checks website names against those used by TpDB and renames if necessary (this will make scans faster).<br>Force will redownload logos.'" popover-trigger="mouseenter" popover-placement="right-top"
+    <span class="glyphicon glyphicon-tag"></span> Populate websites
+    </button>
+    <input type="checkbox" ng-if="$ctrl.tpdb_enabled" ng-model="$ctrl.site_force"
+           uib-popover-html="'Re-download all logos'"
+           popover-trigger="mouseenter" popover-placement="top"> <label ng-if="$ctrl.tpdb_enabled">Re-get existing logos</label>
   <div class="divider"></div>
       </div>
     </div>

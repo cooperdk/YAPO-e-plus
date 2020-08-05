@@ -41,8 +41,14 @@ def tpdb (scene_id: int, force: bool):
     scene_name = current_scene.name
     # scene_name = scene_name.replace(" ", "%20")
 
-    if "tpdb: scanned" in str(current_scene.scene_tags.all()).lower() and not force:
-        log.swarn("WARNING: Already searched!")
+
+
+    searched = False
+    for scene_tag in current_scene.scene_tags.all():
+        if any([scene_tag.name == "TpDB: Match: Good", scene_tag.name == "TpDB: Match: Questionable"]):
+            searched = True
+    if searched:
+        log.sinfo(f"Scene #{current_scene.id} is already searched!")
         return
 
     log.sinfo(f'Scanning for "{scene_name}" on TpDB...')
@@ -75,7 +81,11 @@ def tpdb (scene_id: int, force: bool):
         }
         print("Scanning... ",end="")
         response = requests.request('GET', url, headers=headers, params=params)
-        response = response.json()
+
+        try:
+            response = response.json()
+        except:
+            pass
 
         # print (str(response))
         #pp = pprint.PrettyPrinter(indent=4)
@@ -113,7 +123,10 @@ def tpdb (scene_id: int, force: bool):
                 'User-Agent': 'YAPO e+ 0.7',
             }
             response = requests.request('GET', url, headers=headers, params=params)
-            response = response.json()
+            try:
+                response = response.json()
+            except:
+                pass
             if "id" and "title" in str(response):
                 found = 2
                 
@@ -162,13 +175,16 @@ def tpdb (scene_id: int, force: bool):
                 #pp.pprint(response['data'])
             perflist = ""
             ite = 0
+            perf = ""
             for performer in response['data'][0]['performers']:
+                perf = namecheck(performer['name'])
+                perforiginal = performer['name']
                 ite += 1
                 #pp = pprint.PrettyPrinter(indent=4)
                 #pp.pprint(performer)
                 #print(f"Performers: {perflist}")
-                print(f"----> PERFORMER: {performer['name'].lower().strip()} - list: {perflist.lower().strip()}")
-                if not performer['name'].lower().strip() in perflist.lower().strip():
+                print(f"----> PERFORMER: {perf} - list: {perflist}")
+                if not perf.lower().strip() in perflist.lower().strip():
                     if performer['parent'] is not None and performer['parent']['extras'] is not None:
                         performer_extras = performer['parent']['extras']
                         # print(performer_extras['gender'])
@@ -176,69 +192,70 @@ def tpdb (scene_id: int, force: bool):
                         actoradded = ""
                         sp = ""
                         if performer_extras['gender'] is not None and "f" in performer_extras['gender'].lower():
-                            print(f"  --> TpDB PERFORMER -> Checking #{ite} ({performer['name'].strip()})...")
+                            print(f"  --> TpDB PERFORMER -> Checking #{ite} ({perf})...")
                             actors = list(Actor.objects.extra(select={ "length": "Length(name)" }).order_by("-length"))
                             sp = ""
                             for scene_performer in actors:
 
                                 keyname=""
                                 primary=0
-                                sp=scene_performer.name.lower().strip()
-                                perf=performer['name'].lower().strip()
-                                if sp == perf:
-                                    keyname = scene_performer.name
+                                sp=scene_performer.name
+                                if sp.lower() == perforiginal.lower():
+                                    keyname = sp
                                     primary = 1
                                     print(f"  --> SM 1: YAPO performer name {scene_performer.name} is keyname")
                                     break
 
                                 if not keyname:
                                     sp = scene_performer.name
-                                    perf = performer['name']
                                     perf=namecheck(perf)
-                                    if sp==perf:
+                                    if sp.lower()==perf.lower():
                                         keyname = scene_performer.name
                                         primary = 1
-                                        print(f"  --> SM 1: YAPO performer name matches checked TpDB name")
+                                        print(f"  --> SM 1: YAPO performer name {sp} matches checked TpDB name")
                                         break
 
 
                             if not keyname:
 
-                                akaroot = Actor.objects.all()
+                                akaroot = ActorAlias.objects.all()
 
 
                                 if not keyname and 'aliases' in performer.keys():
                                     alia = str(performer['aliases']).lower().strip()
 
                                     for alias in akaroot:
-                                        akanames = [sub.name for sub in alias.actor_aliases.all()]
-                                        #print(f"GETTING {alias.name} -> {akanames}")
 
-                                        #print(f"Testing alias: {alias.name} ... \r",end="")
-                                        if (alias.name.lower() in perf) or (alias.name.lower() in performer['parent']['name']) or (alias.name.lower() in alia):
+                                        if not keyname and alias.name.lower() == perf.lower():
                                             keyname = alias.name
                                             primary = 3
-                                            print(f"  --> SM 3: YAPO performer {keyname} is keyname (by alias)")
-                                elif not keyname and 'aliases' in performer['parent'].keys():
-                                    alia = str(performer['parent']['aliases']).lower().strip()
-
-                                    for alias in akaroot:
-                                        akanames = [sub.name for sub in alias.actor_aliases.all()]
-                                        #print(f"GETTING {alias.name} -> {akanames}")
-
-                                        #print(f"Testing alias: {alias.name} ... \r",end="")
-                                        if (alias.name.lower() == perf) or (alias.name.lower() == performer['parent']['name']):
+                                            break
+                                        if not keyname and alias.name.lower() == performer['name']:
                                             keyname = alias.name
-                                            primary = 4
-                                            print(f"  --> SM 4: YAPO performer {keyname} is keyname (by alias)")
-                                else:
-                                    alia = ""
+                                            primary = 3
+                                            break
+                                        if not keyname:
+                                            for alia in performers['aliases']:
+                                                if alias.name.lower() == alia.lower():
+                                                    keyname = alias.name
+                                                    primary = 3
+                                                    break
+                                        if not keyname and 'aliases' in performer['parent'].keys:
+                                            for alia in performers['parent']['aliases']:
+                                                if alias.name.lower() == alia.lower():
+                                                    keyname = alias.name
+                                                    primary = 3
+                                                    break
+                                        else:
+                                            alia = ""
 
 
-                            if keyname:
+
+                            if keyname.strip() != "":
                                 #actor_to_add = Actor.objects.get(pk=actor_id)
                                 print(f"----> CHECKING SCENE ACTORS")
-                                if (keyname not in str(current_scene.actors.all()).lower()) and (Actor.objects.filter(name=keyname).exists()):
+                                keyname = namecheck(keyname)
+                                if (keyname.lower() not in str(current_scene.actors.all()).lower()) and (Actor.objects.filter(name=keyname).exists()):
                                     print("  --> ACTOR MATCH")
                                     actor_to_add = Actor.objects.get(name=keyname)
                                     keyname = actor_to_add.name
@@ -250,39 +267,38 @@ def tpdb (scene_id: int, force: bool):
 
                             if not keyname:
                                 perpn = performer['name']
-                                perpn2 = namecheck(perpn)
+                                perpn = namecheck(perpn)
                                 secondary = 2
-                                if sp == perpn2.lower().strip():
-                                    keyname = perpn2.strip()
+                                if sp.lower() == perpn.lower():
+                                    keyname = perpn
                                     print(f"  --> SM 2: TpDB REPLACED {performer['name']} -> {keyname} is keyname")
                                     break
 
-                                if performer['name'] and not keyname:
-                                    perpn = performer['name'].lower().strip()
-                                    if sp == perpn and not keyname:
-                                        keyname = performer['name']
+                                if performer['parent']['name'] and not keyname:
+                                    perpn = performer['parent']['name']
+                                    perpn = namecheck(perpn)
+                                    if sp.lower() == perpn.lower() and not keyname:
+                                        keyname = performer['parent']['name']
                                         secondary = 3
                                         print(f"  --> SM 3: {keyname} is keyname")
                                         break
 
 
-
-                                if Config().tpdb_actors:
+                                if (Config().tpdb_actors) and (keyname.strip() != ""):
                                     # If an actor is found on TpDB, but doesn't exist in YAPO
-                                    log.info(f"Auto-adding a new actor: {performer['name']}")
+                                    log.info(f"Auto-adding a new actor: {keyname}")
                                     act = Actor()
-                                    act.name = performer['name']
+                                    act.name = keyname
                                     act.date_added = datetime.now()
                                     act.save()
                                     actoradded = True
-                                    keyname = act.name
                                     aux.addactor(current_scene, act)
-                                    log.sinfo(f"  --> ACTOR ADDED TO SCENE: {act.name}")
+                                    log.sinfo(f"  --> ACTOR ADDED TO SCENE: {keyname}")
                                 else:
-                                    log.info(f"We could add the actor {performer['name']}, but auto-adding is disabled")
+                                    log.info(f"We could add the actor {keyname}, but auto-adding is disabled")
 
 
-                        if Actor.objects.filter(name=keyname).exists():
+                        if (keyname.strip() != "") and (Actor.objects.filter(name=keyname).exists()):
                             actor = Actor.objects.get(name=keyname)
                             if len(perflist) > 3 and not actor.name.lower() in perflist.lower():
                                 perflist = perflist + ", " + actor.name
@@ -401,7 +417,7 @@ def tpdb (scene_id: int, force: bool):
                                 actor.last_lookup = datetime.now()
                             actor.save()
 
-                            if actoradded:
+                            if (actoradded) and (keyname != ""):
                                 log.sinfo(f"Scraping additional info about {actor.name}...")
                                 success = scraper_tmdb.search_person_with_force_flag(
                                     actor, True)
@@ -467,6 +483,8 @@ def tpdb (scene_id: int, force: bool):
 
 
             log.sinfo(f"Found and registered data for scene ID {scene_id}")
+        else:
+            log.sinfo(f"Scene not found in TpDB")
 
     except KeyError:
         success = False
@@ -678,8 +696,8 @@ def namecheck(actor: str):
         newActor = "Bunny Colby"
     if newActor == "Nancy A." or newActor == "Nancy A":
         newActor = "Nancy Ace"
-    if newActor == "Nathaly" or newActor == "Nathalie Cherie" or newActor == "Natalie Cherie":
-        newActor = "Nathaly Cherie"
+    if newActor == "Nathaly" or newActor == "Nathalie Cherie" or newActor == "Natalie Cherie" or newActor == "Nathaly Cherie":
+        newActor = "Nathaly Heaven"
     if newActor == "Nika Noir":
         newActor = "Nika Noire"
     if newActor == "Noe Milk" or newActor == "Noemiek":

@@ -19,6 +19,7 @@ angular.module('settings').component('settings', {
                 //self.tpdb_add_actors = false;
                 //self.tpdb_add_photo = false;
                 self.tpdb_force = false;
+                self.site_force = false;
                 self.alerts = [];
                 self.addAlert = function (msg, type, timeout) {
                     self.alerts.push({msg: msg, type: type, timeout: timeout});
@@ -145,7 +146,7 @@ angular.module('settings').component('settings', {
                 self.tpdb_scan_all = function () {
                     if(self.tpdb_enabled == false) { self.addAlert("TpDB scanning is disabled. Please enable it first.", 'warning', '3000'); }
                     else if (confirm("Are you sure? This may take a long time. The process can only be interrupted by force quitting YAPO.")) {
-                        self.addAlert("Starting TpDB scan, please hold on...", 'info', '5000');
+                        self.addAlert("Starting TpDB scan, please hold on... (you will get no further status unless an error occurs).", 'info', '5000');
                         $http.get('settings/', {
                             params: {
                                 tpdb_scan_all: 'True',
@@ -157,13 +158,34 @@ angular.module('settings').component('settings', {
                             // self.response = response.data.vlc_path;
                             // self.pathToVLC = response.data.vlc_path;
                             // alert("Got response from server: " + self.pathToFolderToAdd);
-                            self.addAlert("Done scanning with TpDB.", 'success', '1000000');
+                            //self.addAlert("Done scanning with TpDB.", 'success', '1000000');
                         }, function errorCallback(response) {
                             self.addAlert("Something went wrong while scanning. Click to confirm.", 'danger', '1000000');
                         });
                     }
                 };
 
+                self.populate_websites = function () {
+                    if(self.tpdb_enabled == false) { self.addAlert("TpDB scanning is disabled. Please enable it first.", 'warning', '3000'); }
+                    else if (confirm("Are you sure? This may take some time. The process can only be interrupted by force quitting YAPO.")) {
+                        self.addAlert("Populating website information, please hold on... (you will get no further status  unless an error occurs).", 'info', '5000');
+                        $http.get('settings/', {
+                            params: {
+                                populate_websites: 'True',
+                                force: self.site_force
+                            }
+
+                        }   ).then(function (response) {
+                            // alert(angular.toJson(response));
+                            // self.response = response.data.vlc_path;
+                            // self.pathToVLC = response.data.vlc_path;
+                            // alert("Got response from server: " + self.pathToFolderToAdd);
+                            // self.addAlert("Done populating websites.", 'success', '1000000');
+                        }, function errorCallback(response) {
+                            self.addAlert("Something went wrong while scanning. Click to confirm.", 'danger', '1000000');
+                        });
+                    }
+                };
                 self.checkDupe = function () {
 
                 if (confirm("Are you sure? Any identical copies of your videos will be removed, leaving only one copy."))		{
@@ -190,7 +212,7 @@ angular.module('settings').component('settings', {
                 
                 self.scrapAllActor = function () {
                     if (confirm("Are you sure? This may take a long time. The process can only be interrupted by force quitting YAPO.")) {
-                       self.addAlert("Starting scrape, please hold on...", 'info', '5000');
+                       self.addAlert("Starting scrape, please hold on... (you will get no further status unless an error occurs).", 'info', '5000');
                         $http.get('settings/', {
                             params: {
                                 scrapAllActors: 'True',
@@ -202,7 +224,7 @@ angular.module('settings').component('settings', {
                         // self.response = response.data.vlc_path;
                         // self.pathToVLC = response.data.vlc_path;
                         // alert("Got response from server: " + self.pathToFolderToAdd);
-                        self.addAlert("Done scraping actors.", 'success', '10000000');
+                        //self.addAlert("Done scraping actors.", 'success', '10000000');
                         }, function errorCallback(response) {
                         self.addAlert("Something went wrong. Click to confirm.", 'danger', '1000000');
                         });
