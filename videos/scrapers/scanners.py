@@ -47,7 +47,7 @@ def tpdb (scene_id: int, force: bool):
     for scene_tag in current_scene.scene_tags.all():
         if any([scene_tag.name == "TpDB: Match: Good", scene_tag.name == "TpDB: Match: Questionable"]):
             searched = True
-    if searched:
+    if searched and not force:
         log.sinfo(f"Scene #{current_scene.id} is already searched!")
         return
 
@@ -179,6 +179,8 @@ def tpdb (scene_id: int, force: bool):
             for performer in response['data'][0]['performers']:
                 perf = namecheck(performer['name'])
                 perforiginal = performer['name']
+                perpn = ""
+                keyname = ""
                 ite += 1
                 #pp = pprint.PrettyPrinter(indent=4)
                 #pp.pprint(performer)
@@ -249,8 +251,7 @@ def tpdb (scene_id: int, force: bool):
                                         else:
                                             alia = ""
 
-
-
+                            #print("keyname " + keyname)
                             if keyname.strip() != "":
                                 #actor_to_add = Actor.objects.get(pk=actor_id)
                                 print(f"----> CHECKING SCENE ACTORS")
@@ -265,38 +266,52 @@ def tpdb (scene_id: int, force: bool):
                                     else:
                                         print(f"  --> ACTOR already in scene.")
 
+                            #print("keyname " + keyname)
                             if not keyname:
                                 perpn = performer['name']
                                 perpn = namecheck(perpn)
                                 secondary = 2
+                                #print ("perpn sec " + perpn + " sp lwr " + sp)
                                 if sp.lower() == perpn.lower():
-                                    keyname = perpn
+
                                     print(f"  --> SM 2: TpDB REPLACED {performer['name']} -> {keyname} is keyname")
                                     break
 
-                                if performer['parent']['name'] and not keyname:
-                                    perpn = performer['parent']['name']
-                                    perpn = namecheck(perpn)
-                                    if sp.lower() == perpn.lower() and not keyname:
-                                        keyname = performer['parent']['name']
-                                        secondary = 3
-                                        print(f"  --> SM 3: {keyname} is keyname")
-                                        break
+                            #print("keyname " + keyname)
+                            if performer['parent']['name'] and not keyname:
+                                perpn = performer['parent']['name']
+                                perpn = namecheck(perpn)
+                                print("perpn thd " + perpn + " sp lwr " + sp)
+                                if sp.lower() == perpn.lower():
 
+                                    secondary = 3
+                                    print(f"  --> SM 3: {keyname} is keyname")
+                                    break
 
-                                if (Config().tpdb_actors) and (keyname.strip() != ""):
-                                    # If an actor is found on TpDB, but doesn't exist in YAPO
-                                    log.info(f"Auto-adding a new actor: {keyname}")
+                            #print("keyname " + keyname + " - perf name " + perpn)
+                            if (Config().tpdb_actors) and (perpn):
+                                # If an actor is found on TpDB, but doesn't exist in YAPO
+                                log.info(f"Auto-adding a new actor: {perpn}")
+                                try:
                                     act = Actor()
-                                    act.name = keyname
+                                    act.name = perpn
                                     act.date_added = datetime.now()
                                     act.save()
                                     actoradded = True
                                     aux.addactor(current_scene, act)
                                     log.sinfo(f"  --> ACTOR ADDED TO SCENE: {keyname}")
-                                else:
-                                    log.info(f"We could add the actor {keyname}, but auto-adding is disabled")
+                                except:
+                                    log.error(f'Couldn\'t add {keyname} - possibly exists already even though she didn\'t turn up...')
+                                    break
+                            elif Config().tpdb_actors == True:
+                                log.info(f"We could add the actor {keyname}, but auto-adding is disabled")
 
+                            if (actoradded) and (perpn) and (not keyname):
+                                log.sinfo(f"Scraping additional info about {act.name}...")
+                                success = scraper_tmdb.search_person_with_force_flag(
+                                    act, True)
+                                success = scraper_freeones.search_freeones_with_force_flag(
+                                        act, True)
 
                         if (keyname.strip() != "") and (Actor.objects.filter(name=keyname).exists()):
                             actor = Actor.objects.get(name=keyname)
@@ -413,16 +428,11 @@ def tpdb (scene_id: int, force: bool):
                                 added = True
 
                             if added == True:
-                                insert_actor_tag(actor, "TpDB: Tagged")
+                                insert_actor_tag(actor, "TpDB: Info added")
                                 actor.last_lookup = datetime.now()
                             actor.save()
 
-                            if (actoradded) and (keyname != ""):
-                                log.sinfo(f"Scraping additional info about {actor.name}...")
-                                success = scraper_tmdb.search_person_with_force_flag(
-                                    actor, True)
-                                success = scraper_freeones.search_freeones_with_force_flag(
-                                        actor, True)
+
                             if added:
                                 log.sinfo(f"Some information about {actor.name} was added to the profile.")
             newtitle = ""
