@@ -45,7 +45,7 @@
 
     <div class="collapse multi-collapse in" id="tpdb">
       <div class="card card-body">
-          <h4>TpDB scanning</h4><p><i>You must reload the page to see the current variables.</i></p>
+          <h4>TpDB scanning</h4><p><i>You must press "Save TpDB settings to save your choices and you must reload the page to see the current variables.</i></p>
 
     <input type="checkbox" ng-model="$ctrl.tpdb_enabled" ng-change="getdetails()"
         uib-popover-html="'Enable the TpDB (metadataapi.net) scanning functions'"
@@ -91,11 +91,11 @@
     <span ng-if="$ctrl.tpdb_enabled" style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>
 
 
-    <button style="color: #33ccff;" ng-if="$ctrl.tpdb_enabled" type="button" ng-click="$ctrl.TpDB()"" class="btn btn-default btn-sm"
+    <button style="color: #33ccff;" type="button" ng-click="$ctrl.TpDB()"" class="btn btn-default btn-sm"
         uib-popover-html="'Save these settings'"
         popover-trigger="mouseenter" popover-placement="right-top"
 
-    <span ng-if="$ctrl.tpdb_enabled" style="width:10%" class="glyphicon glyphicon-cog"></span> Save TpDB Settings
+    <span style="width:10%" class="glyphicon glyphicon-cog"></span> Save TpDB Settings
     </button>
 
     <span ng-if="$ctrl.tpdb_enabled" style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>

@@ -6,8 +6,6 @@ import os
 import re
 import time
 import urllib.parse as urllib_parse
-import videos.const
-import urllib.request as urllib_req
 import django
 import requests
 import videos.aux_functions as aux
@@ -17,9 +15,11 @@ import videos.const as const
 from django.utils import timezone
 from utils.printing import Logger
 log = Logger()
+from configuration import Config, Constants
 
 import requests.packages.urllib3
 requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
+#urllib3.disable_warnings()
 
 django.setup()
 
@@ -122,7 +122,7 @@ def search_freeones(actor_to_search, alias, force):
                 #print("There is at least one picture reference.\nURL: " + images_page + ".")
                 soup = BeautifulSoup(r.content, "html5lib")
 
-            if actor_to_search.thumbnail == const.UNKNOWN_PERSON_IMAGE_PATH or force:
+            if actor_to_search.thumbnail == Constants().unknown_person_image_path or force:
                 if not("freeones.com" in images_page.lower()):
                     aux.progress(3,27,"Searching for Photo")
                 elif soup.find("section", {'id': 'fxgp-gallery'}):
@@ -132,7 +132,7 @@ def search_freeones(actor_to_search, alias, force):
                     if picture_list.find("a"):
                         first_picture = picture_list.find("a")
                         #print("Saving... ", end="")
-                        save_path = os.path.join(videos.const.MEDIA_PATH, 'actor', str(actor_to_search.id), 'profile')
+                        save_path = os.path.join(Config().site_media_path, 'actor', str(actor_to_search.id), 'profile')
                         #print("Profile pic path: " + save_path)
                         save_file_name = os.path.join(save_path, 'profile.jpg')
                         if not os.path.isfile(save_file_name):

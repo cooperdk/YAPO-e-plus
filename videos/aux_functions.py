@@ -4,15 +4,16 @@ import re
 import urllib.request
 from videos.models import *
 from configuration import Config, Constants
-from dateutil.parser import parse
+#from dateutil.parser import parse
 import datetime
-import requests.packages.urllib3
-import http.client
 import urllib3
+import requests.packages.urllib3
 import socket
 import shutil
+from lxml import html
 from utils.printing import Logger
 log = Logger()
+urllib3.disable_warnings()
 
 def progress (count: int, total: int, suffix=''):
     bar_len = 42
@@ -206,6 +207,8 @@ def tpdb_formatter (name):
     #print(f"New name to use for searching: {name}")
     return name
 
+def strip_html (s):
+    return str(html.fromstring(s).text_content())
 
 
 def strip_bad_chars (name):
@@ -309,40 +312,217 @@ def save_website_logo (image_link, website, force, *args):
         return
     save_file_name = os.path.join(save_path, "logo" + ext)
     if (not os.path.isfile(save_file_name) and Config().tpdb_website_logos) or force:
-        maxretries = 3
-        attempt = 0
-        while attempt < maxretries:
-            try:
-                user_agent = {'user-agent': 'YAPO e+ 0.7'}
-                http=urllib3.PoolManager(10,headers=user_agent)
-                r1=http.urlopen('GET', image_link)
-                if r1.status == 200:
-                    #if os.path.exists(save_file_name):
-                    #    os.remove(save_file_name)
-                    with open(save_file_name, 'w+b') as f:
-                        f.write(r1.data)
-                        f.close()
-            #urllib.request.urlretrieve(image_link, save_file_name)
-            except:
-                attempt += 1
-                dlerror = 1
-            else:
-                dlerror = 0
-                break
 
-        if dlerror == 0:
-            log.info(f"Downloaded website logo for website {ws.id} - {ws.name}")
-            rel_path = os.path.relpath(save_file_name, start="videos")
-            as_uri = urllib.request.pathname2url(rel_path)
-            ws.thumbnail = as_uri
-            ws.save()
-            success = True
-            return success
-        else:
-            log.error(f"DOWNLOAD ERROR: Logo: {image_link}")
+        if not os.path.exists(save_path):
+            os.makedirs(save_path)
+            if download_image(img, save_file_name):
+                rel_path = os.path.relpath(save_file_name, start="videos")
+                as_uri = urllib.request.pathname2url(rel_path)
+                ws.thumbnail = as_uri
+                ws.save()
+                success = True
+            else:
+                log.swarn(f"DOWNLOAD ERROR: Photo ({actor.name}): {img}")
+
 
     else:
         log.sinfo(f"LOGO: {ws.name}: Skipping download, because the website already has a logo.")
+
+
+def populate_actors():
+    actors = Actor.objects.order_by("name")  # name
+    for actor in actors:
+        photo = actor.thumbnail
+        desc = actor.description
+        url = 'https://metadataapi.net/api/performers'
+
+        params = { 'q': actor.name }
+        headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'User-Agent': 'YAPO e+ 0.71',
+        }
+        print(f"Contacting API for info about {actor.name}... ", end="")
+        response = requests.request('GET', url, headers=headers, params=params)  # , params=params
+        print("\n")
+        try:
+            response = response.json()
+        except:
+            pass
+
+        pid = ""
+        img = ""
+        bio = ""
+        desc = ""
+        changed = False
+        success = False
+        photo = ""
+        if all([response['data'], len(str(response['data'])) > 15]):
+            # print("1")
+            # try:
+            if 'id' in response['data'][0].keys():
+                pid = response['data'][0]['id']
+                # print("id")
+            if 'image' in response['data'][0].keys():
+                img = response['data'][0]['image']
+                # print("i")
+            elif 'thumbnail' in response['data'][0].keys():
+                img = response['data'][0]['thumbnail']
+                # print("t")
+            if 'bio' in response['data'][0].keys():
+                desc = response['data'][0]['bio']
+
+            if actor.thumbnail == Constants().unknown_person_image_path:
+                # print(f"No image, downloading ({img}) - ", end="")
+                save_path = os.path.join(Config().site_media_path, 'actor', str(actor.id), 'profile')
+                # print("Profile pic path: " + save_path)
+                save_file_name = os.path.join(save_path, 'profile.jpg')
+                if img and not os.path.isfile(save_file_name):
+                    if not os.path.exists(save_path):
+                        os.makedirs(save_path)
+                    if download_image(img, save_file_name):
+                        rel_path = os.path.relpath(save_file_name, start="videos")
+                        as_uri = urllib.request.pathname2url(rel_path)
+                        actor.thumbnail = as_uri
+                        photo += " [ Photo ]"
+                        success = True
+                        changed = True
+                    else:
+                        log.swarn(f"DOWNLOAD ERROR: Photo ({actor.name}): {img}")
+
+                    #save_actor_profile_image_from_web(img, actor, True)
+
+            if any([not actor.description, len(actor.description) < 128,
+                    "freeones" in actor.description.lower()]):
+                # print("no good desc")
+                if desc:
+                    # print("chg desc")
+                    if len(desc) > 72:
+                        actor.description = aux.strip_html(desc)
+                        changed = True
+                        success = True
+                        photo += " [ Description ]"
+            if pid:
+                # print("id")
+                if not actor.tpdb_id:
+                    actor.tpdb_id = pid
+                    photo += " [ TpDB ID ]"
+                    changed = True
+                    success = True
+
+            if success:
+                # print("yep, done")
+                actor.last_lookup = datetime.datetime.now()
+                actor.modified_date = datetime.datetime.now()
+                actor.save()
+                log.sinfo(f'Information about {actor.name} was successfully gathered from TpDB: {photo}.')
+
+            else:
+
+                save_path = os.path.join(Config().site_media_path, 'actor', str(actor.id), 'profile')
+                save_file_name = os.path.join(save_path, 'profile.jpg')
+
+                if (actor.tpdb_id == pid) and (len(actor.description) > 125 and (
+                os.path.isfile(save_file_name))):
+                    success = True
+                    log.sinfo(
+                        f'Your installation has good details about {actor.name}. You can force this operation.')
+
+            #return success
+
+        # except:
+        # success = False
+        # log.swarn(f'There was an error downloading a photo for and/or getting information about {actor.name}!')
+        # return success
+
+        else:
+            log.swarn(f'It seems that TpDB might not know anything about {actor.name}!')
+            logfile = open(os.path.join(Config().data_path, 'tpdb-missing-actors.log'), 'a+')
+            logfile.write(f"{actor.name} - {str(actor.actor_aliases)}\n")
+            logfile.close()
+            success = False
+
+
+def download_image (image_url, path):
+
+    try:
+        req = Request(image_url, headers={
+            "User-Agent": "YAPO e+ 0.71" })
+        try:
+            # timeout time to download an image
+            if socket_timeout:
+                timeout = float(socket_timeout)
+            else:
+                timeout = 10
+
+            response = urlopen(req, None, timeout)
+            data = response.read()
+            response.close()
+
+            try:
+                output_file = open(path, 'wb')
+                output_file.write(data)
+                output_file.close()
+            except OSError as e:
+                download_status = 'fail'
+                download_message = f"OSError on an image... Error: {e}"
+                return_image_name = ''
+                absolute_path = ''
+
+            # return image name back to calling method to use it for thumbnail downloads
+            download_status = True
+
+
+
+        except UnicodeEncodeError as e:
+            download_status = 'fail'
+            download_message = f"UnicodeEncodeError on an image...trying next one... Error: {e}"
+            return_image_name = ''
+            absolute_path = ''
+
+        except URLError as e:
+            download_status = 'fail'
+            download_message = f"URLError on an image...trying next one... Error: {e}"
+            return_image_name = ''
+            absolute_path = ''
+
+        except BadStatusLine as e:
+            download_status = 'fail'
+            download_message = f"BadStatusLine on an image...trying next one... Error: {e}"
+            return_image_name = ''
+            absolute_path = ''
+
+    except HTTPError as e:  # If there is any HTTPError
+        download_status = 'fail'
+        download_message = f"HTTPError on an image...trying next one... Error: {e}"
+        return_image_name = ''
+        absolute_path = ''
+
+    except URLError as e:
+        download_status = 'fail'
+        download_message = f"URLError on an image...trying next one... Error: {e}"
+        return_image_name = ''
+        absolute_path = ''
+
+    except ssl.CertificateError as e:
+        download_status = 'fail'
+        download_message = f"CertificateError on an image...trying next one... Error: {e}"
+        return_image_name = ''
+        absolute_path = ''
+
+    except IOError as e:  # If there is any IOError
+        download_status = 'fail'
+        download_message = f"IOError on an image...trying next one... Error: {e}"
+        return_image_name = ''
+        absolute_path = ''
+
+    except IncompleteRead as e:
+        download_status = 'fail'
+        download_message = f"IncompleteReadError on an image...trying next one... Error: {e}"
+        return_image_name = ''
+        absolute_path = ''
+
+    return download_status
 
 
 
@@ -356,28 +536,16 @@ def save_actor_profile_image_from_web (image_link, actor, force):
 
     save_file_name = os.path.join(save_path, "profile.jpg")
     if not os.path.isfile(save_file_name) or force:
-        maxretries = 3
-        attempt = 0
-        while attempt < maxretries:
-            try:
-                urllib.request.urlretrieve(image_link, save_file_name)
-            except http.client.IncompleteRead:
-                attempt += 1
-                dlerror = 1
-            else:
-                dlerror = 0
-                break
 
-        if dlerror == 0:
-            print("Downloaded photo.")
+        if download_image(image_link, save_file_name):
             rel_path = os.path.relpath(save_file_name, start="videos")
             as_uri = urllib.request.pathname2url(rel_path)
             actor.thumbnail = as_uri
         else:
-            print("Download error, you need to try again or insert a photo manually.")
+            log.warn(f"Error downloading photo for {actor.name} ({image_link}).")
 
     else:
-        print("Skipping, because there's already a usable photo.")
+        log.sinfo(f"Skipping download, we already have a usable photo of {actor.name}.")
 
 
 

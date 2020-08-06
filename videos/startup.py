@@ -29,34 +29,44 @@ def banner():
         SCRIPT_ROOT = os.path.dirname(os.path.realpath(__file__))
         compiled = False
 
-    if os.name == 'nt':
-        os.system('mode con: cols=140 lines=4096')
-        os.system('cls')
-    else:
-        os.system('clear')
-
     if platform.system() == "Windows":
+        import win32console
+        #os.system('mode con: cols=140 lines=4096')
+        os.system('cls')
+        cmd = 'color 07'
+        os.system(cmd)
+        #cmd = 'mode con: cols=140 lines=4096'
+        #os.system(cmd)
+        cmd = 'mode 140,52'
+        os.system(cmd)
+
         from ctypes import windll, byref
         import ctypes.wintypes as wintypes
 
         STDOUT = -11
 
         hdl = windll.kernel32.GetStdHandle(STDOUT)
-        rect = wintypes.SMALL_RECT(0, 0, 132, 55)  # (left, top, right, bottom)
+        rect = wintypes.SMALL_RECT(0, 0, 140, 52)  # (left, top, right, bottom)
         windll.kernel32.SetConsoleWindowInfo(hdl, True, byref(rect))
         bufsize = wintypes._COORD(140, 4096)  # rows, columns
         windll.kernel32.SetConsoleScreenBufferSize(hdl, bufsize)
 
-    print("\033[1m\033[32m")
-    print("____    ____  ___       ______     ______         _______        ")
-    print("\   \  /   / /   \     |   _  \   /  __  \       |   ____|   _   ")
-    print(" \   \/   / /  ^  \    |  |_)  | |  |  |  |      |  |__    _| |_ ")
-    print("  \_    _/ /  /_\  \   |   ___/  |  |  |  |      |   __|  |_   _|")
-    print("    |  |  /  _____  \  |  |      |  `--'  |      |  |____   |_|  ")
-    print("    |__| /__/     \__\ | _|       \______/       |_______|       ")
-    print("")
-    print("              \033[37m\033[44mYET ANOTHER PORN ORGANIZER - extended\033[49m")
-    print("\033[1m\033[37m=================================================================")
+        cmd = os.path.join(SCRIPT_ROOT, 'consetbuffer') + '/X 140 /Y 2048'
+        cmd = 'color 07'
+        os.system(cmd)
+    else:
+        os.system('clear')
+    print("\033[40m\033[1m\033[32m")
+    print("\t____    ____  ___       ______     ______         _______        ")
+    print("\t\   \  /   / /   \     |   _  \   /  __  \       |   ____|   _   ")
+    print("\t \   \/   / /  ^  \    |  |_)  | |  |  |  |      |  |__    _| |_ ")
+    print("\t  \_    _/ /  /_\  \   |   ___/  |  |  |  |      |   __|  |_   _|")
+    print("\t    |  |  /  _____  \  |  |      |  `--'  |      |  |____   |_|  ")
+    print("\t    |__| /__/     \__\ | _|       \______/       |_______|       ")
+    print("\t")
+    print("\t              \033[37m\033[44mYET ANOTHER PORN ORGANIZER - extended\033[49m")
+    print("\t\033[1m\033[37m\033[40m=================================================================")
+    print("\t\033[0;10r")
     print(f"\033[22mExecuting YAPO from: {SCRIPT_ROOT}", end="")
     if compiled:
         print(f" (frozen/compiled build)")
@@ -200,7 +210,7 @@ def ffmpeg_check():
         ffplay = os.path.exists(os.path.abspath(os.path.join(dir_to_check, 'ffplay.exe')))
         ffprobe = os.path.exists(os.path.abspath(os.path.join(dir_to_check, 'ffprobe.exe')))
         if not all([ffmpeg, ffplay, ffprobe]):
-            print("\n\n")
+            print("\n")
             print("You don't have a copy of FFMPEG in your YAPO system.")
             print("I am going to install a copy of FFPMEG (4.3, static).")
             print(f"It will be placed at {dir_to_check}")
@@ -226,7 +236,7 @@ def ffmpeg_check():
                 sys.exit()
 
 
-def startup_sequence ():
+def startup_sequence():
 
     banner()
     print("")
@@ -244,15 +254,19 @@ def startup_sequence ():
     print(f"\nYou have {mem} GB available. CPU speed is {cpu} GHz and you have {cpucnt} cores available.")
 
     if mem >= 2 and cpu > 1.2:
-        print("Since you have sufficient hardware, video processing features will be enabled.")
+        print("\nSince you have sufficient hardware, video processing features will be enabled.")
         Config().videoprocessing = True
         log.info("Video processing enabled, sufficient hardware specifications")
+        print("\n")
     else:
-        print("Since you have insufficient hardware, video processing will be disabled.")
+        print("\nSince you have insufficient hardware, video processing will be disabled.")
         Config().videoprocessing = False
         log.info("Video processing disabled, too low hardware specification")
+        print("\n")
 
     ffmpeg_check()
+
+    #aux.populate_actors()
 
     if "runserver" in sys.argv[1]:
         site = Config().yapo_url
@@ -266,7 +280,10 @@ def startup_sequence ():
 If you want YAPO to open your browser automatically, this needs to be set in settings.\n')
 
 
+
 class ready:
+
+    #startup_sequence()
 
     try:
         if not 'migrat' in str(sys.argv[1:]):

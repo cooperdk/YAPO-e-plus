@@ -92,6 +92,8 @@ class WebsiteSerializer(serializers.ModelSerializer):
             "is_runner_up",
             "rating",
             "thumbnail",
+            "url",
+            "tpdb_id",
             "scenes",
             "website_alias",
             "exclusions",
@@ -184,6 +186,7 @@ class ActorListSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "name",
+            "tpdb_id",
             "thumbnail",
             "rating",
             "height",
@@ -245,6 +248,7 @@ class ActorSerializer(serializers.ModelSerializer):
             "height",
             "measurements",
             "extra_text",
+            "tpdb_id",
             "last_lookup",
             "is_exempt_from_one_word_search",
             "actor_aliases",
@@ -306,6 +310,7 @@ class SceneListSerializer(serializers.ModelSerializer):
             "rating",
             "path_to_file",
             "hash",
+            "release_date",
         ]
 
         # fields = ['id', 'name']

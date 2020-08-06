@@ -7,7 +7,7 @@ import django.db
 import errno
 from django.shortcuts import render, get_object_or_404
 import requests
-import json
+import requests.packages.urllib3
 import videos.addScenes
 import videos.filename_parser as filename_parser
 import videos.scrapers.freeones as scraper_freeones
@@ -15,7 +15,7 @@ import videos.scrapers.imdb as scraper_imdb
 import videos.scrapers.tmdb as scraper_tmdb
 import videos.scrapers.scanners as scanners
 #import videos.scrapers.googleimages as scraper_images
-from configuration import Config
+from configuration import Config, Constants
 from videos import ffmpeg_process
 import urllib.request
 import YAPO.settings
@@ -23,6 +23,7 @@ from wsgiref.util import FileWrapper
 from django.http import StreamingHttpResponse
 import mimetypes
 from datetime import timedelta
+
 
 # For REST framework
 
@@ -52,9 +53,7 @@ from django.db import connection
 # import pathlib
 from utils.printing import Logger
 log = Logger()
-
-
-
+import urllib3
 
 def get_scenes_in_folder_recursive(folder, scene_list):
     scenes = list(folder.scenes.all())
@@ -316,7 +315,7 @@ def populate_websites(force):
     headers = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'User-Agent': 'YAPO e+ 0.7',
+        'User-Agent': 'YAPO e+ 0.71',
     }
     print("Downloading site information... ", end="")
     response = requests.request('GET', url, headers=headers, params=params) #, params=params
@@ -370,6 +369,7 @@ def populate_websites(force):
                     if not site.tpdb_id:
                         site.tpdb_id = int(tsid)
 
+
                     site.save()
                 except:
                     log.error(
@@ -383,6 +383,153 @@ def populate_websites(force):
 
     return Response(status=200)
 
+
+
+def tpdb_scan_actor(actor, force: bool):
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+    import videos.aux_functions as aux
+    photo = actor.thumbnail
+    desc = actor.description
+    url = 'https://metadataapi.net/api/performers'
+
+    log.sinfo(f'Contacting TpDB API for info about {actor.name}.')
+
+    params = { 'q': actor.name }
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'User-Agent': 'YAPO e+ 0.71',
+    }
+
+    response = requests.request('GET', url, headers=headers, params=params)  # , params=params
+    #print("\n")
+    try:
+        response = response.json()
+    except:
+        pass
+
+    pid = ""
+    img = ""
+    bio = ""
+    desc = ""
+    changed = False
+    success = False
+    photo = ""
+
+    if all([response['data'], len(str(response['data'])) > 15]):
+        #print("1")
+        #try:
+        if 'id' in response['data'][0].keys():
+            pid = response['data'][0]['id']
+            #print("id")
+        if 'image' in response['data'][0].keys():
+            img = response['data'][0]['image']
+            #print("i")
+        elif 'thumbnail' in response['data'][0].keys():
+            img = response['data'][0]['thumbnail']
+            #print("t")
+        if 'bio' in response['data'][0].keys():
+            desc = response['data'][0]['bio']
+            #print("d")
+        if actor.thumbnail == Constants().unknown_person_image_path:
+            #print(f"No image, downloading ({img}) - ", end="")
+            save_path = os.path.join(Config().site_media_path, 'actor', str(actor.id), 'profile')
+            # print("Profile pic path: " + save_path)
+            save_file_name = os.path.join(save_path, 'profile.jpg')
+            if img and not os.path.isfile(save_file_name):
+                if not os.path.exists(save_path):
+                    os.makedirs(save_path)
+                maxretries = 3
+                attempt = 0
+                #while attempt < maxretries:
+                    #try:
+                if aux.download_image(img, save_file_name):
+                    rel_path = os.path.relpath(save_file_name, start="videos")
+                    as_uri = urllib.request.pathname2url(rel_path)
+                    actor.thumbnail = as_uri
+                    photo += " [ Photo ]"
+                    success = True
+                else:
+                    log.swarn(f"DOWNLOAD ERROR: Photo ({actor.name}): {img}")
+                #user_agent = { 'user-agent': 'YAPO e+ 0.7' }
+                #http = urllib3.PoolManager(10, headers=user_agent) # , cert_reqs='CERT_REQUIRED', ca_certs=certifi.where()
+                #r1 = http.urlopen('GET', img)
+                #if r1.status == 200:
+                    # if os.path.exists(save_file_name):
+                    #    os.remove(save_file_name)
+
+            # urllib.request.urlretrieve(image_link, save_file_name)
+            #except:
+                #attempt += 1
+                #dlerror = 1
+            #else:
+                #dlerror = 0
+                        #break
+                if dlerror == 0:
+                    with open(save_file_name, 'w+b') as f:
+                        f.write(r1)
+                        f.close()
+                    #log.info(f"Downloaded website logo for website {ws.id} - {ws.name}")
+                    rel_path = os.path.relpath(save_file_name, start="videos")
+                    as_uri = urllib.request.pathname2url(rel_path)
+                    actor.thumbnail = as_uri
+                    photo += " [ Photo ]"
+                    success = True
+                else:
+                    log.swarn(f"DOWNLOAD ERROR: Photo ({actor.name}): {img}")
+        if any([force, not actor.description, len(actor.description) < 128, "freeones" in actor.description.lower()]):
+            #print("no good desc")
+            if desc:
+                #print("chg desc")
+                if len(desc) > 72:
+                    actor.description = aux.strip_html(desc)
+                    changed = True
+                    success = True
+                    photo += " [ Description ]"
+        if pid:
+            #print("id")
+            if not actor.tpdb_id or force:
+                actor.tpdb_id = pid
+                photo += " [ TpDB ID ]"
+                changed = True
+                success = True
+
+        if success:
+            #print("yep, done")
+            actor.last_lookup = datetime.datetime.now()
+            actor.modified_date = datetime.datetime.now()
+            actor.save()
+            log.sinfo(f'Information about {actor.name} was successfully gathered from TpDB: {photo}.')
+
+        else:
+
+            save_path = os.path.join(Config().site_media_path, 'actor', str(actor.id), 'profile')
+            save_file_name = os.path.join(save_path, 'profile.jpg')
+
+            if not force and ((actor.tpdb_id == pid) and (len(actor.description) > 125) and (os.path.isfile(save_file_name))):
+                success = True
+                log.sinfo(f'Your installation has good details about {actor.name}. You can force this operation.')
+
+            elif force and ((actor.tpdb_id == pid) and (len(actor.description) > 125) and (os.path.isfile(save_file_name))):
+                success = True
+                log.sinfo(f'It seems that there is no better information about {actor.name} on TpDB.')
+        return success
+
+        #except:
+            #success = False
+            #log.swarn(f'There was an error downloading a photo for and/or getting information about {actor.name}!')
+            #return success
+
+    else:
+        log.swarn(f'It seems that TpDB might not know anything about {actor.name}!')
+        success = False
+        return success
+
+
+
+
+
+
 def scrape_all_actors(force):
     actors = Actor.objects.all()
 
@@ -395,6 +542,9 @@ def scrape_all_actors(force):
                 print("Searching in TMDb")
                 scraper_tmdb.search_person_with_force_flag(actor, False)
                 print("Finished TMDb search")
+                print("Searching TpDB...")
+                tpdb_scan_actor(actor, False)
+                print("Finished TpDB search")
                 print("Searching IMDB...")
                 scraper_imdb.search_imdb_with_force_flag(actor, False)
                 print("Finished IMDB Search")
@@ -409,6 +559,9 @@ def scrape_all_actors(force):
             print("Searching in TMDb")
             scraper_tmdb.search_person_with_force_flag(actor, True)
             print("Finished TMDb search")
+            print("Searching TpDB...")
+            tpdb_scan_actor(actor, True)
+            print("Finished TpDB search")
             print("Searching IMDB...")
             scraper_imdb.search_imdb_with_force_flag(actor, True)
             print("Finished IMDB Search")
@@ -531,6 +684,21 @@ class ScrapeActor(views.APIView):
             else:
                 return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
 
+        elif search_site == "TpDB":
+
+            actor_to_search = Actor.objects.get(pk=actor_id)
+            success = False
+            if force:
+                success = tpdb_scan_actor(actor_to_search, True)
+            else:
+                success = tpdb_scan_actor(actor_to_search, False)
+
+            if success:
+                return Response(status=200)
+
+            else:
+                return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+
         elif search_site == "Freeones":
 
             actor_to_search = Actor.objects.get(pk=actor_id)
@@ -568,6 +736,9 @@ class ScrapeActor(views.APIView):
 
             else:
                 return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+
+
+
 
 
 def permanently_delete_scene_and_remove_from_db(scene):

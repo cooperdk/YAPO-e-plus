@@ -83,8 +83,11 @@
                 <td colspan="2">
 
 
-                    <div class="alcenter">Scrape info from:<br>
-                        <p>
+                    <div class="alcenter">Scrape info from:&nbsp;&nbsp;&nbsp;<input type="checkbox" ng-model="$ctrl.forceScrape"
+                                   uib-popover-html="Force scrape all actors for new information.<br>
+                                   Only updates empty database values."
+                                   popover-trigger="mouseenter" popover-placement="top"> Force<br>
+                            <div class="divider"></div>
                             <button type="button" ng-click="$ctrl.scrapeActor('IMDB')" class="btn btn-default btn-sm">
                                 <span class="glyphicon glyphicon-plus"></span><small> IMDB</small>
                             </button>
@@ -93,15 +96,16 @@
                                 <span class="glyphicon glyphicon-plus"></span><small> TMDb</small>
                             </button>
 
+                            <button type="button" ng-click="$ctrl.scrapeActor('TpDB')" class="btn btn-default btn-sm">
+                                <span class="glyphicon glyphicon-plus"></span><small> TpDB (img + descr.)</small>
+                            </button>
+
                             <button type="button" ng-click="$ctrl.scrapeActor('Freeones')"
                                     class="btn btn-default btn-sm">
                                 <span class="glyphicon glyphicon-plus"></span><small> Freeones</small>
                             </button>
-                            <input type="checkbox" ng-model="$ctrl.forceScrape"
-                                   uib-popover-html="Force scrape all actors for new information.<br>
-                                   Only updates empty database values."
-                                   popover-trigger="mouseenter" popover-placement="top"> Force
-                        </p>
+
+
 
                     </div>
                     <detail-profile-image ng-if="$ctrl.updateImage" actor="$ctrl.actor"></detail-profile-image>

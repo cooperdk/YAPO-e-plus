@@ -6,7 +6,7 @@ import requests
 import json
 import django.db
 from datetime import datetime
-import pprint
+#import pprint
 import urllib
 import re
 from videos import aux_functions as aux
@@ -77,7 +77,7 @@ def tpdb (scene_id: int, force: bool):
         headers = {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'User-Agent': 'YAPO e+ 0.7',
+            'User-Agent': 'YAPO e+ 0.71',
         }
         print("Scanning... ",end="")
         response = requests.request('GET', url, headers=headers, params=params)
@@ -120,7 +120,7 @@ def tpdb (scene_id: int, force: bool):
             headers = {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
-                'User-Agent': 'YAPO e+ 0.7',
+                'User-Agent': 'YAPO e+ 0.71',
             }
             response = requests.request('GET', url, headers=headers, params=params)
             try:
@@ -299,6 +299,22 @@ def tpdb (scene_id: int, force: bool):
                                     act.save()
                                     actoradded = True
                                     aux.addactor(current_scene, act)
+                                    if actor.thumbnail == Constants().unknown_person_image_path:
+                                        # print(f"No image, downloading ({img}) - ", end="")
+                                        save_path = os.path.join(Config().site_media_path, 'actor', str(actor.id),
+                                                                 'profile')
+                                        # print("Profile pic path: " + save_path)
+                                        save_file_name = os.path.join(save_path, 'profile.jpg')
+                                        if img and not os.path.isfile(save_file_name):
+                                            if not os.path.exists(save_path):
+                                                os.makedirs(save_path)
+                                                if aux.download_image(img, save_file_name):
+                                                    rel_path = os.path.relpath(save_file_name, start="videos")
+                                                    as_uri = urllib.request.pathname2url(rel_path)
+                                                    actor.thumbnail = as_uri
+                                                    print(f"  --> DOWNLOADED PHOTO")
+                                                else:
+                                                    log.swarn(f"DOWNLOAD ERROR: Photo ({actor.name}): {img}")
                                     log.sinfo(f"  --> ACTOR ADDED TO SCENE: {keyname}")
                                 except:
                                     log.error(f'Couldn\'t add {keyname} - possibly exists already even though she didn\'t turn up...')

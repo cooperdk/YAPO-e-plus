@@ -13,7 +13,6 @@ from configuration import Config
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 
-
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 

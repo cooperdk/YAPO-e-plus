@@ -87,6 +87,7 @@ class Actor(models.Model):
     gender = models.CharField(max_length=15, choices=GENDER_CHOICES, blank=True)
     imdb_id = models.CharField(max_length=25, null=True, blank=True)
     tmdb_id = models.CharField(max_length=25, null=True, blank=True)
+    tpdb_id = models.CharField(null=True, default="", max_length=48, blank=True)
     official_pages = models.TextField(default="", blank=True)
     actor_tags = models.ManyToManyField(
         ActorTag, blank=True, related_name="actors" # null=True, 
