@@ -1,28 +1,29 @@
 import os
 import sys
-import re
-import urllib.request
 from videos.models import *
 from configuration import Config, Constants
 #from dateutil.parser import parse
 import datetime
-import urllib3
-import requests.packages.urllib3
 import urllib.request
 from urllib.request import Request, urlopen
 from urllib.request import URLError, HTTPError
 from urllib.parse import quote
 import http.client
 from http.client import IncompleteRead, BadStatusLine
+http.client._MAXHEADERS = 1000
+from http.client import IncompleteRead, BadStatusLine
+import argparse
 import ssl
-
+import datetime
+import json
+import re
 http.client._MAXHEADERS = 1000
 import socket
 import shutil
 from lxml import html
 from utils.printing import Logger
 log = Logger()
-urllib3.disable_warnings()
+
 
 def progress (count: int, total: int, suffix=''):
     bar_len = 42
@@ -254,18 +255,18 @@ def save_website_logo (image_link, website, force, *args):
         ws = Website.objects.filter(name=website)
 
         if ws:
-            #print("Found 1")
+            #print("Found the website locally")
             ws = Website.objects.get(name=website)
             website = ws.name
         if not ws:
-            print("Method unsuccesful, trying method 2...")
+            #print("Method unsuccesful, trying method 2...")
             ws = Website.objects.filter(name__iexact=website.replace(" ",""))
             if ws:
                 #print("Found 2")
                 ws = Website.objects.get(name__iexact=website.replace(" ",""))
                 website = ws.name
         if not ws and Config().tpdb_websites:
-            #print("Adding site")
+            print(f"Adding website: {website}")
             for arg in args:
                 hasarg += 1
                 sceneid = arg
@@ -292,11 +293,11 @@ def save_website_logo (image_link, website, force, *args):
 
     if image_link:
         if image_link.lower() == "null" or image_link == "":
-            print(f"TpDB has no logo registered for {website}.")
+            print(f"No logo URL available for {website}.")
             success = False
             return
     else:
-        print(f"TpDB has no logo registered for {website}.")
+        print(f"No logo URL available for {website}.")
         success = False
         return
 
@@ -310,6 +311,7 @@ def save_website_logo (image_link, website, force, *args):
 
     ws = Website.objects.get(name=website)
     save_path = os.path.join(Config().site_media_path, "websites", str(ws.id))
+    #print("Save path: " + save_path)
     if not os.path.exists(save_path):
         os.makedirs(save_path)
         print(f"Created website directory: {save_path}")
@@ -319,19 +321,25 @@ def save_website_logo (image_link, website, force, *args):
         print("Error in logo filename!")
         success = False
         return
+
     save_file_name = os.path.join(save_path, "logo" + ext)
     if (not os.path.isfile(save_file_name) and Config().tpdb_website_logos) or force:
 
-        if not os.path.exists(save_path):
-            os.makedirs(save_path)
-            if download_image(img, save_file_name):
-                rel_path = os.path.relpath(save_file_name, start="videos")
-                as_uri = urllib.request.pathname2url(rel_path)
-                ws.thumbnail = as_uri
-                ws.save()
-                success = True
-            else:
-                log.swarn(f"DOWNLOAD ERROR: Photo ({actor.name}): {img}")
+        #print("Saving to " + save_file_name)
+
+        if download_image(image_link, save_file_name):
+            ws = Website.objects.get(name=website)
+            print("OK")
+            rel_path = os.path.relpath(save_file_name, start="videos")
+            as_uri = urllib.request.pathname2url(rel_path)
+            ws.thumbnail = as_uri
+            print(f"Saved {as_uri} to DB ({rel_path})")
+            ws.modified_date = datetime.datetime.now()
+            ws.save()
+            success = True
+
+        else:
+            log.swarn(f"DOWNLOAD ERROR: Logo: ({ws.name}): {image_link}")
 
 
     else:
@@ -483,49 +491,49 @@ def download_image (image_url, path):
 
         except UnicodeEncodeError as e:
             download_status = 'fail'
-            download_message = f"UnicodeEncodeError on an image...trying next one... Error: {e}"
+            log.info(f"UnicodeEncodeError on an image...trying next one... Error: {e}")
             return_image_name = ''
             absolute_path = ''
 
         except URLError as e:
             download_status = 'fail'
-            download_message = f"URLError on an image...trying next one... Error: {e}"
+            log.info(f"URLError on an image...trying next one... Error: {e}")
             return_image_name = ''
             absolute_path = ''
 
         except BadStatusLine as e:
             download_status = 'fail'
-            download_message = f"BadStatusLine on an image...trying next one... Error: {e}"
+            log.info(f"BadStatusLine on an image...trying next one... Error: {e}")
             return_image_name = ''
             absolute_path = ''
 
     except HTTPError as e:  # If there is any HTTPError
         download_status = 'fail'
-        download_message = f"HTTPError on an image...trying next one... Error: {e}"
+        log.info(f"HTTPError on an image...trying next one... Error: {e}")
         return_image_name = ''
         absolute_path = ''
 
     except URLError as e:
         download_status = 'fail'
-        download_message = f"URLError on an image...trying next one... Error: {e}"
+        log.info(f"URLError on an image...trying next one... Error: {e}")
         return_image_name = ''
         absolute_path = ''
 
     except ssl.CertificateError as e:
         download_status = 'fail'
-        download_message = f"CertificateError on an image...trying next one... Error: {e}"
+        log.info(f"CertificateError on an image...trying next one... Error: {e}")
         return_image_name = ''
         absolute_path = ''
 
     except IOError as e:  # If there is any IOError
         download_status = 'fail'
-        download_message = f"IOError on an image...trying next one... Error: {e}"
+        log.info(f"IOError on an image...trying next one... Error: {e}")
         return_image_name = ''
         absolute_path = ''
 
     except IncompleteRead as e:
         download_status = 'fail'
-        download_message = f"IncompleteReadError on an image...trying next one... Error: {e}"
+        log.info(f"IncompleteReadError on an image...trying next one... Error: {e}")
         return_image_name = ''
         absolute_path = ''
 

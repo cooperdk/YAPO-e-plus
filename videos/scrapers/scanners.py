@@ -22,7 +22,7 @@ from utils import titleparser as tp
 import videos.scrapers.freeones as scraper_freeones
 import videos.scrapers.tmdb as scraper_tmdb
 django.setup()
-from configuration import Config
+from configuration import Config, Constants
 #import urllib.request
 from utils.printing import Logger
 log = Logger()
@@ -184,11 +184,14 @@ def tpdb (scene_id: int, force: bool):
             perflist = ""
             ite = 0
             perf = ""
+
             for performer in response['data'][0]['performers']:
                 perf = namecheck(performer['name'])
                 perforiginal = performer['name']
                 perpn = ""
                 keyname = ""
+                primary = 0
+                secondary = 0
                 ite += 1
                 #pp = pprint.PrettyPrinter(indent=4)
                 #pp.pprint(performer)
@@ -199,7 +202,7 @@ def tpdb (scene_id: int, force: bool):
                         performer_extras = performer['parent']['extras']
                         # print(performer_extras['gender'])
                         keyname = ""
-                        actoradded = ""
+                        actoradded = False
                         sp = ""
                         if performer_extras['gender'] is not None and "f" in performer_extras['gender'].lower():
                             print(f"  --> TpDB PERFORMER -> Checking #{ite} ({perf})...")
@@ -280,57 +283,61 @@ def tpdb (scene_id: int, force: bool):
                                 perpn = namecheck(perpn)
                                 secondary = 2
                                 #print ("perpn sec " + perpn + " sp lwr " + sp)
-                                if sp.lower() == perpn.lower():
+                                keyname = perpn
+                                print(f"  --> SM 2: TpDB REPLACED {performer['name']} -> {keyname} is keyname")
 
-                                    print(f"  --> SM 2: TpDB REPLACED {performer['name']} -> {keyname} is keyname")
-                                    break
 
-                            #print("keyname " + keyname)
+                                #print("keyname " + keyname)
                             if performer['parent']['name'] and not keyname:
                                 perpn = performer['parent']['name']
                                 perpn = namecheck(perpn)
                                 #print("perpn thd " + perpn + " sp lwr " + sp)
-                                if sp.lower() == perpn.lower():
+                                keyname = perpn
+                                secondary = 3
+                                print(f"  --> SM 3: {keyname} is keyname")
 
-                                    secondary = 3
-                                    print(f"  --> SM 3: {keyname} is keyname")
-                                    break
 
                             #print("keyname " + keyname + " - perf name " + perpn)
-                            if (Config().tpdb_actors) and (perpn):
+                            if (Config().tpdb_actors) and (perpn) and (keyname) and (primary == 0):
                                 # If an actor is found on TpDB, but doesn't exist in YAPO
                                 log.info(f"Auto-adding a new actor: {perpn}")
-                                try:
-                                    act = Actor()
-                                    act.name = perpn
-                                    act.date_added = datetime.now()
-                                    act.save()
-                                    actoradded = True
-                                    aux.addactor(current_scene, act)
-                                    if actor.thumbnail == Constants().unknown_person_image_path:
-                                        # print(f"No image, downloading ({img}) - ", end="")
-                                        save_path = os.path.join(Config().site_media_path, 'actor', str(actor.id),
-                                                                 'profile')
-                                        # print("Profile pic path: " + save_path)
-                                        save_file_name = os.path.join(save_path, 'profile.jpg')
-                                        if img and not os.path.isfile(save_file_name):
-                                            if not os.path.exists(save_path):
-                                                os.makedirs(save_path)
-                                                if aux.download_image(img, save_file_name):
-                                                    rel_path = os.path.relpath(save_file_name, start="videos")
-                                                    as_uri = urllib.request.pathname2url(rel_path)
-                                                    actor.thumbnail = as_uri
-                                                    print(f"  --> DOWNLOADED PHOTO")
-                                                else:
-                                                    log.swarn(f"DOWNLOAD ERROR: Photo ({actor.name}): {img}")
-                                    log.sinfo(f"  --> ACTOR ADDED TO SCENE: {keyname}")
-                                except:
-                                    log.error(f'Couldn\'t add {keyname} - possibly exists already even though she didn\'t turn up...')
-                                    break
-                            elif Config().tpdb_actors == True:
-                                log.info(f"We could add the actor {keyname}, but auto-adding is disabled")
+                                #try:
+                                if 'image' in performer.keys() and secondary == 2:
+                                    print(f"Perf img check: {performer.keys()}")
+                                    img = performer['image']
+                                elif 'image' in performer['parent'].keys() and secondary == 3:
+                                    print(f"Perf img check: {performer['parent'].keys()}")
+                                    img = performer['parent']['image']
+                                act = Actor()
+                                act.name = perpn
+                                act.date_added = datetime.now()
+                                act.thumbnail = Constants().unknown_person_image_path
+                                act.save()
+                                actoradded = True
+                                aux.addactor(current_scene, act)
+                                if act.thumbnail == Constants().unknown_person_image_path:
+                                    # print(f"No image, downloading ({img}) - ", end="")
+                                    save_path = os.path.join(Config().site_media_path, 'actor', str(act.id),
+                                                             'profile')
+                                    # print("Profile pic path: " + save_path)
+                                    save_file_name = os.path.join(save_path, 'profile.jpg')
+                                    if img and not os.path.isfile(save_file_name):
+                                        if not os.path.exists(save_path):
+                                            os.makedirs(save_path)
+                                        aux.download_image(img, save_file_name)
+                                        rel_path = os.path.relpath(save_file_name, start="videos")
+                                        as_uri = urllib.request.pathname2url(rel_path)
+                                        act.thumbnail = as_uri
+                                        act.save()
 
-                            if (actoradded) and (perpn) and (not keyname):
+                                log.sinfo(f"  --> ACTOR CREATED AND ADDED TO SCENE: {act.name}")
+                                #except:
+                                    #log.error(f'Couldn\'t add {perpn} - possibly exists already even though she didn\'t turn up...')
+                                    #break
+                            elif Config().tpdb_actors == False:
+                                log.info(f"We could add the actor {act.name}, but auto-adding is disabled")
+
+                            if (actoradded) and (perpn):
                                 log.sinfo(f"Scraping additional info about {act.name}...")
                                 success = scraper_tmdb.search_person_with_force_flag(
                                     act, True)
@@ -437,8 +444,8 @@ def tpdb (scene_id: int, force: bool):
                                             #    remtag = actor.actor_tags.filter(name__contains=" hair").values('id')[0]['id']
                                             #    print(f"TO REMOVE --> {remtag}")
                                             #    actor.actor_tags.remove(remtag)
-                                            insert_actor_tag(actor, hair + " hair")
-                                            print(f"Added tag: {hair} hair")
+                                            insert_actor_tag(actor, hair + " hair".capitalize())
+                                            print(f"Added tag: {hair.capitalize()} hair")
                                             added = True
 
 
@@ -490,7 +497,7 @@ def tpdb (scene_id: int, force: bool):
                 current_scene.name = newtitle
                 log.sinfo(f'Scene name is now \"{newtitle}\".')
             else:
-                print('"Renaming is disabled, but we suggest "{newtitle}".')
+                print('Renaming is disabled, but we suggest: \"{newtitle}\".')
 
             current_scene.save()
             success = True
@@ -556,7 +563,7 @@ def tpdb (scene_id: int, force: bool):
         except:
             website = "none"
         if not current_scene.websites.filter(name=site):
-            if website is not "none":
+            if website != "none":
                 log.sinfo(f"Adding website: {website.name} to the scene {current_scene.name}")
                 current_scene.websites.add(website)
             else:

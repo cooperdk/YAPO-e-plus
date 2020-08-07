@@ -18,9 +18,10 @@ djangorestframework==3.11.0
 dload>=0.6
 future>=0.18.2
 html5lib>=1.0.1
-idna>=2.7
+idna==2.5
 importlib-metadata==1.7.0
 Jinja2==2.11.2
+lxml>=4.5.2
 MarkupSafe==1.1.1
 numpy>=1.14.4
 parsedatetime>=2.6
@@ -34,7 +35,7 @@ pytz>=2020.1
 pywin32>=227; platform_system == "Windows"
 pywin32-ctypes>=0.2.0; platform_system == "Windows"
 PyYAML~=5.3.1
-requests==2.20.0
+requests==2.21
 selenium>=3.141.0
 six>=1.15.0
 soupsieve>=2.0.1
@@ -43,7 +44,7 @@ static-ranges>=0.2.0
 static3>=0.7.0
 texttable>=1.6.2
 tmdbsimple==2.2.0
-urllib3>=1.24.3
+urllib3~=1.21.1
 waitress==1.4.4
 webencodings>=0.5.1
 zipp>=3.1.0

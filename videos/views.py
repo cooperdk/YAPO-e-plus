@@ -23,7 +23,7 @@ from wsgiref.util import FileWrapper
 from django.http import StreamingHttpResponse
 import mimetypes
 from datetime import timedelta
-
+import videos.aux_functions as aux
 
 # For REST framework
 
@@ -348,7 +348,7 @@ def populate_websites(force):
             tsurl = tpdb['url']
             tslogo = tpdb['logo']
 
-            print (f"Site: {site.name} - {tsn}                    \r", end="")
+            #print (f"Site: {site.name} - {tsn}                    \r", end="")
 
             if site.name == tsn:
                 found = True
@@ -377,6 +377,7 @@ def populate_websites(force):
                     if not site.tpdb_id:
                         site.tpdb_id = int(tsid)
 
+                    aux.save_website_logo(tslogo, site.name, force)
 
                     site.save()
                 except:
@@ -384,8 +385,8 @@ def populate_websites(force):
                         f'Attempting to rename {oldname} to {newname} resulted in an error. New name probably already exists!')
                     break
                 print("\n")
-                aux.save_website_logo(tslogo, site.name, force)
-                break
+
+
 
     print("Done.")
 
@@ -395,7 +396,7 @@ def populate_websites(force):
 
 def tpdb_scan_actor(actor, force: bool):
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-    import videos.aux_functions as aux
+
     photo = actor.thumbnail
     desc = actor.description
     url = 'https://metadataapi.net/api/performers'
@@ -439,12 +440,12 @@ def tpdb_scan_actor(actor, force: bool):
         if 'bio' in response['data'][0].keys():
             desc = response['data'][0]['bio']
             #print("d")
-        if actor.thumbnail == Constants().unknown_person_image_path:
+        if actor.thumbnail == Constants().unknown_person_image_path or force:
             #print(f"No image, downloading ({img}) - ", end="")
             save_path = os.path.join(Config().site_media_path, 'actor', str(actor.id), 'profile')
             # print("Profile pic path: " + save_path)
             save_file_name = os.path.join(save_path, 'profile.jpg')
-            if img and not os.path.isfile(save_file_name):
+            if img and (not os.path.isfile(save_file_name) or force):
                 if not os.path.exists(save_path):
                     os.makedirs(save_path)
                 maxretries = 3
@@ -459,32 +460,7 @@ def tpdb_scan_actor(actor, force: bool):
                     success = True
                 else:
                     log.swarn(f"DOWNLOAD ERROR: Photo ({actor.name}): {img}")
-                #user_agent = { 'user-agent': 'YAPO e+ 0.7' }
-                #http = urllib3.PoolManager(10, headers=user_agent) # , cert_reqs='CERT_REQUIRED', ca_certs=certifi.where()
-                #r1 = http.urlopen('GET', img)
-                #if r1.status == 200:
-                    # if os.path.exists(save_file_name):
-                    #    os.remove(save_file_name)
 
-            # urllib.request.urlretrieve(image_link, save_file_name)
-            #except:
-                #attempt += 1
-                #dlerror = 1
-            #else:
-                #dlerror = 0
-                        #break
-                if dlerror == 0:
-                    with open(save_file_name, 'w+b') as f:
-                        f.write(r1)
-                        f.close()
-                    #log.info(f"Downloaded website logo for website {ws.id} - {ws.name}")
-                    rel_path = os.path.relpath(save_file_name, start="videos")
-                    as_uri = urllib.request.pathname2url(rel_path)
-                    actor.thumbnail = as_uri
-                    photo += " [ Photo ]"
-                    success = True
-                else:
-                    log.swarn(f"DOWNLOAD ERROR: Photo ({actor.name}): {img}")
         if any([force, not actor.description, len(actor.description) < 128, "freeones" in actor.description.lower()]):
             #print("no good desc")
             if desc:

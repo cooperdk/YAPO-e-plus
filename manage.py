@@ -45,7 +45,7 @@ if __name__ == "__main__":
     #print(sys.argv)
     if not any(["migrate" in sys.argv, "makemigrations" in sys.argv, "loaddata" in sys.argv,
                 "dumpdata" in sys.argv, "shell" in sys.argv, "dumpscript" in sys.argv, "sql" in sys.argv,
-                "showmigrations" in sys.argv, "runserver" in sys.argv]):
+                "showmigrations" in sys.argv, "runserver" in sys.argv, "clean_pyc" in sys.argv]):
 
         execute_from_command_line([SCRIPT_ROOT, 'runserver', Config().yapo_url, '--noreload'])
     else:
