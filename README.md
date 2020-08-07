@@ -138,31 +138,35 @@ If something is not working, it is generally enough to make sure all dependencie
    If you have configured an IP and port in settings, YAPO will start in a new browser tab.
    If you want to avoid this, set the IP/port to "no" or something similar.
 
-    1. If you get this error when you're done:
-        ```bash
-        You are trying to add a non-nullable field **'date_added'** to folder without a default; we can't do that (the database needs  something to populate existing rows).
-        ```
+1. **Runtime issues and installation problems**
+
+    **If you get this error when you're done:**
+    ```bash
+    You are trying to add a non-nullable field **'date_added'** to folder without a default; we can't do that (the database needs  something to populate existing rows).
+    ```
        
-        When asked to select a fix, select option 1 and type in `datetime.datetime.now()` and press enter.
+    When asked to select a fix, select option 1 and type in `datetime.datetime.now()` and press enter.
+   
+    If you need more help installing the software, first look towards the end of this document, there's a section named "Installation".
+    Only if you really have difficulties, register an issue on Github. I will offer installation help, by mail or through Teamviewer, for a coffee donation.
+        
+    **If you get errors other that those in part 3 above, try to do**
+        
+    `python manage.py migrate --fake`
        
-        If you need more help installing the software, first look towards the end of this document, there's a section named "Installation".
-        Only if you really have difficulties, register an issue on Github. I will offer installation help, by mail or through Teamviewer, for a coffee donation.
+    (or replace fake with fake-initial if you don't have a db.sqlite3 database file in your main YAPO e+ folder)
         
-        If you get errors other that those in part 3 above, try to do
+    You can also secure your database with the command:
         
-        `python manage.py migrate --fake`
+    `python manage.py dumpdata --indent=4 > database.json`
         
-        (or replace fake with fake-initial if you don't have a db.sqlite3 database file in your main YAPO e+ folder)
+    Which will export your database tables to json format. You can then import it after executing step 1 and 2 above to generate a new database with the command:
         
-        You can also secure your database with the command:
+    `python manage.py loaddata database.json --ignorenonexistent`
         
-        `python manage.py dumpdata --indent=4 > database.json`
-        
-        Which will export your database tables to json format. You can then import it after executing step 1 and 2 above to generate a new database with the command:
-        
-        `python manage.py loaddata database.json --ignorenonexistent`
-        
-        If you have any issues with this, I will fix your database for a small donation. There are sometimes problems due to Django's way of updating databases. Typically, it is due to primary keys in built-in tables.
+    If you have any issues with this, I will fix your database for a small donation. There are sometimes problems due to Django's way of updating databases. Typically, it is due to primary keys in built-in tables.
+
+
 
 **Running YAPO in a Docker environment**
 
