@@ -124,16 +124,16 @@ If something is not working, it is generally enough to make sure all dependencie
         
         This will actually make the adjustments to the database it took note of in the previous step.
         
-    1. You can now start YAPO.
+1. You can now start YAPO.
     
-       ```python manage.py```
-       if you have configured a hostname/IP and port in settings.yml (or in the Settings tab in the UI), or
+   `python manage.py`
+   if you have configured a hostname/IP and port in settings.yml (or in the Settings tab in the UI), or
        
-       ```python manage.py runserver <ip>:<port> --noreload```
-       if you wish to have control over the IP and port you want outside of the configuration settings.
-       
-       If you have configured an IP and port in settings, YAPO will start in a new browser tab.
-       If you want to avoid this, set the IP/port to "no" or something similar.
+   `python manage.py runserver <ip>:<port> --noreload`
+   if you wish to have control over the IP and port you want outside of the configuration settings.
+      
+   If you have configured an IP and port in settings, YAPO will start in a new browser tab.
+   If you want to avoid this, set the IP/port to "no" or something similar.
 
     1. If you get this error when you're done:
         ```bash
