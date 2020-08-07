@@ -6,6 +6,7 @@ from utils.printing import Logger
 from datetime import datetime
 import videos.const
 import shutil
+import colorama
 log = Logger()
 
 # Quick-start development settings - unsuitable for production
@@ -43,15 +44,26 @@ if not 'migrat' in str(sys.argv[1:]): # Check if the user runs migration. Don't 
     src = Config().root_path
     dest = os.path.join(Config().database_dir)
     okmoved = True
+
+    try:
+        if sys.frozen or sys.importers:
+            compiled = True
+    except AttributeError:
+        compiled = False
+
     if not os.path.isfile(os.path.join(src, "db.sqlite3")) and not os.path.isfile(os.path.join(dest, "db.sqlite3")):
         print("\n")
         log.error("No database")
         print(f"There is no database installed at: {os.path.join(dest, 'db.sqlite3')}")
         print(
             "Please run the below commands from your YAPO main directory to create the database,\nor place your database at the above location.\n\nConsult the guide or website for help.")
-        print("\nCODE TO RUN:")
-        print("python manage.py makemigrations")
-        print("python manage.py migrate\n")
+        print("\nCOMMAND(S) TO RUN:\n")
+        if not compiled:
+            print("python manage.py makemigrations")
+            print("python manage.py migrate\n")
+        else:
+            print("migrate.exe\n")
+            print("(Follow the directions displayed)")
         input("\nPress enter to exit YAPO and take care of the above. >")
         sys.exit()
 

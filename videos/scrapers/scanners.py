@@ -8,6 +8,14 @@ import django.db
 from datetime import datetime
 #import pprint
 import urllib
+import urllib.request
+from urllib.request import Request, urlopen
+from urllib.request import URLError, HTTPError
+from urllib.parse import quote
+import http.client
+from http.client import IncompleteRead, BadStatusLine
+
+http.client._MAXHEADERS = 1000
 import re
 from videos import aux_functions as aux
 from utils import titleparser as tp

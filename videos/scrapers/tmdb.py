@@ -8,6 +8,7 @@ import urllib.request as urllib
 import videos.const as const
 import videos.aux_functions as aux
 from django.utils import timezone
+from utils import Constants
 django.setup()
 
 from videos.models import Actor, ActorAlias
@@ -21,7 +22,7 @@ MEDIA_PATH = os.path.join('videos', 'media')
 
 def search_person(actor_in_question, alias, force):
     sucesss = False
-    print(f"Looking for: {actor_in_question.name}                                                           \r",end="")
+    print(f"\033[KLooking for: {actor_in_question.name}\r",end="")
     search = tmdb.Search()
     # response = search.person(query="Harmony Rose", include_adult='true')
     if not alias:
@@ -41,39 +42,39 @@ def search_person(actor_in_question, alias, force):
                 actor_in_question.save()
             person = tmdb.People(str(s['id']))
             person_info = person.info()
-### This is just for image downloading.
+            ### This is just for image downloading.
             if person_info['profile_path'] is not None:
                 picture_link = f"https://image.tmdb.org/t/p/original/{person_info['profile_path']}"
                 if aux.url_is_alive(picture_link):
-                    #if actor_in_question.thumbnail == const.UNKNOWN_PERSON_IMAGE_PATH or force:
-                    print(f"Trying to get image from TMDB: {picture_link}\r",end="")
-                    if aux.url_is_alive(picture_link):
-                        aux.save_actor_profile_image_from_web(picture_link,actor_in_question,force)
-                    else:
-                        print("Seems as there's no photo at this link.\r",end="")
+                    if actor_in_question.thumbnail == Constants().unknown_person_image_path or force:
+                        print(f"\033[KTrying to get image from TMDB: {picture_link}\r",end="")
+                        if aux.url_is_alive(picture_link):
+                            aux.save_actor_profile_image_from_web(picture_link,actor_in_question,force)
+                        else:
+                            print("\033[KSeems as there's no photo at this link.\r",end="")
 
 
             person_aka = person_info['also_known_as']
             if person_info['biography'] is not None:
                 if not (actor_in_question.description) or (len(actor_in_question.description)<48):
                     actor_in_question.description = person_info['biography']
-                print("There's no description or it's too short, so added it from TMDB.\r",end="")
+                print("\033[KThere's no description or it's too short, so added it from TMDB.\r",end="")
             else:
                 actor_in_question.description = ""
             if not person_info['birthday'] == "":
                 actor_in_question.date_of_birth = person_info['birthday']
-                print(f"Added Birthday to: {actor_in_question.name}")
+                print(f"\033[KAdded Birthday to: {actor_in_question.name}", end="")
             if not actor_in_question.gender:
                 person_gender = person_info['gender']
                 if person_gender == 2:
                     actor_in_question.gender = 'M'
-                    print(f"Added Gender to: {actor_in_question.name}\r",end="")
+                    print(f"\033[KAdded Gender to: {actor_in_question.name}\r",end="")
                 elif person_gender == 1:
                     actor_in_question.gender = 'F'
-                    print(f"Added Gender to: {actor_in_question.name}\r",end="")
+                    print(f"\033[KAdded Gender to: {actor_in_question.name}\r",end="")
             if person_info['homepage']:
                 actor_in_question.official_pages = person_info['homepage']
-                print(f"Added Homepage to: {actor_in_question.name}\r",end="")
+                print(f"\033[KAdded Homepage to: {actor_in_question.name}\r",end="")
 
                 actor_in_question.tmdb_id = person_info['id']
                 actor_in_question.imdb_id = person_info['imdb_id']
@@ -81,11 +82,12 @@ def search_person(actor_in_question, alias, force):
             if actor_in_question.thumbnail == const.UNKNOWN_PERSON_IMAGE_PATH or force:
                 if person_info['profile_path'] is not None:
                     picture_link = f"https://image.tmdb.org/t/p/original/{person_info['profile_path']}"
-                    print(f"Trying to get image from TMDB: {picture_link}\r",end="")
+                    print(f"\033[KTrying to get image from TMDB: {picture_link}\r",end="")
                     if aux.url_is_alive(picture_link):
                         aux.save_actor_profile_image_from_web(picture_link,actor_in_question,force)
+
                     else:
-                        print("Seems as there's no photo at this link.\r",end="")
+                        print("\033[KSeems as there's no photo at this link.\r",end="")
             for aka in person_aka:
                 aka = aka.lstrip()
                 aka = aka.rstrip()
@@ -106,7 +108,7 @@ def search_person(actor_in_question, alias, force):
             break
 
     if not sucesss:
-        print (f"Actor: {actor_in_question.name} could not be found on TMDb\r")
+        print (f"\033[KActor: {actor_in_question.name} could not be found on TMDb\r")
     return sucesss
 
 
@@ -121,12 +123,12 @@ def search_alias(actor_in_question, alias, force):
 
 def search_person_with_force_flag(actor_in_question, force):
     success = False
-    print(f"Looking for: {actor_in_question.name}\r",end="")
+    print(f"\033[KLooking for: {actor_in_question.name}\r",end="")
     if force:
-        print("Force flag is true, ignoring last lookup")
+        print("\033[KForce flag is true, ignoring last lookup")
         success = search_person(actor_in_question, None, force)
     elif not actor_in_question.last_lookup:
-        print(f"Actor: {actor_in_question.name} was not yet searched... Searching now!\r",end="")
+        print(f"\033[KActor: {actor_in_question.name} was not yet searched... Searching now!\r",end="")
         success = search_person(actor_in_question, None, force)
 
     return success

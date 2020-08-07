@@ -54,6 +54,14 @@ from django.db import connection
 from utils.printing import Logger
 log = Logger()
 import urllib3
+import urllib.request
+from urllib.request import Request, urlopen
+from urllib.request import URLError, HTTPError
+from urllib.parse import quote
+import http.client
+from http.client import IncompleteRead, BadStatusLine
+
+http.client._MAXHEADERS = 1000
 
 def get_scenes_in_folder_recursive(folder, scene_list):
     scenes = list(folder.scenes.all())

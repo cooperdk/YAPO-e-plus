@@ -8,6 +8,15 @@ from configuration import Config, Constants
 import datetime
 import urllib3
 import requests.packages.urllib3
+import urllib.request
+from urllib.request import Request, urlopen
+from urllib.request import URLError, HTTPError
+from urllib.parse import quote
+import http.client
+from http.client import IncompleteRead, BadStatusLine
+import ssl
+
+http.client._MAXHEADERS = 1000
 import socket
 import shutil
 from lxml import html
@@ -450,10 +459,7 @@ def download_image (image_url, path):
             "User-Agent": "YAPO e+ 0.71" })
         try:
             # timeout time to download an image
-            if socket_timeout:
-                timeout = float(socket_timeout)
-            else:
-                timeout = 10
+            timeout = 10
 
             response = urlopen(req, None, timeout)
             data = response.read()
@@ -470,6 +476,7 @@ def download_image (image_url, path):
                 absolute_path = ''
 
             # return image name back to calling method to use it for thumbnail downloads
+            log.sinfo(f'Image "{image_url}" downloaded to {path}')
             download_status = True
 
 
