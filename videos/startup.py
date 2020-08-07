@@ -286,12 +286,12 @@ class ready:
     #startup_sequence()
 
     try:
-        if not 'migrat' in str(sys.argv[1:]):
+        if not 'migrat' in str(sys.argv):
             print("Not in migration mode. Executing startup sequence...")
             time.sleep(2)
             startup_sequence()
         else:
-            log.info(f'User entered migration mode with the "{sys.argv[1]}" command.')
+            log.info(f'User entered migration mode.')
             print("\n")
     except:
         log.warn("An error occured while testing if the user is in migration mode or not.")
