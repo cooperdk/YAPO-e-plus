@@ -6,7 +6,6 @@ from configuration import Config
 #os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 
 import platform
-import sys
 import YAPO.settings
 #import settings
 from configuration import Config
@@ -20,7 +19,6 @@ def get_main_dir():
    if main_is_frozen():
        return os.path.dirname(sys.executable)
    return os.path.dirname(os.path.realpath(__file__))
-
 
 
 if __name__ == "__main__":

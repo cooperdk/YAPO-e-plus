@@ -38,9 +38,10 @@ else:
         }
     }
 
+
 # First of all, check if the db is located in the old folder (root)
 
-if not 'migrat' in str(sys.argv[1:]): # Check if the user runs migration. Don't execute this if that's the case.
+if not 'migrat' or "passcheck" in str(sys.argv[1:]): # Check if the user runs migration. Don't execute this if that's the case.
     src = Config().root_path
     dest = os.path.join(Config().database_dir)
     okmoved = True
@@ -53,7 +54,7 @@ if not 'migrat' in str(sys.argv[1:]): # Check if the user runs migration. Don't 
 
     if not os.path.isfile(os.path.join(src, "db.sqlite3")) and not os.path.isfile(os.path.join(dest, "db.sqlite3")):
         print("\n")
-        log.error("No database")
+        print("No database")
         print(f"There is no database installed at: {os.path.join(dest, 'db.sqlite3')}")
         print(
             "Please run the below commands from your YAPO main directory to create the database,\nor place your database at the above location.\n\nConsult the guide or website for help.")
@@ -73,13 +74,13 @@ if not 'migrat' in str(sys.argv[1:]): # Check if the user runs migration. Don't 
                 shutil.move(src, dest)
                 okmoved = True
             except:
-                log.error("Error moving the database")
+                print("Error moving the database")
                 print("There was an error moving the database to it's new location:")
                 print(f"{src} -> {dest}")
                 input("Please check the source and destination. Press enter to exit YAPO. >")
                 sys.exit()
         else:
-            log.error("Databases at two locations")
+            print("Databases at two locations")
             print(f"There is a database file at both the below listed locations. You need to delete the one")
             print("you don't wish to use and make sure the other is in the listed destination directory.")
             print("This is a check because we have moved the database to a subdirectory.")
@@ -89,7 +90,9 @@ if not 'migrat' in str(sys.argv[1:]): # Check if the user runs migration. Don't 
             input("Press enter to exit YAPO, and start it again when the above is taken care of. >")
             sys.exit()
         if okmoved:
-            log.info(f"The database was moved to {dest}.")
+            print(f"The database was moved to {dest}.")
+
+
 
 
 # Application definition
