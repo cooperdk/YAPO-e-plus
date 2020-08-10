@@ -294,5 +294,4 @@ class ready:
             log.info(f'User entered migration mode.')
             print("\n")
     except:
-        log.warn("An error occured while testing if the user is in migration mode or not.")
-    pass
+        pass

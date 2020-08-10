@@ -466,6 +466,25 @@ def tpdb (scene_id: int, force: bool):
 
                             if added:
                                 log.sinfo(f"Some information about {actor.name} was added to the profile.")
+
+
+            if found:
+
+                try:
+                    website = Website.objects.get(name=site)
+                except:
+                    website = "none"
+                if not current_scene.websites.filter(name=site):
+                    if website != "none":
+                        log.sinfo(f"Adding website: {website.name} to the scene {current_scene.name}")
+                        current_scene.websites.add(website)
+                    else:
+                        log.warn(f"This website couldn't be found: {site}")
+                else:
+                    print("Website already registered to scene.")
+                if Config().tpdb_website_logos:
+                    aux.save_website_logo(site_logo, site, False, current_scene.id)
+
             newtitle = ""
             if title:
                 newtitle = title
@@ -522,6 +541,29 @@ def tpdb (scene_id: int, force: bool):
             except:
                 pass
 
+            try:
+                tg = SceneTag.objects.get(name="TpDB: Match: Good")
+                tq = SceneTag.objects.get(name="TpDB: Match: Questionable")
+                tn = SceneTag.objects.get(name="TpDB: Match: None")
+                current_scene.scene_tags.remove(tg)
+                current_scene.scene_tags.remove(tq)
+                current_scene.scene_tags.remove(tn)
+                current_scene.save()
+                # tpdbtag.  current_scene.scene_tags.remove(tpdbtag.id)
+            except:
+                pass
+            if found == 1:
+                insert_scene_tag(current_scene, "TpDB: Match: Good")
+            elif found == 2:
+                insert_scene_tag(current_scene, "TpDB: Match: Questionable")
+            elif success == False:
+                insert_scene_tag(current_scene, "TpDB: Match: None")
+
+            insert_scene_tag(current_scene, "TpDB: Scanned")
+            # print("Tagged the scene with a TpDB tag.")
+
+            return success
+
 
             log.sinfo(f"Found and registered data for scene ID {scene_id}")
         else:
@@ -530,50 +572,8 @@ def tpdb (scene_id: int, force: bool):
     except KeyError:
         success = False
         log.warn(f"Issue(s) occured: {sys.exc_info()}")
-        #pass
-
-
-
-    try:
-        tg=SceneTag.objects.get(name="TpDB: Match: Good")
-        tq=SceneTag.objects.get(name="TpDB: Match: Questionable")
-        tn=SceneTag.objects.get(name="TpDB: Match: None")
-        current_scene.scene_tags.remove(tg)
-        current_scene.scene_tags.remove(tq)
-        current_scene.scene_tags.remove(tn)
-        current_scene.save()
-            #tpdbtag.  current_scene.scene_tags.remove(tpdbtag.id)
-    except:
-        pass
-    if found == 1:
-            insert_scene_tag(current_scene, "TpDB: Match: Good")
-    elif found == 2:
-        insert_scene_tag(current_scene, "TpDB: Match: Questionable")
-    elif success == False:
-        insert_scene_tag(current_scene, "TpDB: Match: None")
-
-    insert_scene_tag(current_scene, "TpDB: Scanned")
-    #print("Tagged the scene with a TpDB tag.")
-
-
-    if found:
-
-        try:
-            website = Website.objects.get(name=site)
-        except:
-            website = "none"
-        if not current_scene.websites.filter(name=site):
-            if website != "none":
-                log.sinfo(f"Adding website: {website.name} to the scene {current_scene.name}")
-                current_scene.websites.add(website)
-            else:
-                log.warn(f"This website couldn't be found: {site}")
-        else:
-            print("Website already registered to scene.")
-        if Config().tpdb_website_logos:
-            aux.save_website_logo(site_logo, site, False, current_scene.id)
-
-            return success
+        return success
+        # pass
 
 
 def strip_bad_chars(name):
