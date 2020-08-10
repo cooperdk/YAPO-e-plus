@@ -44,7 +44,7 @@ static-ranges>=0.2.0
 static3>=0.7.0
 texttable>=1.6.2
 tmdbsimple==2.2.0
-urllib3~=1.21.1
+urllib3>=1.24.2
 waitress==1.4.4
 webencodings>=0.5.1
 zipp>=3.1.0
