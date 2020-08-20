@@ -50,7 +50,7 @@ def getSearchSiteName(siteID):
 
 def siteValues():
 
-    searchSites = [None] * 893
+    searchSites = [None] * 897
 
     searchSites[0] = ("BlackedRaw", "BlackedRaw", "https://www.blackedraw.com", "https://www.blackedraw.com/api")
     searchSites[1] = ("Blacked", "Blacked", "https://www.blacked.com", "https://www.blacked.com/api")
@@ -635,7 +635,7 @@ def siteValues():
     searchSites[583] = ("Latina Sex Tapes", "Latina Sex Tapes", "https://www.mofos.com", "https://site-api.project1service.com")
     searchSites[584] = ("Mano Job", "Mano Job", "https://www.finishesthejob.com", "https://www.finishesthejob.com/search?search=")
     searchSites[585] = ("The Dick Suckers", "The Dick Suckers", "https://www.finishesthejob.com", "https://www.finishesthejob.com/search?search=")
-    searchSites[586] = ("Mr POV", "Mister POV", "https://www.finishesthejob.com", "https://www.finishesthejob.com/search?search=")
+    searchSites[586] = ("Mister POV", "Mister POV", "https://www.finishesthejob.com", "https://www.finishesthejob.com/search?search=")
     searchSites[587] = ("4K Desire", "4K Desire", "https://www.wankz.com", "https://www.wankz.com/search?q=")
     searchSites[588] = ("All Interracial", "All Interracial", "https://www.wankz.com", "https://www.wankz.com/search?q=")
     searchSites[589] = ("Bang My Stepmom", "Bang My Stepmom", "https://www.wankz.com", "https://www.wankz.com/search?q=")
@@ -940,6 +940,10 @@ def siteValues():
     searchSites[890] = ("Horny DreamBabez", "Horny DreamBabez", "https://hornydreambabez.com/", "https://hornydreambabez.com/")
     searchSites[891] = ("Shot Her First", "Shot Her First", "https://hushpass.com/t1/", "https://hushpass.com/t1/search.php?query=shot+her+first+")
     searchSites[892] = ("Push Her Limits", "Push Her Limits", "http://pushherlimits.com/", "http://pushherlimits.com/")
+    searchSites[893] = ("Hookup Hotshot", "Hookup Hotshot", "https://hookuphotshot.com/", "https://hookuphotshot.com/the-dates/")
+    searchSites[894] = ("Exploited College Girls", "Exploited College Girls", "https://exploitedcollegegirls.com/", "https://exploitedcollegegirls.com/free/updates.php")
+    searchSites[895] = ("FTV Girls", "FTV Girls", "https://www.ftvgirls.com/", "https://www.ftvgirls.com/updates.html")
+    searchSites[896] = ("FTV Milfs", "FTV Milfs", "https://www.ftvmilfs.com/", "https://www.ftvmilfs.com/updates.html")
 
     return searchSites
 
@@ -1059,6 +1063,7 @@ def getSearchSettings(mediaTitle: str):
         ('^btra ', 'BigTitsRoundAsses '),
         ('^burna ', 'BurningAngel '),
         ('^bwb ', 'BigWetButts '),
+        ('^cagfs ', 'CrazyAsianGFs '),
         ('^cc ', 'CzechCasting'),
         ('^cfnm ', 'ClothedFemaleNudeMale '),
         ('^clip ', 'LegalPorno '),
@@ -1068,8 +1073,8 @@ def getSearchSettings(mediaTitle: str):
         ('^cuf ', 'CumFiesta '),
         ('^cws ', 'CzechWifeSwap '),
         ('^da ', 'DoctorAdventures '),
-        ('^Daughter ', 'DaughterSwap '),
-        ('^Daughters ', 'DaughterSwap '),
+        ('^daughter ', 'DaughterSwap '),
+        ('^daughters ', 'DaughterSwap '),
         ('^dbm ', 'DontBreakMe '),
         ('^dc ', 'DorcelVision '),
         ('^ddfb ', 'DDFBusty '),
@@ -1083,6 +1088,8 @@ def getSearchSettings(mediaTitle: str):
         ('^esp ', 'EuroSexParties '),
         ('^ete ', 'EuroTeenErotica '),
         ('^ext ', 'ExxxtraSmall '),
+        ('^excogi ', 'ExploitedCollegeGirls '),
+        ('^ecg ', 'ExploitedCollegeGirls '),
         ('^fams ', 'FamilyStrokes '),
         ('^faq ', 'FirstAnalQuest '),
         ('^fds ', 'FakeDrivingSchool '),
@@ -1152,7 +1159,7 @@ def getSearchSettings(mediaTitle: str):
         ('^mmts ', 'MomsTeachSex '),
         ('^mnm ', 'MyNaughtyMassage '),
         ('^mom ', 'MomXXX '),
-        ('^mpov ', 'MrPOV '),
+        ('^mpov ', 'MisterPOV '),
         ('^mr ', 'MassageRooms '),
         ('^mrs ', 'MassageRooms '),
         ('^mshf ', 'MySistersHotFriend '),
