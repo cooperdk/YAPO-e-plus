@@ -1182,7 +1182,10 @@ def settings(request):
                     if checkDupeHash(scene_1.hash) > 1:
                         print(f"Scene {scene_1.id} at least one dupe, scanning...")
                         for scene_2 in Scene.objects.all():
-                            if not scene_1.pk == scene_2.pk:
+                            if scene_1.path_to_file == scene_2.path_to_file:
+                                log.warn(f"Scene IDs {scene_1.pk} and {scene_2.pk} refer to the same file: {scene_1.path_to_file}")
+                                break
+                            if (not scene_1.pk == scene_2.pk) or (not scene_1.path_to_file == scene_2.path_to_file):
                                 # if scene_2.path_to_file == scene_1.path_to_file:
                                 #    print("!!! Found duplicate scene (exact path): " +
                                 #    str(scene_1.id) + " - " + scene_1.name + "\nFile path: " + scene_1.path_to_file +
@@ -1560,7 +1563,6 @@ class FileUploadView(views.APIView):
         print("got file")
 
         return Response(status=204)
-
 
 def angular_index(request):
 

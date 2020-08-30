@@ -1,1 +1,7 @@
-<h1>YAPO e+</h1>
+<uib-alert ng-repeat="alert in $ctrl.alerts" class="enter" type="{{ alert.type }}" close="$ctrl.closeAlert($index)"
+           dismiss-on-timeout="{{ alert.timeout }}">{{ alert.msg }}
+</uib-alert>
+
+<div class="container-fluid">
+<h3>Yapo</h3>
+</div>

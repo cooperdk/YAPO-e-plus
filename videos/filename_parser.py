@@ -273,12 +273,12 @@ def parse_scene_all_metadata(scene, actors, actors_alias, scene_tags, websites):
   print("Looking for scene tags...")
   scene_path = parse_scene_tags_in_scene(scene, scene_path, scene_tags)
 
-  print("\r\nMatching scene name to studio releases... ", end="")
-  site = filenames.parse(scene.name)
-  if site != "None":
-    print(site)
-  else:
-    print()
+  # print("\r\nMatching scene name to studio releases... ", end="")
+  # site = filenames.parse(scene.name)
+  # if site != "None":
+  #   print(site)
+  # else:
+  #   print()
 
   if not (scene.hash):
     print("\r\nHashing scene... ", end="")

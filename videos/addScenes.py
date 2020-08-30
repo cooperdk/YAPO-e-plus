@@ -32,16 +32,6 @@ ACCEPTED_VIDEO_EXTENSIONS = {
 }
 
 def get_files(walk_dir, make_video_sample):
-    # norm_path = os.path.normpath(path)
-    # files_in_dir = os.listdir(norm_path)
-
- #   print("walk_dir = " + walk_dir)
-
-    # If your current working directory may change during script execution, it's recommended to
-    # immediately convert program arguments to an absolute path. Then the variable root below will
-    # be an absolute path as well. Example:
-    # walk_dir = os.path.abspath(walk_dir)
-#    print("walk_dir (absolute) = " + os.path.abspath(walk_dir))
 
     for root, subdirs, files in os.walk(walk_dir):
         # print('--\nroot = ' + root)
@@ -52,20 +42,24 @@ def get_files(walk_dir, make_video_sample):
         #     for subdir in subdirs:
         #         print('\t- subdirectory ' + subdir)
 
-        for filename in files:
-            file_path = os.path.join(root, filename)
-            filename_extension = os.path.splitext(file_path)[1]
-            for filename_extension_to_test in ACCEPTED_VIDEO_EXTENSIONS:
-                if filename_extension_to_test == filename_extension:
-                    print(
-                        f"Filename is {file_path}\nExtension is {filename_extension}\n"
-                    )
+        if not root.startswith("$") or root.startswith(".") or subdirs.startswith("$") or subdirs.startswith("."):
 
-                    create_scene(file_path, make_video_sample)
-                    print(
-                        "\n------------------------------------------------------------------------------\n"
-                    )
-                    break
+            for filename in files:
+                file_path = os.path.join(root, filename)
+                filename_extension = os.path.splitext(file_path)[1]
+                for filename_extension_to_test in ACCEPTED_VIDEO_EXTENSIONS:
+                    if filename_extension_to_test == filename_extension:
+                        print(
+                            f"Filename is {file_path}\nExtension is {filename_extension}\n"
+                        )
+
+                        create_scene(file_path, make_video_sample)
+                        print(
+                            "\n------------------------------------------------------------------------------\n"
+                        )
+                        break
+        else:
+            print("Skipping an off-limits path ($ or . as first character in dirname)")
 
 
 def create_sample_video(scene):
@@ -264,9 +258,17 @@ def create_scene(scene_path, make_sample_video):
                 scene_tags = list(
                     SceneTag.objects.extra(select={ "length": "Length(name)" }).order_by("-length")
                 )
-                print("Looking for scene tags...")
+                print("Parsing locally registered scene tags...")
                 scene_path = current_scene.path_to_file.lower()
                 filename_parser.parse_scene_tags_in_scene(current_scene, scene_path, scene_tags)
+
+                if not Config().tpdb_websites:
+                    print("Parsing locally registered websites...")
+                    scene_path = parse_website_in_scenes(scene, scene_path, websites)
+
+                if not Config().tpdb_actors:
+                    print("Parsing locally registered actors and aliases...")
+                    scene_path = parse_actors_in_scene(scene, scene_path, actors, actors_alias)
 
             else:
                 print("Scene was not found on TpDB, parsing it internally...")

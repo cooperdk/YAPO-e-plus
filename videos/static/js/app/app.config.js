@@ -6,7 +6,6 @@ app.config(['$sceProvider', '$locationProvider', '$routeProvider', '$httpProvide
 
         $locationProvider.hashPrefix('!');
 
-
         $routeProvider.when('/actor', {
             template: '<section-list-wrapper main-page="true" section-type="\'ActorList\'"></section-list-wrapper>'
         }).when('/actor/:actorId', {
@@ -42,7 +41,7 @@ app.config(['$sceProvider', '$locationProvider', '$routeProvider', '$httpProvide
         }).when('/playlist/:playlistId', {
             template: '<playlist-detail></playlist-detail>'
         }).otherwise('/'), {
-            template: '<br><br><br><br><h1> This is temp index</h1>'
+            template: '<index></index>'
 
         };
         //
