@@ -1119,6 +1119,7 @@ def getSearchSettings(mediaTitle: str):
         ('^hotab ', 'HouseofTaboo '),
         ('^ht ', 'Hogtied '),
         ('^hustl3r ', 'Hustler '),
+        ('^ihw ', 'IHaveAWife '),
         ('^ihaw ', 'IHaveAWife '),
         ('^iktg ', 'IKnowThatGirl '),
         ('^il ', 'ImmoralLive '),

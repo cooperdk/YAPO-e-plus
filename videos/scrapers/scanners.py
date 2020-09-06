@@ -74,7 +74,7 @@ def tpdb (scene_id: int, force: bool):
         log.sinfo(f"Parser will search for: {parsetext}")
         # if current_scene.tpdb_id is not None and current_scene.tpdb_id != "" and len(current_scene.tpdb_id) > 12:
         #     parsetext = current_scene.tpdb_id
-        url = 'https://metadataapi.net/api/scenes'
+        url = 'https://api.metadataapi.net/api/scenes'
 
         params = {
             'parse': parsetext,
@@ -118,7 +118,7 @@ def tpdb (scene_id: int, force: bool):
             '''
             log.sinfo(f'Not successful scanning with conventional search,\n       Now scanning with secondary parsetext: "{scene_name_formatted}"...')
             # scene_name = scene_name.replace(" ", "%20")
-            url = 'https://metadataapi.net/api/scenes'
+            url = 'https://api.metadataapi.net/api/scenes'
             params = {
                 'parse': scene_name_formatted,
                 'limit': '1'

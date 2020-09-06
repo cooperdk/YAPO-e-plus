@@ -308,7 +308,7 @@ def populate_websites(force):
     ### Force will re-download logos.
 
     import videos.aux_functions as aux
-    online = aux.is_website_online("metadataapi.net")
+    online = aux.is_website_online("api.metadataapi.net")
     if not online:
         log.warn("TpDB is down, cannot check websites using their API!")
         return Response(status=500)
@@ -317,7 +317,7 @@ def populate_websites(force):
 
     # if current_scene.tpdb_id is not None and current_scene.tpdb_id != "" and len(current_scene.tpdb_id) > 12:
     #     parsetext = current_scene.tpdb_id
-    url = 'https://metadataapi.net/api/sites'
+    url = 'https://api.metadataapi.net/api/sites'
 
     params = {'limit': 99999}
     headers = {
@@ -399,7 +399,7 @@ def tpdb_scan_actor(actor, force: bool):
 
     photo = actor.thumbnail
     desc = actor.description
-    url = 'https://metadataapi.net/api/performers'
+    url = 'https://api.metadataapi.net/api/performers'
 
     log.sinfo(f'Contacting TpDB API for info about {actor.name}.')
 
