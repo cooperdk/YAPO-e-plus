@@ -317,7 +317,7 @@ def populate_websites(force):
 
     # if current_scene.tpdb_id is not None and current_scene.tpdb_id != "" and len(current_scene.tpdb_id) > 12:
     #     parsetext = current_scene.tpdb_id
-    url = 'https://api.metadataapi.net/api/sites'
+    url = 'https://api.metadataapi.net/sites'
 
     params = {'limit': 99999}
     headers = {
@@ -399,7 +399,7 @@ def tpdb_scan_actor(actor, force: bool):
 
     photo = actor.thumbnail
     desc = actor.description
-    url = 'https://api.metadataapi.net/api/performers'
+    url = 'https://api.metadataapi.net/performers'
 
     log.sinfo(f'Contacting TpDB API for info about {actor.name}.')
 
