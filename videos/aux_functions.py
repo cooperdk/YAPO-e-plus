@@ -231,7 +231,7 @@ def strip_bad_chars (name):
     return name
 
 
-def is_website_online(host):
+def is_domain_reachable(host):
     """ This function checks to see if a host name has a DNS entry by checking
         for socket info. If the website gets something in return,
         we know it's available to DNS.
@@ -239,9 +239,22 @@ def is_website_online(host):
     try:
         socket.gethostbyname(host)
     except socket.gaierror:
-        return False
+        result = False
     else:
-        return True
+        result =  True
+
+def checkTpDB():
+    try:
+        request = requests.get("http://api.metadataapi.net/scenes?parse=faye-reagan&limit=1", timeout = 3)
+        if request.status_code <= 400:
+            result = True
+        else:
+            result = False
+            log.warn(f"api.metadataapi.net returns an unexpected reply code: {request.status_code}")
+
+    except (ConnectionError, ConnectionRefusedError, ConnectionAbortedError, ConnectionResetError) as e:
+        log.warn(f"Cannot connect to api.metadataapi.net: {e}")
+        result = False
 
 
 

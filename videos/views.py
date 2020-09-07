@@ -308,9 +308,7 @@ def populate_websites(force):
     ### Force will re-download logos.
 
     import videos.aux_functions as aux
-    online = aux.is_website_online("api.metadataapi.net")
-    if not online:
-        log.warn("TpDB is down, cannot check websites using their API!")
+    if not aux.is_domain_reachable("api.metadataapi.net") or not aux.checkTpDB():
         return Response(status=500)
 
     log.sinfo(f"Traversing websites for logos...")
@@ -396,6 +394,10 @@ def populate_websites(force):
 
 def tpdb_scan_actor(actor, force: bool):
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+    import videos.aux_functions as aux
+    if not aux.is_domain_reachable("api.metadataapi.net") or not aux.checkTpDB():
+        return Response(status=500)
 
     photo = actor.thumbnail
     desc = actor.description

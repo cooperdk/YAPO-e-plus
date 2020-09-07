@@ -40,9 +40,7 @@ def tpdb (scene_id: int, force: bool):
     success = False
     found = 0
 
-    online = aux.is_website_online("api.metadataapi.net")
-    if not online:
-        log.warn("TpDB is offline!")
+    if not aux.is_domain_reachable("api.metadataapi.net") or not aux.checkTpDB():
         return False
 
     current_scene = Scene.objects.get(pk=scene_id)
