@@ -19,6 +19,7 @@ import json
 import re
 http.client._MAXHEADERS = 1000
 import socket
+import requests
 import shutil
 from lxml import html
 from utils.printing import Logger
@@ -242,11 +243,13 @@ def is_domain_reachable(host):
         result = False
     else:
         result =  True
+    return result
+
 
 def checkTpDB():
     try:
         request = requests.get("http://api.metadataapi.net/scenes?parse=faye-reagan&limit=1", timeout = 3)
-        if request.status_code <= 400:
+        if request.status_code == 200:
             result = True
         else:
             result = False
@@ -255,7 +258,7 @@ def checkTpDB():
     except (ConnectionError, ConnectionRefusedError, ConnectionAbortedError, ConnectionResetError) as e:
         log.warn(f"Cannot connect to api.metadataapi.net: {e}")
         result = False
-
+    return result
 
 
 def save_website_logo (image_link, website, force, *args):
