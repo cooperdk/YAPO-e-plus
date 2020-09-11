@@ -165,7 +165,7 @@ def vercheck (): # Check the local version against Github
             if str(ver) != str(remoteVer):
                 log.info(f'A new version of YAPO e+ is available ({remoteVer})!')
     else:
-        print("Since this build is frozen, an update check is nor performed.")
+        print("This is a frozen build, check the website or Github releases for updates.")
 
 def stats (): # Prints statistics about your videos and metadata
     size = getsizeall()
