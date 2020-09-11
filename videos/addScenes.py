@@ -62,13 +62,77 @@ def get_files(walk_dir, make_video_sample):
             print("Skipping an off-limits path ($ or . as first character in dirname)")
 
 
-def create_sample_video(scene):
+def create_sample_video(scene : Scene):
+    video_path = scene.get_media_path("sample")
+    video_filename_path = os.path.join(video_path, "sample.mp4")
+
+    # Has the sample already been created?
+    if os.path.isfile(video_filename_path):
+        print(f"Sample for {scene.name} already exists!")
+        return
+
     print(f"Trying to create a sample video for scene: {scene.name}")
     success = ffmpeg_process.ffmpeg_create_sammple_video(scene)
     if success:
         print(f"Sample video for scene: {scene.name} created successfully.")
     else:
         print(f"Something went wrong while trying to create video sample for scene: {scene.name}")
+
+def do_ffprobe(scene_in_db):
+    print("Trying to use ffprobe on scene... ", end="")
+    if not ffmpeg_process.ffprobe_get_data_without_save(scene_in_db):
+        print("ffprobe failed.")
+        return False
+
+    scene_in_db.save()
+    print("OK, taking a screenshot... ", end="")
+    ffmpeg_process.ffmpeg_take_scene_screenshot_without_save(scene_in_db)
+    print("Screenshot taken.")
+
+    return True
+
+def create_sheet_for_scene(scene_in_db : Scene):
+    sheet_width = Config().sheet_width
+    sheet_grid = Config().sheet_grid
+    if sheet_width > 2048:
+        sheet_width = 2048
+    if sheet_width < 800:
+        sheet_width = 800
+
+    sheet_path = scene_in_db.get_media_path("sheet.jpg")
+    if os.path.exists(sheet_path):
+        print("Contact sheet for this scene already exists, not re-generating.")
+        return
+
+    file_path = os.path.abspath(scene_in_db.path_to_file)
+    print(f"Generating Contact Sheet ({sheet_width} px wide, grid: {sheet_grid}... ")
+
+    args = [
+        "videosheet",
+        file_path,
+        "--show-timestamp",
+        "--width", str(sheet_width),
+        "--grid", sheet_grid,
+        "--quality", "75",
+        "--timestamp-format", "{H}:{M}:{S}",
+        "--template", os.path.abspath(os.path.join(Config().site_path, 'static', 'yapo.template')),
+        "--timestamp-border-mode",
+        "--timestamp-font-size", "15",
+        "--start-delay-percent", "1",
+        "--start-delay-percent", "0",
+        "--format", "jpg",
+        "-o", os.path.abspath(sheet_path),
+    ]
+    try:
+        videosheet.main(args)
+
+        print("Contact Sheet saved to %s" % (os.path.abspath(sheet_path)))
+    except Exception as e:
+        print(f"Error creating contact sheet: {e}")
+
+    watermark(
+        os.path.abspath(sheet_path), os.path.join(Config().site_path, 'static', 'yapo-wm.png')
+    )
 
 
 def create_scene(scene_path, make_sample_video):
@@ -78,205 +142,70 @@ def create_scene(scene_path, make_sample_video):
     current_scene.name = os.path.splitext(filename)[0]
     # TODO: Insert website abbreviation function call here
     current_scene.path_to_dir = path_to_dir
-    sheet_width = Config().sheet_width
-    sheet_grid = Config().sheet_grid
-    if sheet_width > 2048:
-        sheet_width = 2048
-    if sheet_width < 800:
-        sheet_width = 800
-#    print(
-#        "Scene Name: %s\nPath to Dir: %s\nPath to File: %s"
-#        % (current_scene.name, current_scene.path_to_dir, current_scene.path_to_file)
-#    )
 
+    # If the scene already exists, use the existing scene.
+    # Take a note if we're re-using one, since we'll skip a load of scraping if so.
     if Scene.objects.filter(path_to_file=current_scene.path_to_file):
         print("Scene already exists, skipping scene.")
-        scene_in_db = Scene.objects.get(path_to_file=current_scene.path_to_file)
-        if scene_in_db.thumbnail is None:
-            print("Trying to use ffprobe on scene... ",end="")
-            if ffmpeg_process.ffprobe_get_data_without_save(scene_in_db):
-                print("OK, taking a screenshot... ", end="")
-
-                ffmpeg_process.ffmpeg_take_scene_screenshot_without_save(scene_in_db)
-
-                print("Screenshot taken.")
-        sheet_path = os.path.abspath(
-            os.path.join(Config().site_media_path, "scenes", str(scene_in_db.id), "sheet.jpg")
-        )
-        if os.path.exists(sheet_path):
-            print("Contact sheet for this scene already exists, not re-generating.")
-        else:
-            file_path = os.path.abspath(current_scene.path_to_file)
-            print(f"Generating Contact Sheet ({sheet_width} px wide, grid: {sheet_grid}... ")
-            #               try:
-
-            args = [
-                "videosheet",
-                file_path,
-                "-t",
-                "-w",
-                str(sheet_width),
-                "-g",
-                sheet_grid,
-                "--quality",
-                "75",
-                "--timestamp-format",
-                "{H}:{M}:{S}",
-                "--template",
-                os.path.abspath(
-                    os.path.join(Config().site_path, 'static', 'yapo.template')
-                ),
-                "--timestamp-border-mode",
-                "--timestamp-font-size",
-                "15",
-                "--start-delay-percent",
-                "1",
-                "--start-delay-percent",
-                "0",
-                "-f",
-                "jpg",
-                "-o",
-                os.path.abspath(sheet_path),
-            ]
-            try:
-                # sys.argv = args
-                videosheet.main(args)
-
-                watermark(
-                    os.path.abspath(sheet_path), os.path.join(Config().site_path, 'static', 'yapo-wm.png')
-                )
-
-                print("Contact Sheet saved to %s" % (os.path.abspath(sheet_path)))
-            except:
-                print("Error creating contact sheet!")
-
-        if make_sample_video:
-            video_filename_path = os.path.join(
-                Config().site_media_path, "scenes", str(scene_in_db.id), "sample", "sample.mp4"
-            )
-            if not os.path.isfile(video_filename_path):
-                create_sample_video(scene_in_db)
-            else:
-                print(f"Sample for {scene_in_db.name} already exists!")
-
-            scene_in_db.save()
-        
+        current_scene = Scene.objects.get(path_to_file=current_scene.path_to_file)
+        isPreExistingScene = True
     else:
-        print("Trying to use ffprobe on scene... ", end="")
-        if ffmpeg_process.ffprobe_get_data_without_save(current_scene):
-            current_scene.save()
-            print("Taking a screenshot...", end="")
+        isPreExistingScene = False
 
-            ffmpeg_process.ffmpeg_take_scene_screenshot_without_save(current_scene)
+    if not do_ffprobe(current_scene):
+        print(f"Failed to probe scene {current_scene.name}, skipping scene...")
+        return
+    create_sheet_for_scene(current_scene)
+    if make_sample_video:
+        create_sample_video(current_scene)
 
-            print("Screenshot taken.")
+    if isPreExistingScene:
+        current_scene.save()
+        return
 
+    add_scene_to_folder_view(current_scene)
 
-            sheet_path = os.path.abspath(
-                os.path.join(Config().site_media_path, "scenes", str(current_scene.id), "sheet.jpg")
-            )
-            if os.path.exists(sheet_path):
-                print("Contact sheet for this scene already exists, not re-generating.")
-            else:  
-                file_path = os.path.abspath(current_scene.path_to_file)
-                print(f"Generating Contact Sheet ({sheet_width} px wide, grid: {sheet_grid})... ")
- #               try:
+    actors = list(
+        Actor.objects.extra(select={"length": "Length(name)"}).order_by(
+            "-length"
+        )
+    )
+    actors_alias = list(
+        ActorAlias.objects.extra(select={"length": "Length(name)"}).order_by(
+            "-length"
+        )
+    )
+    scene_tags = SceneTag.objects.extra(
+        select={"length": "Length(name)"}
+    ).order_by("-length")
+    websites = Website.objects.extra(
+        select={"length": "Length(name)"}
+    ).order_by("-length")
 
+    # This is the TpDB scanner invoker. Now, YAPO will only slowparse the scene if necessary
+    succ = False
+    succ = scanners.tpdb(current_scene.id, True) if Config().tpdb_enabled else False
+    if succ:
+        scene_tags = list(
+            SceneTag.objects.extra(select={ "length": "Length(name)" }).order_by("-length")
+        )
+        print("Parsing locally registered scene tags...")
+        scene_path = current_scene.path_to_file.lower()
+        filename_parser.parse_scene_tags_in_scene(current_scene, scene_path, scene_tags)
 
-                args = [
-                        "videosheet",
-                        file_path,
-                        "-t",
-                        "-w",
-                        str(sheet_width),
-                        "-g",
-                        sheet_grid,
-                        "--quality",
-                        "75",
-                        "--timestamp-format",
-                        "{H}:{M}:{S}",
-                        "--template",
-                        os.path.abspath(
-                            os.path.join(Config().site_path, 'static', 'yapo.template')
-                        ),
-                        "--timestamp-border-mode",
-                        "--timestamp-font-size",
-                        "15",
-                        "--start-delay-percent",
-                        "1",
-                        "--start-delay-percent",
-                        "0",
-                        "-f",
-                        "jpg",
-                        "-o",
-                        os.path.abspath(sheet_path),
-                    ]
+        if not Config().tpdb_websites:
+            print("Parsing locally registered websites...")
+            scene_path = parse_website_in_scenes(scene, scene_path, websites)
 
-                try:
-                    #sys.argv = args
-                    videosheet.main(args)
+        if not Config().tpdb_actors:
+            print("Parsing locally registered actors and aliases...")
+            scene_path = parse_actors_in_scene(scene, scene_path, actors, actors_alias)
 
-                    watermark(
-                        os.path.abspath(sheet_path), os.path.join(Config().site_path, 'static', 'yapo-wm.png')
-                    )
-
-
-                    print("Contact Sheet saved to %s"%(os.path.abspath(sheet_path)))
-                except:
-                   print("Error creating contact sheet!")
-
-
-
-            if make_sample_video:
-                create_sample_video(current_scene)
-
-            add_scene_to_folder_view(current_scene)
-
-            current_scene.save()
-
-            actors = list(
-                Actor.objects.extra(select={"length": "Length(name)"}).order_by(
-                    "-length"
-                )
-            )
-            actors_alias = list(
-                ActorAlias.objects.extra(select={"length": "Length(name)"}).order_by(
-                    "-length"
-                )
-            )
-            scene_tags = SceneTag.objects.extra(
-                select={"length": "Length(name)"}
-            ).order_by("-length")
-            websites = Website.objects.extra(
-                select={"length": "Length(name)"}
-            ).order_by("-length")
-
-            # This is the TpDB scanner invoker. Now, YAPO will only slowparse the scene if necessary
-            succ = False
-            succ = scanners.tpdb(current_scene.id, True) if Config().tpdb_enabled else False
-            if succ:
-                scene_tags = list(
-                    SceneTag.objects.extra(select={ "length": "Length(name)" }).order_by("-length")
-                )
-                print("Parsing locally registered scene tags...")
-                scene_path = current_scene.path_to_file.lower()
-                filename_parser.parse_scene_tags_in_scene(current_scene, scene_path, scene_tags)
-
-                if not Config().tpdb_websites:
-                    print("Parsing locally registered websites...")
-                    scene_path = parse_website_in_scenes(scene, scene_path, websites)
-
-                if not Config().tpdb_actors:
-                    print("Parsing locally registered actors and aliases...")
-                    scene_path = parse_actors_in_scene(scene, scene_path, actors, actors_alias)
-
-            else:
-                print("Scene was not found on TpDB, parsing it internally...")
-            filename_parser.parse_scene_all_metadata(
-                current_scene, actors, actors_alias, scene_tags, websites
-            )
-        else:
-            print(f"Failed to probe scene {current_scene.name}, skipping scene...")
+    else:
+        print("Scene was not found on TpDB, parsing it internally...")
+    filename_parser.parse_scene_all_metadata(
+        current_scene, actors, actors_alias, scene_tags, websites
+    )
 
 
 def add_scene_to_folder_view(scene_to_add):

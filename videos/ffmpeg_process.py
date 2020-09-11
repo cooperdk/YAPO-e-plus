@@ -290,11 +290,10 @@ def move_sample_movie_to_correct_dir(
         original_path = os.path.normpath(org_path)
         destination_path = os.path.join(save_path, filename)
 
-        if os.path.isdir(save_path):
-            shutil.move(original_path, destination_path)
-        else:
+        if not os.path.isdir(save_path):
             os.makedirs(save_path)
-            shutil.move(original_path, destination_path)
+
+        shutil.move(original_path, destination_path)
 
         if type_of_media == "video":
             delete_temp_files()
@@ -356,7 +355,7 @@ def parse_ffprobe_data(ffprobe_json_output):
     return ans
 
 
-def ffmpeg_take_scene_screenshot_without_save(scene):
+def ffmpeg_take_scene_screenshot_without_save(scene : Scene):
     # When we get here we assume that the scene was alrady probed with ffprobe, therefore it has all the video metadata.
 
     # {10 /x + y  = 1} , {7200 / x + y = 300} where 10 and 7200 are the duration of the original video

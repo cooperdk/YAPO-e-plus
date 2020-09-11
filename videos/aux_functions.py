@@ -3,6 +3,8 @@ import sys
 import time
 from concurrent.futures import thread
 
+from typing import List
+
 from videos.models import *
 from configuration import Config, Constants
 #from dateutil.parser import parse
@@ -248,9 +250,9 @@ def is_domain_reachable(host):
 def save_website_logo (image_link, website, force, *args):
     website = website.strip()
 
+    ws = None
     try:
         hasarg = 0
-        ws = None
         print("Website scan, method 1...")
         ws = Website.objects.filter(name=website)
 
@@ -290,18 +292,13 @@ def save_website_logo (image_link, website, force, *args):
     except:
         pass
 
-
     if image_link:
         if image_link.lower() == "null" or image_link == "":
             print(f"No logo URL available for {website}.")
-            success = False
             return
     else:
         print(f"No logo URL available for {website}.")
-        success = False
         return
-
-
 
     if not Config().tpdb_website_logos:
         return
@@ -310,43 +307,35 @@ def save_website_logo (image_link, website, force, *args):
         return
 
     ws = Website.objects.get(name=website)
-    save_path = os.path.join(Config().site_media_path, "websites", str(ws.id))
-    #print("Save path: " + save_path)
-    if not os.path.exists(save_path):
-        os.makedirs(save_path)
-        print(f"Created website directory: {save_path}")
+    save_path = scene.get_media_path()
     if os.path.splitext(image_link)[1]:
         ext = os.path.splitext(image_link)[1]
     else:
         print("Error in logo filename!")
-        success = False
         return
 
     save_file_name = os.path.join(save_path, "logo" + ext)
-    if (not os.path.isfile(save_file_name) and Config().tpdb_website_logos) or force:
-
-        #print("Saving to " + save_file_name)
-
-        if download_image(image_link, save_file_name):
-            ws = Website.objects.get(name=website)
-            print("OK")
-            as_uri = pathname2url(save_file_name)
-            ws.thumbnail = as_uri
-            print(f"Saved {as_uri} to DB ({save_file_name})")
-            ws.modified_date = datetime.datetime.now()
-            ws.save()
-            success = True
-
-        else:
-            log.swarn(f"DOWNLOAD ERROR: Logo: ({ws.name}): {image_link}")
-
-
-    else:
+    if os.path.isfile(save_file_name) and not force:
         log.sinfo(f"LOGO: {ws.name}: Skipping download, because the website already has a logo.")
+        return
+
+    os.makedirs(save_file_name)
+
+    if not download_image(image_link, save_file_name):
+        log.swarn(f"DOWNLOAD ERROR: Logo: ({ws.name}): {image_link}")
+        return
+
+    ws = Website.objects.get(name=website)
+    print("OK")
+    as_uri = pathname2url(save_file_name)
+    ws.thumbnail = as_uri
+    print(f"Saved {as_uri} to DB ({save_file_name})")
+    ws.modified_date = datetime.datetime.now()
+    ws.save()
 
 
 def populate_actors():
-    actors = Actor.objects.order_by("name")  # name
+    actors: List[Actor] = Actor.objects.order_by("name")
     for actor in actors:
         photo = actor.thumbnail
         desc = actor.description
@@ -390,7 +379,7 @@ def populate_actors():
 
             if actor.thumbnail == Constants().unknown_person_image_path:
                 # print(f"No image, downloading ({img}) - ", end="")
-                save_path = os.path.join(Config().site_media_path, 'actor', str(actor.id), 'profile')
+                save_path = actor.get_media_path('profile')
                 # print("Profile pic path: " + save_path)
                 save_file_name = os.path.join(save_path, 'profile.jpg')
                 if img and not os.path.isfile(save_file_name):

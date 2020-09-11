@@ -6,10 +6,34 @@ from mptt.models import MPTTModel, TreeForeignKey
 from django.dispatch import receiver
 from django.db.models import signals
 
-import datetime
+import os
 
 
 # Create your models here.
+from configuration import Config
+
+import abc
+
+# Inherit from this if your model has files underneath the media dir, indexed by ID.
+class ModelWithMediaContent:
+    __metaclass__ = abc.ABCMeta
+
+    def __init__(self):
+        pass
+
+    @abc.abstractmethod
+    def get_media_dir(self) -> str:
+        return
+
+    def get_media_path(self, filename : str) -> str:
+        mediaDir = os.path.abspath(
+            os.path.join(Config().site_media_path, self.get_media_dir(), str(self.id))
+        )
+        # TODO: is it a good idea to always create this here? I think so but I'm not 100%?
+        if not os.path.exists(mediaDir):
+            os.makedirs(mediaDir)
+
+        return os.path.join(mediaDir, filename)
 
 
 class ActorAlias(models.Model):
@@ -22,8 +46,7 @@ class ActorAlias(models.Model):
     def __str__(self):
         return f"{self.name} "
 
-
-class SceneTag(models.Model):
+class SceneTag(models.Model, ModelWithMediaContent):
     name = models.CharField(max_length=50, unique=True)
     date_added = models.DateTimeField(auto_now_add=True)
     play_count = models.IntegerField(default=0)
@@ -40,6 +63,8 @@ class SceneTag(models.Model):
     def __str__(self):
         return f"{self.name} "
 
+    def get_media_dir(self):
+        return "tags"
 
 class ActorTag(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -62,7 +87,7 @@ class ActorTag(models.Model):
         return f"{self.name} "
 
 
-class Actor(models.Model):
+class Actor(models.Model, ModelWithMediaContent):
     MALE = "M"
     FEMALE = "F"
     TRANSGENDER = "T"
@@ -119,6 +144,9 @@ class Actor(models.Model):
     def get_name_delimiter(self, delimiter):
         return self.name.replace(" ", delimiter)
 
+    def get_media_dir(self):
+        return "actor"
+
     def createOrAddAlias(self, aka):
         if not self.actor_aliases.filter(name=aka):
             newAlias = ActorAlias.objects.get_or_create(name=aka)
@@ -127,8 +155,7 @@ class Actor(models.Model):
             self.actor_aliases.add(newAlias[0])
 
 
-
-class Website(models.Model):
+class Website(models.Model, ModelWithMediaContent):
     name = models.CharField(max_length=50, unique=True)
     date_added = models.DateTimeField(auto_now_add=True)
     play_count = models.IntegerField(default=0)
@@ -144,11 +171,14 @@ class Website(models.Model):
     modified_date = models.DateTimeField(auto_now=True)
     url = models.TextField(max_length=256, default="", null=True, blank=True)
     tpdb_id = models.IntegerField(default=0)
+
     def __str__(self):
         return f"{self.name} "
 
+    def get_media_dir(self):
+        return "websites"
 
-class Scene(models.Model):
+class Scene(models.Model, ModelWithMediaContent):
     name = models.CharField(max_length=500)
     tpdb_id = models.CharField(null=True, default="", max_length=48, blank=True)
     release_id = models.CharField(null=True, default="", max_length=64, blank=True)
@@ -192,6 +222,8 @@ class Scene(models.Model):
     def get_absolute_url(self):
         return reverse("videos:scene-details", kwargs={"pk": self.pk})
 
+    def get_media_dir(self):
+        return "websites"
 
 class Folder(MPTTModel):
     name = models.CharField(max_length=300, unique=True)
