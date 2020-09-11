@@ -163,7 +163,7 @@ def vercheck (): # Check the local version against Github
 
             # print("Github version: "+str(remoteVer))
             if str(ver) != str(remoteVer):
-                log.info(f'███ A new version of YAPO e+ is available ({remoteVer})! ███')
+                log.info(f'A new version of YAPO e+ is available ({remoteVer})!')
     else:
         print("Since this build is frozen, an update check is nor performed.")
 
@@ -283,8 +283,8 @@ If you want YAPO to open your browser automatically, this needs to be set in set
 
 class ready:
     import time
-    #startup_sequence()
-
+    startup_sequence()
+'''
     try:
         if not 'migrat' in str(sys.argv):
             print("Not in migration mode. Executing startup sequence...")
@@ -295,3 +295,4 @@ class ready:
             print("\n")
     except:
         pass
+'''
