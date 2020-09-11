@@ -5,7 +5,7 @@ setup(
     version="0.8.0",
     description="YAPO - Yet Another Porn Organizer - Extended+",
     author="CooperDK",
-    packages=["yapo-eplus'],
+    packages=["yapo-eplus"],
     install_requires=['chardet==3.0.4', 'certifi>=2020.6.20', 'urllib3==1.24.3',
         'Django==3.0.7', 'django-autocomplete-light==3.5.1', 'django-extensions==2.2.9',
         'django-mptt==0.11.0', 'djangorestframework==3.11.0', 'dj_static', 'asgiref>=3.2.10', 'static_ranges',
