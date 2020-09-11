@@ -13,48 +13,13 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-import json
-from datetime import datetime
 
-from django.conf import settings
 from django.conf.urls import url, include
 from django.conf.urls.static import static
 from django.contrib import admin
 from rest_framework.routers import DefaultRouter
-import videos.const
-import YAPO.settings
-import videos.aux_functions
 from videos import views
 from configuration import Config
-
-# from django.contrib import admin
-# admin.autodiscover()
-
-# actor_alias_list = ActorAliasViewSet.as_view({
-#     'get': 'list',
-#     'post': 'create'
-# })
-#
-#
-# actor_alias_detail = ActorAliasViewSet.as_view({
-#     'get': 'retrieve',
-#     'put': 'update',
-#     'patch': 'partial_update',
-#     'delete': 'destroy'
-# })
-#
-# actor_list = ActorViewSet.as_view({
-#     'get': 'list',
-#     'post': 'create'
-# })
-#
-# actor_detail = ActorViewSet.as_view({
-#     'get': 'retrieve',
-#     'put': 'update',
-#     'patch': 'partial_update',
-#     'delete': 'destroy'
-# })
-
 
 # Create a router and register our viewsets with it.
 router = DefaultRouter()
@@ -67,8 +32,6 @@ router.register(r'website', views.WebsiteViewSet)
 router.register(r'folder', views.FolderViewSet)
 router.register(r'folder-local', views.LocalSceneFoldersViewSet)
 router.register(r'playlist', views.PlaylistViewSet)
-# router.register(r'^upload/(?P<filename>[^/]+)', views.FileUploadView.as_view())
-
 
 urlpatterns = [
                   url(r'^admin/', admin.site.urls),
@@ -86,6 +49,3 @@ urlpatterns = [
                   url(r'^play/', views.display_video),
                   url(r'^scan-scene/', views.scanScene.as_view()),
               ] + static(Config().site_media_url, document_root=Config().site_media_path)
-
-
-# urlpatterns = format_suffix_patterns(urlpatterns, allowed=['json'])

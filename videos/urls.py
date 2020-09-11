@@ -1,9 +1,3 @@
-from django.conf.urls import url
-
-from . import views
-from .models import Actor
-
-# REST FRAMEWORK IMPORTS
 from rest_framework.urlpatterns import format_suffix_patterns
 
 

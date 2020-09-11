@@ -1,7 +1,7 @@
 import re
 from datetime import datetime
-from dateutil.parser import parse
-#import parsedatetime
+
+
 def search(title):
 
     trashTitle = (
@@ -13,10 +13,6 @@ def search(title):
     for trash in trashTitle:
         title = re.sub(r'\b%s\b' % trash, '', title, flags=re.IGNORECASE)
     title = ' '.join(title.split())
-    searchSiteID = 0
-    fullsitename = ""
-    searchTitle = ""
-    searchDate = ""
     print("----> Siteparser: " + title)
     searchSettings = getSearchSettings(title)
     searchSiteID = searchSettings[0]
@@ -37,7 +33,6 @@ def getSearchBaseURL(siteID):
 def getSearchSearchURL(siteID):
     searchSites = siteValues()
     return searchSites[siteID][3]
-
 
 def getSearchFilter(siteID):
     searchSites = siteValues()
@@ -1301,7 +1296,7 @@ def getSearchSettings(mediaTitle: str):
                 title = title.replace(' ', '', 1)
                 if title.lower().startswith(site):
                     matched = True
-                    break;
+                    break
 
             if matched:
                 searchTitle = re.sub(site, '', title, 1, flags=re.IGNORECASE)

@@ -1,19 +1,12 @@
+import os.path
+import http.client
+import http.client
 import os
 import os.path
-import subprocess
-import _thread
-import requests
-import json
-import django.db
+import sys
 from datetime import datetime
-#import pprint
-import urllib
-import urllib.request
-from urllib.request import Request, urlopen
-from urllib.request import URLError, HTTPError
-from urllib.parse import quote
-import http.client
-from http.client import IncompleteRead, BadStatusLine
+
+import django.db
 
 http.client._MAXHEADERS = 1000
 import re
@@ -23,14 +16,9 @@ import videos.scrapers.freeones as scraper_freeones
 import videos.scrapers.tmdb as scraper_tmdb
 django.setup()
 from configuration import Config, Constants
-#import urllib.request
 from utils.printing import Logger
 log = Logger()
-#import pycurl, certifi
-#from io import BytesIO
-#import utils.titleparser as tp
 from videos.models import Actor, Scene, ActorAlias, ActorTag, SceneTag, Website
-
 
 def tpdb (scene_id: int, force: bool):
     title = ""
@@ -211,15 +199,10 @@ def tpdb (scene_id: int, force: bool):
 
 
                             if not keyname:
-
                                 akaroot = ActorAlias.objects.all()
 
-
                                 if not keyname and 'aliases' in performer.keys():
-                                    alia = str(performer['aliases']).lower().strip()
-
                                     for alias in akaroot:
-
                                         if not keyname and alias.name.lower() == perf.lower():
                                             keyname = alias.name
                                             primary = 3
@@ -229,23 +212,20 @@ def tpdb (scene_id: int, force: bool):
                                             primary = 3
                                             break
                                         if not keyname:
-                                            for alia in performers['aliases']:
+                                            for alia in performer['aliases']:
                                                 if alias.name.lower() == alia.lower():
                                                     keyname = alias.name
                                                     primary = 3
                                                     break
                                         if not keyname and 'aliases' in performer['parent'].keys:
-                                            for alia in performers['parent']['aliases']:
+                                            for alia in performer['parent']['aliases']:
                                                 if alias.name.lower() == alia.lower():
                                                     keyname = alias.name
                                                     primary = 3
                                                     break
-                                        else:
-                                            alia = ""
 
                             #print("keyname " + keyname)
                             if keyname.strip() != "":
-                                #actor_to_add = Actor.objects.get(pk=actor_id)
                                 print(f"----> CHECKING SCENE ACTORS")
                                 keyname = namecheck(keyname)
                                 if (keyname.lower() not in str(current_scene.actors.all()).lower()) and (Actor.objects.filter(name=keyname).exists()):
@@ -258,31 +238,23 @@ def tpdb (scene_id: int, force: bool):
                                     else:
                                         print(f"  --> ACTOR already in scene.")
 
-                            #print("keyname " + keyname)
                             if not keyname:
                                 perpn = performer['name']
                                 perpn = namecheck(perpn)
                                 secondary = 2
-                                #print ("perpn sec " + perpn + " sp lwr " + sp)
                                 keyname = perpn
                                 print(f"  --> SM 2: TpDB REPLACED {performer['name']} -> {keyname} is keyname")
 
-
-                                #print("keyname " + keyname)
                             if performer['parent']['name'] and not keyname:
                                 perpn = performer['parent']['name']
                                 perpn = namecheck(perpn)
-                                #print("perpn thd " + perpn + " sp lwr " + sp)
                                 keyname = perpn
                                 secondary = 3
                                 print(f"  --> SM 3: {keyname} is keyname")
 
-
-                            #print("keyname " + keyname + " - perf name " + perpn)
                             if (Config().tpdb_actors) and (perpn) and (keyname) and (primary == 0):
                                 # If an actor is found on TpDB, but doesn't exist in YAPO
                                 log.info(f"Auto-adding a new actor: {perpn}")
-                                #try:
                                 if 'image' in performer.keys() and secondary == 2:
                                     print(f"Perf img check: {performer.keys()}")
                                     img = performer['image']
@@ -311,18 +283,13 @@ def tpdb (scene_id: int, force: bool):
                                         act.save()
 
                                 log.sinfo(f"  --> ACTOR CREATED AND ADDED TO SCENE: {act.name}")
-                                #except:
-                                    #log.error(f'Couldn\'t add {perpn} - possibly exists already even though she didn\'t turn up...')
-                                    #break
                             elif Config().tpdb_actors == False:
                                 log.info(f"We could add the actor {act.name}, but auto-adding is disabled")
 
                             if (actoradded) and (perpn):
                                 log.sinfo(f"Scraping additional info about {act.name}...")
-                                success = scraper_tmdb.search_person_with_force_flag(
-                                    act, True)
-                                success = scraper_freeones.search_freeones_with_force_flag(
-                                        act, True)
+                                success = scraper_tmdb.search_person_with_force_flag(act, True)
+                                success = scraper_freeones.search_freeones_with_force_flag(act, True)
 
                         if (keyname.strip() != "") and (Actor.objects.filter(name=keyname).exists()):
                             actor = Actor.objects.get(name=keyname)
@@ -542,10 +509,9 @@ def tpdb (scene_id: int, force: bool):
             insert_scene_tag(current_scene, "TpDB: Scanned")
             # print("Tagged the scene with a TpDB tag.")
 
-            return success
-
-
             log.sinfo(f"Found and registered data for scene ID {scene_id}")
+
+            return success
         else:
             log.sinfo(f"Scene not found in TpDB")
 

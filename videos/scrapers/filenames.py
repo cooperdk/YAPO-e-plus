@@ -1,44 +1,22 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import datetime
 import os
-import re
-import time
 
-import urllib.parse as urllib_parse
-import videos.const
-import urllib.request as urllib_req
 import django
-import requests
-import videos.aux_functions as aux
-from bs4 import BeautifulSoup
-from dateutil.parser import parse
-import videos.const as const
-from django.utils import timezone
-
-
 import requests.packages.urllib3
+
 requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
 
 django.setup()
 
-from videos.models import Actor, Scene, ActorAlias, SceneTag, Website
-
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 
-# MEDIA_PATH = "videos\\media"
-
-def onlyChars(input):
-    valids = "".join(char for char in input if char.isalpha())
+def onlyChars(toClean):
+    valids = "".join(char for char in toClean if char.isalpha())
     return valids
     
-def parse(scene):
 
-#    scene_path = scene.path
-    site = matcher(scene)
-    
-    
 def matcher(text):
     site=site_facialfest(text)
     if site!=("Unknown"):

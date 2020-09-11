@@ -3,14 +3,13 @@ from datetime import datetime
 
 import django
 import tmdbsimple as tmdb
-from typing import List
 
 import videos.aux_functions as aux
 from utils import Constants
 
 django.setup()
 
-from videos.models import Actor, ActorAlias
+from videos.models import Actor
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 

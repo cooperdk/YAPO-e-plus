@@ -1,9 +1,9 @@
+import os
 from datetime import datetime
+
 from configuration import Config
 from utils import Singleton
-import re
-import os
-from os import path
+
 class Logger(metaclass=Singleton):
 
     def warn(self, message: str):

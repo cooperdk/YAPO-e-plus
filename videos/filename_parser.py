@@ -1,14 +1,14 @@
+import datetime
 import os
 import re
-import datetime
-import django
-#import hashlib
 import struct
+
+import django
+
 from configuration import Config
-from videos import const
-import videos.scrapers.filenames as filenames
-import YAPO.settings
 from utils.printing import Logger
+from videos import const
+
 log = Logger()
 django.setup()
 
@@ -18,12 +18,12 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 
 
 def get_hash(path: str):
-  '''
+  """
   This function produces a hash for a video file: size + 64bit chksum of the first and
   last 64k (even if they overlap because the file is smaller than 128k)
   It will take approx. 30 seconds to generate 100 hashes on a regular hard disk.
   This is the OSO/ISDB hasher which is also used by opensubtitles.
-  '''
+  """
   try:
     longlongformat = 'Q'  # unsigned long long little endian
     bytesize = struct.calcsize(longlongformat)
@@ -270,13 +270,6 @@ def parse_scene_all_metadata(scene, actors, actors_alias, scene_tags, websites):
 
   print("Looking for scene tags...")
   scene_path = parse_scene_tags_in_scene(scene, scene_path, scene_tags)
-
-  # print("\r\nMatching scene name to studio releases... ", end="")
-  # site = filenames.parse(scene.name)
-  # if site != "None":
-  #   print(site)
-  # else:
-  #   print()
 
   if not (scene.hash):
     print("\r\nHashing scene... ", end="")

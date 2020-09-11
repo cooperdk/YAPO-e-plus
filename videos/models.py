@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-from django.urls import reverse
 from django.db import models
 from mptt.models import MPTTModel, TreeForeignKey
 from django.dispatch import receiver
@@ -8,8 +7,6 @@ from django.db.models import signals
 
 import os
 
-
-# Create your models here.
 from configuration import Config
 
 import abc
@@ -132,17 +129,8 @@ class Actor(models.Model, ModelWithMediaContent):
     )
     modified_date = models.DateTimeField(auto_now=True)
 
-    def get_absolute_url(self):
-        return reverse("videos:actor-details", kwargs={"pk": self.pk})
-
     def __str__(self):
         return self.name or ""
-
-    def get_name_hyphens(self):
-        return self.name.replace(" ", "-")
-
-    def get_name_delimiter(self, delimiter):
-        return self.name.replace(" ", delimiter)
 
     def get_media_dir(self):
         return "actor"
@@ -215,12 +203,8 @@ class Scene(models.Model, ModelWithMediaContent):
     orig_name = models.CharField(null=True, max_length=500)
     orig_path_to_file = models.CharField(null=True, default="", max_length=500, blank=True)
 
-
     def __str__(self):
         return f"{self.name} "
-
-    def get_absolute_url(self):
-        return reverse("videos:scene-details", kwargs={"pk": self.pk})
 
     def get_media_dir(self):
         return "websites"

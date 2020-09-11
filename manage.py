@@ -1,13 +1,8 @@
 #!/usr/bin/env python
 
-import sys, os
-from configuration import Config
-#os.environ("DJANGO_SETTINGS_MODULE", "YAPO.settings")
-#os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
+import os
+import sys
 
-import platform
-import YAPO.settings
-#import settings
 from configuration import Config
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
@@ -31,6 +26,7 @@ if __name__ == "__main__":
     SCRIPT_ROOT = get_main_dir()
 
     try:
+        # noinspection PyUnresolvedReferences
         if sys.frozen or sys.importers:
             SCRIPT_ROOT = os.path.dirname(sys.executable)
             compiled = True

@@ -1,12 +1,10 @@
-import json
 import os
+import shutil
 import sys
+
 from configuration import Config, Constants
 from utils.printing import Logger
-from datetime import datetime
-import videos.const
-import shutil
-import colorama
+
 log = Logger()
 
 # Quick-start development settings - unsuitable for production
@@ -47,6 +45,7 @@ if not 'migrat' or "passcheck" in str(sys.argv[1:]): # Check if the user runs mi
     okmoved = True
 
     try:
+        # noinspection PyUnresolvedReferences
         if sys.frozen or sys.importers:
             compiled = True
     except AttributeError:

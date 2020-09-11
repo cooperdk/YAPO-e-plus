@@ -155,6 +155,7 @@ def create_scene(scene_path, make_sample_video):
     if not do_ffprobe(current_scene):
         print(f"Failed to probe scene {current_scene.name}, skipping scene...")
         return
+
     create_sheet_for_scene(current_scene)
     if make_sample_video:
         create_sample_video(current_scene)
@@ -183,7 +184,6 @@ def create_scene(scene_path, make_sample_video):
     ).order_by("-length")
 
     # This is the TpDB scanner invoker. Now, YAPO will only slowparse the scene if necessary
-    succ = False
     succ = scanners.tpdb(current_scene.id, True) if Config().tpdb_enabled else False
     if succ:
         scene_tags = list(
@@ -195,14 +195,14 @@ def create_scene(scene_path, make_sample_video):
 
         if not Config().tpdb_websites:
             print("Parsing locally registered websites...")
-            scene_path = parse_website_in_scenes(scene, scene_path, websites)
+            scene_path = filename_parser.parse_website_in_scenes(current_scene, scene_path, websites)
 
         if not Config().tpdb_actors:
             print("Parsing locally registered actors and aliases...")
-            scene_path = parse_actors_in_scene(scene, scene_path, actors, actors_alias)
-
+            scene_path = filename_parser.parse_actors_in_scene(current_scene, scene_path, actors, actors_alias)
     else:
         print("Scene was not found on TpDB, parsing it internally...")
+
     filename_parser.parse_scene_all_metadata(
         current_scene, actors, actors_alias, scene_tags, websites
     )
@@ -315,40 +315,6 @@ def recursive_add_folders(parent, folders, scene_to_add, path_with_ids):
                 f"Added Scene: {scene_to_add.name} to virtual folder {parent.name}"
             )
             parent.save()
-
-
-# Not implemented correctly
-# right now there is no way to clean empty dirs from db.
-def clean_empty_folders():
-    all_folders = Folder.objects.filter(level=0)
-
-    for folder in all_folders:
-        recursive_function(folder)
-        print(folder)
-
-
-def recursive_function(parent, folder):
-    print(f"In folder {folder.name}")
-    if folder.get_next_sibling() is not None:
-        sibling = folder.get_next_sibling()
-        recursive_function(folder, sibling)
-
-    if len(folder.get_children()) != 0:
-        children = folder.get_children()
-        for child in children:
-            recursive_function(folder, child)
-    else:
-        print(f"         {folder.name} is leaf")
-        if folder.scenes.all().count() == 0:
-            name = folder.name
-            parent.children.filter(pk=folder.id).delete()
-            # folder.delete()
-            print(f"{name} didn't have any scenes and was deleted!")
-
-            # siblings = folder.get_siblings()
-            # for sibling in siblings:
-            #     recursive_function(sibling)
-
 
 def write_actors_to_file():
     actors = Actor.objects.all()

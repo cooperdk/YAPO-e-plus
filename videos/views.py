@@ -1,13 +1,12 @@
-import os
+import datetime
 import re
 import os.path
 import subprocess
-import _thread
 from typing import Optional
 
 import django.db
 import errno
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 import requests
 import requests.packages.urllib3
 import videos.addScenes
@@ -16,19 +15,13 @@ import videos.scrapers.freeones as scraper_freeones
 import videos.scrapers.imdb as scraper_imdb
 import videos.scrapers.tmdb as scraper_tmdb
 import videos.scrapers.scanners as scanners
-#import videos.scrapers.googleimages as scraper_images
-from configuration import Config, Constants
+from configuration import Constants
 from videos import ffmpeg_process
 import urllib.request
-import YAPO.settings
 from wsgiref.util import FileWrapper
 from django.http import StreamingHttpResponse
 import mimetypes
 from datetime import timedelta
-import videos.aux_functions as aux
-
-# For REST framework
-
 import platform
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -47,21 +40,14 @@ from rest_framework import status
 from operator import attrgetter
 from random import shuffle
 import videos.const as const
-import YAPO.settings
 from django.utils.datastructures import MultiValueDictKeyError
 import threading
 import videos.startup
-from django.db import connection
-# import pathlib
 from utils.printing import Logger
 log = Logger()
 import urllib3
 import urllib.request
-from urllib.request import Request, urlopen
-from urllib.request import URLError, HTTPError
-from urllib.parse import quote
 import http.client
-from http.client import IncompleteRead, BadStatusLine
 
 http.client._MAXHEADERS = 1000
 
@@ -1467,7 +1453,7 @@ class PlayInVlc(views.APIView):
         scene_id = request.query_params["sceneId"]
         scene = Scene.objects.get(pk=scene_id)
 
-        play_scene_vlc(scene)
+        play_scene_vlc(scene, False)
 
         return Response(status=200)
 
@@ -1646,8 +1632,6 @@ class SceneTagViewSet(viewsets.ModelViewSet):
             return SceneTagIdNameSerialzier
         else:
             return SceneTagSerializer
-
-    queryset = ActorTag.objects.all()
 
     filter_backends = (filters.SearchFilter,)
     search_fields = ("name",)

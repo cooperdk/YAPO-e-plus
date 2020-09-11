@@ -1,6 +1,5 @@
 import glob
 import os
-import sys
 import platform
 
 os.environ["DJANGO_SETTINGS_MODULE"] = "settings"
@@ -9,7 +8,6 @@ import shutil
 import subprocess
 import time
 
-import stat
 import django
 import json
 import re
@@ -18,7 +16,7 @@ import urllib.request as urllib
 django.setup()
 
 from videos.models import Scene
-from configuration import Config, Constants
+from configuration import Config
 
 if platform.system() == "Linux" or platform.system() == "Darwin":
     # Linux or OS X
@@ -308,7 +306,7 @@ def move_sample_movie_to_correct_dir(
                 break
             except OSError as e:
 
-                print(e.message)
+                print(str(e))
                 time.sleep(5)
 
         if not delete_sucess:

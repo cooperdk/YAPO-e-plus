@@ -6,14 +6,15 @@ import os
 import re
 import time
 import urllib.parse as urllib_parse
+
 import django
 import requests
-import videos.aux_functions as aux
 from bs4 import BeautifulSoup
 from dateutil.parser import parse
-import videos.const as const
-from django.utils import timezone
+
+import videos.aux_functions as aux
 from utils.printing import Logger
+
 log = Logger()
 from configuration import Config, Constants
 
@@ -23,25 +24,46 @@ requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.
 
 django.setup()
 
-from videos.models import Actor, ActorAlias, ActorTag
-
+from videos.models import Actor, ActorTag
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 
-# MEDIA_PATH = "videos\\media"
-
-def onlyChars(input):
-    valids = "".join(char for char in input if char.isalpha())
+def onlyChars(toCheck):
+    valids = "".join(char for char in toCheck if char.isalpha())
     return valids
-
-def inchtocm(input):
-    if cm.isdigit(): cm=int(cm)*2.54
-    return cm
 
 def sendAllPiercings():
     actors = Actor.objects.all()
     for actor in actors:
         aux.send_piercings_to_actortag(actor)
+
+
+def addCupSize(actor: Actor, sizeString: str):
+    cupSize = onlyChars(sizeString)
+    if len(cupSize) == 0:
+        return
+
+    insert_actor_tag(actor, cupSize + " Cup")
+    aux.progress(18, 29, "Measurements [Cup size]")
+
+    accepted_strings = {
+        'Tiny tits' : {'A'},
+        'Small tits' : {'B'},
+        'Medium tits' : {'C'},
+        'Big tits': {'D', 'E', 'F'},
+        'Very big tits': {'G', 'H', 'I'},
+        'Huge tits': {'J', 'K', 'L', 'M'},
+        'Massively huge tits': {'N', 'O', 'P', 'Q', 'R', 'S'},
+        'Extremely huge tits': {'T', 'U', 'V', 'W', 'X', 'Y', 'Z'}
+    }
+
+    for tagName in accepted_strings.keys():
+        if cupSize in accepted_strings[tagName]:
+            insert_actor_tag(actor, tagName)
+            break
+
+    aux.progress(19, 29, "Measurements [Tits size]")
+
 
 def search_freeones(actor_to_search, alias, force):
     num = 0
@@ -372,70 +394,8 @@ def search_freeones(actor_to_search, alias, force):
                                 except: pass    
                             else:
                                 actor_to_search.measurements="??-??-??"
-                        cupSize = onlyChars(actor_to_search.measurements)
-                        
-                        if len(cupSize)>0:
-                            insert_actor_tag(actor_to_search, cupSize + " Cup")
-                            aux.progress(18,29,"Measurements [Cup size]")
-            
-                            accepted_stringsTiny = {'A'}
-                            accepted_stringsSmall = {'B'}
-                            accepted_stringsReg = {'C'}       
-                            accepted_stringsBig = {'D', 'E', 'F'}
-                            accepted_stringsVBig = {'G', 'H', 'I'}
-                            accepted_stringsHuge = {'J', 'K', 'L', 'M'}
-                            accepted_stringsMassive = {'N', 'O', 'P', 'Q', 'R', 'S'}
-                            accepted_stringsExtreme = {'T', 'U', 'V', 'W', 'X', 'Y', 'Z'}
-                            cupSizePart=[cupSize]
-                
-                            try:
-                                doneY=False
-                                while not doneY:
-                                    for cupSizePart in cupSize:
-                                        if (cupSizePart in accepted_stringsTiny):
-                                            insert_actor_tag(actor_to_search, "Tiny tits")
-                                            #print("Added tag: Tiny tits")
-                                            doneY=True
 
-                                        if (cupSizePart in accepted_stringsSmall):
-                                            insert_actor_tag(actor_to_search, "Small tits")
-                                            #print("Added tag: Small tits")
-                                            doneY=True
-
-                                        if (cupSizePart in accepted_stringsReg):
-                                            insert_actor_tag(actor_to_search, "Medium tits")
-                                            #print("Added tag: Medium tits")
-                                            doneY=True
-                                
-                                        elif (cupSizePart in accepted_stringsBig):
-                                            insert_actor_tag(actor_to_search, "Big tits")
-                                            #print("Added tag: Big tits")
-                                            doneY=True
-
-                                        elif (cupSizePart in accepted_stringsVBig):
-                                            insert_actor_tag(actor_to_search, "Very big tits")                  
-                                            #print("Added tag: Very big tits")
-                                            doneY=True
-
-                                        elif (cupSizePart in accepted_stringsHuge):
-                                            insert_actor_tag(actor_to_search, "Huge tits")    
-                                            #print("Added tag: Huge tits")
-                                            doneY=True
-
-                                        elif (cupSizePart in accepted_stringsMassive):
-                                            insert_actor_tag(actor_to_search, "Massively huge tits")     
-                                            #print("Added tag: Massively huge tits")
-                                            doneY=True
-
-                                        elif (cupSizePart in accepted_stringsExtreme):
-                                            insert_actor_tag(actor_to_search, "Extremely huge tits")                            
-                                            #print("Added tag: Extremely huge tits")
-                                            doneY=True
-                            
-                                        if done: break
-                                    if done: break
-                                aux.progress(19,29,"Measurements [Tits size]")
-                            except: pass
+                        addCupSize(actor_to_search, cupSize)
 
                     elif link2_text.lower().strip() == 'boobs':
                        
@@ -623,7 +583,6 @@ def insert_actor_tag(actor_to_insert, actor_tag_name):
 
         actor_tag.save()
         actor_to_insert.actor_tags.add(actor_tag)
-
     else:
         actor_tag = ActorTag.objects.get(name=actor_tag_name)
         actor_to_insert.actor_tags.add(actor_tag)

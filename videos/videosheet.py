@@ -210,10 +210,8 @@ class MediaInfo(object):
         """
         ffprobe_command = [
             "ffprobe",
-            "-v",
-            "quiet",
-            "-print_format",
-            "json",
+            "-v", "quiet",
+            "-print_format", "json",
             "-show_format",
             "-show_streams",
             "--",
@@ -476,115 +474,93 @@ class MediaInfo(object):
     def list_template_attributes():
         """Returns a list a of all supported template attributes with their description and example
         """
-        table = []
-        table.append(
+        return [
             {
                 "name": "size",
                 "description": "File size (pretty format)",
                 "example": "128.3 MiB",
-            }
-        )
-        table.append(
+            },
             {
                 "name": "size_bytes",
                 "description": "File size (bytes)",
                 "example": "4662788373",
-            }
-        )
-        table.append(
-            {"name": "filename", "description": "File name", "example": "video.mkv"}
-        )
-        table.append(
+            },
+            {
+                "name": "filename",
+                "description": "File name",
+                "example": "video.mkv"
+            },
             {
                 "name": "duration",
                 "description": "Duration (pretty format)",
                 "example": "03:07",
-            }
-        )
-        table.append(
+            },
             {
                 "name": "sample_width",
                 "description": "Sample width (pixels)",
                 "example": "1920",
-            }
-        )
-        table.append(
+            },
             {
                 "name": "sample_height",
                 "description": "Sample height (pixels)",
                 "example": "1080",
-            }
-        )
-        table.append(
+            },
             {
                 "name": "display_width",
                 "description": "Display width (pixels)",
                 "example": "1920",
-            }
-        )
-        table.append(
+            },
             {
                 "name": "display_height",
                 "description": "Display height (pixels)",
                 "example": "1080",
-            }
-        )
-        table.append(
-            {"name": "video_codec", "description": "Video codec", "example": "h264"}
-        )
-        table.append(
+            },
+            {
+                "name": "video_codec",
+                "description": "Video codec",
+                "example": "h264"
+            },
             {
                 "name": "video_codec_long",
                 "description": "Video codec (long name)",
-                "example": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
-            }
-        )
-        table.append(
+                "example": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10"
+            },
             {
                 "name": "display_aspect_ratio",
                 "description": "Display aspect ratio",
                 "example": "16:9",
-            }
-        )
-        table.append(
+            },
             {
                 "name": "sample_aspect_ratio",
                 "description": "Sample aspect ratio",
                 "example": "1:1",
-            }
-        )
-        table.append(
-            {"name": "audio_codec", "description": "Audio codec", "example": "aac"}
-        )
-        table.append(
+            },
+            {
+                "name": "audio_codec",
+                "description": "Audio codec",
+                "example": "aac"
+            },
             {
                 "name": "audio_codec_long",
                 "description": "Audio codec (long name)",
                 "example": "AAC (Advanced Audio Coding)",
-            }
-        )
-        table.append(
+            },
             {
                 "name": "audio_sample_rate",
                 "description": "Audio sample rate (Hz)",
                 "example": "44100",
-            }
-        )
-        table.append(
+            },
             {
                 "name": "audio_bit_rate",
                 "description": "Audio bit rate (bits/s)",
                 "example": "192000",
-            }
-        )
-        table.append(
+            },
             {
                 "name": "frame_rate",
                 "description": "Frame rate (frames/s)",
                 "example": "23.974",
             }
-        )
-        return table
+        ]
 
 
 class MediaCapture(object):

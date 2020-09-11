@@ -1,13 +1,12 @@
 import os
 from os import path
 import sys
-#import json
 import shutil
 import requests
 import platform
 import webbrowser
 
-from videos.models import Scene, Actor, ActorTag, SceneTag, Folder
+from videos.models import Scene, Actor, ActorTag, SceneTag
 import videos.aux_functions as aux
 from configuration import Config
 from utils import Constants
@@ -22,6 +21,7 @@ def banner():
     SCRIPT_ROOT = get_main_dir()
 
     try:
+        # noinspection PyUnresolvedReferences
         if sys.frozen or sys.importers:
             SCRIPT_ROOT = os.path.dirname(sys.executable)
             compiled = True
@@ -136,6 +136,7 @@ def configcheck ():
 def vercheck (): # Check the local version against Github
 
     try:
+        # noinspection PyUnresolvedReferences
         if sys.frozen or sys.importers:
             SCRIPT_ROOT = os.path.dirname(sys.executable)
             compiled = True
@@ -250,7 +251,6 @@ def startup_sequence():
     mem = int(aux.getMemory())
     cpu = aux.getCPU()
     cpucnt = aux.getCPUCount()
-    global videoProcessing
     print(f"\nYou have {mem} GB available. CPU speed is {cpu} GHz and you have {cpucnt} cores available.")
 
     if mem >= 2 and cpu > 1.2:
@@ -265,8 +265,6 @@ def startup_sequence():
         print("\n")
 
     ffmpeg_check()
-
-    #aux.populate_actors()
 
     if "runserver" in sys.argv[1]:
         site = Config().yapo_url

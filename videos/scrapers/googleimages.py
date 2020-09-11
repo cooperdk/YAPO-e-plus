@@ -162,7 +162,6 @@ class googleimagesdownload:
                 print("Could not open URL. Please check your internet connection and/or ssl settings \n"
                       "If you are using proxy, make sure your proxy settings is configured correctly")
                 sys.exit()
-                return "Page Not found"
 
 
     # Download Page for more than 100 images
@@ -273,16 +272,16 @@ class googleimagesdownload:
 
 
     #Format the object in readable format
-    def format_object(self,object):
+    def format_object(self, toFormat):
         formatted_object = {}
-        formatted_object['image_format'] = object['ity']
-        formatted_object['image_height'] = object['oh']
-        formatted_object['image_width'] = object['ow']
-        formatted_object['image_link'] = object['ou']
-        formatted_object['image_description'] = object['pt']
-        formatted_object['image_host'] = object['rh']
-        formatted_object['image_source'] = object['ru']
-        formatted_object['image_thumbnail_url'] = object['tu']
+        formatted_object['image_format'] = toFormat['ity']
+        formatted_object['image_height'] = toFormat['oh']
+        formatted_object['image_width'] = toFormat['ow']
+        formatted_object['image_link'] = toFormat['ou']
+        formatted_object['image_description'] = toFormat['pt']
+        formatted_object['image_host'] = toFormat['rh']
+        formatted_object['image_source'] = toFormat['ru']
+        formatted_object['image_thumbnail_url'] = toFormat['tu']
         return formatted_object
 
 
@@ -318,9 +317,9 @@ class googleimagesdownload:
             output_file = open(file_name, 'wb')
             output_file.write(data)
             output_file.close()
-        except IOError as e:
-            raise e
         except OSError as e:
+            raise e
+        except IOError as e:
             raise e
         print(f"completed ====> {image_name.encode('raw_unicode_escape').decode('utf-8')}")
         return

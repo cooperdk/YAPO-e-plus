@@ -1,8 +1,5 @@
-import os
-from datetime import datetime
-
-from django.db.models import Manager
 from django.test import TestCase
+
 import videos.models
 from videos.scrapers import tmdb
 

@@ -1,31 +1,19 @@
-import os
+import http.client
 import sys
 import time
-from concurrent.futures import thread
-
-from typing import List
-
-from videos.models import *
-from configuration import Config, Constants
-#from dateutil.parser import parse
-import datetime
 import urllib.request
 from urllib.request import Request, urlopen
-from urllib.request import URLError, HTTPError
-from urllib.parse import quote
-import http.client
-from http.client import IncompleteRead, BadStatusLine
+
+from videos.models import *
+
 http.client._MAXHEADERS = 1000
 from http.client import IncompleteRead, BadStatusLine
-import argparse
 import ssl
 import datetime
-import json
 import re
 http.client._MAXHEADERS = 1000
 import socket
 import requests
-import shutil
 from lxml import html
 from utils.printing import Logger
 log = Logger()
@@ -186,7 +174,7 @@ def tpdb_formatter (name):
     name = re.sub(r'(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s\d{2},\s\d{4}', '', name)
     name = re.sub(r'(January|February|March|April|May|June|July|August|September|October|November|December)\s\d{2},\s\d{4}', '', name)
     name = re.sub(r'\d{1,2}\.{0,1}\s{0,1}(January|February|March|April|May|June|July|August|September|October|November|December)\s{0,1}.\d{4}', '', name)
-    name = re.sub(r'(\d+)[/\.-](\d+)[/\.-](\d+)', '', name)
+    name = re.sub(r'(\d+)[/.-](\d+)[/.-](\d+)', '', name)
     name = re.sub(r'\W', ' ', name)
     for trash in trashTitle:
         name = re.sub(r'\b%s\b' % trash, '', name, flags=re.IGNORECASE)
@@ -332,119 +320,6 @@ def save_website_logo (image_link, website, force, *args):
     print(f"Saved {as_uri} to DB ({save_file_name})")
     ws.modified_date = datetime.datetime.now()
     ws.save()
-
-
-def populate_actors():
-    actors: List[Actor] = Actor.objects.order_by("name")
-    for actor in actors:
-        photo = actor.thumbnail
-        desc = actor.description
-        url = 'https://metadataapi.net/api/performers'
-
-        params = { 'q': actor.name }
-        headers = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'User-Agent': 'YAPO e+ 0.71',
-        }
-        print(f"Contacting API for info about {actor.name}... ", end="")
-        response = requests.request('GET', url, headers=headers, params=params)  # , params=params
-        print("\n")
-        try:
-            response = response.json()
-        except:
-            pass
-
-        pid = ""
-        img = ""
-        bio = ""
-        desc = ""
-        changed = False
-        success = False
-        photo = ""
-        if all([response['data'], len(str(response['data'])) > 15]):
-            # print("1")
-            # try:
-            if 'id' in response['data'][0].keys():
-                pid = response['data'][0]['id']
-                # print("id")
-            if 'image' in response['data'][0].keys():
-                img = response['data'][0]['image']
-                # print("i")
-            elif 'thumbnail' in response['data'][0].keys():
-                img = response['data'][0]['thumbnail']
-                # print("t")
-            if 'bio' in response['data'][0].keys():
-                desc = response['data'][0]['bio']
-
-            if actor.thumbnail == Constants().unknown_person_image_path:
-                # print(f"No image, downloading ({img}) - ", end="")
-                save_path = actor.get_media_path('profile')
-                # print("Profile pic path: " + save_path)
-                save_file_name = os.path.join(save_path, 'profile.jpg')
-                if img and not os.path.isfile(save_file_name):
-                    if not os.path.exists(save_path):
-                        os.makedirs(save_path)
-                    if download_image(img, save_file_name):
-                        as_uri = pathname2url(save_file_name)
-                        actor.thumbnail = as_uri
-                        photo += " [ Photo ]"
-                        success = True
-                        changed = True
-                    else:
-                        log.swarn(f"DOWNLOAD ERROR: Photo ({actor.name}): {img}")
-
-                    #save_actor_profile_image_from_web(img, actor, True)
-
-            if any([not actor.description, len(actor.description) < 128,
-                    "freeones" in actor.description.lower()]):
-                # print("no good desc")
-                if desc:
-                    # print("chg desc")
-                    if len(desc) > 72:
-                        actor.description = strip_html(desc)
-                        changed = True
-                        success = True
-                        photo += " [ Description ]"
-            if pid:
-                # print("id")
-                if not actor.tpdb_id:
-                    actor.tpdb_id = pid
-                    photo += " [ TpDB ID ]"
-                    changed = True
-                    success = True
-
-            if success:
-                # print("yep, done")
-                actor.last_lookup = datetime.datetime.now()
-                actor.modified_date = datetime.datetime.now()
-                actor.save()
-                log.sinfo(f'Information about {actor.name} was successfully gathered from TpDB: {photo}.')
-
-            else:
-
-                save_path = os.path.join(Config().site_media_path, 'actor', str(actor.id), 'profile')
-                save_file_name = os.path.join(save_path, 'profile.jpg')
-
-                if (actor.tpdb_id == pid) and (len(actor.description) > 125 and (
-                os.path.isfile(save_file_name))):
-                    success = True
-                    log.sinfo(
-                        f'Your installation has good details about {actor.name}. You can force this operation.')
-
-            #return success
-
-        # except:
-        # success = False
-        # log.swarn(f'There was an error downloading a photo for and/or getting information about {actor.name}!')
-        # return success
-
-        else:
-            log.swarn(f'It seems that TpDB might not know anything about {actor.name}!')
-            logfile = open(os.path.join(Config().data_path, 'tpdb-missing-actors.log'), 'a+')
-            logfile.write(f"{actor.name} - {str(actor.actor_aliases)}\n")
-            logfile.close()
-            success = False
 
 
 def download_image (image_url, path):
