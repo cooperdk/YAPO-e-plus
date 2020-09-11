@@ -1,0 +1,15 @@
+recursive-include YAPO *
+include LICENSE
+include README.MD
+include CHANGELOG.MD
+include VERSION.MD
+recursive-include videos *
+#recursive-include videos/static *
+#recursive-include videos/media *
+#recursive-include videos/templates *
+#recursive-include videos/templatetags *
+recursive-include utils *
+recursive-include configuration *
+recursive-include data *
+recursive-include database *
+recursive-include config *
