@@ -97,20 +97,9 @@ def strip_bad_chars(name):
             print(f"Adding Data: {name}")
     return name
 
-def insert_aliases(actor_to_insert, aliases):
+def insert_aliases(actor_to_insert: Actor, aliases: str):
     for alias in aliases.split(','):
-        alias = alias.lstrip()
-        alias = alias.rstrip()
-        if not actor_to_insert.actor_aliases.filter(name=alias):
-            alias_to_insert = ActorAlias()
-            alias_to_insert.name = alias.encode('utf-8')
-            # alias_to_insert.actor = actor_to_insert
-            try:
-                alias_to_insert.save()
-                actor_to_insert.actor_aliases.add(alias_to_insert)
-            except django.db.IntegrityError as e:
-                print(e)
-
+        actor_to_insert.createOrAddAlias(alias.strip())
 
 def match_text_in_link_to_query(soup, text, href):
     ans = None

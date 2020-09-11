@@ -630,20 +630,9 @@ def insert_actor_tag(actor_to_insert, actor_tag_name):
         actor_tag.save()
 
 
-def insert_aliases(actor_to_insert, aliases):
+def insert_aliases(actor_to_insert: Actor, aliases : str):
     for alias in aliases.split(','):
-        alias = alias.lstrip()
-        alias = alias.rstrip()
-        if not actor_to_insert.actor_aliases.filter(name=alias):
-            alias_to_insert = ActorAlias()
-            alias_to_insert.name = alias  #.decode('utf-8')    # Encode gives an error in Py 8
-            # alias_to_insert.actor = actor_to_insert
-            try:
-                alias_to_insert.save()
-                actor_to_insert.actor_aliases.add(alias_to_insert)
-            except django.db.IntegrityError as e:
-                print(e)
-
+        actor_to_insert.createOrAddAlias(alias.strip())
 
 def match_link_to_query(soup_links, text_to_find):
     ans = None

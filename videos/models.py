@@ -119,6 +119,14 @@ class Actor(models.Model):
     def get_name_delimiter(self, delimiter):
         return self.name.replace(" ", delimiter)
 
+    def createOrAddAlias(self, aka):
+        if not self.actor_aliases.filter(name=aka):
+            newAlias = ActorAlias.objects.get_or_create(name=aka)
+            newAlias[0].save()
+
+            self.actor_aliases.add(newAlias[0])
+
+
 
 class Website(models.Model):
     name = models.CharField(max_length=50, unique=True)
