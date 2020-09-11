@@ -244,9 +244,7 @@ def parse_all_scenes(ignore_last_lookup):
 
   now = datetime.datetime.now()
 
-  Config().last_all_scene_tag = datetime.datetime.strftime(
-    now, "%Y-%m-%d %H:%M:%S"
-  )
+  Config().last_all_scene_tag = now
 
   Config().save()
 
