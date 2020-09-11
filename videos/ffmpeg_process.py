@@ -4,7 +4,6 @@ import sys
 import platform
 
 os.environ["DJANGO_SETTINGS_MODULE"] = "settings"
-sys.path.append(os.path.abspath("E:\djangoProject\YAPO\YAPO"))
 
 import shutil
 import subprocess
@@ -19,7 +18,7 @@ import urllib.request as urllib
 django.setup()
 
 from videos.models import Scene
-
+from configuration import Config, Constants
 
 if platform.system() == "Linux" or platform.system() == "Darwin":
     # Linux or OS X
@@ -40,15 +39,10 @@ FFMPEG_SCREENSHOT_ARGUMENTS = (
 )
 DEFAULT_SCREENSHOT_TIME = "00:01:30"
 SCREENSHOT_OUTPUT_PATH = os.path.join("videos", "ffmpeg", "temp", "thumb.jpg")
-MEDIA_PATH = os.path.join("videos", "media")
 SAMPLE_RESOLUTION = "640:360"
 
 if not os.path.exists(TEMP_PATH):
     os.makedirs(TEMP_PATH)
-
-if not os.path.exists(MEDIA_PATH):
-    os.makedirs(MEDIA_PATH)
-
 
 def execute_subprocess(command_call, type_of_bin):
     # command_call = "gibrish"
@@ -380,12 +374,13 @@ def ffmpeg_take_scene_screenshot_without_save(scene):
 
     if a["success"]:
         print("Screenshot Taken")
-        dest_path = os.path.join(MEDIA_PATH, "scenes", str(scene.id), "thumb")
+        dest_path = os.path.join(Config().site_media_path, "scenes", str(scene.id), "thumb")
         z = move_sample_movie_to_correct_dir(
             scene, True, "thumb.jpg", dest_path, SCREENSHOT_OUTPUT_PATH, "image"
         )
         time.sleep(1)
-        thumb_path = os.path.relpath(z, start="videos")
+        thumb_path = os.path.relpath(z, start=Config().site_media_path)
+        thumb_path = os.path.join('media', thumb_path)
         as_uri = urllib.pathname2url(thumb_path)
         scene.thumbnail = as_uri
 
@@ -509,7 +504,7 @@ def ffmpeg_create_sammple_video(scene):
             make_video_from_screenshots(scene.framerate)
             time.sleep(5)
 
-            dest_path = os.path.join(MEDIA_PATH, "scenes", str(scene.id), "sample")
+            dest_path = os.path.join(Config().site_media_path, "scenes", str(scene.id), "sample")
             move_sample_movie_to_correct_dir(
                 scene,
                 success,

@@ -3,6 +3,8 @@ import re
 import os.path
 import subprocess
 import _thread
+from typing import Optional
+
 import django.db
 import errno
 from django.shortcuts import render, get_object_or_404
@@ -390,7 +392,49 @@ def populate_websites(force):
 
     return Response(status=200)
 
+class tpdb_actor_response:
+    data = None # type: Optional[str]
+    bio = None
+    image = None
+    pid = None
 
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def parse(actorname, html):
+        responseJson = html.json()
+
+        responseData = responseJson.get('data', '')
+        if responseData is None or len(str(responseData)) < 16:
+            return None
+
+        # We will get back results for a few different actors, so pull out only the one we're queried for.
+        # TODO: deal with pagination
+        responseData = [x for x in responseData if x['name'] == actorname]
+        if len(responseData) == 0:
+            return None
+#        print (responseData)
+        if len(responseData) != 1:
+            raise Exception("tpdb response did not include exactly one 'data' entry for actor '%s' (included: '%s')" % (actorname, ",".join(map(lambda x: x.name, responseData))))
+
+        # Merge in keys we're interested in
+        rawResponseData = responseData[0]
+        cleanResponseData = {}
+        for k in ('id', 'bio', 'image', 'thumbnail'):
+            cleanResponseData[k] = rawResponseData.get(k, None)
+        # Coalesce 'image' and 'thumbnail' values to a single 'image'
+        if cleanResponseData['image'] is None:
+            cleanResponseData['image'] = cleanResponseData['thumbnail']
+
+        toRet = tpdb_actor_response()
+        for k in [x for x in cleanResponseData if x is not None]:
+            # fix up 'id' to 'pid'.
+            if k == 'id':
+                setattr(toRet, 'pid', cleanResponseData[k])
+            setattr(toRet, k, cleanResponseData[k])
+
+        return toRet
 
 def tpdb_scan_actor(actor, force: bool):
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -399,8 +443,6 @@ def tpdb_scan_actor(actor, force: bool):
     if not aux.is_domain_reachable("api.metadataapi.net"):
         return Response(status=500)
 
-    photo = actor.thumbnail
-    desc = actor.description
     url = 'https://api.metadataapi.net/performers'
 
     log.sinfo(f'Contacting TpDB API for info about {actor.name}.')
@@ -413,106 +455,65 @@ def tpdb_scan_actor(actor, force: bool):
     }
 
     response = requests.request('GET', url, headers=headers, params=params)  # , params=params
-    #print("\n")
-    try:
-        response = response.json()
-    except:
-        pass
+    response.raise_for_status()
 
-    pid = ""
-    img = ""
-    bio = ""
-    desc = ""
-    changed = False
     success = False
     photo = ""
 
-    if all([response['data'], len(str(response['data'])) > 15]):
-        #print("1")
-        #try:
-        if 'id' in response['data'][0].keys():
-            pid = response['data'][0]['id']
-            #print("id")
-        if 'image' in response['data'][0].keys():
-            img = response['data'][0]['image']
-            #print("i")
-        elif 'thumbnail' in response['data'][0].keys():
-            img = response['data'][0]['thumbnail']
-            #print("t")
-        if 'bio' in response['data'][0].keys():
-            desc = response['data'][0]['bio']
-            #print("d")
-        if actor.thumbnail == Constants().unknown_person_image_path or force:
-            #print(f"No image, downloading ({img}) - ", end="")
-            save_path = os.path.join(Config().site_media_path, 'actor', str(actor.id), 'profile')
-            # print("Profile pic path: " + save_path)
-            save_file_name = os.path.join(save_path, 'profile.jpg')
-            if img and (not os.path.isfile(save_file_name) or force):
-                if not os.path.exists(save_path):
-                    os.makedirs(save_path)
-                maxretries = 3
-                attempt = 0
-                #while attempt < maxretries:
-                    #try:
-                if aux.download_image(img, save_file_name):
-                    rel_path = os.path.relpath(save_file_name, start="videos")
-                    as_uri = urllib.request.pathname2url(rel_path)
-                    actor.thumbnail = as_uri
-                    photo += " [ Photo ]"
-                    success = True
-                else:
-                    log.swarn(f"DOWNLOAD ERROR: Photo ({actor.name}): {img}")
+    parsedResponse = tpdb_actor_response.parse(actor.name, response)
+    if parsedResponse is None:
+        log.swarn(f'It seems that TpDB might not know anything about {actor.name}!')
+        return False
 
-        if any([force, not actor.description, len(actor.description) < 128, "freeones" in actor.description.lower()]):
-            #print("no good desc")
-            if desc:
-                #print("chg desc")
-                if len(desc) > 72:
-                    actor.description = aux.strip_html(desc)
-                    changed = True
-                    success = True
-                    photo += " [ Description ]"
-        if pid:
-            #print("id")
-            if not actor.tpdb_id or force:
-                actor.tpdb_id = pid
-                photo += " [ TpDB ID ]"
-                changed = True
+    # Download the thumbnail if neccessary
+    if actor.thumbnail == Constants().unknown_person_image_path or force:
+        save_path = os.path.join(Config().site_media_path, 'actor', str(actor.id), 'profile')
+        save_file_name = os.path.join(save_path, 'profile.jpg')
+        if parsedResponse.image is not None and (not os.path.isfile(save_file_name) or force):
+            if not os.path.exists(save_path):
+                os.makedirs(save_path)
+            maxretries = 3
+            attempt = 0
+            #while attempt < maxretries:
+                #try:
+            if aux.download_image(parsedResponse.image, save_file_name):
+                rel_path = os.path.relpath(save_file_name, start="videos")
+                as_uri = urllib.request.pathname2url(rel_path)
+                actor.thumbnail = as_uri
+                photo += " [ Photo ]"
                 success = True
+            else:
+                log.swarn(f"DOWNLOAD ERROR: Photo ({actor.name}): {parsedResponse.image}")
 
-        if success:
-            #print("yep, done")
-            actor.last_lookup = datetime.datetime.now()
-            actor.modified_date = datetime.datetime.now()
-            actor.save()
-            log.sinfo(f'Information about {actor.name} was successfully gathered from TpDB: {photo}.')
+    if any([force, not actor.description, len(actor.description) < 128, "freeones" in actor.description.lower()]):
+        #print("no good desc")
+        if parsedResponse.bio is not None and len(parsedResponse.bio) > 72:
+            actor.description = aux.strip_html(parsedResponse.bio)
+            success = True
+            photo += " [ Description ]"
 
-        else:
+    if parsedResponse.pid  is not None:
+        if not actor.tpdb_id or force:
+            actor.tpdb_id = parsedResponse.pid
+            photo += " [ TpDB ID ]"
+            success = True
 
-            save_path = os.path.join(Config().site_media_path, 'actor', str(actor.id), 'profile')
-            save_file_name = os.path.join(save_path, 'profile.jpg')
-
-            if not force and ((actor.tpdb_id == pid) and (len(actor.description) > 125) and (os.path.isfile(save_file_name))):
-                success = True
-                log.sinfo(f'Your installation has good details about {actor.name}. You can force this operation.')
-
-            elif force and ((actor.tpdb_id == pid) and (len(actor.description) > 125) and (os.path.isfile(save_file_name))):
-                success = True
-                log.sinfo(f'It seems that there is no better information about {actor.name} on TpDB.')
-        return success
-
-        #except:
-            #success = False
-            #log.swarn(f'There was an error downloading a photo for and/or getting information about {actor.name}!')
-            #return success
+    if success:
+        actor.last_lookup = datetime.datetime.now()
+        actor.modified_date = datetime.datetime.now()
+        actor.save()
+        log.sinfo(f'Information about {actor.name} was successfully gathered from TpDB: {photo}.')
 
     else:
-        log.swarn(f'It seems that TpDB might not know anything about {actor.name}!')
-        success = False
-        return success
-
-
-
+        save_path = os.path.join(Config().site_media_path, 'actor', str(actor.id), 'profile')
+        save_file_name = os.path.join(save_path, 'profile.jpg')
+        if not force and ((actor.tpdb_id == parsedResponse.pid) and (len(actor.description) > 125) and (os.path.isfile(save_file_name))):
+            success = True
+            log.sinfo(f'Your installation has good details about {actor.name}. You can force this operation.')
+        elif force and ((actor.tpdb_id == parsedResponse.pid) and (len(actor.description) > 125) and (os.path.isfile(save_file_name))):
+            success = True
+            log.sinfo(f'It seems that there is no better information about {actor.name} on TpDB.')
+    return success
 
 
 
@@ -520,8 +521,6 @@ def scrape_all_actors(force):
     actors = Actor.objects.all()
 
     for actor in actors:
-    
-        #print("\r")
 
         if not force:
             if actor.last_lookup is None:

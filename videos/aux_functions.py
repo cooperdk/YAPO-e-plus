@@ -1,5 +1,8 @@
 import os
 import sys
+import time
+from concurrent.futures import thread
+
 from videos.models import *
 from configuration import Config, Constants
 #from dateutil.parser import parse
@@ -31,7 +34,7 @@ def progress (count: int, total: int, suffix=''):
     filled_len = int(round(bar_len * count / float(total)))
 
     percents = round(100.0 * count / float(total), 1)
-    bar = '\u2588' * filled_len + '\u2591' * (bar_len - filled_len)
+    bar = '#' * filled_len + '-' * (bar_len - filled_len)
     #bar = '█' * filled_len + '░' * (bar_len - filled_len)
     sys.stdout.write(f"\r{bar} [{percents}%] - {suffix}                    \r")
 
@@ -153,23 +156,6 @@ def insert_actor_tag (actor_to_insert, actor_tag_name):
         #        print("Added tag: " + actor_tag_name + " for " + actor_to_insert.name)
         actor_tag.save()
 
-
-def url_is_alive (url):
-    """
-    Checks that a given URL is reachable.
-    :param url: A URL
-    :rtype: bool
-    """
-    request = urllib.request.Request(url)
-    request.get_method = lambda: "HEAD"
-
-    try:
-        urllib.request.urlopen(request)
-        return True
-    except urllib.request.HTTPError:
-        return False
-
-
 def remove_text_inside_brackets(text, brackets="()[]"):
     count = [0] * (len(brackets) // 2) # count open/close brackets
     saved_chars = []
@@ -231,6 +217,20 @@ def strip_bad_chars (name):
             print(f"Adding Data: {name}")
     return name
 
+def get_with_retry(url, headers, params):
+    deadline = datetime.datetime.now() + datetime.timedelta(minutes=4)
+
+    while True:
+        try:
+            response = requests.request('GET', url, headers=headers, params=params)
+            response.raise_for_status()
+            return response
+        except Exception as e:
+            print(f"Exception: {e} ")
+            if datetime.datetime.now() > deadline:
+                raise
+            print(f"will retry.")
+            time.sleep(3)
 
 def is_domain_reachable(host):
     """ This function checks to see if a host name has a DNS entry by checking
@@ -244,22 +244,6 @@ def is_domain_reachable(host):
     else:
         result =  True
     return result
-
-
-def checkTpDB():
-    try:
-        request = requests.get("http://api.metadataapi.net/scenes?parse=faye-reagan&limit=1", timeout = 3)
-        if request.status_code == 200:
-            result = True
-        else:
-            result = False
-            log.warn(f"api.metadataapi.net returns an unexpected reply code: {request.status_code}")
-
-    except (ConnectionError, ConnectionRefusedError, ConnectionAbortedError, ConnectionResetError) as e:
-        log.warn(f"Cannot connect to api.metadataapi.net: {e}")
-        result = False
-    return result
-
 
 def save_website_logo (image_link, website, force, *args):
     website = website.strip()
@@ -346,10 +330,9 @@ def save_website_logo (image_link, website, force, *args):
         if download_image(image_link, save_file_name):
             ws = Website.objects.get(name=website)
             print("OK")
-            rel_path = os.path.relpath(save_file_name, start="videos")
-            as_uri = urllib.request.pathname2url(rel_path)
+            as_uri = pathname2url(save_file_name)
             ws.thumbnail = as_uri
-            print(f"Saved {as_uri} to DB ({rel_path})")
+            print(f"Saved {as_uri} to DB ({save_file_name})")
             ws.modified_date = datetime.datetime.now()
             ws.save()
             success = True
@@ -414,8 +397,7 @@ def populate_actors():
                     if not os.path.exists(save_path):
                         os.makedirs(save_path)
                     if download_image(img, save_file_name):
-                        rel_path = os.path.relpath(save_file_name, start="videos")
-                        as_uri = urllib.request.pathname2url(rel_path)
+                        as_uri = pathname2url(save_file_name)
                         actor.thumbnail = as_uri
                         photo += " [ Photo ]"
                         success = True
@@ -431,7 +413,7 @@ def populate_actors():
                 if desc:
                     # print("chg desc")
                     if len(desc) > 72:
-                        actor.description = aux.strip_html(desc)
+                        actor.description = strip_html(desc)
                         changed = True
                         success = True
                         photo += " [ Description ]"
@@ -566,36 +548,31 @@ def save_actor_profile_image_from_web (image_link, actor, force):
         os.makedirs(save_path)
 
     save_file_name = os.path.join(save_path, "profile.jpg")
-    if not os.path.isfile(save_file_name) or force:
-
-        if download_image(image_link, save_file_name):
-            rel_path = os.path.relpath(save_file_name, start="videos")
-            as_uri = urllib.request.pathname2url(rel_path)
-            actor.thumbnail = as_uri
-        else:
-            log.warn(f"Error downloading photo for {actor.name} ({image_link}).")
-
-    else:
+    if not force and os.path.isfile(save_file_name):
         log.sinfo(f"Skipping download, we already have a usable photo of {actor.name}.")
+        return
 
+    if not download_image(image_link, save_file_name):
+        log.warn(f"Error downloading photo for {actor.name} ({image_link}).")
+        return
 
+    rel_path = os.path.relpath(save_file_name, start="videos")
+    as_uri = pathname2url(save_file_name)
+    actor.thumbnail = as_uri
 
 def actor_folder_from_name_to_id ():
     actors = Actor.objects.all()
 
     for actor in actors:
-        rel_path = os.path.relpath(
-            os.path.join(
-                Config().site_media_path,
-                "actor",
-                str(actor.id),
-                "profile",
-                "profile.jpg",
-            ),
-            start="videos",
-        )
+        abs_path = os.path.join(
+                    Config().site_media_path,
+                    "actor",
+                    str(actor.id),
+                    "profile",
+                    "profile.jpg",
+            )
 
-        as_uri = urllib.request.pathname2url(rel_path)
+        as_uri = pathname2url(abs_path)
 
         print(
            f"Actor {actor.name} thumb path is: {actor.thumbnail} \n and it should be {as_uri}"
@@ -666,6 +643,20 @@ def actor_folder_from_name_to_id ():
 
     return True
 
+def pathname2url(path):
+    # Chop off the leading site media path
+    if path.find(Config().site_media_path) is not 0:
+        raise Exception(f"File {path} is not under the media path {Config().site_media_path}")
+    path = path[len(Config().site_media_path):]
+
+    # And turn into a URL.
+    as_uri = urllib.request.pathname2url(path).strip('/')
+
+    # It'll be under the media directory.
+    mediaUrl = Config().site_media_url.strip('/')
+    as_uri = "%s/%s" % (mediaUrl, as_uri)
+
+    return as_uri
 
 if __name__ == "__main__":
     print("this is main")

@@ -40,14 +40,10 @@ def tpdb (scene_id: int, force: bool):
     success = False
     found = 0
 
-    if not aux.is_domain_reachable("api.metadataapi.net") or not aux.checkTpDB():
-        return False
 
     current_scene = Scene.objects.get(pk=scene_id)
     scene_name = current_scene.name
     # scene_name = scene_name.replace(" ", "%20")
-
-
 
     searched = False
     for scene_tag in current_scene.scene_tags.all():
@@ -86,18 +82,8 @@ def tpdb (scene_id: int, force: bool):
             'User-Agent': 'YAPO e+ 0.71',
         }
         print("Scanning... ",end="")
-        response = requests.request('GET', url, headers=headers, params=params)
-
-        try:
-            response = response.json()
-        except:
-            pass
-
-        # print (str(response))
-        #pp = pprint.PrettyPrinter(indent=4)
-        #pp.pprint(response)
-
-
+        response = aux.get_with_retry(url, headers=headers, params=params)
+        response = response.json()
 
         if "id" and "title" in str(response):
             found = 1
@@ -128,11 +114,8 @@ def tpdb (scene_id: int, force: bool):
                 'Accept': 'application/json',
                 'User-Agent': 'YAPO e+ 0.71',
             }
-            response = requests.request('GET', url, headers=headers, params=params)
-            try:
-                response = response.json()
-            except:
-                pass
+            response = aux.get_with_retry(url, headers=headers, params=params)
+            response = response.json()
             if "id" and "title" in str(response):
                 found = 2
                 
@@ -323,8 +306,7 @@ def tpdb (scene_id: int, force: bool):
                                         if not os.path.exists(save_path):
                                             os.makedirs(save_path)
                                         aux.download_image(img, save_file_name)
-                                        rel_path = os.path.relpath(save_file_name, start="videos")
-                                        as_uri = urllib.request.pathname2url(rel_path)
+                                        as_uri = aux.pathname2url(save_file_name)
                                         act.thumbnail = as_uri
                                         act.save()
 
@@ -514,7 +496,7 @@ def tpdb (scene_id: int, force: bool):
                 current_scene.name = newtitle
                 log.sinfo(f'Scene name is now \"{newtitle}\".')
             else:
-                print('Renaming is disabled, but we suggest: \"{newtitle}\".')
+                print(f'Renaming is disabled, but we suggest: \"{newtitle}\".')
 
             current_scene.save()
             success = True
