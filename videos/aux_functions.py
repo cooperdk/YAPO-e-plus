@@ -522,5 +522,16 @@ def pathname2url(path):
 
     return as_uri
 
+# Convert a filename mapping as returned from pathname2url back to a path name.
+def urlpath2pathname(url):
+    mediaUrl = Config().site_media_url.strip("/\\")
+    if url.find(mediaUrl) is not 0:
+        raise Exception(f"url {url} is not under the media path {mediaUrl}")
+    url = url[len(mediaUrl):]
+    url = url.strip('/\\')
+
+    url = os.path.join(Config().site_media_path, url)
+    return url
+
 if __name__ == "__main__":
     print("this is main")

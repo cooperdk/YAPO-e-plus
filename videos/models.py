@@ -143,6 +143,12 @@ class Actor(models.Model, ModelWithMediaContent):
 
             self.actor_aliases.add(newAlias[0])
 
+    def generateThumbnailPath(self):
+        thumnbail_dir = self.get_media_path('profile')
+        if not os.path.exists(thumnbail_dir):
+            os.makedirs(thumnbail_dir)
+        return os.path.join(thumnbail_dir, 'profile.jpg')
+
 
 class Website(models.Model, ModelWithMediaContent):
     name = models.CharField(max_length=50, unique=True)

@@ -18,7 +18,7 @@ import videos.scrapers.imdb as scraper_imdb
 import videos.scrapers.tmdb as scraper_tmdb
 import videos.scrapers.scanners as scanners
 from configuration import Constants
-from videos import ffmpeg_process
+from videos import ffmpeg_process, aux_functions
 import urllib.request
 from wsgiref.util import FileWrapper
 from django.http import StreamingHttpResponse
@@ -959,8 +959,10 @@ def clean_dir(modelType : ModelWithMediaContent):
     number_of_folders = len(os.listdir(dir_to_clean))
     index = 1
 
+    modelTypeName = str(modelType.name.field).split('.')[-2:-1][0]
+
     for dir_in_path in os.listdir(dir_to_clean):
-        print(f"Checking {modelType.name} folder {index} out of {number_of_folders}")
+        print(f"Checking {modelTypeName} folder {index} out of {number_of_folders}")
 
         # The original Yapo-e-plus code skips any directory names which are not integers, so we do too.
         try:
@@ -973,7 +975,7 @@ def clean_dir(modelType : ModelWithMediaContent):
         dir_with_path = os.path.join(dir_to_clean, dir_in_path)
 
         if len(modelType.objects.filter(pk=dir_in_path_int)) == 0:
-            print(f"{modelType.name} id {dir_in_path_int} is not in the database... Deleting folder {dir_with_path}")
+            print(f"{modelTypeName} id {dir_in_path_int} is not in the database... Deleting folder {dir_with_path}")
             shutil.rmtree(dir_with_path)
 
         index += 1
@@ -1437,65 +1439,48 @@ class AssetAdd(views.APIView):
     )
 
     def post(self, request, format=None):
-        my_file = "alala"
-        # my_file = request.FILES['file']
-        save_path = const.TEMP_PATH
-        # os.path.abspath('D:\\aria2')
-        save_file_name = "temp.jpg"
+        reqDataFile = request.data.get("file", None)
+        reqDataType = request.data.get("type", None)
+        reqDataID = request.data.get("id", None)
 
-        save_dest = os.path.join(save_path, save_file_name)
-        #
-        # if request.FILES['file']:
-        #     # multi part file upload
-        #     print ("multiPart")
-        #     current_path = os.path.dirname(__file__)
-        #     # filename = '/static/myfile.jpg'
-        #     filename = save_dest
-        #     with open(filename, 'wb+') as temp_file:
-        #         for chunk in my_file.chunks():
-        #             temp_file.write(chunk)
-        #
-        #     my_saved_file = open(filename)  # there you go
-        #     return Response(status=200)
+        if None in (reqDataFile, reqDataType, reqDataID):
+            return Response(status=500)
 
-        if request.data["file"]:
-            # print (request.data['file'])
-            data = request.data["file"]
-            if data.startswith("data:image"):
-                # base64 encoded image - decode
+        return self.handle_post_request(reqDataFile, reqDataType, reqDataID)
 
-                format, imgstr = data.split(";base64,")  # format ~= data:image/X,
-                ext = format.split("/")[-1]  # guess file extension
-                # id = uuid.uuid4()
-                # data = ContentFile(base64.b64decode(imgstr), name=id.urn[9:] + '.' + ext)
-                with open(save_dest, "wb") as fh:
-                    fh.write(base64.decodebytes(imgstr.encode("utf-8")))
+    def handle_post_request(self, dataFile, dataType, dataID):
+        # The only object we support updating here is Actor.
+        if dataType != "Actor":
+            return Response(status=500)
 
-                if request.data["type"] == "Actor":
-                    actor = Actor.objects.get(pk=request.data["id"])
+        # Get the object to update, bailing if it doesn't exist
+        actor = Actor.objects.get(pk=dataID)
 
-                    current_tumb = os.path.join(
-                        const.MEDIA_PATH,
-                        "actor",
-                        f"{actor.id}",
-                        "profile",
-                        "profile.jpg",
-                    )
-                    print(current_tumb)
+        # We expect a base64-encoded image.
+        if not dataFile.startswith("data:image"):
+            return Response(status=500)
 
-                    rel_path = os.path.relpath(current_tumb, start="videos")
-                    as_uri = urllib.request.pathname2url(rel_path)
+        # Decode the image to a temporary file
+        save_dest = os.path.join(const.TEMP_PATH, "temp.jpg")
+        try:
+            format, imgstr = dataFile.split(";base64,")
+            with open(save_dest, "wb") as fh:
+                fh.write(base64.decodebytes(imgstr.encode("utf-8")))
 
-                    actor.thumbnail = as_uri
-                    actor.save()
+            # set the actor's thumbnail path, and copy the temporary file to the new location.
+            thumnbail_path = actor.generateThumbnailPath()
+            if os.path.exists(thumnbail_path):
+                os.remove(thumnbail_path)
+            shutil.move(save_dest, thumnbail_path)
 
-                    if not os.path.exists(current_tumb):
-                        os.makedirs(os.path.dirname(current_tumb))
-                    shutil.move(save_dest, current_tumb)
+            actor.thumbnail = aux_functions.pathname2url(thumnbail_path)
+            actor.save()
+        finally:
+            # Delete the temporary file before we return
+            if os.path.exists(save_dest):
+                os.remove(save_dest)
 
-            return Response(status=200)
-
-        return Response(status=500)
+        return Response(status=200)
 
 
 class FileUploadView(views.APIView):
