@@ -22,13 +22,14 @@ class ModelWithMediaContent:
     def get_media_dir(self) -> str:
         return
 
-    def get_media_path(self, filename : str) -> str:
+    # Get the media path for this model. If createIfNotExisting is specified, ensure the path exists before returning.
+    def get_media_path(self, filename : str = '', createIfNotExisting = True ) -> str:
         mediaDir = os.path.abspath(
             os.path.join(Config().site_media_path, self.get_media_dir(), str(self.id))
         )
-        # TODO: is it a good idea to always create this here? I think so but I'm not 100%?
-        if not os.path.exists(mediaDir):
-            os.makedirs(mediaDir)
+        if createIfNotExisting:
+            if not os.path.exists(mediaDir):
+                os.makedirs(mediaDir)
 
         return os.path.join(mediaDir, filename)
 
