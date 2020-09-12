@@ -149,7 +149,6 @@ class Actor(models.Model, ModelWithMediaContent):
             os.makedirs(thumnbail_dir)
         return os.path.join(thumnbail_dir, 'profile.jpg')
 
-
 class Website(models.Model, ModelWithMediaContent):
     name = models.CharField(max_length=50, unique=True)
     date_added = models.DateTimeField(auto_now_add=True)

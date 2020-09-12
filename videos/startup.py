@@ -9,25 +9,27 @@ import webbrowser
 from videos.models import Scene, Actor, ActorTag, SceneTag
 import videos.aux_functions as aux
 from configuration import Config
-from utils import Constants
 from colorama import init
-from utils.printing import Logger
+
+import logging
+
+log = logging.getLogger(__name__)
 
 init()
-log = Logger()
 
-def banner():
-
-    SCRIPT_ROOT = get_main_dir()
-
+def isCompiled():
     try:
         # noinspection PyUnresolvedReferences
         if sys.frozen or sys.importers:
-            SCRIPT_ROOT = os.path.dirname(sys.executable)
-            compiled = True
+            return True
     except AttributeError:
+        return False
+
+def banner():
+    if hasattr(sys, "frozen") or isCompiled():
+        SCRIPT_ROOT = os.path.dirname(sys.executable)
+    else:
         SCRIPT_ROOT = os.path.dirname(os.path.realpath(__file__))
-        compiled = False
 
     if platform.system() == "Windows":
         import win32console
@@ -56,49 +58,26 @@ def banner():
         os.system(cmd)
     else:
         os.system('clear')
-    print("\033[40m\033[1m\033[32m")
-    print("\t____    ____  ___       ______     ______         _______        ")
-    print("\t\   \  /   / /   \     |   _  \   /  __  \       |   ____|   _   ")
-    print("\t \   \/   / /  ^  \    |  |_)  | |  |  |  |      |  |__    _| |_ ")
-    print("\t  \_    _/ /  /_\  \   |   ___/  |  |  |  |      |   __|  |_   _|")
-    print("\t    |  |  /  _____  \  |  |      |  `--'  |      |  |____   |_|  ")
-    print("\t    |__| /__/     \__\ | _|       \______/       |_______|       ")
-    print("\t")
-    print("\t              \033[37m\033[44mYET ANOTHER PORN ORGANIZER - extended\033[49m")
-    print("\t\033[1m\033[37m\033[40m=================================================================")
-    print("\t\033[0;10r")
-    print(f"\033[22mExecuting YAPO from: {SCRIPT_ROOT}", end="")
-    if compiled:
-        print(f" (frozen/compiled build)")
+
+    log.info(f"Executing YAPO from: {SCRIPT_ROOT}")
+    if isCompiled():
+        log.info(f"This is a frozen/compiled build.")
     else:
-        print(f" (running in a Python environment)")
-    print(f"Database dir is:     {Config().database_dir}")
-    print(f"Config dir is:       {Config().config_path}")
-    print(f"Media files dir is:  {Config().site_media_path}")
-    print("Consider making regular backup of the db, config and media directories.\n")
+        log.info(f"Running in a Python environment.")
+    log.info(f"Database dir is:     {Config().database_dir}")
+    log.info(f"Config dir is:       {Config().config_path}")
+    log.info(f"Media files dir is:  {Config().site_media_path}")
 
-
-def main_is_frozen():
-   return (hasattr(sys, "frozen")) # old py2exe
-
-def get_main_dir():
-   if main_is_frozen():
-       return os.path.dirname(sys.executable)
-   return os.path.dirname(os.path.realpath(__file__))
-
-
-
-def getsizeall () -> str: # Retrieves the total amount of bytes of registered scenes
-    row = Scene.objects.raw(
-        "SELECT SUM(size) AS total, id FROM videos_scene"
-    )  # cursor.fetchone()
+# Retrieves the total amount of bytes of registered scenes
+def getsizeall () -> str:
+    row = Scene.objects.raw("SELECT SUM(size) AS total, id FROM videos_scene")
     if row[0].total is not None:
         return sizeformat(row[0].total)
     else:
-        return "no space"
+        return sizeformat(0)
 
-
-def sizeformat (b: int) -> str: # returns a human-readable filesize depending on the file's size
+# returns a human-readable filesize depending on the file's size
+def sizeformat (b: int) -> str:
     if b < 1000:
         return f"{b}B"
     elif b < 1000000:
@@ -110,186 +89,156 @@ def sizeformat (b: int) -> str: # returns a human-readable filesize depending on
     else:
         return f"{b/1000000000000:.1f}TB"
 
-
-
-def write_actors_to_file(): # Method to dump all actors alphabetically in a ready-to-insert manner.
+# Dump all actors alphabetically in a ready-to-insert manner.
+def write_actors_to_file():
     actortxt = os.path.join(Config().data_path, "actors_dump.txt")
-    actors = Actor.objects.order_by("id")  # name
+    actors = Actor.objects.order_by("id")
     actors_string = ",".join(actor.name for actor in actors)
-    numactors = len(actors)
 
     with open(actortxt, "w") as file:
         file.write(actors_string)
 
-    print("For backup purposes, we just wrote all actors in alphabetical form to:")
-    print(actortxt)
-    print("To recover actor data, please consult the guide.")
+    log.info(f"For backup purposes, we just wrote all actors in alphabetical form to {actortxt}. " +
+            + "To recover actor data, please consult the guide.")
 
 
 def configcheck ():
-    settings = os.path.join(Config().config_path, Constants().default_yaml_settings_filename)
+    settings = Config().configfile_path
     if not path.isfile(settings):
-        log.info("There is no config file, so one has been generated.")
+        log.warning("There is no config file, so one has been generated.")
         Config().save()
 
+# Check the local version against Github
+def vercheck():
+    if isCompiled():
+        log.warning("Since this build is frozen, an update check is nor performed.")
 
-def vercheck (): # Check the local version against Github
+    #dirname of dirname of file results in parent directory
+    update = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "VERSION.md"))
 
+    if not path.isfile(update):
+        log.warning(f"Unable to check update status, file {update} does not exist")
+        return
+
+    # Parse the version string out of the VERSION.md file
+    with open(update, "r") as verfile:
+        currentVersion = verfile.read()
+    currentVersion = str(currentVersion).strip()
+    log.info(f"This is version {currentVersion} of YAPO.")
     try:
-        # noinspection PyUnresolvedReferences
-        if sys.frozen or sys.importers:
-            SCRIPT_ROOT = os.path.dirname(sys.executable)
-            compiled = True
-    except AttributeError:
-        SCRIPT_ROOT = os.path.dirname(os.path.realpath(__file__))
-        compiled = False
+        remoteVer = requests.get("https://raw.githubusercontent.com/cooperdk/YAPO-e-plus/develop/VERSION.md").text
+        remoteVer = remoteVer.strip()
+    except requests.exceptions.BaseHTTPError as f:
+        log.warning(f"Unable to check for updates: {f}")
+        return
 
-    if not compiled:
-        #dirname of dirname of file results in parent directory
-        update = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "VERSION.md"))
+    if currentVersion != remoteVer:
+        log.warning(f'A new version of YAPO e+ is available. You are running {currentVersion} but {remoteVer} is available.')
 
-        if path.isfile(update):
-            with open(update, "r") as verfile:
-                ver = verfile.read()
-            ver = str(ver).strip()
-            print(f"--- Version {ver}")
-            try:
-                remoteVer = requests.get(
-                    "https://raw.githubusercontent.com/cooperdk/YAPO-e-plus/develop/VERSION.md"
-                ).text
-                remoteVer = remoteVer.strip()
-            except:
-                remoteVer = "?REQUEST ERROR"
-                pass
-
-            # print("Github version: "+str(remoteVer))
-            if str(ver) != str(remoteVer):
-                log.info(f'███ A new version of YAPO e+ is available ({remoteVer})! ███')
-    else:
-        print("Since this build is frozen, an update check is nor performed.")
-
-def stats (): # Prints statistics about your videos and metadata
+# Prints statistics about your videos and metadata
+def stats():
     size = getsizeall()
-    row = Actor.objects.raw(
-        "SELECT COUNT(*) AS total, id FROM videos_actor"
-    )  # cursor.fetchone()
+    row = Actor.objects.raw("SELECT COUNT(*) AS total, id FROM videos_actor")
     if row[0].total is not None:
         act = str(row[0].total)
-    row = Scene.objects.raw(
-        "SELECT COUNT(*) AS total, id FROM videos_scene"
-    )  # cursor.fetchone()
+    row = Scene.objects.raw("SELECT COUNT(*) AS total, id FROM videos_scene")
     if row[0].total is not None:
         sce = str(row[0].total)
-    row = ActorTag.objects.raw(
-        "SELECT COUNT(*) AS total, id FROM videos_actortag"
-    )  # cursor.fetchone()
+    row = ActorTag.objects.raw("SELECT COUNT(*) AS total, id FROM videos_actortag")
     if row[0].total is not None:
         acttag = str(row[0].total)
-    row = SceneTag.objects.raw(
-        "SELECT COUNT(*) AS total, id FROM videos_scenetag"
-    )  # cursor.fetchone()
+    row = SceneTag.objects.raw("SELECT COUNT(*) AS total, id FROM videos_scenetag")
     if row[0].total is not None:
         sctag = str(row[0].total)
     # TODO assign that all values got read correctly and have a valid value!
 
-    print(f"\nCurrently, there are {sce} videos registered in YAPO e+.\nThey take up {size} of disk space.")
-    print(f"There are {sctag} tags available for video clips.")
-    print(f"\nThere are {act} actors in the database.\nThese actors have {acttag} usable tags.\n\n")
+    log.info(f"Currently, there are {sce} videos registered in YAPO e+, taking up {size} of disk space.")
+    log.info(f"There are {sctag} tags available for video clips.")
+    log.info(f"There are {act} actors in the database. These actors have {acttag} usable tags.")
 
 
-def backupper (): # Generates a backup of the database
+# Generates a backup of the database
+def backupper():
     src = Config().database_path
     dest = os.path.join(Config().database_dir, "db.sqlite3.backup")
     shutil.copy(src, dest)
-    print(f"Performed a database backup to {dest}\n")
+    log.info(f"Performed a database backup to {dest}")
 
 def ffmpeg_check():
     import dload
-    if platform.system() == "Windows":
-        dir_to_check = os.path.join(Config().site_path, 'ffmpeg')
-        ffmpeg = os.path.exists(os.path.abspath(os.path.join(dir_to_check, 'ffmpeg.exe')))
-        ffplay = os.path.exists(os.path.abspath(os.path.join(dir_to_check, 'ffplay.exe')))
-        ffprobe = os.path.exists(os.path.abspath(os.path.join(dir_to_check, 'ffprobe.exe')))
-        if not all([ffmpeg, ffplay, ffprobe]):
-            print("\n")
-            print("You don't have a copy of FFMPEG in your YAPO system.")
-            print("I am going to install a copy of FFPMEG (4.3, static).")
-            print(f"It will be placed at {dir_to_check}")
-            input("Press enter to acknowledge... >")
-            print("Getting https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-20200628-4cfcfb3-win64-static.zip...")
-            try:
-                print("Download... ",end="")
-                dload.save_unzip("https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-20200628-4cfcfb3-win64-static.zip", dir_to_check, True)
-                print("CP ffmpeg... ", end="")
-                print(os.path.abspath(os.path.join(dir_to_check, 'https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-20200628-4cfcfb3-win64-static', 'bin', 'ffmpeg.exe')))
-                shutil.move(os.path.abspath(os.path.join(dir_to_check, 'ffmpeg-20200628-4cfcfb3-win64-static', 'bin', 'ffmpeg.exe')), os.path.abspath(dir_to_check))
-                print("CP ffplay... ", end="")
-                shutil.move(os.path.abspath(os.path.join(dir_to_check, 'ffmpeg-20200628-4cfcfb3-win64-static', 'bin', 'ffplay.exe')), os.path.abspath(dir_to_check))
-                print("CP ffprobe... ", end="")
-                shutil.move(os.path.abspath(os.path.join(dir_to_check, 'ffmpeg-20200628-4cfcfb3-win64-static', 'bin', 'ffprobe.exe')), os.path.abspath(dir_to_check))
-                print("RM temp dir... ", end="")
-                shutil.rmtree(os.path.abspath(os.path.join(dir_to_check, 'ffmpeg-20200628-4cfcfb3-win64-static')))
-                print("Done.")
-            except:
-                print(f"An error occured, please download FFMPEG manually from the above link")
-                print(f"and place it in {dir_to_check}")
-                input("YAPO will exit now. Press enter to acknowledge... >")
-                sys.exit()
+    if platform.system() != "Windows":
+        # TODO: this check should be done on Linux, too.
+        log.warning("This is not Windows. Assuming that ffmpeg is installed correctly.")
+    dir_to_check = os.path.join(Config().site_path, 'ffmpeg')
+
+    allFound = True
+    for executable in ('ffmpeg.exe', 'ffplay.exe', 'ffprobe.exe'):
+        if not os.path.exists(os.path.abspath(os.path.join(dir_to_check, executable))):
+            allFound = False
+
+    if not allFound:
+        print("You don't have a copy of FFMPEG in your YAPO system.")
+        print("I am going to install a copy of FFPMEG (4.3, static).")
+        print(f"It will be placed at {dir_to_check}")
+        input("Press enter to acknowledge... >")
+        print("Getting https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-20200628-4cfcfb3-win64-static.zip...")
+        try:
+            print("Download... ",end="")
+            dload.save_unzip("https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-20200628-4cfcfb3-win64-static.zip", dir_to_check, True)
+            print("CP ffmpeg... ", end="")
+            print(os.path.abspath(os.path.join(dir_to_check, 'https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-20200628-4cfcfb3-win64-static', 'bin', 'ffmpeg.exe')))
+            shutil.move(os.path.abspath(os.path.join(dir_to_check, 'ffmpeg-20200628-4cfcfb3-win64-static', 'bin', 'ffmpeg.exe')), os.path.abspath(dir_to_check))
+            print("CP ffplay... ", end="")
+            shutil.move(os.path.abspath(os.path.join(dir_to_check, 'ffmpeg-20200628-4cfcfb3-win64-static', 'bin', 'ffplay.exe')), os.path.abspath(dir_to_check))
+            print("CP ffprobe... ", end="")
+            shutil.move(os.path.abspath(os.path.join(dir_to_check, 'ffmpeg-20200628-4cfcfb3-win64-static', 'bin', 'ffprobe.exe')), os.path.abspath(dir_to_check))
+            print("RM temp dir... ", end="")
+            shutil.rmtree(os.path.abspath(os.path.join(dir_to_check, 'ffmpeg-20200628-4cfcfb3-win64-static')))
+            print("Done.")
+        except:
+            print(f"An error occured, please download FFMPEG manually from the above link")
+            print(f"and place it in {dir_to_check}")
+            input("YAPO will exit now. Press enter to acknowledge... >")
+            sys.exit()
 
 
 def startup_sequence():
 
     banner()
-    print("")
     configcheck()
-    print("")
     vercheck()
-    print("")
     stats()
     backupper()
     write_actors_to_file()
+
     mem = int(aux.getMemory())
     cpu = aux.getCPU()
     cpucnt = aux.getCPUCount()
-    print(f"\nYou have {mem} GB available. CPU speed is {cpu} GHz and you have {cpucnt} cores available.")
+    log.info(f"You have {mem} GB available. CPU speed is {cpu} GHz and you have {cpucnt} cores available.")
 
     if mem >= 2 and cpu > 1.2:
-        print("\nSince you have sufficient hardware, video processing features will be enabled.")
-        Config().videoprocessing = True
         log.info("Video processing enabled, sufficient hardware specifications")
-        print("\n")
+        Config().videoprocessing = True
     else:
-        print("\nSince you have insufficient hardware, video processing will be disabled.")
+        log.warning("Since you have insufficient hardware, video processing will be disabled.")
         Config().videoprocessing = False
-        log.info("Video processing disabled, too low hardware specification")
-        print("\n")
 
     ffmpeg_check()
 
     if "runserver" in sys.argv[1]:
         site = Config().yapo_url
         if ":" in site:
-            if not ("http://") in site:
-                site="http://" + site + "/"
-            print (f"Site to open: {site}\n")
+            if not "http://" in site:
+                site = "http://" + site + "/"
             webbrowser.get().open_new_tab(site)
         else:
-            print('You\'re missing a defined port number in the /config/settings.yml variable "yapo_url".\n\
-If you want YAPO to open your browser automatically, this needs to be set in settings.\n')
-
-
+            log.warning("You're missing a defined port number in the /config/settings.yml variable 'yapo_url'. If you want YAPO to open your browser automatically, this needs to be set in settings.")
 
 class ready:
     import time
-    #startup_sequence()
 
-    try:
-        if not 'migrat' in str(sys.argv):
-            print("Not in migration mode. Executing startup sequence...")
-            time.sleep(2)
-            startup_sequence()
-        else:
-            log.info(f'User entered migration mode.')
-            print("\n")
-    except:
-        pass
+    if not 'migrat' in str(sys.argv):
+        time.sleep(2)
+        startup_sequence()
+    else:
+        log.info(f'User entered migration mode.')

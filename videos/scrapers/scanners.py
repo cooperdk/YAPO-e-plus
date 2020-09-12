@@ -16,32 +16,27 @@ import videos.scrapers.freeones as scraper_freeones
 import videos.scrapers.tmdb as scraper_tmdb
 django.setup()
 from configuration import Config, Constants
-from utils.printing import Logger
-log = Logger()
+import logging
+log = logging.getLogger(__name__)
 from videos.models import Actor, Scene, ActorAlias, ActorTag, SceneTag, Website
 
 def tpdb (scene_id: int, force: bool):
     title = ""
     site = ""
-    date = ""
-    perflist = ""
-    success = False
     found = 0
-
 
     current_scene = Scene.objects.get(pk=scene_id)
     scene_name = current_scene.name
-    # scene_name = scene_name.replace(" ", "%20")
 
     searched = False
     for scene_tag in current_scene.scene_tags.all():
         if any([scene_tag.name == "TpDB: Match: Good", scene_tag.name == "TpDB: Match: Questionable"]):
             searched = True
     if searched and not force:
-        log.sinfo(f"Scene #{current_scene.id} is already searched!")
+        log.info(f"Scene #{current_scene.id} is already searched!")
         return
 
-    log.sinfo(f'Scanning for "{scene_name}" on TpDB...')
+    log.info(f'Scanning for "{scene_name}" on TpDB...')
 
     try:
         parsetext = scene_name
@@ -53,7 +48,7 @@ def tpdb (scene_id: int, force: bool):
         else:
             parsetext = parsedict[2]
 
-        log.sinfo(f"Parser will search for: {parsetext}")
+        log.info(f"Parser will search for: {parsetext}")
         # if current_scene.tpdb_id is not None and current_scene.tpdb_id != "" and len(current_scene.tpdb_id) > 12:
         #     parsetext = current_scene.tpdb_id
         url = 'https://api.metadataapi.net/scenes'
@@ -69,7 +64,6 @@ def tpdb (scene_id: int, force: bool):
             'Accept': 'application/json',
             'User-Agent': 'YAPO e+ 0.71',
         }
-        print("Scanning... ",end="")
         response = aux.get_with_retry(url, headers=headers, params=params)
         response = response.json()
 
@@ -88,7 +82,7 @@ def tpdb (scene_id: int, force: bool):
                         if alias.name in scene_name_formatted:
                             scene_name_formatted = scene_name_formatted.replace(alias.name, "")
             '''
-            log.sinfo(f'Not successful scanning with conventional search,\n       Now scanning with secondary parsetext: "{scene_name_formatted}"...')
+            log.info(f'Not successful scanning with conventional search, scanning with secondary parsetext: "{scene_name_formatted}"...')
             # scene_name = scene_name.replace(" ", "%20")
             url = 'https://api.metadataapi.net/scenes'
             params = {
@@ -106,17 +100,17 @@ def tpdb (scene_id: int, force: bool):
             response = response.json()
             if "id" and "title" in str(response):
                 found = 2
-                
 
-        #pp = pprint.PrettyPrinter(indent=4)
-        #pp.pprint(response)
         if found == 1 or found == 2:
-
-            print(f"  --> A result was returned using method {found}. Parsing JSON...")
+            description = None
+            release_dateStr = None
+            scenetags = []
             site_logo = ""
+
+            log.info(f"A result was returned using method {found}. Parsing JSON...")
+
             if "title" in response['data'][0].keys():
                 title = response['data'][0]['title']
-                print(f"  --> Title is {title}")
             if "description" in response['data'][0].keys():
                 description = response['data'][0]['description']
             if "site" in response['data'][0].keys():
@@ -126,66 +120,48 @@ def tpdb (scene_id: int, force: bool):
                 if "tags" in response['data'][0].keys():
                     scenetags = response['data'][0]['tags']
             if "date" in response['data'][0].keys():
-                release_date = response['data'][0]['date']
+                release_dateStr = response['data'][0]['date']
             if "id" in response['data'][0].keys():
                 tpdb_id = response['data'][0]['id']
-            if description is not None: current_scene.description = description
-            if release_date is not None:
-                #print(release_date)
+            if description is not None:
+                current_scene.description = description
+            if release_dateStr is not None:
                 try:
-                    release_date=datetime.strptime(release_date, "%Y-%m-%d").date()
-                #release_date = strftime(release_date) + " 00:00:00"
-                #release_date = datetime.strptime(release_date, "%Y-%m-%d %H:%M:%S")
-                    print(release_date)
+                    current_scene.release_date=datetime.strptime(release_dateStr, "%Y-%m-%d").date()
                 except:
-                    release_date = None
-                if release_date is not None:
-                    current_scene.release_date = release_date
-
+                    log.warning(f"Failed to parse release date {release_dateStr}")
 
             if tpdb_id is not None:
                 current_scene.tpdb_id = tpdb_id
-                success = True
                 current_scene.save()
 
-                #pp = pprint.PrettyPrinter(indent=4)
-                #pp.pprint(response['data'])
             perflist = ""
             ite = 0
-            perf = ""
 
             for performer in response['data'][0]['performers']:
                 perf = namecheck(performer['name'])
                 perforiginal = performer['name']
                 perpn = ""
-                keyname = ""
                 primary = 0
                 secondary = 0
                 ite += 1
-                #pp = pprint.PrettyPrinter(indent=4)
-                #pp.pprint(performer)
-                #print(f"Performers: {perflist}")
-                print(f"----> PERFORMER: {perf} - list: {perflist}")
+                log.info(f"PERFORMER: {perf} - list: {perflist}")
                 if not perf.lower().strip() in perflist.lower().strip():
                     if performer['parent'] is not None and performer['parent']['extras'] is not None:
                         performer_extras = performer['parent']['extras']
-                        # print(performer_extras['gender'])
                         keyname = ""
                         actoradded = False
-                        sp = ""
                         if performer_extras['gender'] is not None and "f" in performer_extras['gender'].lower():
-                            print(f"  --> TpDB PERFORMER -> Checking #{ite} ({perf})...")
+                            log.info(f"TpDB PERFORMER -> Checking #{ite} ({perf})...")
                             actors = list(Actor.objects.extra(select={ "length": "Length(name)" }).order_by("-length"))
-                            sp = ""
                             for scene_performer in actors:
-
                                 keyname=""
                                 primary=0
                                 sp=scene_performer.name
                                 if sp.lower() == perforiginal.lower():
                                     keyname = sp
                                     primary = 1
-                                    print(f"  --> SM 1: YAPO performer name {scene_performer.name} is keyname")
+                                    log.info(f"SM 1: YAPO performer name {scene_performer.name} is keyname")
                                     break
 
                                 if not keyname:
@@ -194,7 +170,7 @@ def tpdb (scene_id: int, force: bool):
                                     if sp.lower()==perf.lower():
                                         keyname = scene_performer.name
                                         primary = 1
-                                        print(f"  --> SM 1: YAPO performer name {sp} matches checked TpDB name")
+                                        log.info(f"SM 1: YAPO performer name {sp} matches checked TpDB name")
                                         break
 
 
@@ -224,42 +200,41 @@ def tpdb (scene_id: int, force: bool):
                                                     primary = 3
                                                     break
 
-                            #print("keyname " + keyname)
                             if keyname.strip() != "":
-                                print(f"----> CHECKING SCENE ACTORS")
+                                log.info(f"CHECKING SCENE ACTORS")
                                 keyname = namecheck(keyname)
                                 if (keyname.lower() not in str(current_scene.actors.all()).lower()) and (Actor.objects.filter(name=keyname).exists()):
-                                    print("  --> ACTOR MATCH")
+                                    log.info("  --> ACTOR MATCH")
                                     actor_to_add = Actor.objects.get(name=keyname)
                                     keyname = actor_to_add.name
                                     if not current_scene.actors.filter(name=keyname):
                                         aux.addactor(current_scene, actor_to_add)
-                                        print(f"  --> ACTOR ADDED TO SCENE: {keyname}")
+                                        log.info(f"  --> ACTOR ADDED TO SCENE: {keyname}")
                                     else:
-                                        print(f"  --> ACTOR already in scene.")
+                                        log.info(f"  --> ACTOR already in scene.")
 
                             if not keyname:
                                 perpn = performer['name']
                                 perpn = namecheck(perpn)
                                 secondary = 2
                                 keyname = perpn
-                                print(f"  --> SM 2: TpDB REPLACED {performer['name']} -> {keyname} is keyname")
+                                log.info(f"  --> SM 2: TpDB REPLACED {performer['name']} -> {keyname} is keyname")
 
                             if performer['parent']['name'] and not keyname:
                                 perpn = performer['parent']['name']
                                 perpn = namecheck(perpn)
                                 keyname = perpn
                                 secondary = 3
-                                print(f"  --> SM 3: {keyname} is keyname")
+                                log.info(f"  --> SM 3: {keyname} is keyname")
 
                             if (Config().tpdb_actors) and (perpn) and (keyname) and (primary == 0):
                                 # If an actor is found on TpDB, but doesn't exist in YAPO
                                 log.info(f"Auto-adding a new actor: {perpn}")
                                 if 'image' in performer.keys() and secondary == 2:
-                                    print(f"Perf img check: {performer.keys()}")
+                                    log.info(f"Perf img check: {performer.keys()}")
                                     img = performer['image']
                                 elif 'image' in performer['parent'].keys() and secondary == 3:
-                                    print(f"Perf img check: {performer['parent'].keys()}")
+                                    log.info(f"Perf img check: {performer['parent'].keys()}")
                                     img = performer['parent']['image']
                                 act = Actor()
                                 act.name = perpn
@@ -269,10 +244,7 @@ def tpdb (scene_id: int, force: bool):
                                 actoradded = True
                                 aux.addactor(current_scene, act)
                                 if act.thumbnail == Constants().unknown_person_image_path:
-                                    # print(f"No image, downloading ({img}) - ", end="")
-                                    save_path = os.path.join(Config().site_media_path, 'actor', str(act.id),
-                                                             'profile')
-                                    # print("Profile pic path: " + save_path)
+                                    save_path = os.path.join(Config().site_media_path, 'actor', str(act.id), 'profile')
                                     save_file_name = os.path.join(save_path, 'profile.jpg')
                                     if img and not os.path.isfile(save_file_name):
                                         if not os.path.exists(save_path):
@@ -282,14 +254,14 @@ def tpdb (scene_id: int, force: bool):
                                         act.thumbnail = as_uri
                                         act.save()
 
-                                log.sinfo(f"  --> ACTOR CREATED AND ADDED TO SCENE: {act.name}")
+                                log.info(f"  --> ACTOR CREATED AND ADDED TO SCENE: {act.name}")
                             elif Config().tpdb_actors == False:
                                 log.info(f"We could add the actor {act.name}, but auto-adding is disabled")
 
-                            if (actoradded) and (perpn):
-                                log.sinfo(f"Scraping additional info about {act.name}...")
-                                success = scraper_tmdb.search_person_with_force_flag(act, True)
-                                success = scraper_freeones.search_freeones_with_force_flag(act, True)
+                            if actoradded and perpn:
+                                log.info(f"Scraping additional info about {act.name}...")
+                                scraper_tmdb.search_person_with_force_flag(act, True)
+                                scraper_freeones.search_freeones_with_force_flag(act, True)
 
                         if (keyname.strip() != "") and (Actor.objects.filter(name=keyname).exists()):
                             actor = Actor.objects.get(name=keyname)
@@ -297,7 +269,6 @@ def tpdb (scene_id: int, force: bool):
                                 perflist = perflist + ", " + actor.name
                             elif len(perflist) < 3:
                                 perflist = actor.name
-                            #print(f"Got actor {actor.name} from db...")
                             added = False
 
                             if actor.date_of_birth == None or actor.date_of_birth == "" or actor.date_of_birth == "1970-01-01":
@@ -305,30 +276,20 @@ def tpdb (scene_id: int, force: bool):
                                     dob = performer_extras["birthday"]
                                     if dob is not None:
                                         actor.date_of_birth = performer_extras["birthday"]
-                                        #print(f"Added info: Birthday: {actor.date_of_birth}")
                                         added = True
-                                        # actor.save()
-                                    # print(performer_extras.keys())
 
                             if "fakeboobs" in performer_extras.keys():
                                 faketits = performer_extras['fakeboobs']
 
                                 if faketits is not None:
-                                    #print(f"Fake tits: {faketits}")
                                     if faketits == True:
-                                        #print("Yes...")
                                         if not "tits" in str(actor.actor_tags.all().lower()):
                                             actor.actor_tags.add("Fake tits")
-                                            #print("Added tag: Fake tits")
                                             added = True
                                     elif faketits == False:
-                                        print("No...")
                                         if not "tits" in str(actor.actor_tags.all().lower()):
                                             actor.actor_tags.add("Natural tits")
-                                            #print("Added tag: Natural tits")
                                             added = True
-                                    # actor.save()
-
 
                             if not actor.ethnicity or actor.ethnicity == "":
                                 if "ethnicity" in performer_extras.keys():
@@ -336,9 +297,7 @@ def tpdb (scene_id: int, force: bool):
                                     if ethnicity is not None:
                                         if actor.ethnicity == None or actor.ethnicity == "":
                                             actor.ethnicity = ethnicity
-                                            #print(f"Ethnicity: {ethnicity}")
                                             added = True
-                                            # actor.save()
 
                             if not actor.country_of_origin or actor.country_of_origin == "":
                                 if "birthplace" in performer_extras.keys():
@@ -348,9 +307,7 @@ def tpdb (scene_id: int, force: bool):
                                             birthplace = "United States"
                                         if actor.country_of_origin == None or actor.country_of_origin == "":
                                             actor.country_of_origin = birthplace
-                                            #print(f"Birthplace: {birthplace}")
                                             added = True
-                                            # actor.save()
                             if not actor.weight or actor.weight == 0:
                                 if "weight" in performer_extras.keys():
                                     weight = performer_extras['weight']
@@ -358,7 +315,6 @@ def tpdb (scene_id: int, force: bool):
                                         weight = re.findall(r'[\d]+', weight)
                                         weight = weight[0]
                                         actor.weight = weight
-                                        #print(f"Weight: {weight} kg")
                                         added = True
 
                             if not actor.height or actor.height == 0:
@@ -374,7 +330,6 @@ def tpdb (scene_id: int, force: bool):
                                             height = int(round(height * 2.54))
                                         height=height[0]
                                         actor.height = height
-                                        #print(f"Height: {height} cm")
                                         added = True
 
                             if "hair_colour" in performer_extras.keys():
@@ -383,23 +338,14 @@ def tpdb (scene_id: int, force: bool):
                                     hair = hair.replace("Brunette, ", "")
                                     hair = hair.replace("Blonde, ", "")
                                     hair = hair.replace("Redhead, ", "")
-                                    #print(f"Hair color: {hair}")
                                     if hair is not None:
-                                        tags = str(actor.actor_tags.all())
                                         if not actor.actor_tags.filter(name__contains=" hair"):
-                                            #if actor.actor_tags.filter(name__contains=" hair"):
-                                            #    remtag = actor.actor_tags.filter(name__contains=" hair").values('id')[0]['id']
-                                            #    print(f"TO REMOVE --> {remtag}")
-                                            #    actor.actor_tags.remove(remtag)
                                             insert_actor_tag(actor, hair + " hair".capitalize())
-                                            print(f"Added tag: {hair.capitalize()} hair")
                                             added = True
-
 
                             if performer["parent"]["bio"] is not None and len(performer["parent"]["bio"]) > 72:
                                 actor.description = performer["parent"]["bio"]
                                 added = True
-                                # actor.save()
 
                             if not actor.gender:
                                 actor.gender = "F"
@@ -410,36 +356,28 @@ def tpdb (scene_id: int, force: bool):
                                 actor.last_lookup = datetime.now()
                             actor.save()
 
-
                             if added:
-                                log.sinfo(f"Some information about {actor.name} was added to the profile.")
-
+                                log.info(f"Some information about {actor.name} was added to the profile.")
 
             if found:
-
                 try:
                     website = Website.objects.get(name=site)
                 except:
                     website = "none"
                 if not current_scene.websites.filter(name=site):
                     if website != "none":
-                        log.sinfo(f"Adding website: {website.name} to the scene {current_scene.name}")
+                        log.info(f"Adding website: {website.name} to the scene {current_scene.name}")
                         current_scene.websites.add(website)
                     else:
-                        log.warn(f"This website couldn't be found: {site}")
+                        log.warning(f"This website couldn't be found: {site}")
                 else:
-                    print("Website already registered to scene.")
+                    log.info("Website already registered to scene.")
                 if Config().tpdb_website_logos:
                     aux.save_website_logo(site_logo, site, False, current_scene.id)
 
             newtitle = ""
             if title:
                 newtitle = title
-                #print(newtitle)
-
-           # if any([release_date, perflist, site]):
-            #    newtitle = f"{newtitle} - "
-            #    print (newtitle)
 
             if (perflist and len(perflist) > 4) and newtitle and not perflist.lower().strip() == newtitle.lower().strip():
                 newtitle = f"{perflist} - {newtitle}"
@@ -448,57 +386,42 @@ def tpdb (scene_id: int, force: bool):
             elif newtitle and not perflist.lower():
                 newtitle = f"{newtitle}"
 
-            if release_date:
-                newtitle = f"{release_date} - {newtitle}"
-                #print(newtitle)
-
             if site:
                 newtitle = f"{site} - {newtitle}"
-                #print(newtitle)
 
-            #print(Config().tpdb_autorename.lower())
             if "true" in Config().tpdb_autorename.lower():
                 if not current_scene.orig_name:
                     current_scene.orig_name = current_scene.name
                 current_scene.name = newtitle
-                log.sinfo(f'Scene name is now \"{newtitle}\".')
+                log.info(f'Scene name is now \"{newtitle}\".')
             else:
-                print(f'Renaming is disabled, but we suggest: \"{newtitle}\".')
+                log.info(f'Renaming is disabled, but we suggest: \"{newtitle}\".')
 
             current_scene.save()
             success = True
-            # print(f"Description:\n{description}")
 
-            try:
-                if found:
-                    tagcounter = 0
-                    maxtags = int(Config().tpdb_tags)
-                    if (maxtags > 0):
-                        print(f"Max tags set to {maxtags}")
-                        print(f'Inserting tags: ', end="")
-                        for tag in scenetags:
-                            if tagcounter < maxtags:
-                                tagcounter += 1
-                                print(f'[ {tag["tag"].capitalize()} ]', end="")
-                                insert_scene_tag(current_scene, tag["tag"].capitalize())
-                            else:
-                                break
-                        print("\n")
-                        log.sinfo(f"Added {tagcounter} tags from TpDB to this scene.")
-            except:
-                pass
+            if found:
+                tagcounter = 0
+                maxtags = int(Config().tpdb_tags)
+                if maxtags > 0:
+                    log.info(f'Inserting tags: ')
+                    for tag in scenetags:
+                        if tagcounter < maxtags:
+                            tagcounter += 1
+                            log.info(f'[ {tag["tag"].capitalize()} ]')
+                            insert_scene_tag(current_scene, tag["tag"].capitalize())
+                        else:
+                            break
+                    log.info(f"Added {tagcounter} tags from TpDB to this scene.")
 
-            try:
-                tg = SceneTag.objects.get(name="TpDB: Match: Good")
-                tq = SceneTag.objects.get(name="TpDB: Match: Questionable")
-                tn = SceneTag.objects.get(name="TpDB: Match: None")
-                current_scene.scene_tags.remove(tg)
-                current_scene.scene_tags.remove(tq)
-                current_scene.scene_tags.remove(tn)
-                current_scene.save()
-                # tpdbtag.  current_scene.scene_tags.remove(tpdbtag.id)
-            except:
-                pass
+            tg = SceneTag.objects.get(name="TpDB: Match: Good")
+            tq = SceneTag.objects.get(name="TpDB: Match: Questionable")
+            tn = SceneTag.objects.get(name="TpDB: Match: None")
+            current_scene.scene_tags.remove(tg)
+            current_scene.scene_tags.remove(tq)
+            current_scene.scene_tags.remove(tn)
+            current_scene.save()
+
             if found == 1:
                 insert_scene_tag(current_scene, "TpDB: Match: Good")
             elif found == 2:
@@ -507,29 +430,16 @@ def tpdb (scene_id: int, force: bool):
                 insert_scene_tag(current_scene, "TpDB: Match: None")
 
             insert_scene_tag(current_scene, "TpDB: Scanned")
-            # print("Tagged the scene with a TpDB tag.")
 
-            log.sinfo(f"Found and registered data for scene ID {scene_id}")
+            log.info(f"Found and registered data for scene ID {scene_id}")
 
             return success
         else:
-            log.sinfo(f"Scene not found in TpDB")
+            log.info(f"Scene not found in TpDB")
 
     except KeyError:
-        success = False
-        log.warn(f"Issue(s) occured: {sys.exc_info()}")
-        return success
-        # pass
-
-
-def strip_bad_chars(name):
-    bad_chars = {" "}
-    for char in bad_chars:
-        if char in name:
-            #print("Before: " + name)
-            name = name.replace(char, "")
-            #print("Adding Data: " + name)
-    return name
+        log.warning(f"Issue(s) occured: {sys.exc_info()}")
+        return False
 
 def insert_scene_tag(current_scene, tagname):
     if not SceneTag.objects.filter(name=tagname):
@@ -539,7 +449,7 @@ def insert_scene_tag(current_scene, tagname):
     current_scene.scene_tags.add(scene_tag_to_add)
 
 def insert_actor_tag(actor_to_insert, actor_tag_name):
-    actor_tag_name = strip_bad_chars(actor_tag_name)
+    actor_tag_name = aux.strip_bad_chars(actor_tag_name)
 
     if not ActorTag.objects.filter(name=actor_tag_name):
         actor_tag = ActorTag()
@@ -547,14 +457,10 @@ def insert_actor_tag(actor_to_insert, actor_tag_name):
 
         actor_tag.save()
         actor_to_insert.actor_tags.add(actor_tag)
-
     else:
         actor_tag = ActorTag.objects.get(name=actor_tag_name)
         actor_to_insert.actor_tags.add(actor_tag)
         actor_tag.save()
-
-
-
 
 def namecheck(actor: str):
 

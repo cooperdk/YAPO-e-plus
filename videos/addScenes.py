@@ -1,11 +1,8 @@
 import json
-import os, sys
 import os.path
-from os import path
 from videos import ffmpeg_process
 import django
 from videos import filename_parser
-from configuration import Config, Constants
 import videos.videosheet as videosheet
 from PIL import Image
 import videos.scrapers.scanners as scanners
@@ -16,6 +13,7 @@ from videos.models import *
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 
+# These should be lower-case.
 ACCEPTED_VIDEO_EXTENSIONS = {
     ".mp4",
     ".avi",
@@ -31,36 +29,22 @@ ACCEPTED_VIDEO_EXTENSIONS = {
     ".webm"
 }
 
+import logging
+log = logging.getLogger(__name__)
+
 def get_files(walk_dir, make_video_sample):
 
     for root, subdirs, files in os.walk(walk_dir):
-        # print('--\nroot = ' + root)
-        # list_file_path = os.path.join(root, 'my-directory-list.txt')
-        # print('list_file_path = ' + list_file_path)
+        if root.startswith("$") or root.startswith(".") or subdirs.startswith("$") or subdirs.startswith("."):
+            log.info("Skipping an off-limits path ($ or . as first character in dirname)")
+            continue
 
-        # with open(list_file_path, 'wb') as list_file:
-        #     for subdir in subdirs:
-        #         print('\t- subdirectory ' + subdir)
-
-        if not root.startswith("$") or root.startswith(".") or subdirs.startswith("$") or subdirs.startswith("."):
-
-            for filename in files:
-                file_path = os.path.join(root, filename)
-                filename_extension = os.path.splitext(file_path)[1]
-                for filename_extension_to_test in ACCEPTED_VIDEO_EXTENSIONS:
-                    if filename_extension_to_test == filename_extension:
-                        print(
-                            f"Filename is {file_path}\nExtension is {filename_extension}\n"
-                        )
-
-                        create_scene(file_path, make_video_sample)
-                        print(
-                            "\n------------------------------------------------------------------------------\n"
-                        )
-                        break
-        else:
-            print("Skipping an off-limits path ($ or . as first character in dirname)")
-
+        for filename in files:
+            file_path = os.path.join(root, filename)
+            filename_extension = os.path.splitext(file_path)[1]
+            if filename_extension.lower() in ACCEPTED_VIDEO_EXTENSIONS:
+                log.info(f"Filename is {file_path}, extension is {filename_extension}")
+                create_scene(file_path, make_video_sample)
 
 def create_sample_video(scene : Scene):
     video_path = scene.get_media_path("sample")
@@ -68,26 +52,26 @@ def create_sample_video(scene : Scene):
 
     # Has the sample already been created?
     if os.path.isfile(video_filename_path):
-        print(f"Sample for {scene.name} already exists!")
+        log.info(f"Sample for {scene.name} already exists!")
         return
 
-    print(f"Trying to create a sample video for scene: {scene.name}")
+    log.info(f"Trying to create a sample video for scene: {scene.name}")
     success = ffmpeg_process.ffmpeg_create_sammple_video(scene)
     if success:
-        print(f"Sample video for scene: {scene.name} created successfully.")
+        log.info(f"Sample video for scene: {scene.name} created successfully.")
     else:
-        print(f"Something went wrong while trying to create video sample for scene: {scene.name}")
+        log.info(f"Something went wrong while trying to create video sample for scene: {scene.name}")
 
 def do_ffprobe(scene_in_db):
-    print("Trying to use ffprobe on scene... ", end="")
+    log.info("Trying to use ffprobe on scene... ", end="")
     if not ffmpeg_process.ffprobe_get_data_without_save(scene_in_db):
-        print("ffprobe failed.")
+        log.info("ffprobe failed.")
         return False
 
     scene_in_db.save()
-    print("OK, taking a screenshot... ", end="")
+    log.info("OK, taking a screenshot... ", end="")
     ffmpeg_process.ffmpeg_take_scene_screenshot_without_save(scene_in_db)
-    print("Screenshot taken.")
+    log.info("Screenshot taken.")
 
     return True
 
@@ -101,11 +85,11 @@ def create_sheet_for_scene(scene_in_db : Scene):
 
     sheet_path = scene_in_db.get_media_path("sheet.jpg")
     if os.path.exists(sheet_path):
-        print("Contact sheet for this scene already exists, not re-generating.")
+        log.info("Contact sheet for this scene already exists, not re-generating.")
         return
 
     file_path = os.path.abspath(scene_in_db.path_to_file)
-    print(f"Generating Contact Sheet ({sheet_width} px wide, grid: {sheet_grid}... ")
+    log.info(f"Generating Contact Sheet ({sheet_width} px wide, grid: {sheet_grid}... ")
 
     args = [
         "videosheet",
@@ -126,13 +110,11 @@ def create_sheet_for_scene(scene_in_db : Scene):
     try:
         videosheet.main(args)
 
-        print("Contact Sheet saved to %s" % (os.path.abspath(sheet_path)))
+        log.info("Contact Sheet saved to %s" % (os.path.abspath(sheet_path)))
     except Exception as e:
-        print(f"Error creating contact sheet: {e}")
+        log.error(f"Error creating contact sheet: {e}")
 
-    watermark(
-        os.path.abspath(sheet_path), os.path.join(Config().site_path, 'static', 'yapo-wm.png')
-    )
+    watermark(os.path.abspath(sheet_path), os.path.join(Config().site_path, 'static', 'yapo-wm.png'))
 
 
 def create_scene(scene_path, make_sample_video):
@@ -146,14 +128,14 @@ def create_scene(scene_path, make_sample_video):
     # If the scene already exists, use the existing scene.
     # Take a note if we're re-using one, since we'll skip a load of scraping if so.
     if Scene.objects.filter(path_to_file=current_scene.path_to_file):
-        print("Scene already exists, skipping scene.")
+        log.info("Scene already exists, skipping scene.")
         current_scene = Scene.objects.get(path_to_file=current_scene.path_to_file)
         isPreExistingScene = True
     else:
         isPreExistingScene = False
 
     if not do_ffprobe(current_scene):
-        print(f"Failed to probe scene {current_scene.name}, skipping scene...")
+        log.error(f"Failed to probe scene {current_scene.name}, skipping scene...")
         return
 
     create_sheet_for_scene(current_scene)
@@ -167,14 +149,10 @@ def create_scene(scene_path, make_sample_video):
     add_scene_to_folder_view(current_scene)
 
     actors = list(
-        Actor.objects.extra(select={"length": "Length(name)"}).order_by(
-            "-length"
-        )
+        Actor.objects.extra(select={"length": "Length(name)"}).order_by("-length")
     )
     actors_alias = list(
-        ActorAlias.objects.extra(select={"length": "Length(name)"}).order_by(
-            "-length"
-        )
+        ActorAlias.objects.extra(select={"length": "Length(name)"}).order_by("-length")
     )
     scene_tags = SceneTag.objects.extra(
         select={"length": "Length(name)"}
@@ -189,19 +167,19 @@ def create_scene(scene_path, make_sample_video):
         scene_tags = list(
             SceneTag.objects.extra(select={ "length": "Length(name)" }).order_by("-length")
         )
-        print("Parsing locally registered scene tags...")
+        log.info("Parsing locally registered scene tags...")
         scene_path = current_scene.path_to_file.lower()
         filename_parser.parse_scene_tags_in_scene(current_scene, scene_path, scene_tags)
 
         if not Config().tpdb_websites:
-            print("Parsing locally registered websites...")
+            log.info("Parsing locally registered websites...")
             scene_path = filename_parser.parse_website_in_scenes(current_scene, scene_path, websites)
 
         if not Config().tpdb_actors:
-            print("Parsing locally registered actors and aliases...")
+            log.info("Parsing locally registered actors and aliases...")
             scene_path = filename_parser.parse_actors_in_scene(current_scene, scene_path, actors, actors_alias)
     else:
-        print("Scene was not found on TpDB, parsing it internally...")
+        log.info("Scene was not found on TpDB, parsing it internally...")
 
     filename_parser.parse_scene_all_metadata(
         current_scene, actors, actors_alias, scene_tags, websites
@@ -209,13 +187,8 @@ def create_scene(scene_path, make_sample_video):
 
 
 def add_scene_to_folder_view(scene_to_add):
-    # scene_path = os.path.normpath(scene_to_add.path_to_dir)
-
     path = os.path.normpath(scene_to_add.path_to_dir)
 
-    # drive, path = os.path.splitdrive(scene_path)
-
-    print(path)
     folders = []
     while 1:
         path, folder = os.path.split(path)
@@ -230,11 +203,6 @@ def add_scene_to_folder_view(scene_to_add):
 
     folders.reverse()
 
-    # print (drive)
-    is_first = True
-    parent = ""
-    # for folder in folders:
-    #     print (folder)
     path_with_ids = []
     recursive_add_folders(None, folders, scene_to_add, path_with_ids)
 
@@ -245,7 +213,7 @@ def recursive_add_folders(parent, folders, scene_to_add, path_with_ids):
             path_with_ids = []
             if not Folder.objects.filter(name=folders[0]):
                 temp = Folder.objects.create(name=folders[0])
-                print(f"Created virtual folder: {temp.name}")
+                log.info(f"Created virtual folder: {temp.name}")
                 parent = Folder.objects.get(name=folders[0])
                 if parent.last_folder_name_only is None:
                     parent.last_folder_name_only = folders[0]
@@ -253,25 +221,18 @@ def recursive_add_folders(parent, folders, scene_to_add, path_with_ids):
                 path_with_ids.append(
                     {"name": parent.last_folder_name_only, "id": parent.id}
                 )
-                # print ("Parent Name is {}, Path with Id's are {}".format(parent.name, path_with_ids.encode('utf-8')))
-                # print(json.dumps(path_with_ids))
                 if parent.path_with_ids is None:
                     parent.path_with_ids = json.dumps(path_with_ids)
                     parent.save()
-                # print ("Last folder name is : {}".format(folders[0]))
                 del folders[0]
-
             else:
                 parent = Folder.objects.get(name=folders[0])
                 path_with_ids.append(
                     {"name": parent.last_folder_name_only, "id": parent.id}
                 )
-                # print ("Parent Name is {}, Path with Id's are {}".format(parent.name, path_with_ids.encode('utf-8')))
-                # print(json.dumps(path_with_ids))
                 if parent.path_with_ids is None:
                     parent.path_with_ids = json.dumps(path_with_ids)
                     parent.save()
-                # print ("Last folder name is : {}".format(folders[0]))
                 del folders[0]
 
             recursive_add_folders(parent, folders, scene_to_add, path_with_ids)
@@ -288,7 +249,7 @@ def recursive_add_folders(parent, folders, scene_to_add, path_with_ids):
 
             if not if_in_children:
                 parent = Folder.objects.create(name=folder_to_add, parent=parent)
-                print(f"Created virtual folder: {parent.name}")
+                log.info(f"Created virtual folder: {parent.name}")
                 if parent.last_folder_name_only is None:
                     parent.last_folder_name_only = folders[0]
                 parent.save()
@@ -299,85 +260,52 @@ def recursive_add_folders(parent, folders, scene_to_add, path_with_ids):
             path_with_ids.append(
                 {"name": parent.last_folder_name_only, "id": parent.id}
             )
-            # print ("Parent Name is {}, Path with Id's are {}".format(parent.name.encode('utf-8'),
-            #                                                          path_with_ids))
-            # print(json.dumps(path_with_ids))
             if parent.path_with_ids is None:
                 parent.path_with_ids = json.dumps(path_with_ids)
                 parent.save()
-            # print ("Last folder name is : {}".format(folders[0]))
             del folders[0]
             recursive_add_folders(parent, folders, scene_to_add, path_with_ids)
     else:
         if not parent.scenes.filter(name=scene_to_add.name):
             parent.scenes.add(scene_to_add)
-            print(
-                f"Added Scene: {scene_to_add.name} to virtual folder {parent.name}"
-            )
+            log.info(f"Added Scene: {scene_to_add.name} to virtual folder {parent.name}")
             parent.save()
 
 def write_actors_to_file():
     actors = Actor.objects.all()
     actors_string = ",".join([actor.name for actor in actors])
 
-    file = open("actors.txt", "w")
-
-    file.write(actors_string)
-
-    file.close()
-
+    with open("actors.txt", "w") as file:
+        file.write(actors_string)
 
 def populate_last_folder_name_in_virtual_folders():
     all_folders = Folder.objects.all()
     for folder in all_folders:
         if not folder.last_folder_name_only:
-            print(f"Folder name is {folder.name}")
+            log.info(f"Folder name is {folder.name}")
             name = os.path.normpath(folder.name)
             only_last = os.path.basename(name)
             if only_last == "":
                 only_last = name
-            print(f"Folder last name is {only_last}")
+            log.info(f"Folder last name is {only_last}")
             folder.last_folder_name_only = only_last
             folder.save()
 
 def watermark(input_image_path, watermark_image_path):
-    if os.path.exists(input_image_path):
-        base_image = Image.open(input_image_path).convert(
-            "RGBA"
-        )  # convert to RGBA is important
-        watermark = Image.open(watermark_image_path).convert("RGBA")
-        width, height = base_image.size
-        mark_width, mark_height = watermark.size
-        position = (width - mark_width - 32, 28)  # (height-mark_height-32 for lower-right)
-        transparent = Image.new("RGBA", (width, height), (0, 0, 0, 0))
-        transparent.paste(base_image, (0, 0))
-        transparent.paste(watermark, position, mask=watermark)
-        # transparent.show()
-        transparent = transparent.convert("RGB")
-        transparent.save(input_image_path)
-    else:
-        print("Not watermarking, as the image file doesn't exist.")
-def main():
-    scenes = Scene.objects.all()
-    for scene in scenes:
-        add_scene_to_folder_view(scene)
+    if not os.path.exists(input_image_path):
+        log.warning("Not watermarking, as the image file doesn't exist.")
+        return
 
-        # populate_last_folder_name_in_virtual_folders()
-        # write_actors_to_file()
-        # clean_empty_folders()
-        # os.environ.setdefault("DJANGO_SETTINGS_MODULE", "myproject.settings")
-
-        # get_files(TEST_PATH)
-        # find_duplicates()
-        # scenes_virtual_folder = Scene.objects.all()
-        # for s in scenes_virtual_folder:
-        #     add_scene_to_folder_view(s)
-        #     # for x in range(1377, 1387):
-        #     #     scene = Scene.objects.get(pk=x)
-        #     #     add_scene_to_folder_view(scene)
-        #     #
-        #     #     # scene = Scene.objects.first()
-
-
-if __name__ == "__main__":
-    main()
+    base_image = Image.open(input_image_path).convert(
+        "RGBA"
+    )  # convert to RGBA is important
+    watermark = Image.open(watermark_image_path).convert("RGBA")
+    width, height = base_image.size
+    mark_width, mark_height = watermark.size
+    position = (width - mark_width - 32, 28)  # (height-mark_height-32 for lower-right)
+    transparent = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    transparent.paste(base_image, (0, 0))
+    transparent.paste(watermark, position, mask=watermark)
+    # transparent.show()
+    transparent = transparent.convert("RGB")
+    transparent.save(input_image_path)

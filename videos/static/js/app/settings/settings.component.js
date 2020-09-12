@@ -215,7 +215,7 @@ angular.module('settings').component('settings', {
                        self.addAlert("Starting scrape, please hold on... (you will get no further status unless an error occurs).", 'info', '5000');
                         $http.get('settings/', {
                             params: {
-                                scrapAllActors: 'True',
+                                scrapeAllActors: 'True',
                                 force: self.forceScrape
                             }
 

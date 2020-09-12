@@ -9,7 +9,6 @@ VCSI: https://github.com/amietn/vcsi
 videosheet.py "f:\SorteretXXX\Luna Bright\BraceFaced - Luna Bright - The Virgin Braceface Diaries.mp4" -t -w 1024 -g 5x6 --quality 75 --template D:\yapo\videos\videosheet\yapo.template --timestamp-border-mode --start-delay-percent 1 --end-delay-percent 1 -f jpg -o sheet.jpg
 """
 
-from __future__ import print_function
 import datetime
 import os
 import shutil
@@ -41,20 +40,19 @@ import parsedatetime
 
 here = os.path.abspath(os.path.dirname(__file__))
 
-# with open(os.path.join(here, "VERSION")) as f:
+import logging
+log = logging.getLogger(__name__)
+
 VERSION = "7.0.12"
 __version__ = VERSION
 __author__ = "Nils Amiet"
-
 
 class Grid(namedtuple("Grid", ["x", "y"])):
     def __str__(self):
         return "%sx%s" % (self.x, self.y)
 
-
 class Frame(namedtuple("Frame", ["filename", "blurriness", "timestamp", "avg_color"])):
     pass
-
 
 class Color(namedtuple("Color", ["r", "g", "b", "a"])):
     def to_hex(self, component):
@@ -199,11 +197,11 @@ class MediaInfo(object):
         self.parse_attributes()
 
         if verbose:
-            print(self.filename)
-            print(f"{self.sample_width}x{self.sample_height}")
-            print(f"{self.display_width}x{self.display_height}")
-            print(self.duration)
-            print(self.size)
+            log.info(self.filename)
+            log.info(f"{self.sample_width}x{self.sample_height}")
+            log.info(f"{self.display_width}x{self.display_height}")
+            log.info(self.duration)
+            log.info(self.size)
 
     def probe_media(self, path):
         """Probe video file using ffprobe
@@ -242,8 +240,8 @@ class MediaInfo(object):
                 if stream["codec_type"] == "video":
                     self.video_stream = stream
                     break
-            except:
-                pass
+            except Exception as e:
+                log.exception(f"find_video_stream: {e}")
 
     def find_audio_stream(self):
         """Find the first stream which is an audio stream
@@ -253,8 +251,8 @@ class MediaInfo(object):
                 if stream["codec_type"] == "audio":
                     self.audio_stream = stream
                     break
-            except:
-                pass
+            except Exception as e:
+                log.exception(f"find_audio_stream: {e}")
 
     def compute_display_resolution(self):
         """Computes the display resolution.
@@ -400,7 +398,7 @@ class MediaInfo(object):
         """
         ratio = width / float(self.display_width)
         desired_height = int(math.floor(self.display_height * ratio))
-        return (width, desired_height)
+        return width, desired_height
 
     def parse_attributes(self):
         """Parse multiple media attributes
@@ -588,25 +586,20 @@ class MediaCapture(object):
 
         ffmpeg_command = [
             "ffmpeg",
-            "-ss",
-            time,
-            "-i",
-            self.path,
-            "-vframes",
-            "1",
-            "-s",
-            f"{width}x{height}",
+            "-ss", time,
+            "-i", self.path,
+            "-vframes", "1",
+            "-s", f"{width}x{height}",
         ]
 
+        select_args = []
         if self.frame_type is not None:
-            select_args = ["-vf", f"select='eq(frame_type\\,{self.frame_type})'"]
+            if self.frame_type == "key":
+                select_args = ["-vf", "select=key"]
+            else:
+                select_args = ["-vf", f"select='eq(frame_type\\,{self.frame_type})'"]
 
-        if self.frame_type == "key":
-            select_args = ["-vf", "select=key"]
-
-        if self.frame_type is not None:
-            ffmpeg_command += select_args
-
+        ffmpeg_command += select_args
         ffmpeg_command += ["-y", out_path]
 
         if self.accurate:
@@ -616,19 +609,13 @@ class MediaCapture(object):
             if skip_time_seconds < 0:
                 ffmpeg_command = [
                     "ffmpeg",
-                    "-i",
-                    self.path,
-                    "-ss",
-                    time,
-                    "-vframes",
-                    "1",
-                    "-s",
-                    "%sx%s" % (width, height),
+                    "-i", self.path,
+                    "-ss", time,
+                    "-vframes", "1",
+                    "-s", f"{width}x{height}",
                 ]
 
-                if self.frame_type is not None:
-                    ffmpeg_command += select_args
-
+                ffmpeg_command += select_args
                 ffmpeg_command += ["-y", out_path]
             else:
                 skip_time = MediaInfo.pretty_duration(
@@ -636,21 +623,14 @@ class MediaCapture(object):
                 )
                 ffmpeg_command = [
                     "ffmpeg",
-                    "-ss",
-                    skip_time,
-                    "-i",
-                    self.path,
-                    "-ss",
-                    skip_delay,
-                    "-vframes",
-                    "1",
-                    "-s",
-                    "%sx%s" % (width, height),
+                    "-ss", skip_time,
+                    "-i", self.path,
+                    "-ss", skip_delay,
+                    "-vframes", "1",
+                    "-s", f"{width}x{height}",
                 ]
 
-                if self.frame_type is not None:
-                    ffmpeg_command += select_args
-
+                ffmpeg_command += select_args
                 ffmpeg_command += ["-y", out_path]
 
         try:
@@ -759,7 +739,7 @@ def timestamp_generator(media_info, args):
     time = start_delay_seconds + capture_interval
 
     for i in range(args.num_samples):
-        yield (time, MediaInfo.pretty_duration(time, show_millis=True))
+        yield time, MediaInfo.pretty_duration(time, show_millis=True)
         time += capture_interval
 
 
@@ -811,7 +791,7 @@ def select_sharpest_images(media_info, media_capture, args):
         with ThreadPoolExecutor() as executor:
             for i, timestamp_tuple in enumerate(timestamps):
                 status = f"Starting task... {i+1}/{args.num_samples}"
-                print(status, end="\r")
+                log.info(status)
                 suffix = ".jpg"  # faster processing time
                 future = executor.submit(
                     do_capture,
@@ -822,26 +802,23 @@ def select_sharpest_images(media_info, media_capture, args):
                     args,
                 )
                 futures.append(future)
-            print()
 
             for i, future in enumerate(futures):
                 status = f"Sampling... {i+1}/{args.num_samples}"
-                print(status, end="\r")
+                log.info(status)
                 frame = future.result()
                 blurs += [frame]
-            print()
     else:
         # grab captures sequentially
         for i, timestamp_tuple in enumerate(timestamps):
             status = f"Sampling... {i+1}/{args.num_samples}"
-            print(status, end="\r")
+            log.info(status)
             suffix = ".png"  # arguably higher image quality
             frame = do_capture(
                 timestamp_tuple, desired_size[0], desired_size[1], suffix, args
             )
 
             blurs += [frame]
-        print()
 
     time_sorted = sorted(blurs, key=lambda x: x.timestamp)
 
@@ -969,7 +946,6 @@ def prepare_metadata_text_lines(
 ):
     """Prepare the metadata header text and return a list containing each line.
     """
-    template = ""
     if template_path is None:
         template = """{{filename}}
         File size: {{size}}
@@ -1009,7 +985,6 @@ def compute_timestamp_position(
     """
     position = args.timestamp_position
 
-    x_offset = 0
     if position in [TimestampPosition.west, TimestampPosition.nw, TimestampPosition.sw]:
         x_offset = args.timestamp_horizontal_margin
     elif position in [
@@ -1026,7 +1001,6 @@ def compute_timestamp_position(
             - 2 * rectangle_hpadding
         )
 
-    y_offset = 0
     if position in [
         TimestampPosition.nw,
         TimestampPosition.north,
@@ -1060,19 +1034,19 @@ def compute_timestamp_position(
 def load_font(args, font_path, font_size, default_font_path):
     """Loads given font and defaults to fallback fonts if that fails."""
     if args.is_verbose:
-        print("Loading font...")
+        log.info("Loading font...")
 
     fonts = [font_path] + FALLBACK_FONTS
     if font_path == default_font_path:
         for font in fonts:
             if args.is_verbose:
-                print(f"Trying to load font: {font}")
+                log.info(f"Trying to load font: {font}")
             if os.path.exists(font):
                 try:
                     return ImageFont.truetype(font, font_size)
                 except OSError:
                     pass
-        print("Falling back to default font.")
+        log.warning("Falling back to default font.")
         return ImageFont.load_default()
     else:
         try:
@@ -1300,16 +1274,14 @@ def cleanup(frames, args):
     """Delete temporary captures
     """
     if args.is_verbose:
-        print(f"Deleting {len(frames)} temporary frames...")
+        log.info(f"Deleting {len(frames)} temporary frames...")
     for frame in frames:
         try:
             if args.is_verbose:
-                print(f"Deleting {frame.filename} ...")
+                log.info(f"Deleting {frame.filename} ...")
             os.unlink(frame.filename)
         except Exception as e:
-            if args.is_verbose:
-                print(f"[Error] Failed to delete {frame.filename}")
-                print(e)
+            log.exception(f"Failed to delete {frame.filename}: {e}")
 
 
 def print_template_attributes():
@@ -1322,7 +1294,7 @@ def print_template_attributes():
     rows = [[x["name"], x["description"], x["example"]] for x in table]
     tab.add_rows(rows, header=False)
     tab.header(["Attribute name", "Description", "Example"])
-    print(tab.draw())
+    log.info(tab.draw())
 
 
 def mxn_type(string):
@@ -1386,9 +1358,9 @@ def manual_timestamps(string):
 
         return timestamps
     except Exception as e:
-        print(e)
-        error = "Manual frame timestamps must be comma-separated and of the form h:mm:ss.mmmm"
-        raise argparse.ArgumentTypeError(error)
+        errorMessage = "Manual frame timestamps must be comma-separated and of the form h:mm:ss.mmmm"
+        log.exception(f"{errorMessage}: {e}")
+        raise argparse.ArgumentTypeError(errorMessage)
 
 
 def timestamp_position_type(string):
@@ -1426,16 +1398,10 @@ def comma_separated_string_type(string):
     return splits
 
 
-def error(message):
-    """Print an error message."""
-    print(f"[ERROR] {message}")
-
-
 def error_exit(message):
     """Print an error message and exit"""
-    error(message)
+    log.error(message)
     sys.exit(-1)
-
 
 def main(args):
     sys.argv = args
@@ -1833,14 +1799,10 @@ def main(args):
     def process_file_or_ignore(filepath, args):
         try:
             process_file(filepath, args)
-        except Exception:
+        except Exception as e:
+            log.exception(f"failed to process {filepath}: {e}")
             if not args.ignore_errors:
                 raise
-            else:
-                print(
-                    f"[WARN]: failed to process {filepath} ... skipping.",
-                    file=sys.stderr,
-                )
 
     if args.recursive:
         for path in args.filenames:
@@ -1868,13 +1830,13 @@ def process_file(path, args):
     """Generate a video contact sheet for the file at given path
     """
     if args.is_verbose:
-        print(f"Considering {path}...")
+        log.info(f"Considering {path}...")
 
     args = deepcopy(args)
 
     if not os.path.exists(path):
         if args.ignore_errors:
-            print(f"File does not exist, skipping: {path}")
+            log.info(f"File does not exist, skipping: {path}")
             return
         else:
             error_message = f"File does not exist: {path}"
@@ -1882,7 +1844,7 @@ def process_file(path, args):
 
     file_extension = path.lower().split(".")[-1]
     if file_extension in args.exclude_extensions:
-        print(f"[WARN] Excluded extension {file_extension}. Skipping.")
+        log.warning(f"Excluded extension {file_extension}. Skipping.")
         return
 
     output_path = args.output_path
@@ -1895,12 +1857,10 @@ def process_file(path, args):
 
     if args.no_overwrite:
         if os.path.exists(output_path):
-            print(
-                f"[INFO] contact-sheet already exists, skipping: {output_path}"
-            )
+            log.info(f"contact-sheet already exists, skipping: {output_path}")
             return
 
-    print(f"Processing {path}...")
+    log.info(f"Processing {path}...")
 
     if args.interval is not None and args.manual_timestamps is not None:
         error_exit("Cannot use --interval and --manual at the same time.")
@@ -2001,7 +1961,7 @@ def process_file(path, args):
         media_info, media_capture, args
     )
 
-    print("Composing contact sheet...")
+    log.info("Composing contact sheet...")
     image = compose_contact_sheet(media_info, selected_frames, args)
 
     is_save_successful = save_image(args, image, media_info, output_path)
@@ -2010,9 +1970,9 @@ def process_file(path, args):
     thumbnail_output_path = args.thumbnail_output_path
     if thumbnail_output_path is not None:
         os.makedirs(thumbnail_output_path, exist_ok=True)
-        print(f"Copying thumbnails to {thumbnail_output_path} ...")
+        log.info(f"Copying thumbnails to {thumbnail_output_path} ...")
         for i, frame in enumerate(selected_frames):
-            print(frame.filename)
+            log.info(frame.filename)
             thumbnail_file_extension = frame.filename.lower().split(".")[-1]
             thumbnail_filename = f"{os.path.basename(path)}.{i:04d}.{thumbnail_file_extension}"
             thumbnail_destination = os.path.join(
@@ -2020,12 +1980,8 @@ def process_file(path, args):
             )
             shutil.copyfile(frame.filename, thumbnail_destination)
 
-    print("Cleaning up temporary files...")
+    log.info("Cleaning up temporary files...")
     cleanup(temp_frames, args)
 
     if not is_save_successful:
         error_exit(f"Unsupported image format: {args.image_format}.")
-
-
-#if __name__ == "__main__":
-#    main()

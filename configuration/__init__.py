@@ -7,6 +7,9 @@ import json
 from utils import Singleton
 from utils import Constants
 
+import logging
+log = logging.getLogger(__name__)
+
 __yaml_root_element__ = "YAPOConfig"
 __settings_datetime_format__ = "%Y-%m-%d %H:%M:%S"
 __settings_keyword_none__ = "None"
@@ -72,9 +75,6 @@ class Config(metaclass=Singleton):
 
     self.__update_config_from_file__()
 
-  def __log__(self, message: str) -> None:  # should be utils.printing, but that leads to circular dependency
-    print(f"[CONF ] {datetime.now().strftime(self.timeprint_format)}> {message}")
-
   def __update_config_from_file__(self) -> None:
     if os.path.isfile(self.configfile_path):
       self.__load_settings__(self.configfile_path)
@@ -93,10 +93,10 @@ class Config(metaclass=Singleton):
       with open(settings_path, 'r') as file:
         settings_dict = json.loads(file.read())
         self.__update_settings__({__yaml_root_element__: settings_dict})
-      self.__log__("Converting old json format configuration file to yaml...")
+      log.info("Converting old json format configuration file to yaml...")
       self.save()
       os.remove(settings_path)
-      self.__log__("Finished, deleted old json format configuration file.")
+      log.info("Finished, deleted old json format configuration file.")
       return
     raise Exception(f'{settings_path} is no known config format. Only .yml or .json are allowed.')
 

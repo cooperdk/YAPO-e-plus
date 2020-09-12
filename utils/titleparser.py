@@ -1,6 +1,8 @@
 import re
 from datetime import datetime
 
+import logging
+log = logging.getLogger(__name__)
 
 def search(title):
 
@@ -13,16 +15,16 @@ def search(title):
     for trash in trashTitle:
         title = re.sub(r'\b%s\b' % trash, '', title, flags=re.IGNORECASE)
     title = ' '.join(title.split())
-    print("----> Siteparser: " + title)
+    log.info("Siteparser: " + title)
     searchSettings = getSearchSettings(title)
     searchSiteID = searchSettings[0]
     fullsitename = searchSettings[1]
     searchTitle = searchSettings[2]
     searchDate = searchSettings[3]
-    print("  --> Title: " + searchTitle)
-    print("  --> Site:  " + fullsitename)
+    log.info("Title: " + searchTitle)
+    log.info("Site:  " + fullsitename)
     if searchDate:
-        print("  --> Date:  " + searchDate)
+        log.info("Date:  " + searchDate)
 
     return searchSiteID, fullsitename, searchTitle, searchDate
 
@@ -961,7 +963,7 @@ def getSearchSiteIDByFilter(searchFilter):
     if searchResults:
         from operator import itemgetter
 
-        print('  --> Site found with method #3 - ',end='')
+        log.info('Site found with method #3 - ')
         return max(searchResults, key=itemgetter(1))[0]
 
     # Method #2
@@ -972,10 +974,10 @@ def getSearchSiteIDByFilter(searchFilter):
             siteNameF = sites[0].lower().replace(" ", "").replace("'", "")
 
             if searchFilterF == siteNameF:
-                print('  --> Site found with method #2 - ',end='')
+                log.info('Site found with method #2 - ')
                 return searchID
-        except:
-            pass
+        except Exception as e:
+            log.exception("getSearchSiteIDByFilter (method #2): ", e)
 
     # Method #1
     # Might try converting this code to use startswith() to avoid problems with overlapping site names:
@@ -993,12 +995,12 @@ def getSearchSiteIDByFilter(searchFilter):
             siteNameF = sites[0].lower().replace(" ", "").replace("'", "")
 
             if siteNameF in searchFilterF[0] or siteNameF in searchFilterF[1]:
-                print('  --> Site found with method #1 - ',end='')
+                log.info('Site found with method #1 - ')
                 return searchID
-        except:
-            pass
+        except Exception as e:
+            log.exception("getSearchSiteIDByFilter (method #1): ", e)
 
-    print(f'Search Filter: {searchFilterF}')
+    log.info(f'Search Filter: {searchFilterF}')
 
     return None
 
@@ -1239,19 +1241,16 @@ def getSearchSettings(mediaTitle: str):
     abbFixed = False
     for abbreviation, full in abbreviations:
         r = re.compile(abbreviation, flags=re.IGNORECASE)
-        mediatitle2 = ""
         mediatitle2 = mediaTitle.replace("_", " ")
         mediatitle2 = mediatitle2.replace("-", " ")
         mediatitle2 = mediatitle2.replace(".", " ")
-        #print(mediatitle2)
         if r.match(mediatitle2):
             mediaTitle = r.sub(full, mediatitle2, 1)
             abbFixed = True
-            #print(mediaTitle)
             break
 
     if abbFixed:
-        print(f" ---> Possible abbreviation fixed: {mediaTitle}")
+        log.info(f"Possible abbreviation fixed: {mediaTitle}")
 
     # Search Site ID
     searchSiteID = None
@@ -1267,7 +1266,7 @@ def getSearchSettings(mediaTitle: str):
     # Remove Site from Title
     searchSiteID = getSearchSiteIDByFilter(mediaTitle)
     if searchSiteID:
-        print(f"  --> siteID: {searchSiteID} - {searchSites[searchSiteID][0]}")
+        log.info(f"siteID: {searchSiteID} - {searchSites[searchSiteID][0]}")
         if searchSites[searchSiteID][0]:
             fullsitename = searchSites[searchSiteID][0]
         # searchSites [0] matches madiaTitle
@@ -1321,8 +1320,6 @@ def getSearchSettings(mediaTitle: str):
             searchTitle = searchTitle.replace(sceneNumber, "")
     '''
 
-    #print("searchTitle (before date processing): " + searchTitle)
-
     # Search Type
     searchTitle = searchTitle.replace('#', '')
     searchDate = None
@@ -1340,10 +1337,8 @@ def getSearchSettings(mediaTitle: str):
         if date:
             try:
                 date_obj = datetime.strptime(date.group(), dateFormat)
-                #print("Date found")
-
-            except:
-                pass
+            except Exception as e:
+                log.exception(f"Failed to parse date {date.group()}", e)
 
             if date_obj:
                 searchDate = date_obj.strftime('%Y-%m-%d')

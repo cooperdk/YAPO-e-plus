@@ -18,6 +18,9 @@ django.setup()
 from videos.models import Scene
 from configuration import Config
 
+import logging
+log = logging.getLogger(__name__)
+
 if platform.system() == "Linux" or platform.system() == "Darwin":
     # Linux or OS X
     FFPROBE_BIN = "ffprobe"
@@ -43,21 +46,9 @@ if not os.path.exists(TEMP_PATH):
     os.makedirs(TEMP_PATH)
 
 def execute_subprocess(command_call, type_of_bin):
-    # command_call = "gibrish"
     command_call = command_call
-
-    p = subprocess.Popen(
-        command_call, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True
-    )
-
-    # p.wait()
-
-    # result = subprocess.Popen(command_call, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+    p = subprocess.Popen(command_call, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
     a = p.communicate()
-    # print(p.returncode)
-    # print (a[0])
-
-    # print(a[0])
 
     ans = dict()
     if p.returncode == 0:
@@ -83,32 +74,22 @@ def ffmpeg_take_screenshot(screenshot_time, filename):
         SCREENSHOT_OUTPUT_PATH,
     )
 
-#    print("Taking screenshot of video...")  # (command_call)
-
     return execute_subprocess(command_call, "ffmpeg")
 
 
 def ffprobe(filename):
     command_call = '{} {} "{}"'.format(FFPROBE_BIN, FFPROBE_JSON_ARGUMENTS, filename)
-    # print("Calling ffprobe...")# command call: {}".format(command_call))
 
     return execute_subprocess(command_call, "ffprobe")
 
 
 def get_length(filename):
-    # result = subprocess.Popen([FFPROBE_BIN, filename],
-    #                           stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-
     command_call = '{} "{}"'.format(FFPROBE_BIN, filename)
-#    print("Getting video length...")  # (command_call)
 
     result = subprocess.Popen(
         command_call, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True
     )
     a = result.communicate()
-#    print("Video is " + result.returncode + " in length")
-
-    # print(a[0])
 
     if result.returncode == 0:
         ans = a[0]
@@ -116,18 +97,6 @@ def get_length(filename):
         ans = -1
 
     return ans
-
-
-# ffmpeg -i input.flv -vf fps=1 out%d.png
-def make_screenshots(fps_of_screenshots, filename):
-    input_argument = '-i "{}"'.format(filename)
-    video_filters = "-q:v 4 -vf fps={},scale=640:-2".format(fps_of_screenshots)
-
-    print("Taking screenshots...")
-    # print("{} {} {} {}".format(FFMPEG_BIN, input_argument, video_filters, FFMPEG_TEMP_OUTPUT_IMAGES))
-
-
-# ffmpeg -framerate 1/5 -i img%03d.png -c:v libx264 -r 30 -pix_fmt yuv420p out.mp4
 
 
 def make_video_from_screenshots(framerate):
@@ -138,12 +107,8 @@ def make_video_from_screenshots(framerate):
     command_call = "{} {} {} {} {}".format(
         FFMPEG_BIN, framerate_argument, input_argument, other_arguments, output_video
     )
-    print(
-        "Making video from frames..."
-    )  # using ffmpeg command: \n{}".format(command_call))
+    log.info("Making video from frames...")
     execute_subprocess(command_call, "ffmpeg")
-    # p = subprocess.Popen(command_call, shell=True)
-    # p.wait()
 
 
 def seconds_to_string(seconds):
@@ -216,7 +181,6 @@ def make_sample_video(
     start_number = 000
 
     for key, seek_time in segments_start_timestamp.items():
-        # print(seek_time)
         output = extract_frames_in_given_time(
             filename, seek_time, frames_per_segment, start_number,
         )
@@ -250,26 +214,20 @@ def extract_frames_in_given_time(filename, seek_time, frames_per_segment, start_
         start_number_argument,
         FFMPEG_TEMP_OUTPUT_IMAGES,
     )
-    print(
-        "Extracting frames from scene..."
-    )  # using ffmpeg command: \n{}".format(command_call))
-
+    log.info("Extracting frames from scene...")
+    
     p = subprocess.Popen(
         command_call, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True
     )
     a = p.communicate()
-    # print(p.returncode)
-
-    # print(a[0])
-
     output = a[0]
 
     if p.returncode == 0:
         ans = a[0]
     else:
         ans = -1
-        print("Something went wrong while extracting video frames, exiting function...")
-        print("This is the output of the error: {}".format(a[0]))
+        log.error("Something went wrong while extracting video frames, exiting function...")
+        log.error("This is the output of the error: {}".format(a[0]))
 
     if b"Output file is empty, nothing was encoded" in output:
         ans = -1
@@ -298,26 +256,24 @@ def move_sample_movie_to_correct_dir(
 
         return destination_path
     else:
-        delete_sucess = False
         for x in range(1, 5):
             try:
                 delete_temp_files()
-                delete_sucess = True
                 break
             except OSError as e:
 
-                print(str(e))
+                if x == 4:
+                    log.exception(f"move_sample_movie_to_correct_dir failed." ,e)
+                    delete_temp_files()
+                    raise
+
+                log.error(f"move_sample_movie_to_correct_dir: {e}, will retry")
                 time.sleep(5)
-
-        if not delete_sucess:
-            delete_temp_files()
-
 
 def delete_temp_files():
     files = glob.glob(os.path.join(TEMP_PATH, "*"))
     for f in files:
         os.remove(f)
-
 
 def parse_ffprobe_data(ffprobe_json_output):
     ans = dict()
@@ -343,11 +299,7 @@ def parse_ffprobe_data(ffprobe_json_output):
             try:
                 ans["framerate"] = framerate_numerator / framerate_denominator
             except ZeroDivisionError:
-                print(
-                    "Average framerate in JSON is "
-                    + temp
-                    + " could not divide by zero!"
-                )
+                log.info(f"Average framerate in JSON is {temp}")
                 ans["framerate"] = 0
 
     return ans
@@ -370,8 +322,8 @@ def ffmpeg_take_scene_screenshot_without_save(scene : Scene):
     a = ffmpeg_take_screenshot(screenshot_time, scene.path_to_file)
 
     if a["success"]:
-        print("Screenshot Taken")
-        dest_path = os.path.join(Config().site_media_path, "scenes", str(scene.id), "thumb")
+        log.info("Screenshot Taken")
+        dest_path = scene.get_media_path("thumb")
         z = move_sample_movie_to_correct_dir(
             scene, True, "thumb.jpg", dest_path, SCREENSHOT_OUTPUT_PATH, "image"
         )
@@ -425,7 +377,7 @@ def ffprobe_get_data_without_save(scene):
             else:
                 scene.duration = 0
         except KeyError:
-            print("Well Fuck! ffprobe didn't find the needed info in the file...")
+            log.error("Well Fuck! ffprobe didn't find the needed info in the file...")
             ans = False
             return ans
 
@@ -501,7 +453,8 @@ def ffmpeg_create_sammple_video(scene):
             make_video_from_screenshots(scene.framerate)
             time.sleep(5)
 
-            dest_path = os.path.join(Config().site_media_path, "scenes", str(scene.id), "sample")
+            dest_path = scene.get_media_path('scenes')
+            os.path.join(dest_path, "sample")
             move_sample_movie_to_correct_dir(
                 scene,
                 success,
@@ -516,46 +469,3 @@ def ffmpeg_create_sammple_video(scene):
     else:
         success = False
         return success
-
-
-def main():
-    scenes = Scene.objects.all()
-    counter = 0
-    for scene in scenes:
-        if scene.id > 9410:
-            path = scene.path_to_file.encode("utf-8")
-            ffprobe_json_output = ffprobe(path)
-            if ffprobe_json_output["success"]:
-                try:
-                    parsed_ffprobe_data = parse_ffprobe_data(
-                        ffprobe_json_output["response"]
-                    )
-                except KeyError:
-                    print(
-                        "Well Fuck! ffprobe didn't find the needed info in the file..."
-                    )
-                    continue
-
-                print(scene.name)
-                for key, y in parsed_ffprobe_data.items():
-                    print(key + ": " + str(y))
-
-                scene.framerate = parsed_ffprobe_data["framerate"]
-                scene.bit_rate = parsed_ffprobe_data["bitrate"]
-                scene.size = parsed_ffprobe_data["size"]
-                scene.codec_name = parsed_ffprobe_data["codec"]
-                scene.height = parsed_ffprobe_data["height"]
-                scene.width = parsed_ffprobe_data["width"]
-                scene.duration = parsed_ffprobe_data["duration"]
-
-                ffmpeg_take_scene_screenshot_without_save(scene)
-
-                scene.save()
-        else:
-            print("Scene {} was already processed".format(scene.name.encode("utf-8")))
-
-
-if __name__ == "__main__":
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
-
-    main()

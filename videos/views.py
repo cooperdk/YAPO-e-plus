@@ -1,4 +1,5 @@
 import datetime
+import math
 import re
 import os.path
 import subprocess
@@ -45,8 +46,8 @@ import videos.const as const
 from django.utils.datastructures import MultiValueDictKeyError
 import threading
 import videos.startup
-from utils.printing import Logger
-log = Logger()
+import logging
+log = logging.getLogger(__name__)
 import urllib3
 import urllib.request
 import http.client
@@ -57,45 +58,26 @@ def get_scenes_in_folder_recursive(folder, scene_list):
     scenes = list(folder.scenes.all())
     scene_list = list(chain(scene_list, scenes))
 
-    if folder.children.count() == 0:
-        return scene_list
+    for child in folder.children.all():
+        scene_list = get_scenes_in_folder_recursive(child, scene_list)
 
-    else:
-        for child in folder.children.all():
-            scene_list = get_scenes_in_folder_recursive(child, scene_list)
-
-        return scene_list
-
-
-def onlyChars(input):
-    valids = "".join(character for character in input if character.isalpha())
-    return valids
-
+    return scene_list
 
 def get_folders_recursive(folder, folder_list):
-    # scenes = list(folder.scenes.all())
-    # scene_list = list(chain(scene_list, scenes))
+    folder_list = []
 
-    if folder.children.count() == 0:
-        return list()
+    for child in folder.children.all():
+        temp_list = get_folders_recursive(child, folder_list)
 
-    else:
+        folders = list(folder.children.all())
+        folder_list = list(chain(folders, temp_list))
 
-        for child in folder.children.all():
-            temp_list = get_folders_recursive(child, folder_list)
-
-            folders = list(folder.children.all())
-            # folder_list = list(chain(folder_list, folders))
-            folder_list = list(chain(folders, temp_list))
-
-        return folder_list
-
+    return folder_list
 
 def lambda_attrgetter(string, x):
     y = attrgetter(string)
 
     return y(x)
-
 
 def search_in_get_queryset(original_queryset, request):
     qs_list = list()
@@ -108,19 +90,6 @@ def search_in_get_queryset(original_queryset, request):
         search_string = request.query_params["search"]
         if search_string:
             search_field = request.query_params["searchField"]
-
-            # if request.query_params['pageType']:
-            #     if request.query_params['pageType'] == 'DbFolder':
-            #         if request.query_params['parent']:
-            #             folder = Folder.objects.get(pk=int(request.query_params['parent']))
-            #             qs_list = get_folders_recursive(folder, qs_list)
-            #             term_is_not_null = True
-            #             tmp_list = list()
-            #             for i in qs_list:
-            #                 if search_string in getattr(i,search_field):
-            #                     tmp_list.append(i)
-            #
-            #             qs_list = tmp_list
 
             if search_string.startswith("<"):
                 string_keyarg = "{search_field}__lte"
@@ -136,7 +105,6 @@ def search_in_get_queryset(original_queryset, request):
                     **{string_keyarg: search_string}
                 )
                 was_searched = True
-                # qs_list = [i for i in qs_list if (search_string in i.name)]
         else:
             if request.query_params["pageType"]:
                 if request.query_params["pageType"] == "DbFolder":
@@ -146,18 +114,16 @@ def search_in_get_queryset(original_queryset, request):
         "recursive" in request.query_params
         and request.query_params["recursive"] == "true"
     ):
-        print("Recursive is TRUE!!!!")
-        print(request.query_params["folders_in_tree"])
+        log.warning("Recursive is TRUE!!!!")
+        log.info(request.query_params["folders_in_tree"])
         folder = Folder.objects.get(pk=int(request.query_params["folders_in_tree"]))
         qs_list = get_scenes_in_folder_recursive(folder, qs_list)
-        print(qs_list)
+        log.info(qs_list)
         term_is_not_null = True
-
     else:
         z = False
         try:
             if request.query_params["pageType"]:
-
                 if request.query_params["pageType"] == "DbFolder" and was_searched:
                     z = True
         except MultiValueDictKeyError:
@@ -165,9 +131,7 @@ def search_in_get_queryset(original_queryset, request):
 
         if not z:
             for qp in request.query_params:
-                # print (qp)
                 term_string = request.query_params.get(qp, None)
-                # print (term_string)
 
                 if (
                     (term_string is not None)
@@ -182,13 +146,6 @@ def search_in_get_queryset(original_queryset, request):
                     and (qp != "pageType")
                     and (qp != "search")
                 ):
-
-                    # if qp == 'sortBy':
-                    #     sort_by = term_string
-                    #     if sort_by == 'random':
-                    #         random = True
-                    #
-                    # else:
                     term_is_not_null = True
                     terms = term_string.split(",")
 
@@ -202,7 +159,7 @@ def search_in_get_queryset(original_queryset, request):
                                 elif (
                                     getattr(i, qp)
                                 ).__class__.__name__ == "ManyRelatedManager":
-                                    print(getattr(i, qp).all())
+                                    log.info(getattr(i, qp).all())
                                     x = getattr(i, qp).all()
                                     for item in getattr(i, qp).all():
                                         if item.id == term:
@@ -210,8 +167,6 @@ def search_in_get_queryset(original_queryset, request):
                                             break
                                 elif (getattr(i, qp)) == term:
                                     t_list.append(i)
-                                    # if term in getattr(i, qp).all():
-                                    #     t_list.append(i)
                             qs_list = t_list
                         else:
                             qs_list = list(
@@ -224,59 +179,31 @@ def search_in_get_queryset(original_queryset, request):
             random = True
         if "usage_count" in sort_by:
             term_is_not_null = True
-            # qs_temp1 = original_queryset.values()
-            # qs_list = qs_temp1
             qs_list = list(original_queryset)
-
-            # temp = original_queryset.values()
-            # list_temp = [entry for entry in temp]
-            # qs_list = list_temp
 
     if term_is_not_null:
         if random:
             shuffle(qs_list)
+            return qs_list
         else:
             if "-" in sort_by:
-                sort_by = sort_by.replace("-", "")
-                if sort_by == "usage_count":
-                    try:
-                        temp_list = sorted(
-                            qs_list, key=lambda k: k.scenes.count(), reverse=True
-                        )
-                    except AttributeError:
-                        temp_list = sorted(
-                            qs_list, key=lambda k: k.actors.count(), reverse=True
-                        )
-                else:
-                    temp_list = sorted(
-                        qs_list,
-                        key=lambda k: (
-                            lambda_attrgetter(sort_by, k) is None,
-                            lambda_attrgetter(sort_by, k) == "",
-                            lambda_attrgetter(sort_by, k),
-                        ),
-                        reverse=True,
-                    )
-
+                reverseSort = True
             else:
+                reverseSort = False
+            sort_by = sort_by.replace("-", "")
 
-                if sort_by == "usage_count":
-                    try:
-                        temp_list = sorted(qs_list, key=lambda k: k.scenes.count())
-                    except AttributeError:
-                        temp_list = sorted(qs_list, key=lambda k: k.actors.count())
-                else:
-                    temp_list = sorted(
-                        qs_list,
-                        key=lambda k: (
-                            lambda_attrgetter(sort_by, k) is None,
-                            lambda_attrgetter(sort_by, k) == "",
-                            lambda_attrgetter(sort_by, k),
-                        ),
+            if sort_by == "usage_count":
+                temp_list = sorted(qs_list, reverse=reverseSort, key=lambda k: k.actors.count())
+            else:
+                temp_list = sorted(qs_list, reverse=reverseSort,
+                    key=lambda k: (
+                        lambda_attrgetter(sort_by, k) is None,
+                        lambda_attrgetter(sort_by, k) == "",
+                        lambda_attrgetter(sort_by, k),
                     )
-            return temp_list
+                )
 
-        return qs_list
+            return temp_list
     else:
         if random:
             return original_queryset.order_by("?")
@@ -301,7 +228,7 @@ def populate_websites(force):
     if not aux.is_domain_reachable("api.metadataapi.net"):
         return Response(status=500)
 
-    log.sinfo(f"Traversing websites for logos...")
+    log.info(f"Traversing websites for logos...")
 
     # if current_scene.tpdb_id is not None and current_scene.tpdb_id != "" and len(current_scene.tpdb_id) > 12:
     #     parsetext = current_scene.tpdb_id
@@ -313,22 +240,14 @@ def populate_websites(force):
         'Accept': 'application/json',
         'User-Agent': 'YAPO e+ 0.71',
     }
-    print("Downloading site information... ", end="")
-    response = requests.request('GET', url, headers=headers, params=params) #, params=params
-    print("\n")
+    response = requests.request('GET', url, headers=headers, params=params)
+    response.raise_for_status()
+    response = response.json()
 
-    try:
-        response = response.json()
-    except:
-        pass
-    print("\n")
     websites = Website.objects.all()
     for site in websites:
         oldname = site.name
-        found = False
-        #print (response['data'].keys())
-        #print(response['data'][0].keys())
-        for tpdb in response['data']: #[0]:
+        for tpdb in response['data']:
             found = False
             tsid = tpdb['id']
             tsn = tpdb['name']
@@ -336,21 +255,18 @@ def populate_websites(force):
             tsurl = tpdb['url']
             tslogo = tpdb['logo']
 
-            #print (f"Site: {site.name} - {tsn}                    \r", end="")
-
             if site.name == tsn:
                 found = True
 
             if (site.name != tsn) and (site.name.lower() == tsn.lower()):
-                log.info(f'Renaming site "{site.name}" to "{tsn}" for consistency')
+                log.warning(f'Renaming site "{site.name}" to "{tsn}" for consistency')
                 site.name = tsn
                 found = True
 
             if (site.name.lower() == tss.lower()) and (site.name.lower() != tsn.lower()):
-                log.info(f'Renaming site "{site.name}" to "{tsn}" because it is truncated')
+                log.warning(f'Renaming site "{site.name}" to "{tsn}" because it is truncated')
                 site.name = tsn
                 found = True
-
 
             if found:
                 try:
@@ -369,14 +285,9 @@ def populate_websites(force):
 
                     site.save()
                 except:
-                    log.error(
-                        f'Attempting to rename {oldname} to {newname} resulted in an error. New name probably already exists!')
+                    log.error(f'Attempting to rename {oldname} to {newname} resulted in an error. New name probably already exists!')
                     break
-                print("\n")
-
-
-
-    print("Done.")
+    log.info("Done.")
 
     return Response(status=200)
 
@@ -402,7 +313,6 @@ class tpdb_actor_response:
         responseData = [x for x in responseData if x['name'] == actorname]
         if len(responseData) == 0:
             return None
-#        print (responseData)
         if len(responseData) != 1:
             raise Exception("tpdb response did not include exactly one 'data' entry for actor '%s' (included: '%s')" % (actorname, ",".join(map(lambda x: x.name, responseData))))
 
@@ -433,7 +343,7 @@ def tpdb_scan_actor(actor, force: bool):
 
     url = 'https://api.metadataapi.net/performers'
 
-    log.sinfo(f'Contacting TpDB API for info about {actor.name}.')
+    log.info(f'Contacting TpDB API for info about {actor.name}.')
 
     params = { 'q': actor.name }
     headers = {
@@ -450,7 +360,7 @@ def tpdb_scan_actor(actor, force: bool):
 
     parsedResponse = tpdb_actor_response.parse(actor.name, response)
     if parsedResponse is None:
-        log.swarn(f'It seems that TpDB might not know anything about {actor.name}!')
+        log.info(f'It seems that TpDB might not know anything about {actor.name}!')
         return False
 
     # Download the thumbnail if neccessary
@@ -471,10 +381,9 @@ def tpdb_scan_actor(actor, force: bool):
                 photo += " [ Photo ]"
                 success = True
             else:
-                log.swarn(f"DOWNLOAD ERROR: Photo ({actor.name}): {parsedResponse.image}")
+                log.warning(f"DOWNLOAD ERROR: Photo ({actor.name}): {parsedResponse.image}")
 
     if any([force, not actor.description, len(actor.description) < 128, "freeones" in actor.description.lower()]):
-        #print("no good desc")
         if parsedResponse.bio is not None and len(parsedResponse.bio) > 72:
             actor.description = aux.strip_html(parsedResponse.bio)
             success = True
@@ -490,66 +399,46 @@ def tpdb_scan_actor(actor, force: bool):
         actor.last_lookup = datetime.datetime.now()
         actor.modified_date = datetime.datetime.now()
         actor.save()
-        log.sinfo(f'Information about {actor.name} was successfully gathered from TpDB: {photo}.')
+        log.info(f'Information about {actor.name} was successfully gathered from TpDB: {photo}.')
 
     else:
         save_path = os.path.join(Config().site_media_path, 'actor', str(actor.id), 'profile')
         save_file_name = os.path.join(save_path, 'profile.jpg')
         if not force and ((actor.tpdb_id == parsedResponse.pid) and (len(actor.description) > 125) and (os.path.isfile(save_file_name))):
             success = True
-            log.sinfo(f'Your installation has good details about {actor.name}. You can force this operation.')
+            log.info(f'Your installation has good details about {actor.name}. You can force this operation.')
         elif force and ((actor.tpdb_id == parsedResponse.pid) and (len(actor.description) > 125) and (os.path.isfile(save_file_name))):
             success = True
-            log.sinfo(f'It seems that there is no better information about {actor.name} on TpDB.')
+            log.info(f'It seems that there is no better information about {actor.name} on TpDB.')
     return success
-
-
 
 def scrape_all_actors(force):
     actors = Actor.objects.all()
 
     for actor in actors:
+        if not force and actor.last_lookup is not None:
+            log.info(f"{actor.name} was already searched")
+            return Response(status=200)
 
-        if not force:
-            if actor.last_lookup is None:
-                print("Searching in TMDb")
-                scraper_tmdb.search_person_with_force_flag(actor, False)
-                print("Finished TMDb search")
-                print("Searching TpDB...")
-                tpdb_scan_actor(actor, False)
-                print("Finished TpDB search")
-                print("Searching IMDB...")
-                scraper_imdb.search_imdb_with_force_flag(actor, False)
-                print("Finished IMDB Search")
-                if actor.gender != "M":
-                    print("Searching in Freeones")
-                    scraper_freeones.search_freeones_with_force_flag(actor, True)
-                    print("Finished Freeones search")
-            else:
-                print(f"{actor.name} was already searched...                                                                        \r",end="")
-        else:
+        log.info("Searching in TMDb")
+        scraper_tmdb.search_person_with_force_flag(actor, force)
+        log.info("Finished TMDb search")
+        log.info("Searching TpDB...")
+        tpdb_scan_actor(actor, False)
+        log.info("Finished TpDB search")
+        log.info("Searching IMDB...")
+        scraper_imdb.search_imdb_with_force_flag(actor, force)
+        log.info("Finished IMDB Search")
+        if actor.gender != "M":
+            log.info("Searching in Freeones")
+            scraper_freeones.search_freeones_with_force_flag(actor, force)
+            log.info("Finished Freeones search")
 
-            print("Searching in TMDb")
-            scraper_tmdb.search_person_with_force_flag(actor, True)
-            print("Finished TMDb search")
-            print("Searching TpDB...")
-            tpdb_scan_actor(actor, True)
-            print("Finished TpDB search")
-            print("Searching IMDB...")
-            scraper_imdb.search_imdb_with_force_flag(actor, True)
-            print("Finished IMDB Search")
-
-            if actor.gender != "M":
-                print("Searching in Freeones")
-                scraper_freeones.search_freeones_with_force_flag(actor, True)
-                print("Finished Freeones search.")
-    print("\rDone scraping actors.                                                                                               ")
+    log.info("Done scraping actors.")
     return Response(status=200)
-
 
 def tag_all_scenes(ignore_last_lookup):
     if Config().current_setting_version < 3:
-
         for actorTag in ActorTag.objects.all():
             if not SceneTag.objects.filter(name=actorTag.name):
                 SceneTag.objects.create(name=actorTag.name)
@@ -557,18 +446,13 @@ def tag_all_scenes(ignore_last_lookup):
             scene_tag_to_add = SceneTag.objects.get(name=actorTag.name)
             actorTag.scene_tags.add(scene_tag_to_add)
             scenetag=SceneTag.objects.filter(name=actorTag.name)
-            print(
-                f"Added scene tag {scenetag} to actor tag {actorTag.name}"
-            )
+            log.info(f"Added scene tag {scenetag} to actor tag {actorTag.name}")
 
     filename_parser.parse_all_scenes(False)
-
     return Response(status=200)
-
 
 def tag_all_scenes_ignore_last_lookup(ignore_last_lookup):
     if Config().current_setting_version < 3:
-
         for actorTag in ActorTag.objects.all():
             if not SceneTag.objects.filter(name=actorTag.name):
                 SceneTag.objects.create(name=actorTag.name)
@@ -576,34 +460,10 @@ def tag_all_scenes_ignore_last_lookup(ignore_last_lookup):
             scene_tag_to_add = SceneTag.objects.get(name=actorTag.name)
             actorTag.scene_tags.add(scene_tag_to_add)
             scenetag=SceneTag.objects.filter(name=actorTag.name)
-            print(
-                f"Added scene tag {scenetag} to actor tag {actorTag.name}"
-            )
+            log.info(f"Added scene tag {scenetag} to actor tag {actorTag.name}")
 
     filename_parser.parse_all_scenes(True)
-
     return Response(status=200)
-
-    # scenes = Scene.objects.all()
-    # scene_count = scenes.count()
-    # counter = 1
-    #
-    # actors = list(Actor.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
-    # actors_alias = list(ActorAlias.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
-    # scene_tags = SceneTag.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
-    # websites = Website.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
-    #
-    # filtered_alias = list()
-    #
-    # for alias in actors_alias:
-    #     if ' ' in alias.name or alias.is_exempt_from_one_word_search:
-    #         filtered_alias.append(alias)
-    #
-    # for scene in scenes:
-    #     print("Scene {} out of {}".format(counter, scene_count))
-    #     filename_parser.parse_scene_all_metadata(scene, actors, filtered_alias, scene_tags, websites)
-    #     counter += 1
-
 
 # views
 
@@ -617,13 +477,12 @@ class scanScene(views.APIView):
             force = True
         else:
             force = False
-        print("Now entering the TPDB scene scanner API REST view")
+        log.info("Now entering the TPDB scene scanner API REST view")
 
         success = scanners.tpdb(scene_id, force)
 
         if success:
             return Response(status=200)
-
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -637,78 +496,26 @@ class ScrapeActor(views.APIView):
             force = True
         else:
             force = False
-        print("Now entering the scrape actor API REST view")
-        print(f"Scanning for {Actor.objects.get(pk=actor_id).name} on {search_site}")
 
+        log.info("Now entering the scrape actor API REST view")
+        log.info(f"Scanning for {Actor.objects.get(pk=actor_id).name} on {search_site}")
+
+        actor_to_search = Actor.objects.get(pk=actor_id)
         if search_site == "TMDb":
-            actor_to_search = Actor.objects.get(pk=actor_id)
-            success = False
-            if force:
-                success = scraper_tmdb.search_person_with_force_flag(
-                    actor_to_search, True
-                )
-            else:
-                success = scraper_tmdb.search_person_with_force_flag(
-                    actor_to_search, False
-                )
-            if success:
-                return Response(status=200)
-
-            else:
-                return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
-
+            success = scraper_tmdb.search_person_with_force_flag(actor_to_search, force)
         elif search_site == "TpDB":
-
-            actor_to_search = Actor.objects.get(pk=actor_id)
-            success = False
-            if force:
-                success = tpdb_scan_actor(actor_to_search, True)
-            else:
-                success = tpdb_scan_actor(actor_to_search, False)
-
-            if success:
-                return Response(status=200)
-
-            else:
-                return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
-
+            success = tpdb_scan_actor(actor_to_search, force)
         elif search_site == "Freeones":
-
-            actor_to_search = Actor.objects.get(pk=actor_id)
-            success = False
-            if force:
-                success = scraper_freeones.search_freeones_with_force_flag(
-                    actor_to_search, True
-                )
-            else:
-                success = scraper_freeones.search_freeones_with_force_flag(
-                    actor_to_search, False
-                )
-
-            if success:
-                return Response(status=200)
-
-            else:
-                return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
-
+            success = scraper_freeones.search_freeones_with_force_flag(actor_to_search, force)
         elif search_site == "IMDB":
+            success = scraper_imdb.search_imdb_with_force_flag(actor_to_search, force)
+        else:
+            return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
 
-            actor_to_search = Actor.objects.get(pk=actor_id)
-            success = False
-            if force:
-                success = scraper_imdb.search_imdb_with_force_flag(
-                    actor_to_search, True
-                )
-            else:
-                success = scraper_imdb.search_imdb_with_force_flag(
-                    actor_to_search, False
-                )
-
-            if success:
-                return Response(status=200)
-
-            else:
-                return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+        if success:
+            return Response(status=200)
+        else:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 def permanently_delete_scene_and_remove_from_db(scene):
     success_delete_file = deletePath(scene.path_to_file)
@@ -716,7 +523,7 @@ def permanently_delete_scene_and_remove_from_db(scene):
 
     if success_delete_file and success_delete_media_path:
         scene.delete()
-        print(f"Removed '{scene.name}' from database")
+        log.info(f"Removed '{scene.name}' from database")
 
 # Deletes a path, returning True if the path does not exist, or False if some error occured.
 def deletePath(pathToDelete):
@@ -725,10 +532,10 @@ def deletePath(pathToDelete):
 
     try:
         shutil.rmtree(pathToDelete)
-        print(f"Deleted '{pathToDelete}'")
+        log.info(f"Deleted '{pathToDelete}'")
         return True
     except OSError as e:
-        print(f"Got OSError while trying to delete {e.filename} : Error number:{e.errno} Error:{e.strerror}")
+        log.error(f"Got OSError while trying to delete {e.filename} : Error number:{e.errno} Error:{e.strerror}")
         return False
 
 def checkDupeHash(hash):
@@ -738,19 +545,16 @@ def checkDupeHash(hash):
 
     cursor.execute("SELECT count(*) from videos_scene WHERE hash = %s", [hash])
     dupecount = cursor.fetchone()
-    # print ("Checked " + hash + " - " + str(dupecount[0]) + "\n")
     return dupecount[0]
-
 
 @api_view(["GET", "POST"])
 def tag_multiple_items(request):
     if request.method == "POST":
-        # print("We got a post request!")
 
         params = request.data["params"]
 
         if params["type"] == "scene":
-            print("Patching scene")
+            log.info("Patching scene")
 
             if params["patchType"] == "websites":
 
@@ -763,32 +567,24 @@ def tag_multiple_items(request):
                     for x in scenes_to_update:
                         scene_to_update = Scene.objects.get(pk=x)
                         scene_to_update.websites.add(website_to_add)
-                        print(
-                            f"Added Website '{website_to_add.name}' to scene '{scene_to_update.name}'"
-                        )
+                        log.info(f"Added Website '{website_to_add.name}' to scene '{scene_to_update.name}'")
 
                         if website_to_add.scene_tags.count() > 0:
                             for tag in website_to_add.scene_tags.all():
                                 scene_to_update.scene_tags.add(tag)
-                                print(
-                                    f"Added Scene Tag '{tag.name}' to scene '{scene_to_update.name}'"
-                                )
+                                log.info(f"Added Scene Tag '{tag.name}' to scene '{scene_to_update.name}'")
 
                         scene_to_update.save()
                 if params["addOrRemove"] == "remove":
                     for x in scenes_to_update:
                         scene_to_update = Scene.objects.get(pk=x)
                         scene_to_update.websites.remove(website_to_add)
-                        print(
-                            f"Removed Website '{website_to_add.name}' from scene '{scene_to_update.name}'"
-                        )
+                        log.info(f"Removed Website '{website_to_add.name}' from scene '{scene_to_update.name}'")
                         if website_to_add.scene_tags.count() > 0:
                             for tag in website_to_add.scene_tags.all():
                                 if tag in scene_to_update.scene_tags.all():
                                     scene_to_update.scene_tags.remove(tag)
-                                    print(
-                                        f"Removed Scene Tag '{tag.name}' from scene '{scene_to_update.name}'"
-                                    )
+                                    log.info(f"Removed Scene Tag '{tag.name}' from scene '{scene_to_update.name}'")
                         scene_to_update.save()
 
             elif params["patchType"] == "scene_tags":
@@ -802,18 +598,14 @@ def tag_multiple_items(request):
                         scene_to_update = Scene.objects.get(pk=x)
                         scene_to_update.scene_tags.add(scene_tag_to_add)
                         scene_to_update.save()
-                        print(
-                            f"Added Scene Tag '{scene_tag_to_add.name}' to scene '{scene_to_update.name}'"
-                        )
+                        log.info(f"Added Scene Tag '{scene_tag_to_add.name}' to scene '{scene_to_update.name}'")
 
                 if params["addOrRemove"] == "remove":
                     for x in scenes_to_update:
                         scene_to_update = Scene.objects.get(pk=x)
                         scene_to_update.scene_tags.remove(scene_tag_to_add)
                         scene_to_update.save()
-                        print(
-                            f"Removed Scene Tag '{scene_tag_to_add.name}' from scene '{scene_to_update.name}'"
-                        )
+                        log.info(f"Removed Scene Tag '{scene_tag_to_add.name}' from scene '{scene_to_update.name}'")
             elif params["patchType"] == "actors":
                 actor_id = params["patchData"][0]
                 actor_to_add = Actor.objects.get(pk=actor_id)
@@ -824,18 +616,14 @@ def tag_multiple_items(request):
                     for x in scenes_to_update:
                         scene_to_update = Scene.objects.get(pk=x)
                         scene_to_update.actors.add(actor_to_add)
-                        print(
-                            f"Added Actor '{actor_to_add.name}' to scene '{scene_to_update.name}'"
-                        )
+                        log.info(f"Added Actor '{actor_to_add.name}' to scene '{scene_to_update.name}'")
 
                         if actor_to_add.actor_tags.count() > 0:
                             for actor_tag in actor_to_add.actor_tags.all():
                                 scene_to_update.scene_tags.add(
                                     actor_tag.scene_tags.first()
                                 )
-                                print(
-                                    f"Added Scene Tag '{actor_tag.scene_tags.first().name}' to scene '{scene_to_update.name}'"
-                                )
+                                log.info(f"Added Scene Tag '{actor_tag.scene_tags.first().name}' to scene '{scene_to_update.name}'")
 
                         scene_to_update.save()
 
@@ -843,9 +631,7 @@ def tag_multiple_items(request):
                     for x in scenes_to_update:
                         scene_to_update = Scene.objects.get(pk=x)
                         scene_to_update.actors.remove(actor_to_add)
-                        print(
-                            f"Removed Actor '{actor_to_add.name}' from scene '{scene_to_update.name}'"
-                        )
+                        log.info(f"Removed Actor '{actor_to_add.name}' from scene '{scene_to_update.name}'")
 
                         if actor_to_add.actor_tags.count() > 0:
                             for actor_tag in actor_to_add.actor_tags.all():
@@ -856,26 +642,23 @@ def tag_multiple_items(request):
                                     scene_to_update.scene_tags.remove(
                                         actor_tag.scene_tags.first()
                                     )
-                                    print(
-                                        f"Removed Scene Tag '{actor_tag.scene_tags.first().name}' to scene '{scene_to_update.name}'"
-                                    )
+                                    log.info(f"Removed Scene Tag '{actor_tag.scene_tags.first().name}' to scene '{scene_to_update.name}'")
                         scene_to_update.save()
 
             elif params["patchType"] == "delete":
                 scenes_to_update = params["itemsToUpdate"]
 
                 if params["permDelete"]:
-                    print("permDelete true")
+                    log.warning("permDelete true")
                     for x in scenes_to_update:
                         scene_to_update = Scene.objects.get(pk=x)
                         permanently_delete_scene_and_remove_from_db(scene_to_update)
+                        log.info(f"Removed scene '{scene_to_update.name}'")
                 else:
                     for x in scenes_to_update:
                         scene_to_update = Scene.objects.get(pk=x)
                         scene_to_update.delete()
-                        print(
-                            f"Removed scene '{scene_to_update.name}' from database"
-                        )
+                        log.info(f"Removed scene '{scene_to_update.name}' from database")
 
             elif params["patchType"] == "playlists":
                 playlist_id = params["patchData"][0]
@@ -883,23 +666,17 @@ def tag_multiple_items(request):
                 scenes_to_update = params["itemsToUpdate"]
 
                 if params["addOrRemove"] == "add":
-
                     for x in scenes_to_update:
                         scene_to_update = Scene.objects.get(pk=x)
                         scene_to_update.playlists.add(playlist_to_add)
-                        print(
-                            f"Scene '{scene_to_update.name}' was added to playlist '{playlist_to_add.name}'"
-                        )
+                        log.info(f"Scene '{scene_to_update.name}' was added to playlist '{playlist_to_add.name}'")
                         scene_to_update.save()
                 if params["addOrRemove"] == "remove":
                     for x in scenes_to_update:
                         scene_to_update = Scene.objects.get(pk=x)
                         scene_to_update.playlists.remove(playlist_to_add)
-                        print(
-                            f"Scene '{scene_to_update.name}' was removed to playlist '{playlist_to_add.name}'"
-                        )
+                        log.info(f"Scene '{scene_to_update.name}' was removed to playlist '{playlist_to_add.name}'")
                         scene_to_update.save()
-
             else:
                 scenes_to_update = params["itemsToUpdate"]
                 for x in scenes_to_update:
@@ -907,13 +684,9 @@ def tag_multiple_items(request):
                     patch_type = params["patchType"]
                     patch_data = params["patchData"]
                     setattr(scene_to_update, patch_type, patch_data)
-                    # scene_to_update[patch_type] = patch_data
 
-                    print(
-                        f"Set scene's '{scene_to_update}' attribute '{patch_type}' to '{patch_data}'"
-                    )
+                    log.info(f"Set scene's '{scene_to_update}' attribute '{patch_type}' to '{patch_data}'")
                     scene_to_update.save()
-
         elif params["type"] == "actor":
             if params["patchType"] == "actor_tags":
                 actor_tag_id = params["patchData"][0]
@@ -921,23 +694,17 @@ def tag_multiple_items(request):
                 actors_to_update = params["itemsToUpdate"]
 
                 if params["addOrRemove"] == "add":
-
                     for x in actors_to_update:
                         actor_to_update = Actor.objects.get(pk=x)
                         actor_to_update.actor_tags.add(actor_tag_to_add)
                         actor_to_update.save()
-                        print(
-                            f"Added Actor Tag '{actor_tag_to_add.name}' to actor {actor_to_update.name}"
-                        )
+                        log.info(f"Added Actor Tag '{actor_tag_to_add.name}' to actor {actor_to_update.name}")
                 elif params["addOrRemove"] == "remove":
-
                     for x in actors_to_update:
                         actor_to_update = Actor.objects.get(pk=x)
                         actor_to_update.actor_tags.remove(actor_tag_to_add)
                         actor_to_update.save()
-                        print(
-                            f"Removed Actor Tag '{actor_tag_to_add.name}' to actor {actor_to_update.name}"
-                        )
+                        log.info(f"Removed Actor Tag '{actor_tag_to_add.name}' to actor {actor_to_update.name}")
             else:
                 actors_to_update = params["itemsToUpdate"]
                 for x in actors_to_update:
@@ -945,11 +712,7 @@ def tag_multiple_items(request):
                     patch_type = params["patchType"]
                     patch_data = params["patchData"]
                     setattr(actor_to_update, patch_type, patch_data)
-                    # scene_to_update[patch_type] = patch_data
-
-                    print(
-                        f"Set actors's '{actor_to_update}' attribute '{patch_type}' to '{patch_data}'"
-                    )
+                    log.info(f"Set actors's '{actor_to_update}' attribute '{patch_type}' to '{patch_data}'")
                     actor_to_update.save()
 
         return Response(status=200)
@@ -962,76 +725,62 @@ def clean_dir(modelType : ModelWithMediaContent):
     modelTypeName = str(modelType.name.field).split('.')[-2:-1][0]
 
     for dir_in_path in os.listdir(dir_to_clean):
-        print(f"Checking {modelTypeName} folder {index} out of {number_of_folders}")
+        log.info(f"Checking {modelTypeName} folder {index} out of {number_of_folders}")
 
         # The original Yapo-e-plus code skips any directory names which are not integers, so we do too.
         try:
             dir_in_path_int = int(dir_in_path)
         except ValueError:
-            print(f"Dir name '{dir_in_path}' Could not be converted to an integer, skipping...")
+            log.error(f"Dir name '{dir_in_path}' Could not be converted to an integer, skipping...")
             index += 1
             continue
 
         dir_with_path = os.path.join(dir_to_clean, dir_in_path)
 
         if len(modelType.objects.filter(pk=dir_in_path_int)) == 0:
-            print(f"{modelTypeName} id {dir_in_path_int} is not in the database... Deleting folder {dir_with_path}")
+            log.warning(f"{modelTypeName} id {dir_in_path_int} is not in the database... Deleting folder {dir_with_path}")
             shutil.rmtree(dir_with_path)
 
         index += 1
 
 
-def sizeformat (b: int) -> str: # returns a human-readable filesize depending on the file's size
-    if b < 1000:
+# returns a human-readable filesize depending on the file's size
+def sizeformat (b: int) -> str:
+    if b < 1024:
         return f"{b} bytes"
-    elif b < 1000000:
-        return f"{b/1000:.1f} kilobytes"
-    elif b < 1000000000:
-        return f"{b/1000000:.1f} megabytes"
-    elif b < 1000000000000:
-        return f"{b/1000000000:.1f} gigabytes"
+    elif b < math.pow(1024, 2):
+        return f"{b/1024:.1f} kilobytes"
+    elif b < math.pow(1024, 3):
+        return f"{b/math.pow(1024, 2):.1f} megabytes"
+    elif b < math.pow(1024, 4):
+        return f"{b/math.pow(1024, 3):.1f} gigabytes"
     else:
-        return f"{b/1000000000000:.1f} terabytes"
-
+        return f"{b/math.pow(1024, 4):.1f} terabytes"
 
 @api_view(["GET", "POST"])
 def settings(request):
     if request.method == "GET":
-
-        #print(f"REQ: {str(request.query_params)}")
-
         if "pathToVlc" in request.query_params:
             if request.query_params["pathToVlc"] == "":
-
                 serializer = SettingsSerializer(Config().get_old_settings_as_json())
-
                 return Response(serializer.data)
 
-            else:
+            new_path_to_vlc = os.path.abspath(request.query_params["pathToVlc"]).replace("\\","/")
+            log.info(f'VLC path set to {request.query_params["pathToVlc"]}')
 
-                new_path_to_vlc = os.path.abspath(request.query_params["pathToVlc"]).replace("\\","/")
-                log.info(f'VLC path set to {request.query_params["pathToVlc"]}')
+            if os.path.isfile(new_path_to_vlc):
+                Config().vlc_path = new_path_to_vlc
+                Config().save()
+                return Response(status=200)
 
-                if os.path.isfile(new_path_to_vlc):
-                    Config().vlc_path = new_path_to_vlc
-                    Config().save()
-                    return Response(status=200)
-
-                else:
-                    print("Error: VLC path does not exist!")
-
-                    return Response(status=500)
+            log.error("VLC path does not exist!")
+            return Response(status=500)
 
         if "yapo_url" in request.query_params:
-
             if request.query_params["yapo_url"]:
-
                 if request.query_params["yapo_url"] != "":
-
                     new_yapo_url = request.query_params["yapo_url"]
-
                 else:
-
                     new_yapo_url = "none"
 
                 log.info(f'YAPO URL set to {new_yapo_url}')
@@ -1040,21 +789,10 @@ def settings(request):
 
                 return Response(status=200)
 
-
-        '''
-        if all(["pathToVlc" not in request.query_params, "enable_tpdb" not in request.query_params,
-                "tpdb_websitelogos" not in request.query_params, "tpdb_enable_autorename" not in request.query_params,
-                "tpdb_enable_addactors" not in request.query_params, "tpdb_enable_addphoto" not in request.query_params]):
-
-
-        '''
-
         if "tpdb_settings" in request.query_params:
-
             if "tpdb_enabled" in request.query_params:
                 log.info(f'TpDB set to {request.query_params["tpdb_enabled"]}')
                 Config().tpdb_enabled = request.query_params["tpdb_enabled"]
-                #print(f"CONFIG: tbdb_enabled = {Config().tpdb_enabled}")
                 if Config().tpdb_enabled == 'false':
                     Config().tpdb_website_logos  = 'false'
                     Config().tpdb_autorename  = 'false'
@@ -1091,8 +829,8 @@ def settings(request):
 
                 return Response(status=200)
 
-        if "scrapAllActors" in request.query_params:
-            if request.query_params["scrapAllActors"] == "True":
+        if "scrapeAllActors" in request.query_params:
+            if request.query_params["scrapeAllActors"] == "True":
                 if request.query_params["force"] == "true":
                     force = True
                 else:
@@ -1102,93 +840,69 @@ def settings(request):
                 return Response(status=200)
 
         if "tagAllScenesIgnore" in request.query_params:
-
             threading.Thread(
                 target=tag_all_scenes_ignore_last_lookup, args=(True,)
             ).start()
-            # _thread.start_new_thread(tag_all_scenes_ignore_last_lookup, (), )
             return Response(status=200)
 
         elif "tagAllScenes" in request.query_params:
-
             threading.Thread(target=tag_all_scenes, args=(False,)).start()
-            # _thread.start_new_thread(tag_all_scenes, (), )
             return Response(status=200)
 
         if "checkDupes" in request.query_params:
             if request.query_params["checkDupes"] == "True":
-                print("Checking database for duplicates by hash...")
+                log.info("Checking database for duplicates by hash...")
                 total_saved = 0
                 total_deleted = 0
                 anumber = 0
                 for scene_1 in Scene.objects.all():
                     anumber += 1
-                    # if not anumber % 100:
-                    print("Checked " + str(anumber) + "...\r", end="")
+                    log.info(f"Checked {anumber}...")
                     if checkDupeHash(scene_1.hash) > 1:
-                        print(f"Scene {scene_1.id} at least one dupe, scanning...")
+                        log.info(f"Scene {scene_1.id} at least one dupe, scanning...")
                         for scene_2 in Scene.objects.all():
                             if scene_1.path_to_file == scene_2.path_to_file:
-                                log.warn(f"Scene IDs {scene_1.pk} and {scene_2.pk} refer to the same file: {scene_1.path_to_file}")
+                                log.warning(f"Scene IDs {scene_1.pk} and {scene_2.pk} refer to the same file: {scene_1.path_to_file}")
                                 break
                             if (not scene_1.pk == scene_2.pk) or (not scene_1.path_to_file == scene_2.path_to_file):
-                                # if scene_2.path_to_file == scene_1.path_to_file:
-                                #    print("!!! Found duplicate scene (exact path): " +
-                                #    str(scene_1.id) + " - " + scene_1.name + "\nFile path: " + scene_1.path_to_file +
-                                #    "\nis duplicate of " +
-                                #    str(scene_2.id) + " - " + scene_2.name + "\nFile path: " + scene_2.path_to_file)
                                 if scene_2.hash == scene_1.hash:
                                     total_deleted += 1
                                     total_saved = total_saved + scene_2.size
-                                    print(f"Confirmed! Duplicate scene info:\n {scene_2.id} - {scene_2.path_to_file}\nHash: {scene_2.hash}")
-                                    # print("Passing ID " + str(scene_2.id) + " to delete function...")
+                                    log.warning(f"Confirmed! Duplicate scene info: {scene_2.id} - {scene_2.path_to_file} Hash: {scene_2.hash}")
                                     permanently_delete_scene_and_remove_from_db(scene_2)
                 if total_deleted > 0:
-                    # print(f"Deleted {total_deleted} files, saving {sizeformat(total_saved)}")
                     log.info(f"Deleted {total_deleted} files, saving {sizeformat(total_saved)}")
                 return Response(status=200)
-
-
-        # populate_last_folder_name_in_virtual_folders()
-        #    write_actors_to_file()
-        #    clean_empty_folders()
-        # os.environ.setdefault("DJANGO_SETTINGS_MODULE", "myproject.settings")
-
-        # get_files(TEST_PATH)
 
         if "cleanDatabase" in request.query_params:
             if request.query_params["cleanDatabase"]:
                 scenes = Scene.objects.all()
                 count = scenes.count()
                 counter = 1
-                print("Cleaning Scenes...")  # CooperDK This was enabled
+                log.info("Cleaning Scenes...")
                 for scene in scenes:
-                    print(f"Checking scene {counter} out of {count}\r", end="")
+                    log.info(f"Checking scene {counter} out of {count}")
                     if not os.path.isfile(scene.path_to_file):
-                        print(
-                            f"File for scene {scene.name} does not exist in path {scene.path_to_file}"
-                        )
+                        log.info(f"File for scene {scene.name} does not exist in path {scene.path_to_file}")
                         permanently_delete_scene_and_remove_from_db(scene)
                     counter += 1
-                print("\nFinished cleaning scenes...")
+                log.info("Finished cleaning scenes...")
 
-                print("Cleaning Aliases...")
-
+                log.info("Cleaning Aliases...")
                 aliases = ActorAlias.objects.all()
                 count = aliases.count()
                 counter = 1
                 for alias in aliases:
-                    print(f"Checking Alias {counter} out of {count}\r", end="")
+                    log.info(f"Checking Alias {counter} out of {count}")
                     if alias.actors.count() == 0:
                         alias.delete()
-                        print(f"Alias {alias.name} has no actor... deleting")
+                        log.info(f"Alias {alias.name} has no actor... deleting")
                     counter += 1
-                print("\nFinished cleaning aliases...")
+                log.info("Finished cleaning aliases...")
 
-                print("Cleaning actor dirs that are no longer in database...")
-
+                log.info("Cleaning actor dirs that are no longer in database...")
                 clean_dir(Actor)
-                print("Cleaning scene dirs that are no longer in database...")
+                log.info("Cleaning scene dirs that are no longer in database...")
                 clean_dir(Scene)
                 return Response(status=200)
 
@@ -1202,9 +916,8 @@ def settings(request):
                 all_folders = LocalSceneFolders.objects.all()
                 for folder in all_folders:
                     videos.addScenes.get_files(folder.name, False)
-            print("\nDone.")
+            log.info("Done.")
             return Response(status=200)
-
 
 @api_view(["GET"])
 def ffmpeg(request):
@@ -1240,6 +953,8 @@ def add_comma_seperated_items_to_db(string_of_comma_seperated_items, type_of_ite
             object_to_insert = SceneTag()
         elif type_of_item == "website":
             object_to_insert = Website()
+        else:
+            raise Exception("Unknown type_of_item")
 
         object_to_insert.strip = x.strip()
         object_to_insert.name = object_to_insert.strip
@@ -1248,19 +963,13 @@ def add_comma_seperated_items_to_db(string_of_comma_seperated_items, type_of_ite
             if type_of_item == "actor":
                 if not ActorAlias.objects.filter(name=object_to_insert.name):
                     object_to_insert.save()
-                    print(
-                        f"Added {type_of_item} {object_to_insert.name} To db"
-                    )
+                    log.info(f"Added {type_of_item} {object_to_insert.name} To db")
             else:
                 object_to_insert.save()
-                print(f"Added {type_of_item} {object_to_insert.name} To db")
+                log.info(f"Added {type_of_item} {object_to_insert.name} To db")
         except django.db.IntegrityError as e:
-            # content = {'something whent wrong': e}
-            print(
-                f"{e} while trying to add {type_of_item} {object_to_insert.name}"
-            )
-            # return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+            log.error(f"{e} while trying to add {type_of_item} {object_to_insert.name}")
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class AddItems(views.APIView):
     def get(self, request, format=None):
@@ -1270,29 +979,24 @@ class AddItems(views.APIView):
 
             for folder_to_add_path in folders_to_add_path.split(","):
                 folder_to_add_path_stripped = folder_to_add_path.strip()
-                if os.path.isdir(folder_to_add_path_stripped):
-                    # if the second argument is true - tries to make a sample video when inserting scene to db.
-                    if request.query_params["createSampleVideo"] == "true":
-                        videos.addScenes.get_files(folder_to_add_path_stripped, True)
-                    else:
-                        videos.addScenes.get_files(folder_to_add_path_stripped, False)
-
-                    temp = os.path.abspath(folder_to_add_path_stripped)
-                    try:
-                        local_scene_folder = LocalSceneFolders(name=temp)
-                        local_scene_folder.save()
-                    except django.db.IntegrityError as e:
-                        print(
-                            f"{e} while trying to add {local_scene_folder.name} to folder list"
-                        )
-                    print(
-                        f"Added folder {local_scene_folder.name} to folder list..."
-                    )
-                else:
+                if not os.path.isdir(folder_to_add_path_stripped):
                     content = {"Path does not exist!": "Can't find path!"}
-                    return Response(
-                        content, status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                    )
+                    return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+                # if the second argument is true - tries to make a sample video when inserting scene to db.
+                if request.query_params["createSampleVideo"] == "true":
+                    videos.addScenes.get_files(folder_to_add_path_stripped, True)
+                else:
+                    videos.addScenes.get_files(folder_to_add_path_stripped, False)
+
+                temp = os.path.abspath(folder_to_add_path_stripped)
+                try:
+                    local_scene_folder = LocalSceneFolders(name=temp)
+                    local_scene_folder.save()
+                except django.db.IntegrityError as e:
+                    log.error(f"{e} while trying to add {local_scene_folder.name} to folder list")
+
+                log.info(f"Added folder {local_scene_folder.name} to folder list...")
 
         if request.query_params["actorsToAdd"] != "":
             add_comma_seperated_items_to_db(
@@ -1315,34 +1019,30 @@ class AddItems(views.APIView):
 def play_scene_vlc(scene, random):
     file_path = os.path.normpath(scene.path_to_file)
     if platform.system() == "Windows":
-        vlc_path = Config().vlc_path #os.path.normpath(const.VLC_PATH)
+        vlc_path = Config().vlc_path
     else:
         vlc_path = "vlc"
-    p = subprocess.Popen([vlc_path, file_path])
+    subprocess.Popen([vlc_path, file_path])
     scene.play_count += 1
     scene.date_last_played = datetime.datetime.now()
-    print(
+    log.info(
         f"Play count for scene '{scene.name}' is now '{scene.play_count}' and the date the scene was last played is '{scene.date_last_played}'"
     )
     scene.save()
 
     for scene_tag in scene.scene_tags.all():
         scene_tag.play_count += 1
-        print(
-            f"Play count for scene tag '{scene_tag.name}' is now '{scene_tag.play_count}'"
-        )
+        log.info(f"Play count for scene tag '{scene_tag.name}' is now '{scene_tag.play_count}'")
         scene_tag.save()
 
     for actor in scene.actors.all():
         actor.play_count += 1
-        print(f"Play count for actor '{actor.name}' is now '{actor.play_count}'")
+        log.info(f"Play count for actor '{actor.name}' is now '{actor.play_count}'")
         actor.save()
 
     for website in scene.websites.all():
         website.play_count += 1
-        print(
-            f"Play count for site '{website.name}' is now '{website.play_count}'"
-        )
+        log.info(f"Play count for site '{website.name}' is now '{website.play_count}'")
         website.save()
 
     if random:
@@ -1354,14 +1054,13 @@ def play_scene_vlc(scene, random):
         if not pls.scenes.filter(id=scene.id):
             pls.scenes.add(scene)
             pls.save()
-            print(f"Added scene '{scene.name}' to Random Plays playlist.")
+            log.info(f"Added scene '{scene.name}' to Random Plays playlist.")
         else:
-            print(f"Scene '{scene.name}' already in playlist Random Plays.")
+            log.info(f"Scene '{scene.name}' already in playlist Random Plays.")
 
 
 @api_view(["GET", "POST"])
 def play_in_vlc(request):
-    scene = None
     random = True
 
     if request.method == "GET":
@@ -1406,7 +1105,6 @@ def play_in_vlc(request):
         else:
             return Response(status=500)
 
-
 class PlayInVlc(views.APIView):
     def get(self, request, format=None):
         scene_id = request.query_params["sceneId"]
@@ -1416,7 +1114,6 @@ class PlayInVlc(views.APIView):
 
         return Response(status=200)
 
-
 def open_file_cross_platform(path):
     if platform.system() == "Windows":
         os.startfile(path)
@@ -1424,13 +1121,11 @@ def open_file_cross_platform(path):
         opener = "open" if platform.system() == "Darwin" else "xdg-open"
         subprocess.call([opener, path])
 
-
 class OpenFolder(views.APIView):
     def get(self, request, format=None):
         path = request.query_params["path"]
         open_file_cross_platform(path)
         return Response(status=200)
-
 
 class AssetAdd(views.APIView):
     parser_classes = (
@@ -1489,12 +1184,11 @@ class FileUploadView(views.APIView):
     def put(self, request, filename, format=None):
         file_obj = request.data["file"]
 
-        print("got file")
+        log.info("got file")
 
-        return Response(status=204)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 def angular_index(request):
-
     return render(request, os.path.join("videos","angular","index.html"))
 
 
@@ -1585,7 +1279,6 @@ class SceneTagViewSet(viewsets.ModelViewSet):
 class SceneViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Scene.objects.all()
-        # queryset = self.get_serializer_class().setup_eager_loading(queryset,queryset)
         queryset = SceneListSerializer.setup_eager_loading(queryset, queryset)
         return search_in_get_queryset(queryset, self.request)
 
@@ -1596,11 +1289,6 @@ class SceneViewSet(viewsets.ModelViewSet):
             return SceneSerializer
 
     queryset = Scene.objects.all()
-    # filter_backends = (filters.SearchFilter,)
-    # search_fields = ('name',)
-
-    # serializer_class = SceneSerializer
-
 
 class ActorTagViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
@@ -1619,9 +1307,6 @@ class ActorTagViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.SearchFilter,)
     search_fields = ("name",)
 
-    # serializer_class = ActorTagSerializer
-
-
 class ActorAliasViewSet(viewsets.ModelViewSet):
     """
       This viewset automatically provides `list`, `create`, `retrieve`,
@@ -1632,11 +1317,7 @@ class ActorAliasViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         # random order
-        # queryset = Actor.objects.all().order_by('?')
-        term = "name"
         queryset = ActorAlias.objects.all()
-
-        # **{term: term}
         res_qs = search_in_get_queryset(queryset, self.request)
 
         return res_qs
@@ -1648,12 +1329,9 @@ class ActorAliasViewSet(viewsets.ModelViewSet):
 class ActorViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         # random order
-        # queryset = Actor.objects.all().order_by('?')
-
         queryset = Actor.objects.all()
-
-        # **{term: term}
         res_qs = search_in_get_queryset(queryset, self.request)
+
         return res_qs
 
     def get_serializer_class(self):
@@ -1667,7 +1345,6 @@ class ActorViewSet(viewsets.ModelViewSet):
     # search_fields = ('name',)
     queryset = Actor.objects.all()
     # serializer_class = ActorSerializer
-
 
 def file_iterator(file_name, chunk_size=8192, offset=0, length=None):
     with open(file_name, "rb") as f:
@@ -1688,10 +1365,6 @@ def display_video(request):
     sceneid = request.path
     sceneid = sceneid.split('/')[-1]
 
-    #print(request.headers)
-    #print(request.META)
-    #print(request.GET)
-
     scene = Scene.objects.get(pk=sceneid)
     pathname = scene.path_to_file
     path = pathname
@@ -1701,16 +1374,16 @@ def display_video(request):
         then = scene.date_last_played
     else:
         then = datetime.datetime.now() - timedelta(hours = 12)
+
     if now > then + timedelta(hours=3):
-        print(f"Requesting scene ID {sceneid}...\r", end="")
-        print (f"Playback: [{pathname}] ({size//1048576} MB)")#1048576 is 1024^2
+        log.info(f"Requesting scene ID {sceneid}...")
+        log.info(f"Playback: [{pathname}] ({sizeformat(size)})")
         scene.play_count+=1
         scene.date_last_played=datetime.datetime.now()
         scene.save()
-        print(f"Play count for scene {scene.id} is now {scene.play_count} and the last played date and time is updated.")
+        log.info(f"Play count for scene {scene.id} is now {scene.play_count} and the last played date and time is updated.")
 
-
-    range_header = request.META.get('HTTP_RANGE', '').strip()     #request.META.get('HTTP_RANGE', '').strip()
+    range_header = request.META.get('HTTP_RANGE', '').strip()
     range_re = re.compile(r'bytes\s*=\s*(\d+)\s*-\s*(\d*)', re.I)
     range_match = range_re.match(range_header)
     content_type, encoding = mimetypes.guess_type(path)
@@ -1726,61 +1399,8 @@ def display_video(request):
         resp['Content-Length'] = str(length)
         resp['Content-Range'] = 'bytes %s-%s/%s' % (first_byte, last_byte, size)
     else:
-                 # When the video stream is not obtained, the entire file is returned in the generator mode to save memory.
+        # When the video stream is not obtained, the entire file is returned in the generator mode to save memory.
         resp = StreamingHttpResponse(FileWrapper(open(path, 'rb')), content_type=content_type)
         resp['Content-Length'] = str(size)
     resp['Accept-Ranges'] = 'bytes'
     return resp
-
-'''
-    from django.http import StreamingHttpResponse
-    from wsgiref.util import FileWrapper
-    from datetime import timedelta
-    import mimetypes
-    
-    cont = 0
- 
-    def read_video(path):
-        
-        with open(path, 'rb') as f:
-            while True:
-                data = f.read(10 * 1024)
-                if data:
-                    yield data
-                    cont = 1
-                else:
-                    break
-
-    #dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-    #if x is None:
-        #return HttpResponse("No Video")
-    sceneid = x.path
-    sceneid = sceneid.split('/')[-1]
-    print (f"Requesting scene ID {sceneid}...\r", end="")
-    scene = Scene.objects.get(pk=sceneid)
-    pathname = scene.path_to_file
-    size = scene.size
-    
-    now = datetime.datetime.now()
-    if scene.date_last_played is not None:
-        then = scene.date_last_played
-    else:
-        then = datetime.datetime.now() - timedelta(hours = 12)
-    if now > then + timedelta(hours=3):
-        print (f"Playback: [{pathname}] ({size//1048576} MB)")#1048576 is 1024^2
-        scene.play_count+=1
-        scene.date_last_played=datetime.datetime.now()
-        scene.save()
-        print(f"Play count for scene {scene.id} is now {scene.play_count} and the last played date and time is updated.")
-    try:
-        response = StreamingHttpResponse(FileWrapper(open(pathname, 'rb'), 8192),
-            content_type=mimetypes.guess_type(pathname)[0]) #(open(pathname, 'rb')) #(read_video(pathname), status=206)
-        #response = StreamingHttpResponse(read_video(pathname)) #(open(pathname, 'rb')) #(read_video(pathname), status=206)
-        #response['Content-Length'] = size
-        #response['Content-Disposition'] = "attachment; filename=%s" % filename
-    #response["Content-Range"] = 'bytes 0-%s' % (size)
-    #response['Content-Disposition'] = f'attachement; filename="{pathname}"'
-    except:
-        print("Error")
-    return response
-'''

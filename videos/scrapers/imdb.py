@@ -14,6 +14,8 @@ from bs4 import BeautifulSoup
 requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
 
 django.setup()
+import logging
+log = logging.getLogger(__name__)
 
 from videos.models import Actor
 
@@ -29,14 +31,14 @@ def search_imdb(actor_to_search, alias, force):
     # https://www.iafd.com/results.asp?searchtype=comprehensive&searchstring=isis+love
     if alias:
         name_with_plus = alias.name.replace(' ', '+')
-        print(f"Searching IMDB for: {actor_to_search.name} alias: {alias.name}")
+        log.info(f"Searching IMDB for: {actor_to_search.name} alias: {alias.name}")
         name = alias.name
     else:
         name_with_plus = name.replace(' ', '+')
-        print(f"Searching IMDB for: {actor_to_search.name}")
-        print(f"({name_with_plus})")
+        log.info(f"Searching IMDB for: {actor_to_search.name}")
+        log.info(f"({name_with_plus})")
     r = requests.get(f"https://www.imdb.com/search/name?name={name_with_plus}&adult=include", verify=False)
-    print(f"https://www.imdb.com/search/name?name={name_with_plus}&adult=include")
+    log.info(f"https://www.imdb.com/search/name?name={name_with_plus}&adult=include")
     soup = BeautifulSoup(r.content, "html5lib")
     # link = soup.find_all("a", {"text": "Isis Love"})
     for soup_links in soup.find_all("h3", attrs={'class': 'lister-item-header'}):	#, class_="lister-item-header")
@@ -44,10 +46,8 @@ def search_imdb(actor_to_search, alias, force):
         link = soup_links.find('a')['href']
         #link.replace("nm","")
         match = soup_links.find('a').contents[0]
-        match = strip_bad_chars(match).lstrip()
+        match = aux.strip_bad_chars(match).lstrip()
         match = match.rstrip()
-        #print("Link is: " + link + ", match name: " + match)
-    #print("SOUP: " + str(soup_links))
         href_found = match_text_in_link_to_query(match, name, link) # was soup_links
 
         if href_found:
@@ -55,41 +55,28 @@ def search_imdb(actor_to_search, alias, force):
             found_lnk = urllib_parse.urljoin("https://www.imdb.com/",href_found)
             bio_page = f"{found_lnk}/bio?ref_=nm_ov_bio_sm"
             imdb_id = href_found.replace("/name/","").replace("/","")
-            print(f"{actor_to_search.name} was found on IMDB!")# + href_found + "ID " + imdb_id)
+            log.info(f"{actor_to_search.name} was found on IMDB!")
             actor_to_search.imdb_id = imdb_id
-            print(f"Scraping biography from {bio_page}")
+            log.info(f"Scraping biography from {bio_page}")
             r = requests.get(bio_page, verify=False)
             soup = BeautifulSoup(r.content, "html5lib")
             soup_bio = soup.find("div", attrs={'class': 'soda'})
             if soup_bio is not None:
                 bio = soup_bio.find('p').contents[0]
-                print("Bio found, checking if it should be inserted")
-            #bio=str(soup_bio) #soup_bio.contents[0]
-            #print(bio)
+                log.info("Bio found, checking if it should be inserted")
                 if not (actor_to_search.description) or (len(actor_to_search.description)<48):
                     actor_to_search.description = bio
-                    print("There's no description or it's too short, so added it from IMDB.")
+                    log.info("There's no description or it's too short, so added it from IMDB.")
                 else:
-                    print("Skipping, there's already a bio.")
+                    log.info("Skipping, there's already a bio.")
 
             actor_to_search.last_lookup = datetime.datetime.now()
             actor_to_search.save()
 
         else:
-            #actor_to_search.last_lookup = datetime.datetime.now()
-           #actor_to_search.save()
-            print(f"{actor_to_search.name} was not found on IMDB.")
+            log.info(f"{actor_to_search.name} was not found on IMDB.")
 		
         return success
-
-def strip_bad_chars(name):
-    bad_chars = {" "}
-    for char in bad_chars:
-        if char in name:
-            #print("Before: " + name)
-            name = name.replace(char, "")
-            print(f"Adding Data: {name}")
-    return name
 
 def insert_aliases(actor_to_insert: Actor, aliases: str):
     for alias in aliases.split(','):
@@ -97,12 +84,8 @@ def insert_aliases(actor_to_insert: Actor, aliases: str):
 
 def match_text_in_link_to_query(soup, text, href):
     ans = None
-    #for link in soup_links:
-    #print("Checking " + text + " against " + soup)
     if text.lower() == soup.lower():
-        #print("Match -->" + href)
         ans = href
-    #    break
     return ans
 
 def search_imdb_with_force_flag(actor_to_search, force):
@@ -130,26 +113,3 @@ def search_imdb_alias(actor_to_search, alias, force):
         success = search_imdb(actor_to_search, alias, force)
 
     return success
-
-def main():
-    print("test")
-    for actor in Actor.objects.all():
-
-        print(f"Fetching info for: {actor.name}")
-        time.sleep(10)
-        sucess = search_imdb_with_force_flag(actor, True)
-        if not sucess:
-            for alias in actor.actor_aliases.all():
-                sucess = search_imdb_alias(actor, alias, True)
-                if sucess:
-                    break
-
-    print("Done!")
-
-        # actor = Actor()
-        # actor.name = "Daisy Marie"
-        # search_freeones(actor)
-
-
-if __name__ == "__main__":
-    main()

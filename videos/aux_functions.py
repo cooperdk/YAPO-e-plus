@@ -15,9 +15,9 @@ http.client._MAXHEADERS = 1000
 import socket
 import requests
 from lxml import html
-from utils.printing import Logger
-log = Logger()
 
+import logging
+log = logging.getLogger(__name__)
 
 def progress (count: int, total: int, suffix=''):
     bar_len = 42
@@ -28,24 +28,22 @@ def progress (count: int, total: int, suffix=''):
     #bar = '█' * filled_len + '░' * (bar_len - filled_len)
     sys.stdout.write(f"\r{bar} [{percents}%] - {suffix}                    \r")
 
-
-def progress_end ():
+def progress_end():
     sys.stdout.flush()
 
-
-def getMemory ():
+def getMemory():
     import psutil
     vmem = round(psutil.virtual_memory().total / 1000000000, 0)
     return vmem  # "{:.2}".format(vmem.total/100000000) #shold that be 102400000?
 
 
-def getCPU ():
+def getCPU():
     import psutil
     cpufreq = round(psutil.cpu_freq().max / 1000, 1)
     return cpufreq
 
 
-def getCPUCount ():
+def getCPUCount():
     import psutil
     return psutil.cpu_count(logical=False)  # set Logical to true if treads are to be included
 
@@ -113,10 +111,9 @@ def send_piercings_to_actortag (actor):
             insert_actor_tag(actor, "No piercings")
 
 def addactor (current_scene, actor_to_add):
-
     if not current_scene.actors.filter(name=actor_to_add):
         current_scene.actors.add(actor_to_add)
-        print(f"Added Actor '{actor_to_add.name}' to scene '{current_scene.name}'")
+        log.info(f"Added Actor '{actor_to_add.name}' to scene '{current_scene.name}'")
 
     if actor_to_add.actor_tags.count() > 0:
         for actor_tag in actor_to_add.actor_tags.all():
@@ -124,9 +121,7 @@ def addactor (current_scene, actor_to_add):
                 current_scene.scene_tags.add(
                     actor_tag.scene_tags.first()
                 )
-                print(
-                    f"Added Scene Tag '{actor_tag.scene_tags.first().name}' to scene '{current_scene.name}'"
-                )
+                log.info(f"Added Scene Tag '{actor_tag.scene_tags.first().name}' to scene '{current_scene.name}'")
 
     current_scene.save()
 
@@ -139,11 +134,9 @@ def insert_actor_tag (actor_to_insert, actor_tag_name):
         actor_tag.name = actor_tag_name
         actor_tag.save()
         actor_to_insert.actor_tags.add(actor_tag)
-    #        print("Added new tag: " + actor_tag_name + " for " + actor_to_insert.name)
     else:
         actor_tag = ActorTag.objects.get(name=actor_tag_name)
         actor_to_insert.actor_tags.add(actor_tag)
-        #        print("Added tag: " + actor_tag_name + " for " + actor_to_insert.name)
         actor_tag.save()
 
 def remove_text_inside_brackets(text, brackets="()[]"):
@@ -162,7 +155,6 @@ def remove_text_inside_brackets(text, brackets="()[]"):
             if not any(count): # outside brackets
                 saved_chars.append(character)
     return ''.join(saved_chars)
-
 
 def tpdb_formatter (name):
     trashTitle = (
@@ -189,23 +181,21 @@ def tpdb_formatter (name):
     name = remove_text_inside_brackets(name)
     name = re.sub(' +', ' ', name)
 
-    #name = name.replace(" ","+")
-    #name = name.replace(".","+")
-    #print(f"New name to use for searching: {name}")
     return name
 
 def strip_html (s):
     return str(html.fromstring(s).text_content())
 
-
 def strip_bad_chars (name):
     bad_chars = { " " }
     for char in bad_chars:
         if char in name:
-            # print("Before: " + name)
             name = name.replace(char, "")
-            print(f"Adding Data: {name}")
     return name
+
+def onlyChars(toClean):
+    valids = "".join(char for char in toClean if char.isalpha())
+    return valids
 
 def get_with_retry(url, headers, params):
     deadline = datetime.datetime.now() + datetime.timedelta(minutes=4)
@@ -216,10 +206,10 @@ def get_with_retry(url, headers, params):
             response.raise_for_status()
             return response
         except Exception as e:
-            print(f"Exception: {e} ")
             if datetime.datetime.now() > deadline:
-                raise
-            print(f"will retry.")
+                log.exception(f"Exception retrieving {url}: {e} ")
+
+            log.warning(f"Exception retrieving {url}: {e}; will retry.")
             time.sleep(3)
 
 def is_domain_reachable(host):
@@ -241,22 +231,19 @@ def save_website_logo (image_link, website, force, *args):
     ws = None
     try:
         hasarg = 0
-        print("Website scan, method 1...")
+        log.info("Website scan, method 1...")
         ws = Website.objects.filter(name=website)
 
         if ws:
-            #print("Found the website locally")
             ws = Website.objects.get(name=website)
             website = ws.name
         if not ws:
-            #print("Method unsuccesful, trying method 2...")
             ws = Website.objects.filter(name__iexact=website.replace(" ",""))
             if ws:
-                #print("Found 2")
                 ws = Website.objects.get(name__iexact=website.replace(" ",""))
                 website = ws.name
         if not ws and Config().tpdb_websites:
-            print(f"Adding website: {website}")
+            log.info(f"Adding website: {website}")
             for arg in args:
                 hasarg += 1
                 sceneid = arg
@@ -282,16 +269,16 @@ def save_website_logo (image_link, website, force, *args):
 
     if image_link:
         if image_link.lower() == "null" or image_link == "":
-            print(f"No logo URL available for {website}.")
+            log.info(f"No logo URL available for {website}.")
             return
     else:
-        print(f"No logo URL available for {website}.")
+        log.info(f"No logo URL available for {website}.")
         return
 
     if not Config().tpdb_website_logos:
         return
     if not ws and not Config().tpdb_websites:
-        log.warn(f'LOGO: No website "{website}", and we cannot add it because you didn\'t allow it!')
+        log.warning(f'LOGO: No website "{website}", and we cannot add it because you didn\'t allow it!')
         return
 
     ws = Website.objects.get(name=website)
@@ -299,25 +286,25 @@ def save_website_logo (image_link, website, force, *args):
     if os.path.splitext(image_link)[1]:
         ext = os.path.splitext(image_link)[1]
     else:
-        print("Error in logo filename!")
+        log.error("Logo filename has no extension")
         return
 
     save_file_name = os.path.join(save_path, "logo" + ext)
     if os.path.isfile(save_file_name) and not force:
-        log.sinfo(f"LOGO: {ws.name}: Skipping download, because the website already has a logo.")
+        log.info(f"LOGO: {ws.name}: Skipping download, because the website already has a logo.")
         return
 
     os.makedirs(save_file_name)
 
     if not download_image(image_link, save_file_name):
-        log.swarn(f"DOWNLOAD ERROR: Logo: ({ws.name}): {image_link}")
+        log.error(f"DOWNLOAD ERROR: Logo: ({ws.name}): {image_link}")
         return
 
     ws = Website.objects.get(name=website)
-    print("OK")
+    log.info("OK")
     as_uri = pathname2url(save_file_name)
     ws.thumbnail = as_uri
-    print(f"Saved {as_uri} to DB ({save_file_name})")
+    log.info(f"Saved {as_uri} to DB ({save_file_name})")
     ws.modified_date = datetime.datetime.now()
     ws.save()
 
@@ -326,82 +313,21 @@ def download_image (image_url, path):
 
     try:
         req = Request(image_url, headers={
-            "User-Agent": "YAPO e+ 0.71" })
-        try:
-            # timeout time to download an image
-            timeout = 10
-
-            response = urlopen(req, None, timeout)
+            "User-Agent": "YAPO e+ 0.71"
+        })
+        with urlopen(req, None, 10) as response:
+            response.raise_for_status()
             data = response.read()
-            response.close()
 
-            try:
-                output_file = open(path, 'wb')
-                output_file.write(data)
-                output_file.close()
-            except OSError as e:
-                download_status = 'fail'
-                download_message = f"OSError on an image... Error: {e}"
-                return_image_name = ''
-                absolute_path = ''
+        with open(path, 'wb') as output_file:
+            output_file.write(data)
 
-            # return image name back to calling method to use it for thumbnail downloads
-            log.sinfo(f'Image "{image_url}" downloaded to {path}')
-            download_status = True
+        log.info(f'Image "{image_url}" downloaded to {path}')
+        return True
 
-
-
-        except UnicodeEncodeError as e:
-            download_status = 'fail'
-            log.info(f"UnicodeEncodeError on an image...trying next one... Error: {e}")
-            return_image_name = ''
-            absolute_path = ''
-
-        except URLError as e:
-            download_status = 'fail'
-            log.info(f"URLError on an image...trying next one... Error: {e}")
-            return_image_name = ''
-            absolute_path = ''
-
-        except BadStatusLine as e:
-            download_status = 'fail'
-            log.info(f"BadStatusLine on an image...trying next one... Error: {e}")
-            return_image_name = ''
-            absolute_path = ''
-
-    except HTTPError as e:  # If there is any HTTPError
-        download_status = 'fail'
-        log.info(f"HTTPError on an image...trying next one... Error: {e}")
-        return_image_name = ''
-        absolute_path = ''
-
-    except URLError as e:
-        download_status = 'fail'
-        log.info(f"URLError on an image...trying next one... Error: {e}")
-        return_image_name = ''
-        absolute_path = ''
-
-    except ssl.CertificateError as e:
-        download_status = 'fail'
-        log.info(f"CertificateError on an image...trying next one... Error: {e}")
-        return_image_name = ''
-        absolute_path = ''
-
-    except IOError as e:  # If there is any IOError
-        download_status = 'fail'
-        log.info(f"IOError on an image...trying next one... Error: {e}")
-        return_image_name = ''
-        absolute_path = ''
-
-    except IncompleteRead as e:
-        download_status = 'fail'
-        log.info(f"IncompleteReadError on an image...trying next one... Error: {e}")
-        return_image_name = ''
-        absolute_path = ''
-
-    return download_status
-
-
+    except Exception as e:
+        log.warning(f"Failed to download {image_url}: {e}")
+        return False
 
 def save_actor_profile_image_from_web (image_link, actor, force):
     save_path = os.path.join(
@@ -428,20 +354,10 @@ def actor_folder_from_name_to_id ():
     actors = Actor.objects.all()
 
     for actor in actors:
-        abs_path = os.path.join(
-                    Config().site_media_path,
-                    "actor",
-                    str(actor.id),
-                    "profile",
-                    "profile.jpg",
-            )
-
+        abs_path = actor.generateThumbnailPath()
         as_uri = pathname2url(abs_path)
+        log.info(f"Actor {actor.name} thumb path is: {actor.thumbnail}, but it should be {as_uri}")
 
-        print(
-           f"Actor {actor.name} thumb path is: {actor.thumbnail} \n and it should be {as_uri}"
-        )
-        print(actor.thumbnail != as_uri)
         if (actor.thumbnail != Config().unknown_person_image_path) and (
                 actor.thumbnail != as_uri
         ):
@@ -451,59 +367,27 @@ def actor_folder_from_name_to_id ():
                     os.path.join(Config().site_media_path, "actor", str(actor.id)),
                 )
 
-                print(
+                log.info(
                     "Renamed %s to %s"%(
                         os.path.join(Config().site_media_path, "actor", actor.name),
                         os.path.join(Config().site_media_path, "actor", str(actor.id)),
                     )
                 )
             except FileNotFoundError:
-
-                if os.path.isfile(
-                        os.path.join(
-                            Config().site_media_path,
-                            "actor",
-                            str(actor.id),
-                            "profile",
-                            "profile.jpg",
-                        )
-                ):
-
-                    rel_path_changed = os.path.relpath(
-                        os.path.join(
-                            Config().site_media_path,
-                            "actor",
-                            str(actor.id),
-                            "profile",
-                            "profile.jpg",
-                        ),
-                        start="videos",
-                    )
+                if os.path.isfile(abs_path):
+                    rel_path_changed = os.path.relpath(abs_path, start="videos")
                     as_uri_changed = urllib.request.pathname2url(rel_path_changed)
                     actor.thumbnail = as_uri_changed
                     actor.save()
-                    print(f"Changed {actor.name} thumb in database to {as_uri_changed}")
+                    log.info(f"Changed {actor.name} thumb in database to {as_uri_changed}")
                 else:
-                    print("File %s not found!"%(
-                            os.path.join(Config().site_media_path, "actor", actor.name)
-                        )
-                    )
+                    log.warning("File %s not found!"%(os.path.join(Config().site_media_path, "actor", actor.name)))
 
-            rel_path_changed = os.path.relpath(
-                os.path.join(
-                    Config().site_media_path,
-                    "actor",
-                    str(actor.id),
-                    "profile",
-                    "profile.jpg",
-                ),
-                start="videos",
-            )
+            rel_path_changed = os.path.relpath(abs_path, start="videos")
             as_uri_changed = urllib.request.pathname2url(rel_path_changed)
             actor.thumbnail = as_uri_changed
             actor.save()
-
-            print(f"Changed {actor.name} thumb in database to {as_uri_changed}")
+            log.info(f"Changed {actor.name} thumb in database to {as_uri_changed}")
 
     return True
 
@@ -533,5 +417,14 @@ def urlpath2pathname(url):
     url = os.path.join(Config().site_media_path, url)
     return url
 
-if __name__ == "__main__":
-    print("this is main")
+def heightcmToTagString(height):
+    if height < 148:
+        return "Extremely tiny"
+    if 148 < height < 152:
+        return "Tiny"
+    if 152 < height < 161:
+        return "Petite"
+    if 178 < height < 186:
+        return "Tall"
+    if 186 < height < 220:
+        return "Extremely tall"
