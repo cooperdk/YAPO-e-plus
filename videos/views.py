@@ -6,6 +6,8 @@ from typing import Optional
 
 import django.db
 import errno
+
+from django.db.models import Model
 from django.shortcuts import render
 import requests
 import requests.packages.urllib3
@@ -708,49 +710,26 @@ class ScrapeActor(views.APIView):
             else:
                 return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
 
-
-
-
-
 def permanently_delete_scene_and_remove_from_db(scene):
-    success_delete_file = False
-    success_delete_media_path = False
-    try:
-        os.remove(scene.path_to_file)
-        print(f"Successfully deleted scene '{scene.path_to_file}'")
-        success_delete_file = True
-    except OSError as e:
-        if e.errno == errno.ENOENT:
-            print(
-                f"File {scene.path_to_file} already deleted! [Err No:{e.errno}, Err File:{e.filename} Err:{e.strerror}]"
-            )
-            success_delete_file = True
-        else:
-            print(
-                f"Got OSError while trying to delete {scene.path_to_file} : Error number:{e.errno} Error Filename:{e.filename} Error:{e.strerror}"
-            )
-
-    media_path = os.path.relpath(
-        os.path.join(const.MEDIA_PATH, "scenes", str(scene.id))
-    )
-    print(os.path.dirname(os.path.abspath(__file__)))
-    try:
-        shutil.rmtree(media_path)
-        print(f"Deleted '{media_path}'")
-        success_delete_media_path = True
-    except OSError as e:
-        if e.errno == errno.ENOENT:
-            print(f"Directory '{media_path}' already deleted")
-            success_delete_media_path = True
-        else:
-            print(
-                f"Got OSError while trying to delete {scene.path_to_file} : Error number:{e.errno} Error Filename:{e.filename} Error:{e.strerror}"
-            )
+    success_delete_file = deletePath(scene.path_to_file)
+    success_delete_media_path = deletePath(scene.get_media_dir(createIfNotExisting = False))
 
     if success_delete_file and success_delete_media_path:
         scene.delete()
         print(f"Removed '{scene.name}' from database")
 
+# Deletes a path, returning True if the path does not exist, or False if some error occured.
+def deletePath(pathToDelete):
+    if not os.path.exists(pathToDelete):
+        return True
+
+    try:
+        shutil.rmtree(pathToDelete)
+        print(f"Deleted '{pathToDelete}'")
+        return True
+    except OSError as e:
+        print(f"Got OSError while trying to delete {e.filename} : Error number:{e.errno} Error:{e.strerror}")
+        return False
 
 def checkDupeHash(hash):
     from django.db import connection
@@ -975,52 +954,30 @@ def tag_multiple_items(request):
 
         return Response(status=200)
 
-
-def clean_dir(type_of_model_to_clean):
-    number_of_folders = len(
-        os.listdir(os.path.join(const.MEDIA_PATH, type_of_model_to_clean))
-    )
+def clean_dir(modelType : ModelWithMediaContent):
+    dir_to_clean = os.path.join(Config().site_media_path, modelType.get_media_dir(None))
+    number_of_folders = len(os.listdir(dir_to_clean))
     index = 1
 
-    for dir_in_path in os.listdir(
-        os.path.join(const.MEDIA_PATH, type_of_model_to_clean)
-    ):
+    for dir_in_path in os.listdir(dir_to_clean):
+        print(f"Checking {modelType.name} folder {index} out of {number_of_folders}")
 
-        print(f"Checking {type_of_model_to_clean} folder {index} out of {number_of_folders}\r", end="")
+        # The original Yapo-e-plus code skips any directory names which are not integers, so we do too.
         try:
             dir_in_path_int = int(dir_in_path)
-
-            if type_of_model_to_clean == "actor":
-                try:
-                    actor = Actor.objects.get(pk=dir_in_path_int)
-                except Actor.DoesNotExist:
-                    dir_to_delete = os.path.join(
-                        const.MEDIA_PATH, type_of_model_to_clean, dir_in_path
-                    )
-                    print(
-                        f"Actor id {dir_in_path_int} is not in the database... Deleting folder {dir_to_delete}"
-                    )
-                    shutil.rmtree(dir_to_delete)
-            elif type_of_model_to_clean == "scenes":
-
-                try:
-                    scene = Scene.objects.get(pk=dir_in_path_int)
-                except Scene.DoesNotExist:
-                    dir_to_delete = os.path.join(
-                        const.MEDIA_PATH, type_of_model_to_clean, dir_in_path
-                    )
-                    print(
-                        f"Scene id {dir_in_path_int} is not in the database... Deleting folder {dir_to_delete}"
-                    )
-                    shutil.rmtree(dir_to_delete)
-            index += 1
-
         except ValueError:
-            print(
-                f"Dir name '{dir_in_path}' Could not be converted to an integer, skipping..."
-            )
+            print(f"Dir name '{dir_in_path}' Could not be converted to an integer, skipping...")
             index += 1
-            pass
+            continue
+
+        dir_with_path = os.path.join(dir_to_clean, dir_in_path)
+
+        if len(modelType.objects.filter(pk=dir_in_path_int)) == 0:
+            print(f"{modelType.name} id {dir_in_path_int} is not in the database... Deleting folder {dir_with_path}")
+            shutil.rmtree(dir_with_path)
+
+        index += 1
+
 
 def sizeformat (b: int) -> str: # returns a human-readable filesize depending on the file's size
     if b < 1000:
@@ -1228,9 +1185,9 @@ def settings(request):
 
                 print("Cleaning actor dirs that are no longer in database...")
 
-                clean_dir("actor")
+                clean_dir(Actor)
                 print("Cleaning scene dirs that are no longer in database...")
-                clean_dir("scenes")
+                clean_dir(Scene)
                 return Response(status=200)
 
         if "folderToScan" in request.query_params:
