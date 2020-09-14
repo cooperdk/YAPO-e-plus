@@ -242,3 +242,4 @@ class ready:
         startup_sequence()
     else:
         log.info(f'User entered migration mode.')
+    startup_sequence()

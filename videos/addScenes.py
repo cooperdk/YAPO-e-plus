@@ -33,7 +33,6 @@ import logging
 log = logging.getLogger(__name__)
 
 def get_files(walk_dir, make_video_sample):
-
     for root, _, files in os.walk(walk_dir):
         if root.startswith("$") or root.startswith("."):
             log.info("Skipping an off-limits path ($ or . as first character in dirname)")
