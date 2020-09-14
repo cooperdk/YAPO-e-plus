@@ -2,6 +2,8 @@ import glob
 import os
 import platform
 
+from django.conf import Settings
+
 os.environ["DJANGO_SETTINGS_MODULE"] = "settings"
 
 import shutil
@@ -33,7 +35,6 @@ elif platform.system() == "Windows":
 FFMPEG_TEMP_OUTPUT_IMAGES = os.path.join("videos", "ffmpeg", "temp", "img%03d.jpg")
 OUTPUT_VIDEO_FRAMERATE = 15
 OUTPUT_VIDEO_NAME = os.path.join("videos", "ffmpeg", "temp", "out.mp4")
-TEMP_PATH = os.path.join("videos", "ffmpeg", "temp")
 FFPROBE_JSON_ARGUMENTS = "-v quiet -print_format json -show_format -show_streams"
 FFMPEG_SCREENSHOT_ARGUMENTS = (
     '-vf "thumbnail,scale=1280:720,pad=ih*16/9:ih:(ow-iw)/2:(oh-ih)/2" -frames:v 1'
@@ -41,9 +42,6 @@ FFMPEG_SCREENSHOT_ARGUMENTS = (
 DEFAULT_SCREENSHOT_TIME = "00:01:30"
 SCREENSHOT_OUTPUT_PATH = os.path.join("videos", "ffmpeg", "temp", "thumb.jpg")
 SAMPLE_RESOLUTION = "640:360"
-
-if not os.path.exists(TEMP_PATH):
-    os.makedirs(TEMP_PATH)
 
 def execute_subprocess(command_call, type_of_bin):
     command_call = command_call
@@ -271,7 +269,7 @@ def move_sample_movie_to_correct_dir(
                 time.sleep(5)
 
 def delete_temp_files():
-    files = glob.glob(os.path.join(TEMP_PATH, "*"))
+    files = glob.glob(os.path.join(Config().temp_path, "*"))
     for f in files:
         os.remove(f)
 
@@ -460,7 +458,7 @@ def ffmpeg_create_sammple_video(scene):
                 success,
                 "sample.mp4",
                 dest_path,
-                os.path.join(TEMP_PATH, "out.mp4"),
+                os.path.join(Config.temp_path, "out.mp4"),
                 "video",
             )
 

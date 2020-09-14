@@ -1008,7 +1008,7 @@ class AssetAdd(views.APIView):
             return Response(status=500)
 
         # Decode the image to a temporary file
-        save_dest = os.path.join(const.TEMP_PATH, "temp.jpg")
+        save_dest = os.path.join(Config.temp_path, "temp.jpg")
         try:
             format, imgstr = dataFile.split(";base64,")
             with open(save_dest, "wb") as fh:

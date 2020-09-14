@@ -12,6 +12,7 @@ class Constants(metaclass=Singleton):
     self.yapo_url = 'localhost:8000'
     self.code_subdir = 'YAPO'
     self.data_subdir = 'data'
+    self.temp_subdir = 'temp'
     self.site_subdir = 'videos'
     self.config_subdir = 'config'
     self.db_filename = 'db.sqlite3'

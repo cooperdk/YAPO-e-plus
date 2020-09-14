@@ -22,6 +22,7 @@ class Config(metaclass=Singleton):
   yapo_path: str
   site_path: str
   data_path: str
+  temp_path: str
   config_path: str
   database_dir: str
   database_path: str
@@ -47,6 +48,7 @@ class Config(metaclass=Singleton):
     self.yapo_path = os.path.join(self.root_path, Constants().code_subdir)
     self.site_path = os.path.join(self.root_path, Constants().site_subdir)
     self.data_path = os.path.join(self.root_path, Constants().data_subdir)
+    self.temp_path = os.path.join(self.root_path, Constants().temp_subdir)
     self.config_path = os.path.join(self.root_path, Constants().config_subdir)
     self.database_dir = os.path.join(self.root_path, Constants().db_subdir)
     self.database_path = os.path.join(self.database_dir, Constants().db_filename)
@@ -104,6 +106,7 @@ class Config(metaclass=Singleton):
     if settings_dict and settings_dict.get(__yaml_root_element__):
       self.yapo_url = settings_dict[__yaml_root_element__].get("yapo_url") or self.yapo_url
       self.data_path = settings_dict[__yaml_root_element__].get("data_path") or self.yapo_url
+      self.temp_path = settings_dict[__yaml_root_element__].get("temp_path") or self.yapo_url
       self.config_path = settings_dict[__yaml_root_element__].get("config_path") or self.config_path
       self.database_dir = settings_dict[__yaml_root_element__].get("db_dir") or self.database_dir
       self.timeprint_format = settings_dict[__yaml_root_element__].get("log_timeformat") or self.timeprint_format
@@ -126,6 +129,7 @@ class Config(metaclass=Singleton):
       __yaml_root_element__: {
         "yapo_url": self.yapo_url,
         "data_path": self.data_path,
+        "temp_path": self.temp_path,
         "config_path": self.config_path,
         "db_dir": self.database_dir,
         "log_timeformat": self.timeprint_format,
