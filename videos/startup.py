@@ -225,7 +225,7 @@ def startup_sequence():
 
     ffmpeg_check()
 
-    if "runserver" in sys.argv[1]:
+    if len(sys.argv) > 1 and "runserver" in sys.argv[1]:
         site = Config().yapo_url
         if ":" in site:
             if not "http://" in site:
