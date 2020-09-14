@@ -56,8 +56,6 @@ def banner():
         cmd = os.path.join(SCRIPT_ROOT, 'consetbuffer') + '/X 140 /Y 2048'
         cmd = 'color 07'
         os.system(cmd)
-    else:
-        os.system('clear')
 
     log.info(f"Executing YAPO from: {SCRIPT_ROOT}")
     if isCompiled():
@@ -99,7 +97,7 @@ def write_actors_to_file():
         file.write(actors_string)
 
     log.info(f"For backup purposes, we just wrote all actors in alphabetical form to {actortxt}. " +
-            + "To recover actor data, please consult the guide.")
+            "To recover actor data, please consult the guide.")
 
 
 def configcheck ():
@@ -169,6 +167,8 @@ def ffmpeg_check():
     if platform.system() != "Windows":
         # TODO: this check should be done on Linux, too.
         log.warning("This is not Windows. Assuming that ffmpeg is installed correctly.")
+        return
+
     dir_to_check = os.path.join(Config().site_path, 'ffmpeg')
 
     allFound = True

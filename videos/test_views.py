@@ -1,13 +1,11 @@
 import base64
 import os
 from typing import Dict, Any
-from unittest import TestCase
 
-import requests
 from django.test import TestCase
 import videos.models
-from configuration import Config
 from videos import views, aux_functions
+from configuration import Config
 
 
 class Test_views(TestCase):

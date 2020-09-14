@@ -3,24 +3,22 @@ import math
 import re
 import os.path
 import subprocess
-from typing import Optional
 
 import django.db
-import errno
 
-from django.db.models import Model
 from django.shortcuts import render
 import requests
 import requests.packages.urllib3
 import videos.addScenes
 import videos.filename_parser as filename_parser
-import videos.scrapers.freeones as scraper_freeones
-import videos.scrapers.imdb as scraper_imdb
-import videos.scrapers.tmdb as scraper_tmdb
-import videos.scrapers.scanners as scanners
-from configuration import Constants
+
+from videos.scrapers.freeones import scanner_freeones
+from videos.scrapers.imdb import scanner_imdb
+from videos.scrapers.scanner_common import scanner_common
+from videos.scrapers.scanner_tpdb import scanner_tpdb
+from videos.scrapers.tmdb import scanner_tmdb
+
 from videos import ffmpeg_process, aux_functions
-import urllib.request
 from wsgiref.util import FileWrapper
 from django.http import StreamingHttpResponse
 import mimetypes
@@ -48,8 +46,6 @@ import threading
 import videos.startup
 import logging
 log = logging.getLogger(__name__)
-import urllib3
-import urllib.request
 import http.client
 
 http.client._MAXHEADERS = 1000
@@ -210,15 +206,6 @@ def search_in_get_queryset(original_queryset, request):
         else:
             return original_queryset.order_by(sort_by)
 
-def tpdb_scanner(force):
-
-    ### This is the TpDB scanner. It calls the TpDB function in videos.scanners
-
-    scenes = Scene.objects.all()
-    for scene in scenes:
-        scanners.tpdb(scene.id, force)
-    return Response(status=200)
-
 def populate_websites(force):
 
     ### Populates website logos, URLs and checks YAPO website names against TpDB names.
@@ -269,8 +256,8 @@ def populate_websites(force):
                 found = True
 
             if found:
+                newname = site.name
                 try:
-                    newname = site.name
                     if not tss.lower() in site.website_alias.lower():
                         if len(site.website_alias) > 1:
                             site.website_alias += f",{tss.lower()}"
@@ -291,127 +278,6 @@ def populate_websites(force):
 
     return Response(status=200)
 
-class tpdb_actor_response:
-    data = None # type: Optional[str]
-    bio = None
-    image = None
-    pid = None
-
-    def __init__(self):
-        pass
-
-    @staticmethod
-    def parse(actorname, html):
-        responseJson = html.json()
-
-        responseData = responseJson.get('data', '')
-        if responseData is None or len(str(responseData)) < 16:
-            return None
-
-        # We will get back results for a few different actors, so pull out only the one we're queried for.
-        # TODO: deal with pagination
-        responseData = [x for x in responseData if x['name'] == actorname]
-        if len(responseData) == 0:
-            return None
-        if len(responseData) != 1:
-            raise Exception("tpdb response did not include exactly one 'data' entry for actor '%s' (included: '%s')" % (actorname, ",".join(map(lambda x: x.name, responseData))))
-
-        # Merge in keys we're interested in
-        rawResponseData = responseData[0]
-        cleanResponseData = {}
-        for k in ('id', 'bio', 'image', 'thumbnail'):
-            cleanResponseData[k] = rawResponseData.get(k, None)
-        # Coalesce 'image' and 'thumbnail' values to a single 'image'
-        if cleanResponseData['image'] is None:
-            cleanResponseData['image'] = cleanResponseData['thumbnail']
-
-        toRet = tpdb_actor_response()
-        for k in [x for x in cleanResponseData if x is not None]:
-            # fix up 'id' to 'pid'.
-            if k == 'id':
-                setattr(toRet, 'pid', cleanResponseData[k])
-            setattr(toRet, k, cleanResponseData[k])
-
-        return toRet
-
-def tpdb_scan_actor(actor, force: bool):
-    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
-    import videos.aux_functions as aux
-    if not aux.is_domain_reachable("api.metadataapi.net"):
-        return Response(status=500)
-
-    url = 'https://api.metadataapi.net/performers'
-
-    log.info(f'Contacting TpDB API for info about {actor.name}.')
-
-    params = { 'q': actor.name }
-    headers = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'User-Agent': 'YAPO e+ 0.71',
-    }
-
-    response = requests.request('GET', url, headers=headers, params=params)  # , params=params
-    response.raise_for_status()
-
-    success = False
-    photo = ""
-
-    parsedResponse = tpdb_actor_response.parse(actor.name, response)
-    if parsedResponse is None:
-        log.info(f'It seems that TpDB might not know anything about {actor.name}!')
-        return False
-
-    # Download the thumbnail if neccessary
-    if actor.thumbnail == Constants().unknown_person_image_path or force:
-        save_path = os.path.join(Config().site_media_path, 'actor', str(actor.id), 'profile')
-        save_file_name = os.path.join(save_path, 'profile.jpg')
-        if parsedResponse.image is not None and (not os.path.isfile(save_file_name) or force):
-            if not os.path.exists(save_path):
-                os.makedirs(save_path)
-            maxretries = 3
-            attempt = 0
-            #while attempt < maxretries:
-                #try:
-            if aux.download_image(parsedResponse.image, save_file_name):
-                rel_path = os.path.relpath(save_file_name, start="videos")
-                as_uri = urllib.request.pathname2url(rel_path)
-                actor.thumbnail = as_uri
-                photo += " [ Photo ]"
-                success = True
-            else:
-                log.warning(f"DOWNLOAD ERROR: Photo ({actor.name}): {parsedResponse.image}")
-
-    if any([force, not actor.description, len(actor.description) < 128, "freeones" in actor.description.lower()]):
-        if parsedResponse.bio is not None and len(parsedResponse.bio) > 72:
-            actor.description = aux.strip_html(parsedResponse.bio)
-            success = True
-            photo += " [ Description ]"
-
-    if parsedResponse.pid  is not None:
-        if not actor.tpdb_id or force:
-            actor.tpdb_id = parsedResponse.pid
-            photo += " [ TpDB ID ]"
-            success = True
-
-    if success:
-        actor.last_lookup = datetime.datetime.now()
-        actor.modified_date = datetime.datetime.now()
-        actor.save()
-        log.info(f'Information about {actor.name} was successfully gathered from TpDB: {photo}.')
-
-    else:
-        save_path = os.path.join(Config().site_media_path, 'actor', str(actor.id), 'profile')
-        save_file_name = os.path.join(save_path, 'profile.jpg')
-        if not force and ((actor.tpdb_id == parsedResponse.pid) and (len(actor.description) > 125) and (os.path.isfile(save_file_name))):
-            success = True
-            log.info(f'Your installation has good details about {actor.name}. You can force this operation.')
-        elif force and ((actor.tpdb_id == parsedResponse.pid) and (len(actor.description) > 125) and (os.path.isfile(save_file_name))):
-            success = True
-            log.info(f'It seems that there is no better information about {actor.name} on TpDB.')
-    return success
-
 def scrape_all_actors(force):
     actors = Actor.objects.all()
 
@@ -420,19 +286,8 @@ def scrape_all_actors(force):
             log.info(f"{actor.name} was already searched")
             return Response(status=200)
 
-        log.info("Searching in TMDb")
-        scraper_tmdb.search_person_with_force_flag(actor, force)
-        log.info("Finished TMDb search")
-        log.info("Searching TpDB...")
-        tpdb_scan_actor(actor, False)
-        log.info("Finished TpDB search")
-        log.info("Searching IMDB...")
-        scraper_imdb.search_imdb_with_force_flag(actor, force)
-        log.info("Finished IMDB Search")
-        if actor.gender != "M":
-            log.info("Searching in Freeones")
-            scraper_freeones.search_freeones_with_force_flag(actor, force)
-            log.info("Finished Freeones search")
+        for scanner in ( scanner_tmdb(), scanner_tpdb(), scanner_imdb(), scanner_freeones() ):
+            scanner.search_person_with_force_flag(actor, force)
 
     log.info("Done scraping actors.")
     return Response(status=200)
@@ -479,7 +334,7 @@ class scanScene(views.APIView):
             force = False
         log.info("Now entering the TPDB scene scanner API REST view")
 
-        success = scanners.tpdb(scene_id, force)
+        success = scanner_tpdb(scene_id, force)
 
         if success:
             return Response(status=200)
@@ -501,17 +356,10 @@ class ScrapeActor(views.APIView):
         log.info(f"Scanning for {Actor.objects.get(pk=actor_id).name} on {search_site}")
 
         actor_to_search = Actor.objects.get(pk=actor_id)
-        if search_site == "TMDb":
-            success = scraper_tmdb.search_person_with_force_flag(actor_to_search, force)
-        elif search_site == "TpDB":
-            success = tpdb_scan_actor(actor_to_search, force)
-        elif search_site == "Freeones":
-            success = scraper_freeones.search_freeones_with_force_flag(actor_to_search, force)
-        elif search_site == "IMDB":
-            success = scraper_imdb.search_imdb_with_force_flag(actor_to_search, force)
-        else:
+        scanner = scanner_common.createForSite(search_site)
+        if scanner is None:
             return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
-
+        success = scanner.search_with_force_flag(actor_to_search, force)
         if success:
             return Response(status=200)
         else:
@@ -718,7 +566,7 @@ def tag_multiple_items(request):
         return Response(status=200)
 
 def clean_dir(modelType : ModelWithMediaContent):
-    dir_to_clean = os.path.join(Config().site_media_path, modelType.get_media_dir(None))
+    dir_to_clean = os.path.join(Config().site_media_path, modelType.get_media_dir())
     number_of_folders = len(os.listdir(dir_to_clean))
     index = 1
 
@@ -825,7 +673,12 @@ def settings(request):
                     force = True
                 else:
                     force = False
-                threading.Thread(target=tpdb_scanner, args=(force,)).start()
+
+                def tpdb_scanner_thread(forceScan):
+                    allScenes = Scene.objects.all()
+                    for sceneToScan in allScenes:
+                        scanner_tpdb().tpdb_scan_actor(sceneToScan.id, forceScan)
+                threading.Thread(target=tpdb_scanner_thread, args=(force,)).start()
 
                 return Response(status=200)
 
@@ -990,13 +843,12 @@ class AddItems(views.APIView):
                     videos.addScenes.get_files(folder_to_add_path_stripped, False)
 
                 temp = os.path.abspath(folder_to_add_path_stripped)
+                local_scene_folder = LocalSceneFolders(name=temp)
                 try:
-                    local_scene_folder = LocalSceneFolders(name=temp)
                     local_scene_folder.save()
+                    log.info(f"Added folder {local_scene_folder.name} to folder list...")
                 except django.db.IntegrityError as e:
                     log.error(f"{e} while trying to add {local_scene_folder.name} to folder list")
-
-                log.info(f"Added folder {local_scene_folder.name} to folder list...")
 
         if request.query_params["actorsToAdd"] != "":
             add_comma_seperated_items_to_db(

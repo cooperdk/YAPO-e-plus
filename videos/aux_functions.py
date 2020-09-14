@@ -48,169 +48,14 @@ def getCPUCount():
     return psutil.cpu_count(logical=False)  # set Logical to true if treads are to be included
 
 
-def send_piercings_to_actortag (actor):
-    piercings = actor.piercings
-    if piercings:
-        if ("navel" or "belly button" or "bellybutton") in piercings.lower():
-            insert_actor_tag(actor, "Pierced navel")
-        if "clit" in piercings.lower():
-            insert_actor_tag(actor, "Pierced clitoris")
-        if ("nipples" or "nipple rings") in piercings.lower():
-            insert_actor_tag(actor, "Pierced nipples")
-        elif "nipple" in piercings.lower():
-            insert_actor_tag(actor, "Pierced single nipple")
-        if "septum" in piercings.lower():
-            insert_actor_tag(actor, "Pierced septum")
-        if "nose" in piercings.lower():
-            insert_actor_tag(actor, "Pierced nose")
-        if "nostril" in piercings.lower():
-            insert_actor_tag(actor, "Pierced nostril")
-        if "tongue" in piercings.lower():
-            insert_actor_tag(actor, "Pierced tongue")
-        if "tragus" in piercings.lower():
-            insert_actor_tag(actor, "Pierced tragus")
-        if "helix" in piercings.lower():
-            insert_actor_tag(actor, "Pierced helix")
-        if ("earlobe" or "ear lobe") in piercings.lower():
-            insert_actor_tag(actor, "Pierced ear lobe")
-        if "lower lip" in piercings.lower():
-            insert_actor_tag(actor, "Pierced lower lip")
-        if "upper lip" in piercings.lower():
-            insert_actor_tag(actor, "Pierced upper lip")
-        if "monroe" in piercings.lower():
-            insert_actor_tag(actor, "Pierced Monroe")
-        if ("dermal" or "surface") in piercings.lower():
-            insert_actor_tag(actor, "Pierced dermal")
-        if "wrists" in piercings.lower():
-            insert_actor_tag(actor, "Pierced wrists")
-        elif "wrist" in piercings.lower():
-            insert_actor_tag(actor, "Pierced single wrist")
-        if "hip" in piercings.lower():
-            insert_actor_tag(actor, "Pierced hip")
-        elif "hips" in piercings.lower():
-            insert_actor_tag(actor, "Pierced hips")
-        if "labia" in piercings.lower():
-            insert_actor_tag(actor, "Pierced labia")
-        if "back dimples" in piercings.lower():
-            insert_actor_tag(actor, "Pierced back dimples")
-        if ("right brow" or "right eyebrow") in piercings.lower():
-            insert_actor_tag(actor, "Pierced right eyebrow")
-        elif ("left brow" or "left eyebrow") in piercings.lower():
-            insert_actor_tag(actor, "Pierced left eyebrow")
-        elif "brow" in piercings.lower():
-            insert_actor_tag(actor, "Pierced eyebrow")
-        if "ears" in piercings.lower():
-            insert_actor_tag(actor, "Pierced ears")
-        elif "left ear" in piercings.lower():
-            insert_actor_tag(actor, "Pierced left ear")
-        elif "right ear" in piercings.lower():
-            insert_actor_tag(actor, "Pierced right ear")
-        if "chest" in piercings.lower():
-            insert_actor_tag(actor, "Pierced dermal on chest")
-        if any([piercings.lower() == "none", piercings.lower() == "no piercings", piercings.lower() == "no"]):
-            insert_actor_tag(actor, "No piercings")
-
-def addactor (current_scene, actor_to_add):
-    if not current_scene.actors.filter(name=actor_to_add):
-        current_scene.actors.add(actor_to_add)
-        log.info(f"Added Actor '{actor_to_add.name}' to scene '{current_scene.name}'")
-
-    if actor_to_add.actor_tags.count() > 0:
-        for actor_tag in actor_to_add.actor_tags.all():
-            if not current_scene.scene_tags.filter(name=actor_tag.name):
-                current_scene.scene_tags.add(
-                    actor_tag.scene_tags.first()
-                )
-                log.info(f"Added Scene Tag '{actor_tag.scene_tags.first().name}' to scene '{current_scene.name}'")
-
-    current_scene.save()
 
 
-def insert_actor_tag (actor_to_insert, actor_tag_name):
-    actor_tag_name = strip_bad_chars(actor_tag_name)
 
-    if not ActorTag.objects.filter(name=actor_tag_name):
-        actor_tag = ActorTag()
-        actor_tag.name = actor_tag_name
-        actor_tag.save()
-        actor_to_insert.actor_tags.add(actor_tag)
-    else:
-        actor_tag = ActorTag.objects.get(name=actor_tag_name)
-        actor_to_insert.actor_tags.add(actor_tag)
-        actor_tag.save()
 
-def remove_text_inside_brackets(text, brackets="()[]"):
-    count = [0] * (len(brackets) // 2) # count open/close brackets
-    saved_chars = []
-    for character in text:
-        for i, b in enumerate(brackets):
-            if character == b: # found bracket
-                kind, is_close = divmod(i, 2)
-                count[kind] += (-1)**is_close # `+1`: open, `-1`: close
-                if count[kind] < 0: # unbalanced bracket
-                    count[kind] = 0  # keep it
-                else:  # found bracket to remove
-                    break
-        else: # character is not a [balanced] bracket
-            if not any(count): # outside brackets
-                saved_chars.append(character)
-    return ''.join(saved_chars)
-
-def tpdb_formatter (name):
-    trashTitle = (
-        'RARBG', 'COM', '\d{3,4}x\d{3,4}', 'HEVC', 'H265', 'AVC', '\d{2,4}K', '\d{3,4}p', 'TOWN.AG_', 'XXX', 'MP4',
-        'KLEENEX', 'SD', 'H264', 'repack', '1500k', '500k', '1000k', 'rq', 'NEW', 'APT', '[TK]', 'TK', 'hd\d{3,4}p',
-        '1500', '1000'
-    )
-
-    name = re.sub(r'(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s\d{2},\s\d{4}', '', name)
-    name = re.sub(r'(January|February|March|April|May|June|July|August|September|October|November|December)\s\d{2},\s\d{4}', '', name)
-    name = re.sub(r'\d{1,2}\.{0,1}\s{0,1}(January|February|March|April|May|June|July|August|September|October|November|December)\s{0,1}.\d{4}', '', name)
-    name = re.sub(r'(\d+)[/.-](\d+)[/.-](\d+)', '', name)
-    name = re.sub(r'\W', ' ', name)
-    for trash in trashTitle:
-        name = re.sub(r'\b%s\b' % trash, '', name, flags=re.IGNORECASE)
-    name = ' '.join(name.split())
-
-    name = name.replace("(", " ")
-    name = name.replace(")", " ")
-    name = name.replace("[", " ")
-    name = name.replace("]", " ")
-    name = name.replace("!", " ")
-    name = name.replace("?", " ")
-    name = remove_text_inside_brackets(name)
-    name = re.sub(' +', ' ', name)
-
-    return name
 
 def strip_html (s):
     return str(html.fromstring(s).text_content())
 
-def strip_bad_chars (name):
-    bad_chars = { " " }
-    for char in bad_chars:
-        if char in name:
-            name = name.replace(char, "")
-    return name
-
-def onlyChars(toClean):
-    valids = "".join(char for char in toClean if char.isalpha())
-    return valids
-
-def get_with_retry(url, headers, params):
-    deadline = datetime.datetime.now() + datetime.timedelta(minutes=4)
-
-    while True:
-        try:
-            response = requests.request('GET', url, headers=headers, params=params)
-            response.raise_for_status()
-            return response
-        except Exception as e:
-            if datetime.datetime.now() > deadline:
-                log.exception(f"Exception retrieving {url}: {e} ")
-
-            log.warning(f"Exception retrieving {url}: {e}; will retry.")
-            time.sleep(3)
 
 def is_domain_reachable(host):
     """ This function checks to see if a host name has a DNS entry by checking
@@ -309,46 +154,6 @@ def save_website_logo (image_link, website, force, *args):
     ws.save()
 
 
-def download_image (image_url, path):
-
-    try:
-        req = Request(image_url, headers={
-            "User-Agent": "YAPO e+ 0.71"
-        })
-        with urlopen(req, None, 10) as response:
-            response.raise_for_status()
-            data = response.read()
-
-        with open(path, 'wb') as output_file:
-            output_file.write(data)
-
-        log.info(f'Image "{image_url}" downloaded to {path}')
-        return True
-
-    except Exception as e:
-        log.warning(f"Failed to download {image_url}: {e}")
-        return False
-
-def save_actor_profile_image_from_web (image_link, actor, force):
-    save_path = os.path.join(
-        Config().site_media_path, "actor", str(actor.id),"profile/"
-    )
-
-    if not os.path.exists(save_path):
-        os.makedirs(save_path)
-
-    save_file_name = os.path.join(save_path, "profile.jpg")
-    if not force and os.path.isfile(save_file_name):
-        log.sinfo(f"Skipping download, we already have a usable photo of {actor.name}.")
-        return
-
-    if not download_image(image_link, save_file_name):
-        log.warn(f"Error downloading photo for {actor.name} ({image_link}).")
-        return
-
-    rel_path = os.path.relpath(save_file_name, start="videos")
-    as_uri = pathname2url(save_file_name)
-    actor.thumbnail = as_uri
 
 def actor_folder_from_name_to_id ():
     actors = Actor.objects.all()
@@ -390,32 +195,6 @@ def actor_folder_from_name_to_id ():
             log.info(f"Changed {actor.name} thumb in database to {as_uri_changed}")
 
     return True
-
-def pathname2url(path):
-    # Chop off the leading site media path
-    if path.find(Config().site_media_path) is not 0:
-        raise Exception(f"File {path} is not under the media path {Config().site_media_path}")
-    path = path[len(Config().site_media_path):]
-
-    # And turn into a URL.
-    as_uri = urllib.request.pathname2url(path).strip('/')
-
-    # It'll be under the media directory.
-    mediaUrl = Config().site_media_url.strip('/')
-    as_uri = "%s/%s" % (mediaUrl, as_uri)
-
-    return as_uri
-
-# Convert a filename mapping as returned from pathname2url back to a path name.
-def urlpath2pathname(url):
-    mediaUrl = Config().site_media_url.strip("/\\")
-    if url.find(mediaUrl) is not 0:
-        raise Exception(f"url {url} is not under the media path {mediaUrl}")
-    url = url[len(mediaUrl):]
-    url = url.strip('/\\')
-
-    url = os.path.join(Config().site_media_path, url)
-    return url
 
 def heightcmToTagString(height):
     if height < 148:

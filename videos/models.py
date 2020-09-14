@@ -12,6 +12,9 @@ from configuration import Config
 import abc
 
 # Inherit from this if your model has files underneath the media dir, indexed by ID.
+from utils import Constants
+
+
 class ModelWithMediaContent:
     __metaclass__ = abc.ABCMeta
 
@@ -148,6 +151,41 @@ class Actor(models.Model, ModelWithMediaContent):
         if not os.path.exists(thumnbail_dir):
             os.makedirs(thumnbail_dir)
         return os.path.join(thumnbail_dir, 'profile.jpg')
+
+    def has_thumbnail_image(self):
+        if self.thumbnail == Constants().unknown_person_image_path:
+            return False
+        return os.path.isfile(self.generateThumbnailPath())
+
+    def getThumbnailPathURL(self):
+        # FIXME: will this work?
+        self.thumbnail = web.pathname2url(save_file_name)
+
+    def has_valid_date_of_birth(self):
+        if self.date_of_birth is None or self.date_of_birth == "" or self.date_of_birth == "1970-01-01":
+            return False
+        return True
+
+    def has_valid_ethnicity(self):
+        if self.ethnicity is None or self.ethnicity == "":
+            return False
+        return True
+
+    def has_valid_country_of_origin(self):
+        if self.country_of_origin is None or self.country_of_origin == "":
+            return False
+        return True
+
+    def has_valid_weight(self):
+        if self.weight is None or self.weight == 0:
+            return False
+        return True
+
+    def has_valid_height(self):
+        if self.height is None or self.height == 0:
+            return False
+        return True
+
 
 class Website(models.Model, ModelWithMediaContent):
     name = models.CharField(max_length=50, unique=True)

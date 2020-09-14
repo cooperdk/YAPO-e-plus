@@ -1,9 +1,12 @@
 from django.test import TestCase
 import videos.models
-from videos.scrapers import imdb
+from videos.scrapers.imdb import scanner_imdb
+
 
 class test_imdb(TestCase):
     def test_add_search_result_to_actor_clashing_akas(self):
+        uut = scanner_imdb()
+
         # These two actors both have the same alias - 'akanamecommon'.
         actor1 = videos.models.Actor(name='actor1')
         actor2 = videos.models.Actor(name='actor2')
@@ -11,8 +14,8 @@ class test_imdb(TestCase):
         actor1.save()
         actor2.save()
 
-        imdb.insert_aliases(actor1, 'akaname1, akanamecommon')
-        imdb.insert_aliases(actor2, 'akaname2, akanamecommon')
+        uut.insert_aliases_from_CSV(actor1, 'akaname1, akanamecommon')
+        uut.insert_aliases_from_CSV(actor2, 'akaname2, akanamecommon')
 
         actor1.save()
         actor2.save()

@@ -1,9 +1,11 @@
 from django.test import TestCase
 import videos.models
-from videos.scrapers import freeones
+from videos.scrapers.freeones import scanner_freeones
 
 class test_freeones(TestCase):
     def test_add_search_result_to_actor_clashing_akas(self):
+        uut = scanner_freeones()
+
         # These two actors both have the same alias - 'akanamecommon'.
         actor1 = videos.models.Actor(name='actor1')
         actor2 = videos.models.Actor(name='actor2')
@@ -11,8 +13,8 @@ class test_freeones(TestCase):
         actor1.save()
         actor2.save()
 
-        freeones.insert_aliases(actor1, 'akaname1, akanamecommon')
-        freeones.insert_aliases(actor2, 'akaname2, akanamecommon')
+        uut.insert_aliases_from_CSV(actor1, 'akaname1, akanamecommon')
+        uut.insert_aliases_from_CSV(actor2, 'akaname2, akanamecommon')
 
         actor1.save()
         actor2.save()
@@ -33,9 +35,11 @@ class test_freeones(TestCase):
         self.assertTrue(aka2res.get(name='akanamecommon'))
 
     def test_add_cup_size(self):
+        uut = scanner_freeones()
+
         actor = videos.models.Actor(name='actor1')
         actor.save()
-        freeones.addCupSize(actor, "D")
+        uut.addCupSize(actor, "D")
         tagnames = set(map(lambda x: x.name, actor.actor_tags.all()))
         self.assertTrue("Big tits" in tagnames)
         self.assertTrue("D Cup" in tagnames)

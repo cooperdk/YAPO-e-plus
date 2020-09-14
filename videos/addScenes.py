@@ -5,7 +5,7 @@ import django
 from videos import filename_parser
 import videos.videosheet as videosheet
 from PIL import Image
-import videos.scrapers.scanners as scanners
+from videos.scrapers.scanner_tpdb import scanner_tpdb
 
 django.setup()
 
@@ -34,8 +34,8 @@ log = logging.getLogger(__name__)
 
 def get_files(walk_dir, make_video_sample):
 
-    for root, subdirs, files in os.walk(walk_dir):
-        if root.startswith("$") or root.startswith(".") or subdirs.startswith("$") or subdirs.startswith("."):
+    for root, _, files in os.walk(walk_dir):
+        if root.startswith("$") or root.startswith("."):
             log.info("Skipping an off-limits path ($ or . as first character in dirname)")
             continue
 
@@ -162,7 +162,7 @@ def create_scene(scene_path, make_sample_video):
     ).order_by("-length")
 
     # This is the TpDB scanner invoker. Now, YAPO will only slowparse the scene if necessary
-    succ = scanners.tpdb(current_scene.id, True) if Config().tpdb_enabled else False
+    succ = scanner_tpdb(current_scene.id, True) if Config().tpdb_enabled else False
     if succ:
         scene_tags = list(
             SceneTag.objects.extra(select={ "length": "Length(name)" }).order_by("-length")

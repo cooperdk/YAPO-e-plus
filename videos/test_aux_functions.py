@@ -6,7 +6,6 @@ import videos.models
 import videos.scrapers.tmdb as scraper_tmdb
 from configuration import Config
 from utils import Constants
-from videos.views import tpdb_scan_actor
 
 class Test(TestCase):
     def setUp(self):
