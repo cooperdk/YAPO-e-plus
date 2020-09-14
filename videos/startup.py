@@ -177,29 +177,30 @@ def ffmpeg_check():
             allFound = False
 
     if not allFound:
-        print("You don't have a copy of FFMPEG in your YAPO system.")
-        print("I am going to install a copy of FFPMEG (4.3, static).")
-        print(f"It will be placed at {dir_to_check}")
-        input("Press enter to acknowledge... >")
-        print("Getting https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-20200628-4cfcfb3-win64-static.zip...")
-        try:
-            print("Download... ",end="")
-            dload.save_unzip("https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-20200628-4cfcfb3-win64-static.zip", dir_to_check, True)
-            print("CP ffmpeg... ", end="")
-            print(os.path.abspath(os.path.join(dir_to_check, 'https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-20200628-4cfcfb3-win64-static', 'bin', 'ffmpeg.exe')))
-            shutil.move(os.path.abspath(os.path.join(dir_to_check, 'ffmpeg-20200628-4cfcfb3-win64-static', 'bin', 'ffmpeg.exe')), os.path.abspath(dir_to_check))
-            print("CP ffplay... ", end="")
-            shutil.move(os.path.abspath(os.path.join(dir_to_check, 'ffmpeg-20200628-4cfcfb3-win64-static', 'bin', 'ffplay.exe')), os.path.abspath(dir_to_check))
-            print("CP ffprobe... ", end="")
-            shutil.move(os.path.abspath(os.path.join(dir_to_check, 'ffmpeg-20200628-4cfcfb3-win64-static', 'bin', 'ffprobe.exe')), os.path.abspath(dir_to_check))
-            print("RM temp dir... ", end="")
-            shutil.rmtree(os.path.abspath(os.path.join(dir_to_check, 'ffmpeg-20200628-4cfcfb3-win64-static')))
-            print("Done.")
-        except:
-            print(f"An error occured, please download FFMPEG manually from the above link")
-            print(f"and place it in {dir_to_check}")
-            input("YAPO will exit now. Press enter to acknowledge... >")
-            sys.exit()
+        if not all([ffmpeg, ffplay, ffprobe]):
+            print("You don't have a copy of FFMPEG in your YAPO system.")
+            print("I am going to install a copy of FFPMEG (4.3.1 static, YAPO build).")
+            print(f"It will be placed at {dir_to_check}")
+            input("Press enter to acknowledge... >")
+            print("Getting https://porn-organizer.org/dl/ffmpeg-latest.zip...")
+            try:
+                print("Downloading... ")
+                dload.save_unzip("https://porn-organizer.org/dl/ffmpeg-latest.zip", dir_to_check, True)
+                print("Copying ffmpeg")
+                print(os.path.abspath(os.path.join(dir_to_check, 'https://porn-organizer.org/dl/ffmpeg-latest', 'bin', 'ffmpeg.exe')))
+                shutil.move(os.path.abspath(os.path.join(dir_to_check, 'https://porn-organizer.org/dl/ffmpeg-latest', 'bin', 'ffmpeg.exe')), os.path.abspath(dir_to_check))
+                print(" - ffplay")
+                shutil.move(os.path.abspath(os.path.join(dir_to_check, 'https://porn-organizer.org/dl/ffmpeg-latest', 'bin', 'ffplay.exe')), os.path.abspath(dir_to_check))
+                print(" - ffprobe")
+                shutil.move(os.path.abspath(os.path.join(dir_to_check, 'https://porn-organizer.org/dl/ffmpeg-latest', 'bin', 'ffprobe.exe')), os.path.abspath(dir_to_check))
+                print("Removing temp dir... ")
+                shutil.rmtree(os.path.abspath(os.path.join(dir_to_check, 'https://porn-organizer.org/dl/ffmpeg-latest')))
+                print("Done.")
+            except:
+                print(f"An error occured, please download FFMPEG manually from the above link")
+                print(f"and place it in {dir_to_check}")
+                input("YAPO will exit now. Press enter to acknowledge... >")
+                sys.exit()
 
 
 def startup_sequence():
@@ -236,7 +237,6 @@ def startup_sequence():
 
 class ready:
     import time
-
     if not 'migrat' in str(sys.argv):
         time.sleep(2)
         startup_sequence()
