@@ -42,7 +42,7 @@ def get_files(walk_dir, make_video_sample):
         #     for subdir in subdirs:
         #         print('\t- subdirectory ' + subdir)
 
-        if not root.startswith("$") or root.startswith(".") or subdirs.startswith("$") or subdirs.startswith("."):
+        if not root.startswith("$") or root.startswith("."):
 
             for filename in files:
                 file_path = os.path.join(root, filename)
