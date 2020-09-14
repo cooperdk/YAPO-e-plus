@@ -16,6 +16,7 @@ from videos.models import *
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 
+# These should be lower-case.
 ACCEPTED_VIDEO_EXTENSIONS = {
     ".mp4",
     ".avi",
@@ -48,7 +49,7 @@ def get_files(walk_dir, make_video_sample):
                 file_path = os.path.join(root, filename)
                 filename_extension = os.path.splitext(file_path)[1]
                 for filename_extension_to_test in ACCEPTED_VIDEO_EXTENSIONS:
-                    if filename_extension_to_test == filename_extension:
+                    if filename_extension_to_test == filename_extension.lower():
                         print(
                             f"Filename is {file_path}\nExtension is {filename_extension}\n"
                         )
