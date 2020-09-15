@@ -1,0 +1,3 @@
+YAPOConfig:
+  current_setting_version: 3
+  db_dir: /data/path/here

@@ -1,0 +1,4 @@
+YAPOConfig:
+  current_setting_version: 3
+  data_path: /data/path/here
+  yapo_url: myurl
