@@ -23,7 +23,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 
 class scanner_imdb(scanner_common):
 
-    def search_imdb_with_force_flag(self, actor_to_search, force):
+    def search_person_with_force_flag(self, actor_to_search, force):
         success = False
         if force:
             success = self.search_imdb(actor_to_search, None, force)

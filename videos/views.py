@@ -17,7 +17,7 @@ from videos.scrapers.scanner_common import scanner_common
 from videos.scrapers.scanner_tpdb import scanner_tpdb
 from videos.scrapers.tmdb import scanner_tmdb
 
-from videos import ffmpeg_process, aux_functions
+from videos import ffmpeg_process
 from wsgiref.util import FileWrapper
 from django.http import StreamingHttpResponse
 import mimetypes
@@ -364,7 +364,7 @@ class ScrapeActor(views.APIView):
         scanner = scanner_common.createForSite(search_site)
         if scanner is None:
             return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
-        success = scanner.search_with_force_flag(actor_to_search, force)
+        success = scanner.search_person_with_force_flag(actor_to_search, force)
         if success:
             return Response(status=200)
         else:
@@ -682,7 +682,7 @@ def settings(request):
                 def tpdb_scanner_thread(forceScan):
                     allScenes = Scene.objects.all()
                     for sceneToScan in allScenes:
-                        scanner_tpdb().tpdb_scan_actor(sceneToScan.id, forceScan)
+                        scanner_tpdb().search_person_with_force_flag(sceneToScan.id, forceScan)
                 threading.Thread(target=tpdb_scanner_thread, args=(force,)).start()
 
                 return Response(status=200)

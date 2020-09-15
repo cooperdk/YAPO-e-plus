@@ -135,15 +135,16 @@
 <div class="tab-content clearfix">
     <div class="tab-pane active" id="main">
          <ul>
-    <li><span>Favorite:
-        <!-- Rounded switch -->
-        <label class="switch-header">
-  <input type="checkbox" class="hidden-box" ng-model="$ctrl.scene.is_fav"
-         ng-change="$root.patchEntity('scene', $ctrl.scene.id, 'is_fav', $ctrl.scene.is_fav, 'add',
-                                              false, false, null)">
-  <div class="slider round"></div></span>
-        </label>
-
+    <li>
+        <span>Favorite:
+            <!-- Rounded switch -->
+            <label class="switch-header">
+                <input type="checkbox" class="hidden-box" ng-model="$ctrl.scene.is_fav"
+                       ng-change="$root.patchEntity('scene', $ctrl.scene.id, 'is_fav', $ctrl.scene.is_fav, 'add',
+                                                  false, false, null)">
+                <div class="slider round"></div>
+            </label>
+        </span>
     </li>
     <li>Runner up:
         <label class="switch-header">

@@ -40,6 +40,7 @@ if not 'migrat' or "passcheck" in str(sys.argv[1:]): # Check if the user runs mi
     dest = os.path.join(Config().database_dir)
     okmoved = True
 
+    compiled = False
     try:
         # noinspection PyUnresolvedReferences
         if sys.frozen or sys.importers:

@@ -22,10 +22,12 @@ class webAccess:
         self.defaultHeaders = {"User-Agent": webAccess.useragent}
         self.requestTimeout = datetime.timedelta(minutes=2)
 
-    def get_with_retry(self, url, headers = [], params = []):
+    def get_with_retry(self, url, headers = {}, params = {}):
         deadline = datetime.datetime.now() + self.requestTimeout
 
-        headers.extend(self.defaultHeaders)
+        for hdrKey in self.defaultHeaders.keys():
+            if not hdrKey in headers:
+                headers[hdrKey] = self.defaultHeaders[hdrKey]
 
         while True:
             try:
@@ -51,7 +53,7 @@ class webAccess:
         return True
 
     @staticmethod
-    def pathname2url(self, path):
+    def pathname2url(path):
         # Chop off the leading site media path
         if path.find(Config().site_media_path) is not 0:
             raise Exception(f"File {path} is not under the media path {Config().site_media_path}")

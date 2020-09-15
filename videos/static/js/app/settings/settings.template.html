@@ -21,7 +21,7 @@
     ng-model="$ctrl.yapoURL">
     <button style="color: #33ccff;" type="button" ng-click="$ctrl.updateYAPOurl()" class="btn btn-default btn-sm"
             uib-popover-html="'If this is a conventional URL (ip.ip.ip.ip:port or host:port), YAPO will open this URL in your default browser on startup. You can edit the value (yapo_url) manually in the settings.yml file which is in the config directory (/config)'"
-            popover-trigger="mouseenter" popover-placement="right-top"
+            popover-trigger="mouseenter" popover-placement="right-top">
 
 <span style="width:10%" class="glyphicon glyphicon-cog"></span> Set YAPO URL
     </button>
@@ -33,7 +33,7 @@
     ng-model="$ctrl.pathToVLC">
     <button style="color: #33ccff;" type="button" ng-click="$ctrl.updateVlcPath()" class="btn btn-default btn-sm"
             uib-popover-html="'Sets YAPO\'s VLC path to the path in the text input. Only for Windows, as we run vlc without specifying path on Linux. Replace any backslash in the path with a forward slash, otherwise it will break YAPO. You can edit the value (yapo_url) manually in the settings.yml file which is in the config directory (/config)'"
-            popover-trigger="mouseenter" popover-placement="right-top"
+            popover-trigger="mouseenter" popover-placement="right-top">
     
         <span style="width:10%" class="glyphicon glyphicon-cog"></span> Set VLC Path
     </button>
@@ -91,9 +91,9 @@
     <span ng-if="$ctrl.tpdb_enabled" style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>
 
 
-    <button style="color: #33ccff;" type="button" ng-click="$ctrl.TpDB()"" class="btn btn-default btn-sm"
+    <button style="color: #33ccff;" type="button" ng-click="$ctrl.TpDB()" class="btn btn-default btn-sm"
         uib-popover-html="'Save these settings'"
-        popover-trigger="mouseenter" popover-placement="right-top"
+        popover-trigger="mouseenter" popover-placement="right-top">
 
     <span style="width:10%" class="glyphicon glyphicon-cog"></span> Save TpDB Settings
     </button>
@@ -101,7 +101,7 @@
     <span ng-if="$ctrl.tpdb_enabled" style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>
 
     <button type="button" ng-if="$ctrl.tpdb_enabled" ng-click="$ctrl.tpdb_scan_all()" class="btn btn-default btn-sm"
-        uib-popover-html="'Parse all scenes without a \'TpDB: Scanned\' tag and ask TpDB for information.'" popover-trigger="mouseenter" popover-placement="right-top"
+        uib-popover-html="'Parse all scenes without a \'TpDB: Scanned\' tag and ask TpDB for information.'" popover-trigger="mouseenter" popover-placement="right-top">
     <span class="glyphicon glyphicon-tag"></span> Scan all scenes
     </button>
     <input type="checkbox" ng-if="$ctrl.tpdb_enabled" ng-model="$ctrl.tpdb_force"
@@ -110,7 +110,7 @@
 
     <span ng-if="$ctrl.tpdb_enabled" style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>
     <button type="button" ng-if="$ctrl.tpdb_enabled" ng-click="$ctrl.populate_websites()" class="btn btn-default btn-sm"
-        uib-popover-html="'Populates all websites with URLs and logos from TpDB.<br>Also checks website names against those used by TpDB and renames if necessary (this will make scans faster).<br>Force will redownload logos.'" popover-trigger="mouseenter" popover-placement="right-top"
+        uib-popover-html="'Populates all websites with URLs and logos from TpDB.<br>Also checks website names against those used by TpDB and renames if necessary (this will make scans faster).<br>Force will redownload logos.'" popover-trigger="mouseenter" popover-placement="right-top">
     <span class="glyphicon glyphicon-tag"></span> Populate websites
     </button>
     <input type="checkbox" ng-if="$ctrl.tpdb_enabled" ng-model="$ctrl.site_force"
@@ -244,4 +244,4 @@
         </tbody>
     </table>
 </div>
-      </div></div>
+      </div></div></div>

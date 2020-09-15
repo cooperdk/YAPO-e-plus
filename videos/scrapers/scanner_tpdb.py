@@ -1,7 +1,6 @@
 import datetime
 import os
 import re
-import sys
 from typing import Optional, Dict
 
 import urllib3
@@ -10,6 +9,7 @@ from rest_framework.response import Response
 import logging
 
 from configuration import Config
+from videos import aux_functions
 
 log = logging.getLogger(__name__)
 
@@ -64,7 +64,7 @@ class tpdb_actor_response:
 
 class scanner_tpdb(scanner_common):
 
-    def tpdb_scan_actor(self, actor, force: bool):
+    def search_person_with_force_flag(self, actor : Actor, force : bool):
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
         import videos.aux_functions as aux
@@ -454,7 +454,7 @@ class scanner_tpdb(scanner_common):
             log.info("Website already registered to scene.")
 
         if Config().tpdb_website_logos:
-            self.web.save_website_logo(site_logo, siteName, False, current_scene.id)
+            aux_functions.save_website_logo(site_logo, siteName, False, current_scene.id)
 
     def suggestSceneName(self, title: str, site: str, perflist: str):
         newtitle = ""
@@ -530,8 +530,10 @@ class scanner_tpdb(scanner_common):
         log.info(f"Actor {act.name} created and added to scene")
 
         log.info(f"Scraping additional info about {act.name}...")
-        scraper_tmdb.search_person_with_force_flag(act, True)
-        scraper_freeones.search_freeones_with_force_flag(act, True)
+        from videos.scrapers.tmdb import scanner_tmdb
+        scanner_tmdb().search_person_with_force_flag(act, True)
+        from videos.scrapers.freeones import  scanner_freeones
+        scanner_freeones().search_person_with_force_flag(act, True)
 
         return act
 

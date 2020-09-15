@@ -23,14 +23,15 @@
 </h2>
 
 <ul>
-    <li><span>Favorite:
-        <label class="switch-header">
-  <input type="checkbox" class="hidden-box" ng-model="$ctrl.actor.is_fav"
-         ng-change="$root.patchEntity('actor', $ctrl.actor.id, 'is_fav', $ctrl.actor.is_fav, 'add',
-                                              false, false, null)">
-  <div class="slider round"></div></span>
-        </label>
-
+    <li>
+        <span>Favorite:
+            <label class="switch-header">
+                <input type="checkbox" class="hidden-box" ng-model="$ctrl.actor.is_fav"
+                     ng-change="$root.patchEntity('actor', $ctrl.actor.id, 'is_fav', $ctrl.actor.is_fav, 'add',
+                                                      false, false, null)">
+                <div class="slider round"></div>
+            </label>
+        </span>
     </li>
     <li>Runner up:
         <label class="switch-header">

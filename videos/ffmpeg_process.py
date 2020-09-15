@@ -2,8 +2,6 @@ import glob
 import os
 import platform
 
-from django.conf import Settings
-
 os.environ["DJANGO_SETTINGS_MODULE"] = "settings"
 
 import shutil

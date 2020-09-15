@@ -1,19 +1,11 @@
 import http.client
 import sys
-import time
 import urllib.request
-from urllib.request import Request, urlopen
 
 from videos.models import *
 
-http.client._MAXHEADERS = 1000
-from http.client import IncompleteRead, BadStatusLine
-import ssl
 import datetime
-import re
-http.client._MAXHEADERS = 1000
 import socket
-import requests
 from lxml import html
 
 import logging
@@ -113,7 +105,7 @@ def save_website_logo (image_link, website, force, *args):
             if hasarg == 1:
                 scene.websites.add(ws)
                 scene.save()
-                log.sinfo(f"A scene was added to {ws.name}: {scene.name}")
+                log.info(f"A scene was added to {ws.name}: {scene.name}")
         if not ws and not Config().tpdb_websites:
                 log.info(f"We could add the website {website}, but auto-adding is disabled.")
     except:
@@ -148,13 +140,14 @@ def save_website_logo (image_link, website, force, *args):
 
     os.makedirs(save_file_name)
 
-    if not download_image(image_link, save_file_name):
+    web = webAccess()
+    if not web.download_image(image_link, save_file_name):
         log.error(f"DOWNLOAD ERROR: Logo: ({ws.name}): {image_link}")
         return
 
     ws = Website.objects.get(name=website)
     log.info("OK")
-    as_uri = pathname2url(save_file_name)
+    as_uri = webAccess.pathname2url(save_file_name)
     ws.thumbnail = as_uri
     log.info(f"Saved {as_uri} to DB ({save_file_name})")
     ws.modified_date = datetime.datetime.now()
@@ -167,7 +160,7 @@ def actor_folder_from_name_to_id ():
 
     for actor in actors:
         abs_path = actor.generateThumbnailPath()
-        as_uri = pathname2url(abs_path)
+        as_uri = actor.getThumbnailPathURL()
         log.info(f"Actor {actor.name} thumb path is: {actor.thumbnail}, but it should be {as_uri}")
 
         if (actor.thumbnail != Config().unknown_person_image_path) and (

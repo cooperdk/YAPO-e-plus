@@ -4,7 +4,6 @@ from datetime import datetime
 import django
 import tmdbsimple as tmdb
 
-import videos.aux_functions as aux
 from utils import Constants
 
 import logging
@@ -31,7 +30,7 @@ class scanner_tmdb(scanner_common):
             success = self.search_person(actor_in_question, alias, force)
         return success
 
-    def search_person_with_force_flag(self, actor_in_question, force):
+    def search_person_with_force_flag(self, actor_in_question : Actor, force : bool):
         success = False
         log.info(f"Looking for: {actor_in_question.name}")
         if force:

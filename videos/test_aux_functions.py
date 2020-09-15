@@ -16,7 +16,7 @@ class Test(TestCase):
     def test_scan_actor_simple_id(self):
         uut = scanner_tpdb()
         newActor = videos.models.Actor(name = 'Ava Addams')
-        uut.tpdb_scan_actor(newActor, False)
+        uut.search_person_with_force_flag(newActor, False)
         actors = videos.models.Actor.objects.all()
         self.assertEqual(1, len(actors))
         self.assertEqual('Ava Addams', actors[0].name)
@@ -26,7 +26,7 @@ class Test(TestCase):
     def test_scan_actor_simple(self):
         uut = scanner_tpdb()
         newActor = videos.models.Actor(name = 'Anna Song')
-        uut.tpdb_scan_actor(newActor, False)
+        uut.search_person_with_force_flag(newActor, False)
         actors = videos.models.Actor.objects.all()
         self.assertEqual(1, len(actors))
         self.assertEqual('Anna Song', actors[0].name)

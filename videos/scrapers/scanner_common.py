@@ -1,10 +1,6 @@
-import datetime
-import os
-import time
-
-import requests
 from videos.models import SceneTag, ActorTag, Actor
 import logging
+import abc
 
 from videos.scrapers.webAccess import webAccess
 
@@ -13,8 +9,14 @@ log = logging.getLogger(__name__)
 class scanner_common:
     web: webAccess
 
+    __metaclass__ = abc.ABCMeta
+
     def __init__(self):
         self.web = webAccess()
+
+    @abc.abstractmethod
+    def search_person_with_force_flag(self, actor_in_question, force):
+        pass
 
     @staticmethod
     def createForSite(siteName : str):
@@ -38,7 +40,7 @@ class scanner_common:
         if not force and actor.has_thumbnail_image():
             log.info(f"Skipping download, we already have a usable photo of {actor.name}.")
             return
-        if not webAccess.download_image(image_link, actor.generateThumbnailPath()):
+        if not self.web.download_image(image_link, actor.generateThumbnailPath()):
             log.warning(f"Error downloading photo for {actor.name} ({image_link}).")
             return
 

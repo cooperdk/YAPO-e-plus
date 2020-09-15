@@ -556,7 +556,7 @@ def parse_website_in_scenes(scene, scene_path, websites):
             for scene_tag in website.scene_tags.all():
               if not scene.scene_tags.filter(id=scene_tag.id):
                 log.info(f"Adding Scene Tag '{website.name}' to the scene {scene.name}")
-            scene.scene_tags.add(scene_tag)
+              scene.scene_tags.add(scene_tag)
 
   return scene_path
 

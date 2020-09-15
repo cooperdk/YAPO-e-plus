@@ -31,7 +31,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 
 class scanner_freeones(scanner_common):
 
-    def search_freeones_with_force_flag(self, actor_to_search : Actor, force : bool):
+    def search_person_with_force_flag(self, actor_to_search : Actor, force : bool):
         success = False
         if force:
             success = self.search_freeones(actor_to_search, None, force)
