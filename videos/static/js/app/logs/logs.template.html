@@ -1,0 +1,25 @@
+<span>
+<pagination page-type="'logs'"></pagination>
+</span>
+
+<div class="container-fluid"> 
+<h3>Log entries</h3>
+
+<table class="table-striped table-hover thin" style="line-height: 0.5 !important;">
+    <tbody class="">
+	<tr>
+		<th>Timestamp</th>
+		<th>Age</th>
+		<th>Level</th>
+		<th>Message</th>
+	</tr>
+        <tr ng-repeat="logentry in $ctrl.logs | orderBy:$ctrl.sortBy">
+            <td>{{ logentry.timestamp | date:'short' }}</td>
+            <td>{{ logentry.age_str }}</td>
+            <td>{{ logentry.severity }}</td>
+            <td>{{ logentry.string }}</td>
+	</tr>
+    </tbody>
+</table>
+
+</div>
