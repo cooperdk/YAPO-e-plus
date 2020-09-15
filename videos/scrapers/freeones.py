@@ -32,6 +32,13 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 class scanner_freeones(scanner_common):
 
     def search_person_with_force_flag(self, actor_to_search : Actor, force : bool):
+        try:
+            self._search_person_with_force_flag(actor_to_search, force)
+        except Exception as e:
+            log.error(f"While looking up actor {actor_to_search.name}: {e}")
+            raise
+
+    def _search_person_with_force_flag(self, actor_to_search : Actor, force : bool):
         success = False
         if force:
             success = self.search_freeones(actor_to_search, None, force)
@@ -253,11 +260,12 @@ class scanner_freeones(scanner_common):
                             next_td_tag1 = link2.find_next('span').find_next('span')
                             if not actor_to_search.height:
                                 height = next_td_tag1.get_text(strip=True)  #tag.text.strip("'/\n/\t")
-                                if len(height)<1 or height=="Unknown": height="0"
+                                if len(height)<1 or height=="Unknown":
+                                    height="0"
                                 height=re.findall(r'[\d]+', height)
                                 height=int(height[0])
                                 actor_to_search.height = height
-                            height=int(actor_to_search.height)
+                            height = int(actor_to_search.height)
                             if height > 100:
                                 heightStr = aux.heightcmToTagString(height)
                                 self.insert_actor_tag(actor_to_search, heightStr)

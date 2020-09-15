@@ -2,6 +2,7 @@ import math
 import re
 import os.path
 import subprocess
+import traceback
 
 import django.db
 
@@ -281,7 +282,7 @@ def scrape_all_actors(force):
     try:
         _scrape_all_actors(force)
     except Exception as e:
-        log.exception(f"While attempting to scrape actors: {e}")
+        log.exception(f"While attempting to scrape actors: {e} at {traceback.format_exc()}")
 
 def _scrape_all_actors(force):
     actors = Actor.objects.all()

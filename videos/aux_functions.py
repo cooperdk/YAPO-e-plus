@@ -199,11 +199,15 @@ def actor_folder_from_name_to_id ():
 def heightcmToTagString(height):
     if height < 148:
         return "Extremely tiny"
-    if 148 < height < 152:
+    if height < 152:
         return "Tiny"
-    if 152 < height < 161:
+    if height < 161:
         return "Petite"
-    if 178 < height < 186:
+    if height < 178:
+        return "Average"
+    if height < 186:
         return "Tall"
-    if 186 < height < 220:
+    if height < 220:
         return "Extremely tall"
+
+    raise Exception(f"Failed to parse height string {height}")

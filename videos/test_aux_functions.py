@@ -34,8 +34,6 @@ class Test(TestCase):
 
     def test_scan_actor_tmdb(self):
         uut = scraper_tmdb.scanner_tmdb()
-        newActor = videos.models.Actor(name = 'Anna Song')
-        uut.search_person_with_force_flag(newActor, False)
         newActor = videos.models.Actor(name = 'Ava Addams', thumbnail = Constants().unknown_person_image_path)
         newActor.save()
         uut.search_person_with_force_flag(newActor, True)

@@ -35,6 +35,7 @@ class webAccess:
                 response.raise_for_status()
                 return response
             except Exception as e:
+                print(f"Exception retrieving {url}: {e}; will retry.")
                 if datetime.datetime.now() > deadline:
                     log.exception(f"Exception retrieving {url}: {e} ")
 

@@ -3,6 +3,12 @@ import videos.models
 from videos.scrapers.freeones import scanner_freeones
 
 class test_freeones(TestCase):
+    def test_simple(self):
+        uut = scanner_freeones()
+        actor = videos.models.Actor(name='Anabela')
+        actor.save()
+        uut.search_person_with_force_flag(actor, True)
+
     def test_add_search_result_to_actor_clashing_akas(self):
         uut = scanner_freeones()
 

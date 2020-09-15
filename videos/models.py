@@ -171,7 +171,7 @@ class Actor(models.Model, ModelWithMediaContent):
         return os.path.isfile(self.generateThumbnailPath())
 
     def getThumbnailPathURL(self):
-        self.thumbnail = webAccess.pathname2url(self.generateThumbnailPath())
+        return webAccess.pathname2url(self.generateThumbnailPath())
 
     def has_valid_date_of_birth(self):
         if self.date_of_birth is None or self.date_of_birth == "" or self.date_of_birth == "1970-01-01":
