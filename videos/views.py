@@ -763,6 +763,7 @@ def settings(request):
                 clean_dir(Actor)
                 log.info("Cleaning scene dirs that are no longer in database...")
                 clean_dir(Scene)
+                clean_dir("websites")
                 return Response(status=200)
 
         if "folderToScan" in request.query_params:
