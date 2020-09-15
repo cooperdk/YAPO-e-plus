@@ -340,7 +340,7 @@ class scanScene(views.APIView):
             force = False
         log.info("Now entering the TPDB scene scanner API REST view")
 
-        success = scanner_tpdb(scene_id, force)
+        success = scanner_tpdb().scan_scene(scene_id, force)
 
         if success:
             return Response(status=200)
@@ -572,14 +572,14 @@ def tag_multiple_items(request):
         return Response(status=200)
 
 def clean_dir(modelType : ModelWithMediaContent):
-    dir_to_clean = os.path.join(Config().site_media_path, modelType.get_media_dir())
+    dir_to_clean = os.path.join(Config().site_media_path, modelType.get_media_dir_static())
     number_of_folders = len(os.listdir(dir_to_clean))
     index = 1
 
-    modelTypeName = str(modelType.name.field).split('.')[-2:-1][0]
+#    modelTypeName = str(modelType.name.field).split('.')[-2:-1][0]
 
     for dir_in_path in os.listdir(dir_to_clean):
-        log.info(f"Checking {modelTypeName} folder {index} out of {number_of_folders}")
+#        log.info(f"Checking {modelTypeName} folder {index} out of {number_of_folders}")
 
         # The original Yapo-e-plus code skips any directory names which are not integers, so we do too.
         try:
@@ -592,7 +592,7 @@ def clean_dir(modelType : ModelWithMediaContent):
         dir_with_path = os.path.join(dir_to_clean, dir_in_path)
 
         if len(modelType.objects.filter(pk=dir_in_path_int)) == 0:
-            log.warning(f"{modelTypeName} id {dir_in_path_int} is not in the database... Deleting folder {dir_with_path}")
+            log.warning(f"ID {dir_in_path_int} is not in the database... Deleting folder {dir_with_path}")
             shutil.rmtree(dir_with_path)
 
         index += 1
@@ -683,7 +683,7 @@ def settings(request):
                 def tpdb_scanner_thread(forceScan):
                     allScenes = Scene.objects.all()
                     for sceneToScan in allScenes:
-                        scanner_tpdb().search_person_with_force_flag(sceneToScan.id, forceScan)
+                        scanner_tpdb().scan_scene(sceneToScan.id, forceScan)
                 threading.Thread(target=tpdb_scanner_thread, args=(force,)).start()
 
                 return Response(status=200)
@@ -763,7 +763,8 @@ def settings(request):
                 clean_dir(Actor)
                 log.info("Cleaning scene dirs that are no longer in database...")
                 clean_dir(Scene)
-                clean_dir("websites")
+                log.info("Cleaning website dirs that are no longer in database...")
+                clean_dir(Website)
                 return Response(status=200)
 
         if "folderToScan" in request.query_params:

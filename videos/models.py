@@ -150,6 +150,10 @@ class Actor(models.Model, ModelWithMediaContent):
         return self.name or ""
 
     def get_media_dir(self):
+        return Actor.get_media_dir_static()
+
+    @staticmethod
+    def get_media_dir_static():
         return "actor"
 
     def createOrAddAlias(self, aka):
@@ -220,6 +224,10 @@ class Website(models.Model, ModelWithMediaContent):
         return f"{self.name} "
 
     def get_media_dir(self):
+        return Website.get_media_dir_static()
+
+    @staticmethod
+    def get_media_dir_static():
         return "websites"
 
 class Scene(models.Model, ModelWithMediaContent):
@@ -263,7 +271,11 @@ class Scene(models.Model, ModelWithMediaContent):
         return f"{self.name} "
 
     def get_media_dir(self):
-        return "websites"
+        return Scene.get_media_dir_static()
+
+    @staticmethod
+    def get_media_dir_static():
+        return "scenes"
 
 class Folder(MPTTModel):
     name = models.CharField(max_length=300, unique=True)
