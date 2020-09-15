@@ -13,11 +13,7 @@ angular.module('sceneTagList').component('sceneTagList', {
             // self.tags = [];
             self.pageType = 'SceneTag';
 
-
-
             self.nextPage = function (currentPage) {
-
-
                 var input = {
                     currentPage: currentPage,
                     pageType: self.pageType,
@@ -25,49 +21,29 @@ angular.module('sceneTagList').component('sceneTagList', {
                     searchTerm: self.searchTerm,
                     searchField: self.searchField,
                     sortBy: self.sortBy
-
                 };
 
                 self.actorsToadd = pagerService.getNextPage(input);
 
                 self.actorsToadd.$promise.then(function (res) {
-
-                    // self.actorsToadd = res[0];
-
                     var paginationInfo = {
                         pageType: input.pageType,
                         pageInfo: res[1]
                     };
-
                     scopeWatchService.paginationInit(paginationInfo);
-
                     self.tags = helperService.resourceToArray(res[0]);
-
-
                 });
-
-
             };
-
-
-            // if (self.mainPage) {
-            //     console.log("main page is true! + " + self.mainPage);
-            //     self.nextPage(0);
-            // }
 
             $scope.$on("sceneLoaded", function (event, scene) {
                 self.scene = scene;
                 self.nextPage(0);
-
-
             });
 
             $scope.$on("paginationChange", function (event, pageInfo) {
                 if (pageInfo.pageType == self.pageType){
                     self.nextPage(pageInfo.page)
                 }
-
-
             });
 
 
@@ -80,10 +56,8 @@ angular.module('sceneTagList').component('sceneTagList', {
                     self.tags = [];
                     self.searchTerm = searchTerm['searchTerm'];
                     self.searchField = searchTerm['searchField'];
-                    self.nextPage(0);    
+                    self.nextPage(0);
                 }
-                
-
             });
 
             $scope.$on("sortOrderChanged", function (event, sortOrder) {
@@ -96,7 +70,6 @@ angular.module('sceneTagList').component('sceneTagList', {
                     }
                     didSectionListWrapperLoad = true;
                 }
-                
             });
 
             if (!didSectionListWrapperLoad) {
@@ -105,13 +78,7 @@ angular.module('sceneTagList').component('sceneTagList', {
 
 
             self.deleteSceneTag = function (tagToDelete) {
-                // alert("delete scene tag was clicked!");
                 if (angular.isObject(self.scene)) {
-                    // self.pk.splice(self.pk.indexOf(aliasToDelete.id), 1);
-                    // alert(angular.toJson(self.actor.actor_tags));
-                    // alert(angular.toJson(tagToDelete));
-                    // alert(angular.toJson(self.actor.actor_tags.indexOf(tagToDelete.id)));
-
                     var res = helperService.removeObjectFromArrayOfObjects(tagToDelete,self.tags);
 
                     console.log(res['resId']);
@@ -125,15 +92,11 @@ angular.module('sceneTagList').component('sceneTagList', {
                     // alert(angular.toJson(self.actor.actor_tags));
                 }
             };
-            
+
             self.deleteSceneTagFromDb = function (tagToDelete) {
-                
                 SceneTag.remove({sceneTagId: tagToDelete.id});
-
                 var ans = helperService.removeObjectFromArrayOfObjects(tagToDelete,self.tags);
-
                 self.tags = ans['resObject'];
-                
             }
 
         }

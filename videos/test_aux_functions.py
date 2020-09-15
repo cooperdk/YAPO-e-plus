@@ -6,14 +6,17 @@ import videos.models
 import videos.scrapers.tmdb as scraper_tmdb
 from configuration import Config
 from utils import Constants
+from videos.scrapers.scanner_tpdb import scanner_tpdb
+
 
 class Test(TestCase):
     def setUp(self):
         pass
 
     def test_scan_actor_simple_id(self):
+        uut = scanner_tpdb()
         newActor = videos.models.Actor(name = 'Ava Addams')
-        tpdb_scan_actor(newActor, False)
+        uut.tpdb_scan_actor(newActor, False)
         actors = videos.models.Actor.objects.all()
         self.assertEqual(1, len(actors))
         self.assertEqual('Ava Addams', actors[0].name)
@@ -21,17 +24,21 @@ class Test(TestCase):
         self.assertTrue(len(actors[0].description) > 0)
 
     def test_scan_actor_simple(self):
+        uut = scanner_tpdb()
         newActor = videos.models.Actor(name = 'Anna Song')
-        tpdb_scan_actor(newActor, True)
+        uut.tpdb_scan_actor(newActor, False)
         actors = videos.models.Actor.objects.all()
         self.assertEqual(1, len(actors))
         self.assertEqual('Anna Song', actors[0].name)
         self.assertTrue(len(actors[0].description) > 0)
 
     def test_scan_actor_tmdb(self):
+        uut = scraper_tmdb.scanner_tmdb()
+        newActor = videos.models.Actor(name = 'Anna Song')
+        uut.search_person_with_force_flag(newActor, False)
         newActor = videos.models.Actor(name = 'Ava Addams', thumbnail = Constants().unknown_person_image_path)
         newActor.save()
-        scraper_tmdb.search_person_with_force_flag(newActor, True)
+        uut.search_person_with_force_flag(newActor, True)
         actors = videos.models.Actor.objects.all()
         self.assertEqual(1, len(actors))
         self.assertEqual('Ava Addams', actors[0].name)

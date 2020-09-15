@@ -5,7 +5,6 @@ from typing import Dict, Any
 from django.test import TestCase
 import videos.models
 from videos import views, aux_functions
-from configuration import Config
 
 
 class Test_views(TestCase):
@@ -55,7 +54,7 @@ class TestAssetAdd(TestCase):
         req.data["id"] = actor.id
         uut.post(req)
         actor.refresh_from_db()
-        thumbnail_filename = aux_functions.urlpath2pathname(actor.thumbnail)
+        thumbnail_filename = actor.generateThumbnailPath()
 
         self.assertTrue(os.path.exists(thumbnail_filename))
         with open(thumbnail_filename, 'rb') as f:

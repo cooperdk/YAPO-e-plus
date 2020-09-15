@@ -1,4 +1,3 @@
-import datetime
 import math
 import re
 import os.path
@@ -279,6 +278,12 @@ def populate_websites(force):
     return Response(status=200)
 
 def scrape_all_actors(force):
+    try:
+        _scrape_all_actors(force)
+    except Exception as e:
+        log.exception(f"While attempting to scrape actors: {e}")
+
+def _scrape_all_actors(force):
     actors = Actor.objects.all()
 
     for actor in actors:
@@ -1020,7 +1025,7 @@ class AssetAdd(views.APIView):
                 os.remove(thumnbail_path)
             shutil.move(save_dest, thumnbail_path)
 
-            actor.thumbnail = aux_functions.pathname2url(thumnbail_path)
+            actor.thumbnail = actor.getThumbnailPathURL()
             actor.save()
         finally:
             # Delete the temporary file before we return
@@ -1079,6 +1084,13 @@ class LocalSceneFoldersViewSet(viewsets.ModelViewSet):
     queryset = LocalSceneFolders.objects.all()
     serializer_class = LocalSceneFoldersSerializer
 
+class LogViewSet(viewsets.ModelViewSet):
+    def get_queryset(self):
+        queryset = LogEntry.objects.all()
+
+        return search_in_get_queryset(queryset, self.request)
+    queryset = LogEntry.objects.all()
+    serializer_class = LogEntrySerializer
 
 class FolderViewSet(viewsets.ModelViewSet):
     def get_queryset(self):

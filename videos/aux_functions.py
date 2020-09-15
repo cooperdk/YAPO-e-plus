@@ -39,8 +39,15 @@ def getMemory():
 
 def getCPU():
     import psutil
-    cpufreq = round(psutil.cpu_freq().max / 1000, 1)
-    return cpufreq
+    cpuinfo = psutil.cpu_freq()
+    # On some systems, 'max' will be 0.0. In this case, use the current speed.
+    if cpuinfo.max == 0.0:
+        cpufreqMhz = cpuinfo.current
+    else:
+        cpufreqMhz = cpuinfo.max
+
+    cpufreqGhz = round(cpufreqMhz / 1000, 1)
+    return cpufreqGhz
 
 
 def getCPUCount():

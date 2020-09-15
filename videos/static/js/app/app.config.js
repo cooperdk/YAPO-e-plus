@@ -36,6 +36,8 @@ app.config(['$sceProvider', '$locationProvider', '$routeProvider', '$httpProvide
             template: '<add-items></add-items>'
         }).when('/settings/', {
             template: '<settings></settings>'
+        }).when('/log/', {
+            template: '<section-list-wrapper main-page="true"section-type="\'logs\'"></section-list-wrapper>'
         }).when('/playlist/', {
             template: '<playlist-list></playlist-list>'
         }).when('/playlist/:playlistId', {

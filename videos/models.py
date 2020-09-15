@@ -4,6 +4,7 @@ from django.db import models
 from mptt.models import MPTTModel, TreeForeignKey
 from django.dispatch import receiver
 from django.db.models import signals
+import datetime
 
 import os
 
@@ -13,6 +14,7 @@ import abc
 
 # Inherit from this if your model has files underneath the media dir, indexed by ID.
 from utils import Constants
+from videos.scrapers.webAccess import webAccess
 
 
 class ModelWithMediaContent:
@@ -46,6 +48,17 @@ class ActorAlias(models.Model):
 
     def __str__(self):
         return f"{self.name} "
+
+class LogEntry(models.Model):
+    timestamp = models.DateTimeField(auto_now_add=True)
+    severity = models.CharField(max_length=20)
+    string = models.CharField(max_length=1024)
+
+    def __str__(self):
+        return f"{self.string}"
+
+    def age_seconds(self):
+        return datetime.datetime.now() - self.timestamp
 
 class SceneTag(models.Model, ModelWithMediaContent):
     name = models.CharField(max_length=50, unique=True)
@@ -158,8 +171,7 @@ class Actor(models.Model, ModelWithMediaContent):
         return os.path.isfile(self.generateThumbnailPath())
 
     def getThumbnailPathURL(self):
-        # FIXME: will this work?
-        self.thumbnail = web.pathname2url(save_file_name)
+        self.thumbnail = webAccess.pathname2url(self.generateThumbnailPath())
 
     def has_valid_date_of_birth(self):
         if self.date_of_birth is None or self.date_of_birth == "" or self.date_of_birth == "1970-01-01":

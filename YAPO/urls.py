@@ -32,6 +32,7 @@ router.register(r'website', views.WebsiteViewSet)
 router.register(r'folder', views.FolderViewSet)
 router.register(r'folder-local', views.LocalSceneFoldersViewSet)
 router.register(r'playlist', views.PlaylistViewSet)
+router.register(r'log', views.LogViewSet)
 
 urlpatterns = [
                   url(r'^admin/', admin.site.urls),
@@ -47,5 +48,5 @@ urlpatterns = [
                   url(r'^ffmpeg/', views.ffmpeg),
                   url(r'^tag-multiple-items/', views.tag_multiple_items),
                   url(r'^play/', views.display_video),
-                  url(r'^scan-scene/', views.scanScene.as_view()),
+                  url(r'^scan-scene/', views.scanScene.as_view())
               ] + static(Config().site_media_url, document_root=Config().site_media_path)

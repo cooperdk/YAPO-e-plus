@@ -41,7 +41,7 @@ class webAccess:
 
     def download_image(self, image_url : str, output_file_path : str):
         resp = self.get_with_retry(image_url)
-        data = resp.read()
+        data = resp.content
 
         with open(output_file_path, 'wb') as output_file:
             output_file.write(data)
@@ -50,6 +50,7 @@ class webAccess:
 
         return True
 
+    @staticmethod
     def pathname2url(self, path):
         # Chop off the leading site media path
         if path.find(Config().site_media_path) is not 0:

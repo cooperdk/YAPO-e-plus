@@ -84,7 +84,7 @@ class scanner_tmdb(scanner_common):
             if person_info['profile_path'] is not None:
                 picture_link = f"https://image.tmdb.org/t/p/original/{person_info['profile_path']}"
                 log.info(f"Trying to get image from TMDB: {picture_link}")
-                aux.save_actor_profile_image_from_web(picture_link, actor_in_question, force)
+                self.save_actor_profile_image_from_web(picture_link, actor_in_question, force)
 
         if person_info['biography'] is not None:
             if not actor_in_question.description or (len(actor_in_question.description) < 48):

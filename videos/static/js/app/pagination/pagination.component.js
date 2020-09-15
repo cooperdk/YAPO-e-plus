@@ -3,20 +3,15 @@ angular.module('pagination').component('pagination', {
     bindings: {
         pageType: '='
     },
-    controller: ['$routeParams', 'Scene', 'helperService', '$scope', 'SceneTag', 'Actor', 'Website', '$http', '$rootScope', 'scopeWatchService',
-        function PaginationController($routeParams, Scene, helperService, $scope, SceneTag, Actor, Website, $http, $rootScope, scopeWatchService) {
-
+    controller: ['$routeParams', 'log', 'Scene', 'helperService', '$scope', 'SceneTag', 'Actor', 'Website', '$http', '$rootScope', 'scopeWatchService',
+        function PaginationController($routeParams, log, Scene, helperService, $scope, SceneTag, Actor, Website,  $http, $rootScope, scopeWatchService) {
             var self = this;
 
-
-            // self.itemsPerPage = 50;
-
-
-            if (helperService.getNumberOfItemsPerPaige() == undefined) {
+            if (helperService.getNumberOfItemsPerPage() == undefined) {
                 self.itemsPerPage = 50;
-                helperService.setNumberOfItemsPerPaige(self.itemsPerPage)
+                helperService.setNumberOfItemsPerPage(self.itemsPerPage)
             } else {
-                self.itemsPerPage = helperService.getNumberOfItemsPerPaige()
+                self.itemsPerPage = helperService.getNumberOfItemsPerPage()
             }
 
             self.bigCurrentPage = "";
@@ -24,28 +19,17 @@ angular.module('pagination').component('pagination', {
             self.totalItems = "";
             self.onePageOnly = true;
 
-
             self.pageChange = function () {
-                // alert(self.bigCurrentPage);
-
-
                 var ans = {
                     pageType: this.pageType,
                     page: self.bigCurrentPage
                 };
-
                 scopeWatchService.paginationChange(ans);
-
-
             };
 
 
             function getMaxPageFromLinkHeader(linkHeader) {
-
-
                 self.totalItems = parseInt(linkHeader.replace(/.*<(\d+)>; rel="count".*/, '$1'));
-
-
             }
 
 
@@ -58,10 +42,7 @@ angular.module('pagination').component('pagination', {
                         self.onePageOnly = true;
                     }
                 }
-
-
             });
-
 
         }]
 });

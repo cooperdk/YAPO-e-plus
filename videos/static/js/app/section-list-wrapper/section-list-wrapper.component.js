@@ -43,24 +43,8 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
 
 
                 self.saveGridView = function () {
-
-
-                    // self.mainPage = false;
-
                     helperService.setGridView({'actor': self.actorGridView, 'scene': self.sceneGridView});
-
                     scopeWatchService.gridViewOptionChnaged("a");
-
-                    // scopeWatchService.searchTermChanged({
-                    //     'sectionType': self.sectionType,
-                    //     'searchTerm': self.searchTerm,
-                    //     'searchField': self.searchField
-                    // });
-                    //
-                    // scopeWatchService.sortOrderChanged({'sectionType': self.sectionType, 'sortBy': self.sortBy});
-                    // scopeWatchService.runnerUpChanged({'sectionType': self.sectionType, 'runnerUp': self.runnerUp});
-
-
                 };
 
 
@@ -69,9 +53,10 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                 self.sectionTypefunc = function (typeToCheck) {
                     console.log("sectionTypefunc triggered " + self.sectionType);
 
-                    if (self.sectionType == typeToCheck) {
-                        console.log("self.sectionType == typeToCheck is" + (self.sectionType == typeToCheck))
-                    }
+//                    if (self.sectionType == typeToCheck) {
+//                        console.log("self.sectionType == " + self.sectionType)
+//			console.log("typeToCheck == " + typeToCheck)
+//                    }
 
                     return self.sectionType == typeToCheck;
                 };
@@ -231,7 +216,6 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
 
 
                 var dbFolderOrderFields = {
-
                     "name": "Path Asc",
                     "-name": "Path Desc",
                     "last_folder_name_only": "Last Folder Name Asc",
@@ -239,35 +223,34 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                     "date_added": "Date Added Asc",
                     "-date_added": "Date Added Desc",
                     "random": "Random"
-
-
                 };
 
                 var dbFolderSearchInFields = {
-
                     "name": "Path",
                     "last_folder_name_only": "Last Folder Name"
+                };
 
+                var logsOrderFields = {
+                    "-id": "newest first",
+                    "id": "oldest first",
+		}
 
+                var logsSearchInFields = {
+                    "string": "Log data"
                 };
 
 
                 var getSortBy = function (section) {
                     var ans = "name";
-
                     var sectionSortByDict = helperService.getSortByInSectionWrapper();
 
                     if (sectionSortByDict != undefined) {
-
                         if (sectionSortByDict[section] != undefined) {
-
                             ans = sectionSortByDict[section]
                         }
-
                     }
 
                     return ans;
-
                 };
 
 
@@ -334,17 +317,17 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                     self.searchInFields = sceneTagSearchInFields;
                     $rootScope.title = "Scene Tags";
                     self.sortBy = getSortBy('SceneTagList');
-                    
-
                 } else if (self.sectionType == 'DbFolder') {
                     self.orderFields = dbFolderOrderFields;
                     self.searchInFields = dbFolderSearchInFields;
                     $rootScope.title = "Folders";
                     self.sortBy = getSortBy('DbFolder');
-                    
-
-
-                }
+                } else if (self.sectionType == 'logs') {
+                    self.orderFields = logsOrderFields;
+                    self.searchInFields = logsSearchInFields;
+                    $rootScope.title = 'Log messages';
+                    self.sortBy = getSortBy('logs');
+		}
                 };
 
 
@@ -395,8 +378,12 @@ angular.module('sectionListWrapper').component('sectionListWrapper', {
                     $rootScope.title = "Folders";
                     self.sortBy = getSortBy('DbFolder');
                     self.mainPageInit();
-
-
+                } else if (self.sectionType == 'logs') {
+                    self.orderFields = logsOrderFields;
+                    self.searchInFields = logsSearchInFields;
+                    $rootScope.title = "log messages";
+                    self.sortBy = getSortBy('logs');
+                    self.mainPageInit();
                 }
 
                 sectionListWrapperLoaded = true;

@@ -6,5 +6,6 @@ angular.module('core', [
     'core.actorAlias',
     'core.dbFolder',
     'core.website',
-    'core.playlist'
+    'core.playlist',
+    'core.log'
 ]);

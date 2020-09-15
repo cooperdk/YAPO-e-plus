@@ -15,6 +15,10 @@ class SettingsSerializer(serializers.Serializer):
         #print ("SERIALIZER: " + str(x))
         return x
 
+class LogEntrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LogEntry
+        fields = [ 'id', 'string', 'timestamp', 'age_seconds', 'severity' ]
 
 class LocalSceneFoldersSerializer(serializers.ModelSerializer):
     class Meta:

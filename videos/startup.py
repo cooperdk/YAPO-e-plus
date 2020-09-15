@@ -177,30 +177,29 @@ def ffmpeg_check():
             allFound = False
 
     if not allFound:
-        if not all([ffmpeg, ffplay, ffprobe]):
-            print("You don't have a copy of FFMPEG in your YAPO system.")
-            print("I am going to install a copy of FFPMEG (4.3.1 static, YAPO build).")
-            print(f"It will be placed at {dir_to_check}")
-            input("Press enter to acknowledge... >")
-            print("Getting https://porn-organizer.org/dl/ffmpeg-latest.zip...")
-            try:
-                print("Downloading... ")
-                dload.save_unzip("https://porn-organizer.org/dl/ffmpeg-latest.zip", dir_to_check, True)
-                print("Copying ffmpeg")
-                print(os.path.abspath(os.path.join(dir_to_check, 'https://porn-organizer.org/dl/ffmpeg-latest', 'bin', 'ffmpeg.exe')))
-                shutil.move(os.path.abspath(os.path.join(dir_to_check, 'https://porn-organizer.org/dl/ffmpeg-latest', 'bin', 'ffmpeg.exe')), os.path.abspath(dir_to_check))
-                print(" - ffplay")
-                shutil.move(os.path.abspath(os.path.join(dir_to_check, 'https://porn-organizer.org/dl/ffmpeg-latest', 'bin', 'ffplay.exe')), os.path.abspath(dir_to_check))
-                print(" - ffprobe")
-                shutil.move(os.path.abspath(os.path.join(dir_to_check, 'https://porn-organizer.org/dl/ffmpeg-latest', 'bin', 'ffprobe.exe')), os.path.abspath(dir_to_check))
-                print("Removing temp dir... ")
-                shutil.rmtree(os.path.abspath(os.path.join(dir_to_check, 'https://porn-organizer.org/dl/ffmpeg-latest')))
-                print("Done.")
-            except:
-                print(f"An error occured, please download FFMPEG manually from the above link")
-                print(f"and place it in {dir_to_check}")
-                input("YAPO will exit now. Press enter to acknowledge... >")
-                sys.exit()
+        print("You don't have a copy of FFMPEG in your YAPO system.")
+        print("I am going to install a copy of FFPMEG (4.3.1 static, YAPO build).")
+        print(f"It will be placed at {dir_to_check}")
+        input("Press enter to acknowledge... >")
+        print("Getting https://porn-organizer.org/dl/ffmpeg-latest.zip...")
+        try:
+            print("Downloading... ")
+            dload.save_unzip("https://porn-organizer.org/dl/ffmpeg-latest.zip", dir_to_check, True)
+            print("Copying ffmpeg")
+            print(os.path.abspath(os.path.join(dir_to_check, 'https://porn-organizer.org/dl/ffmpeg-latest', 'bin', 'ffmpeg.exe')))
+            shutil.move(os.path.abspath(os.path.join(dir_to_check, 'https://porn-organizer.org/dl/ffmpeg-latest', 'bin', 'ffmpeg.exe')), os.path.abspath(dir_to_check))
+            print(" - ffplay")
+            shutil.move(os.path.abspath(os.path.join(dir_to_check, 'https://porn-organizer.org/dl/ffmpeg-latest', 'bin', 'ffplay.exe')), os.path.abspath(dir_to_check))
+            print(" - ffprobe")
+            shutil.move(os.path.abspath(os.path.join(dir_to_check, 'https://porn-organizer.org/dl/ffmpeg-latest', 'bin', 'ffprobe.exe')), os.path.abspath(dir_to_check))
+            print("Removing temp dir... ")
+            shutil.rmtree(os.path.abspath(os.path.join(dir_to_check, 'https://porn-organizer.org/dl/ffmpeg-latest')))
+            print("Done.")
+        except:
+            print(f"An error occured, please download FFMPEG manually from the above link")
+            print(f"and place it in {dir_to_check}")
+            input("YAPO will exit now. Press enter to acknowledge... >")
+            sys.exit()
 
 
 def startup_sequence():
@@ -221,7 +220,7 @@ def startup_sequence():
         log.info("Video processing enabled, sufficient hardware specifications")
         Config().videoprocessing = True
     else:
-        log.warning("Since you have insufficient hardware, video processing will be disabled.")
+        log.warning(f"Since you have insufficient hardware ({mem} GB RAM, {cpu}Ghz CPU speed), video processing will be disabled.")
         Config().videoprocessing = False
 
     ffmpeg_check()
@@ -242,4 +241,3 @@ class ready:
         startup_sequence()
     else:
         log.info(f'User entered migration mode.')
-    startup_sequence()

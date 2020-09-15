@@ -25,7 +25,7 @@ requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.
 
 django.setup()
 
-from videos.models import Actor, ActorTag
+from videos.models import Actor
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 
@@ -141,11 +141,11 @@ class scanner_freeones(scanner_common):
                                     # FIXME/TODO: wtf is this regex
                                     if re.match(r'^\/\/', first_picture['href']):
                                             first_picture_link = f"https:{first_picture['href']}"
-                                            aux.save_actor_profile_image_from_web(first_picture_link, actor_to_search,force)
+                                            self.save_actor_profile_image_from_web(first_picture_link, actor_to_search,force)
                                             aux.progress(4,27,"Storing photo")
                                     elif re.match(r'^.*jpg$', first_picture['href']):
                                             first_picture_link = first_picture['href']
-                                            aux.save_actor_profile_image_from_web(first_picture_link, actor_to_search,force)
+                                            self.save_actor_profile_image_from_web(first_picture_link, actor_to_search,force)
                                             aux.progress(4,27,"Storing photo")
                             else:
                                 aux.progress(4,29,"Not saving photo, one exists")
@@ -201,7 +201,7 @@ class scanner_freeones(scanner_common):
                         actor_aliases = next_td_tag.text.strip("'/\n/\t")
                         if not("Unknown" in actor_aliases):
                             actor_aliases = actor_aliases.replace(", ", ",")
-                            self.insert_aliases(actor_to_search, actor_aliases)
+                            self.insert_aliases_from_CSV(actor_to_search, actor_aliases)
                     except Exception as e:
                         log.error(f"Cannot get aliases for actor {actor_to_search.name}: {e}")
                         pass

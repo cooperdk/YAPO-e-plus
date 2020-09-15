@@ -6,11 +6,11 @@ angular.module('helper', []).factory('helperService', function ($rootScope, $loc
 
     // $rootScope.$storage.scArray ;
 
-    function setNumberOfItemsPerPaige(numberOfItems) {
+    function setNumberOfItemsPerPage(numberOfItems) {
         $rootScope.$storage.numberOfItemsPerPage = numberOfItems
     }
 
-    function getNumberOfItemsPerPaige() {
+    function getNumberOfItemsPerPage() {
         return $rootScope.$storage.numberOfItemsPerPage
     }
 
@@ -171,8 +171,8 @@ angular.module('helper', []).factory('helperService', function ($rootScope, $loc
         getGridView: getGridView,
         getObjectIndexFromArrayOfObjects: getObjectIndexFromArrayOfObjects,
         removeObjectFromArrayOfObjects: removeObjectFromArrayOfObjects,
-        setNumberOfItemsPerPaige: setNumberOfItemsPerPaige,
-        getNumberOfItemsPerPaige: getNumberOfItemsPerPaige,
+        setNumberOfItemsPerPage: setNumberOfItemsPerPage,
+        getNumberOfItemsPerPage: getNumberOfItemsPerPage,
         setSortByInSectionWrapper: setSortByInSectionWrapper,
         getSortByInSectionWrapper: getSortByInSectionWrapper,
         createNewItem: createNewItem
@@ -182,7 +182,7 @@ angular.module('helper', []).factory('helperService', function ($rootScope, $loc
 
 
 angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias, ActorTag, Scene, SceneTag, Website,
-                                                              DbFolder, helperService) {
+                                                              DbFolder, log, helperService) {
 
         var _prevPage = "";
         var _nextPage = "";
@@ -208,6 +208,7 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
         var _sceneId = "";
         var _actorId = "";
         var _sceneTagId = "";
+	var _logId = "";
         var _websiteId = "";
         var _folderId = "";
         var _runnerUp = "";
@@ -229,6 +230,7 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
                         _sceneId = "";
                         _actorId = "";
                         _sceneTagId = "";
+			            _logId = "";
                         _websiteId = "";
                         _folderId = "";
                         _recursive = "";
@@ -289,6 +291,12 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
                     _sceneTagId = input["sceneTag"].id;
                 }
 
+            }
+
+            if ("log" in input) {
+                if (input["log"] != undefined) {
+                    _logId = input["log"].id;
+                }
             }
 
             if ("website" in input) {
@@ -354,11 +362,11 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
 
             nextPageInput(input);
 
-            if (helperService.getNumberOfItemsPerPaige() == undefined) {
+            if (helperService.getNumberOfItemsPerPage() == undefined) {
 
-                helperService.setNumberOfItemsPerPaige(_pageLimit)
+                helperService.setNumberOfItemsPerPage(_pageLimit)
             } else {
-                _pageLimit = helperService.getNumberOfItemsPerPaige()
+                _pageLimit = helperService.getNumberOfItemsPerPage()
             }
 
             console.log("Current page is: " + _currentPage + " Max page is: " + _maxPage);
@@ -472,8 +480,19 @@ angular.module('pager', []).factory('pagerService', function (Actor, ActorAlias,
                     pageType: _pageType
 
                 })
+            } else if (_pageType == 'logs') {
+                itemsToAdd = log.query({
+                    offset: _pageOffset,
+                    limit: _pageLimit,
+                    parent: _parent,
+			logs: _logId,
+                    search: _searchTerm,
+                    searchField: _searchField,
+                    sortBy: _sortBy,
+                    is_runner_up: _runnerUp,
+                    pageType: _pageType
+                })
             }
-
 
             return itemsToAdd;
 
@@ -567,6 +586,10 @@ angular.module('scopeWatch', []).factory('scopeWatchService', function ($rootSco
 
     }
 
+    function logLoaded(log) {
+        $rootScope.$broadcast("logLoaded", log);
+    }
+
     function websiteLoaded(website) {
 
         console.log("app-service-scopeWatch: websiteLoaded was triggered! ");
@@ -602,6 +625,10 @@ angular.module('scopeWatch', []).factory('scopeWatchService', function ($rootSco
         console.log("app-service-scopeWatch: websiteSelected was triggered! ");
         $rootScope.$broadcast("sceneTagSelected", sceneTag);
 
+    }
+
+    function logSelected(log) {
+        $rootScope.$broadcast("logSelected", log);
     }
 
     function addWebsiteToList(website) {
@@ -741,6 +768,7 @@ angular.module('scopeWatch', []).factory('scopeWatchService', function ($rootSco
         searchTermChanged: searchTermChanged,
         sortOrderChanged: sortOrderChanged,
         sceneTagLoaded: sceneTagLoaded,
+        logLoaded: logLoaded,
         websiteLoaded: websiteLoaded,
         actorSelected: actorSelected,
         websiteSelected: websiteSelected,

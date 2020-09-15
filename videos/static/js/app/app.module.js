@@ -34,8 +34,7 @@ var app = angular.module('yapoApp', [
     'core',
     'addItems',
     'settings',
+    'logs',
     'playlistList',
     'playlistDetail'
-
-
 ]);

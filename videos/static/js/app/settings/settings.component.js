@@ -29,13 +29,13 @@ angular.module('settings').component('settings', {
                     self.alerts.splice(index, 1);
                 };
                 
-                var x = helperService.getNumberOfItemsPerPaige();
-                if (helperService.getNumberOfItemsPerPaige() != undefined){
-                    self.itemsPerPage = helperService.getNumberOfItemsPerPaige()
+                var x = helperService.getNumberOfItemsPerPage();
+                if (helperService.getNumberOfItemsPerPage() != undefined){
+                    self.itemsPerPage = helperService.getNumberOfItemsPerPage()
                 }
                 
                 self.changeNumberOfItemsPerPage = function () {
-                    helperService.setNumberOfItemsPerPaige(self.itemsPerPage);
+                    helperService.setNumberOfItemsPerPage(self.itemsPerPage);
 					self.addAlert("OK. changing items per page to "+self.itemsPerPage+".", 'success', '3000');
                     // scopeWatchService.numberOfItemsPerPageChanged('a');
                 };
