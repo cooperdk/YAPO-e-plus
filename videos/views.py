@@ -1028,6 +1028,18 @@ def clean_dir(type_of_model_to_clean):
                         f"Scene id {dir_in_path_int} is not in the database... Deleting folder {dir_to_delete}"
                     )
                     shutil.rmtree(dir_to_delete)
+            elif type_of_model_to_clean == "websites":
+
+                try:
+                    website = Website.objects.get(pk=dir_in_path_int)
+                except Website.DoesNotExist:
+                    dir_to_delete = os.path.join(
+                        const.MEDIA_PATH, type_of_model_to_clean, dir_in_path
+                    )
+                    print(
+                        f"Website id {dir_in_path_int} is not in the database... Deleting folder {dir_to_delete}"
+                    )
+                    shutil.rmtree(dir_to_delete)
             index += 1
 
         except ValueError:
@@ -1246,6 +1258,9 @@ def settings(request):
                 clean_dir("actor")
                 print("Cleaning scene dirs that are no longer in database...")
                 clean_dir("scenes")
+
+                print("Cleaning website dirs that are no longer in database...")
+                clean_dir("websites")
                 return Response(status=200)
 
         if "folderToScan" in request.query_params:
