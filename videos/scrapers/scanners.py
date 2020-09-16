@@ -83,7 +83,7 @@ def tpdb (scene_id: int, force: bool):
         headers = {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'User-Agent': 'YAPO e+ 0.71',
+            'User-Agent': 'YAPO e+ 0.73',
         }
         print("Scanning... ",end="")
         response = requests.request('GET', url, headers=headers, params=params)
@@ -126,7 +126,7 @@ def tpdb (scene_id: int, force: bool):
             headers = {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
-                'User-Agent': 'YAPO e+ 0.71',
+                'User-Agent': 'YAPO e+ 0.73',
             }
             response = requests.request('GET', url, headers=headers, params=params)
             try:
@@ -170,6 +170,7 @@ def tpdb (scene_id: int, force: bool):
                     release_date = None
                 if release_date is not None:
                     current_scene.release_date = release_date
+                    current_scene.save()
 
 
             if tpdb_id is not None:

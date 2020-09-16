@@ -380,7 +380,7 @@ def populate_actors():
         headers = {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'User-Agent': 'YAPO e+ 0.71',
+            'User-Agent': 'YAPO e+ 0.73',
         }
         print(f"Contacting API for info about {actor.name}... ", end="")
         response = requests.request('GET', url, headers=headers, params=params)  # , params=params
@@ -487,7 +487,7 @@ def download_image (image_url, path):
 
     try:
         req = Request(image_url, headers={
-            "User-Agent": "YAPO e+ 0.71" })
+            "User-Agent": "YAPO e+ 0.73" })
         try:
             # timeout time to download an image
             timeout = 10

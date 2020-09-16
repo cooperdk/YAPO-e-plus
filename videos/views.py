@@ -321,7 +321,7 @@ def populate_websites(force):
     headers = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'User-Agent': 'YAPO e+ 0.71',
+        'User-Agent': 'YAPO e+ 0.73',
     }
     print("Downloading site information... ", end="")
     response = requests.request('GET', url, headers=headers, params=params) #, params=params
@@ -409,7 +409,7 @@ def tpdb_scan_actor(actor, force: bool):
     headers = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'User-Agent': 'YAPO e+ 0.71',
+        'User-Agent': 'YAPO e+ 0.73',
     }
 
     response = requests.request('GET', url, headers=headers, params=params)  # , params=params
