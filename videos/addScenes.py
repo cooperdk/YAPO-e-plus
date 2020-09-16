@@ -34,21 +34,14 @@ ACCEPTED_VIDEO_EXTENSIONS = {
 def get_files(walk_dir, make_video_sample):
 
     for root, subdirs, files in os.walk(walk_dir):
-        # print('--\nroot = ' + root)
-        # list_file_path = os.path.join(root, 'my-directory-list.txt')
-        # print('list_file_path = ' + list_file_path)
 
-        # with open(list_file_path, 'wb') as list_file:
-        #     for subdir in subdirs:
-        #         print('\t- subdirectory ' + subdir)
-
-        if not root.startswith("$") or root.startswith(".") or subdirs.startswith("$") or subdirs.startswith("."):
+        if not root.startswith("$") or root.startswith("."):
 
             for filename in files:
                 file_path = os.path.join(root, filename)
                 filename_extension = os.path.splitext(file_path)[1]
                 for filename_extension_to_test in ACCEPTED_VIDEO_EXTENSIONS:
-                    if filename_extension_to_test == filename_extension:
+                    if filename_extension_to_test.lower() == filename_extension.lower():
                         print(
                             f"Filename is {file_path}\nExtension is {filename_extension}\n"
                         )
@@ -60,6 +53,7 @@ def get_files(walk_dir, make_video_sample):
                         break
         else:
             print("Skipping an off-limits path ($ or . as first character in dirname)")
+
 
 
 def create_sample_video(scene):
