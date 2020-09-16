@@ -26,7 +26,7 @@ from utils.printing import Logger
 log = Logger()
 
 
-def progress (count: int, total: int, suffix=''):
+def progress(count: int, total: int, suffix=''):
     bar_len = 42
     filled_len = int(round(bar_len * count / float(total)))
 
@@ -36,23 +36,30 @@ def progress (count: int, total: int, suffix=''):
     sys.stdout.write(f"\r{bar} [{percents}%] - {suffix}                    \r")
 
 
-def progress_end ():
+def progress_end():
     sys.stdout.flush()
 
 
-def getMemory ():
+def getMemory():
     import psutil
     vmem = round(psutil.virtual_memory().total / 1000000000, 0)
     return vmem  # "{:.2}".format(vmem.total/100000000) #shold that be 102400000?
 
 
-def getCPU ():
+def getCPU():
     import psutil
-    cpufreq = round(psutil.cpu_freq().max / 1000, 1)
-    return cpufreq
+    cpuinfo = psutil.cpu_freq()
+    # On some systems, 'max' will be 0.0. In this case, use the current speed.
+    if cpuinfo.max == 0.0:
+        cpufreqMhz = cpuinfo.current
+    else:
+        cpufreqMhz = cpuinfo.max
+
+    cpufreqGhz = round(cpufreqMhz / 1000, 1)
+    return cpufreqGhz
 
 
-def getCPUCount ():
+def getCPUCount():
     import psutil
     return psutil.cpu_count(logical=False)  # set Logical to true if treads are to be included
 
