@@ -1004,8 +1004,7 @@ def getSearchSiteIDByFilter(searchFilter):
             pass
 
     print(f'Search Filter: {searchFilterF}')
-
-    return None
+    return # was None
 
 
 def getSearchSettings(mediaTitle: str):
@@ -1297,11 +1296,11 @@ def getSearchSettings(mediaTitle: str):
             site = re.sub(r'\W', '', site)
 
             matched = False
-            while(' ' in title):
+            while ' ' in title:
                 title = title.replace(' ', '', 1)
                 if title.lower().startswith(site):
                     matched = True
-                    break;
+                    break
 
             if matched:
                 searchTitle = re.sub(site, '', title, 1, flags=re.IGNORECASE)

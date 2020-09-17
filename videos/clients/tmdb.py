@@ -1,14 +1,11 @@
 import os
-import urllib
 from datetime import datetime
-
 import django
 import tmdbsimple as tmdb
-import urllib.request as urllib
-import videos.const as const
 import videos.aux_functions as aux
-from django.utils import timezone
+import videos.const as const
 from utils import Constants
+
 django.setup()
 
 from videos.models import Actor, ActorAlias
@@ -21,6 +18,16 @@ MEDIA_PATH = os.path.join('videos', 'media')
 
 
 def search_person(actor_in_question, alias, force):
+    """Function to search for an actor using the TMDB API.
+
+    Args:
+        actor_in_question (object): An object containing data for the actor to search
+        alias (bool): True if the search should be done on aliases
+        force (bool) True if the operation should be forced
+
+    Returns:
+        success: bool
+    """
     sucesss = False
     print(f"\033[KLooking for: {actor_in_question.name}\r",end="")
     search = tmdb.Search()

@@ -63,8 +63,8 @@ if not 'migrat' or "passcheck" in str(sys.argv[1:]): # Check if the user runs mi
             print("python manage.py makemigrations")
             print("python manage.py migrate\n")
         else:
-            print("migrate.exe\n")
-            print("(Follow the directions displayed)")
+            print('migrate.exe (or \"migrate\"\n')
+            print("Please follow the directions provided.")
         input("\nPress enter to exit YAPO and take care of the above. >")
         sys.exit()
 

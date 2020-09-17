@@ -11,6 +11,10 @@ class SettingsSerializer(serializers.Serializer):
         #     def __init__(self, j):
         #         self.__dict__ = json.loads(j)
 
+        """
+        Args:
+            value:
+        """
         x = json.loads(value)
         #print ("SERIALIZER: " + str(x))
         return x
@@ -28,6 +32,10 @@ class PathWithIds(serializers.CharField):
         #     def __init__(self, j):
         #         self.__dict__ = json.loads(j)
 
+        """
+        Args:
+            value:
+        """
         x = json.loads(value)
         # print (x)
         return x
@@ -70,6 +78,10 @@ class SceneTagIdNameSerialzier(serializers.ModelSerializer):
         fields = ["id", "name", "usage_count", "play_count"]
 
     def get_usage_count(self, obj):
+        """
+        Args:
+            obj:
+        """
         return obj.scenes.count()
 
 
@@ -113,6 +125,10 @@ class WebsiteIdNameSerailzier(serializers.ModelSerializer):
         fields = ["id", "name", "scene_tags_with_names", "usage_count", "play_count"]
 
     def get_usage_count(self, obj):
+        """
+        Args:
+            obj:
+        """
         return obj.scenes.count()
 
 
@@ -160,6 +176,10 @@ class ActorTagListSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "scene_tags", "usage_count"]
 
     def get_usage_count(self, obj):
+        """
+        Args:
+            obj:
+        """
         return obj.actors.count()
 
 
@@ -200,6 +220,10 @@ class ActorListSerializer(serializers.ModelSerializer):
         ]
 
     def get_usage_count(self, obj):
+        """
+        Args:
+            obj:
+        """
         return obj.scenes.count()
 
 
@@ -289,7 +313,11 @@ class SceneListSerializer(serializers.ModelSerializer):
     websites = WebsiteIdNameSerailzier(many=True, read_only=True)
 
     def setup_eager_loading(self, queryset):
-        """ Perform necessary eager loading of data. """
+        """Perform necessary eager loading of data.
+
+        Args:
+            queryset:
+        """
         queryset = queryset.prefetch_related("actors", "scene_tags", "websites")
         return queryset
 
@@ -397,6 +425,10 @@ class PlaylistListSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "usage_count"]
 
     def get_usage_count(self, obj):
+        """
+        Args:
+            obj:
+        """
         return obj.scenes.count()
 
 

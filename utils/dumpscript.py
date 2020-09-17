@@ -48,10 +48,12 @@ from django_extensions.management.utils import signalcommand
 
 
 def orm_item_locator(orm_obj):
-    """
-    Is called every time an object that will not be exported is required.
-    Where orm_obj is the referred object.
-    We postpone the lookup to locate_object() which will be run on the generated script
+    """Is called every time an object that will not be exported is required.
+    Where orm_obj is the referred object. We postpone the lookup to
+    locate_object() which will be run on the generated script
+
+    Args:
+        orm_obj:
     """
 
     the_class = orm_obj._meta.object_name
@@ -88,6 +90,10 @@ class Command(BaseCommand):
     help = 'Dumps the data as a customised python script.'
 
     def add_arguments(self, parser):
+        """
+        Args:
+            parser:
+        """
         super(Command, self).add_arguments(parser)
         parser.add_argument('appname', nargs='+')
         parser.add_argument(
@@ -97,6 +103,11 @@ class Command(BaseCommand):
 
     @signalcommand
     def handle(self, *args, **options):
+        """
+        Args:
+            *args:
+            **options:
+        """
         app_labels = options['appname']
 
         # Get the models we want to export
@@ -120,10 +131,12 @@ class Command(BaseCommand):
 
 
 def get_models(app_labels):
-    """
-    Get a list of models for the given app labels, with some exceptions.
-    TODO: If a required model is referenced, it should also be included.
-    Or at least discovered with a get_or_create() call.
+    """Get a list of models for the given app labels, with some exceptions.
+    TODO: If a required model is referenced, it should also be included. Or at
+    least discovered with a get_or_create() call.
+
+    Args:
+        app_labels:
     """
 
     # These models are not to be output, e.g. because they can be generated automatically
@@ -154,15 +167,19 @@ def get_models(app_labels):
 
 
 class Code(object):
-    """
-    A snippet of python script.
-    This keeps track of import statements and can be output to a string.
-    In the future, other features such as custom indentation might be included
-    in this class.
+    """A snippet of python script. This keeps track of import statements and can
+    be output to a string. In the future, other features such as custom
+    indentation might be included in this class.
     """
 
     def __init__(self, indent=-1, stdout=None, stderr=None):
 
+        """
+        Args:
+            indent:
+            stdout:
+            stderr:
+        """
         if not stdout:
             stdout = sys.stdout
         if not stderr:
@@ -173,7 +190,7 @@ class Code(object):
         self.stderr = stderr
 
     def __str__(self):
-        """ Return a string representation of this script. """
+        """Return a string representation of this script."""
         if self.imports:
             self.stderr.write(repr(self.import_lines))
             return flatten_blocks([""] + self.import_lines + [""] + self.lines, num_indents=self.indent)
@@ -181,7 +198,7 @@ class Code(object):
             return flatten_blocks(self.lines, num_indents=self.indent)
 
     def get_import_lines(self):
-        """ Take the stored imports and converts them to lines """
+        """Take the stored imports and converts them to lines"""
         if self.imports:
             return ["from %s import %s" % (value, key) for key, value in self.imports.items()]
         else:
@@ -190,9 +207,19 @@ class Code(object):
 
 
 class ModelCode(Code):
-    """ Produces a python script that can recreate data for a given model class. """
+    """Produces a python script that can recreate data for a given model
+    class.
+    """
 
     def __init__(self, model, context=None, stdout=None, stderr=None, options=None):
+        """
+        Args:
+            model:
+            context:
+            stdout:
+            stderr:
+            options:
+        """
         super(ModelCode, self).__init__(indent=0, stdout=stdout, stderr=stderr)
         self.model = model
         if context is None:
@@ -202,17 +229,15 @@ class ModelCode(Code):
         self.instances = []
 
     def get_imports(self):
-        """
-        Return a dictionary of import statements, with the variable being
+        """Return a dictionary of import statements, with the variable being
         defined as the key.
         """
         return {self.model.__name__: smart_text(self.model.__module__)}
     imports = property(get_imports)
 
     def get_lines(self):
-        """
-        Return a list of lists or strings, representing the code body.
-        Each list is a block, each string is a statement.
+        """Return a list of lists or strings, representing the code body. Each
+        list is a block, each string is a statement.
         """
         code = []
 
@@ -234,10 +259,21 @@ class ModelCode(Code):
 
 
 class InstanceCode(Code):
-    """ Produces a python script that can recreate data for a given model instance. """
+    """Produces a python script that can recreate data for a given model
+    instance.
+    """
 
     def __init__(self, instance, id, context=None, stdout=None, stderr=None, options=None):
-        """ We need the instance in question and an id """
+        """We need the instance in question and an id
+
+        Args:
+            instance:
+            id:
+            context:
+            stdout:
+            stderr:
+            options:
+        """
 
         super(InstanceCode, self).__init__(indent=0, stdout=stdout, stderr=stderr)
         self.imports = {}
@@ -264,13 +300,15 @@ class InstanceCode(Code):
             self.many_to_many_waiting_list[field] = list(getattr(self.instance, field.name).all())
 
     def get_lines(self, force=False):
-        """
-        Return a list of lists or strings, representing the code body.
-        Each list is a block, each string is a statement.
+        """Return a list of lists or strings, representing the code body. Each
+        list is a block, each string is a statement.
 
-        force (True or False): if an attribute object cannot be included,
-        it is usually skipped to be processed later. With 'force' set, there
-        will be no waiting: a get_or_create() call is written instead.
+        force (True or False): if an attribute object cannot be included, it
+        is usually skipped to be processed later. With 'force' set, there will
+        be no waiting: a get_or_create() call is written instead.
+
+        Args:
+            force:
         """
         code_lines = []
 
@@ -302,11 +340,9 @@ class InstanceCode(Code):
     lines = property(get_lines)
 
     def skip(self):
-        """
-        Determine whether or not this object should be skipped.
-        If this model instance is a parent of a single subclassed
-        instance, skip it. The subclassed instance will create this
-        parent instance for us.
+        """Determine whether or not this object should be skipped. If this model
+        instance is a parent of a single subclassed instance, skip it. The
+        subclassed instance will create this parent instance for us.
 
         TODO: Allow the user to force its creation?
         """
@@ -332,7 +368,7 @@ class InstanceCode(Code):
         return self.skip_me
 
     def instantiate(self):
-        """ Write lines for instantiation """
+        """Write lines for instantiation"""
         # e.g. model_name_35 = Model()
         code_lines = []
 
@@ -348,7 +384,11 @@ class InstanceCode(Code):
         return code_lines
 
     def get_waiting_list(self, force=False):
-        """ Add lines for any waiting fields that can be completed now. """
+        """Add lines for any waiting fields that can be completed now.
+
+        Args:
+            force:
+        """
 
         code_lines = []
         skip_autofield = self.options['skip_autofield']
@@ -371,7 +411,11 @@ class InstanceCode(Code):
         return code_lines
 
     def get_many_to_many_lines(self, force=False):
-        """ Generate lines that define many to many relations for this instance. """
+        """Generate lines that define many to many relations for this instance.
+
+        Args:
+            force:
+        """
 
         lines = []
 
@@ -397,9 +441,19 @@ class InstanceCode(Code):
 
 
 class Script(Code):
-    """ Produces a complete python script that can recreate data for the given apps. """
+    """Produces a complete python script that can recreate data for the given
+    apps.
+    """
 
     def __init__(self, models, context=None, stdout=None, stderr=None, options=None):
+        """
+        Args:
+            models:
+            context:
+            stdout:
+            stderr:
+            options:
+        """
         super(Script, self).__init__(stdout=stdout, stderr=stderr)
         self.imports = {}
 
@@ -414,10 +468,13 @@ class Script(Code):
         self.options = options
 
     def _queue_models(self, models, context):
-        """
-        Work an an appropriate ordering for the models.
-        This isn't essential, but makes the script look nicer because
-        more instances can be defined on their first try.
+        """Work an an appropriate ordering for the models. This isn't essential,
+        but makes the script look nicer because more instances can be defined on
+        their first try.
+
+        Args:
+            models:
+            context:
         """
         model_queue = []
         number_remaining_models = len(models)
@@ -459,9 +516,8 @@ class Script(Code):
         return model_queue
 
     def get_lines(self):
-        """
-        Return a list of lists or strings, representing the code body.
-        Each list is a block, each string is a statement.
+        """Return a list of lists or strings, representing the code body. Each
+        list is a block, each string is a statement.
         """
         code = [self.FILE_HEADER.strip()]
 
@@ -632,9 +688,12 @@ def import_data():
 # -------------------------------------------------------------------------------
 
 def flatten_blocks(lines, num_indents=-1):
-    """
-    Take a list (block) or string (statement) and flattens it into a string
+    """Take a list (block) or string (statement) and flattens it into a string
     with indentation.
+
+    Args:
+        lines:
+        num_indents:
     """
     # The standard indent is four spaces
     INDENTATION = " " * 4
@@ -651,7 +710,15 @@ def flatten_blocks(lines, num_indents=-1):
 
 
 def get_attribute_value(item, field, context, force=False, skip_autofield=True):
-    """ Get a string version of the given attribute's value, like repr() might. """
+    """Get a string version of the given attribute's value, like repr() might.
+
+    Args:
+        item:
+        field:
+        context:
+        force:
+        skip_autofield:
+    """
     # Find the value of the field, catching any database issues
     try:
         value = getattr(item, field.name)
@@ -708,6 +775,10 @@ def get_attribute_value(item, field, context, force=False, skip_autofield=True):
 
 
 def make_clean_dict(the_dict):
+    """
+    Args:
+        the_dict:
+    """
     if "_state" in the_dict:
         clean_dict = the_dict.copy()
         del clean_dict["_state"]
@@ -716,7 +787,13 @@ def make_clean_dict(the_dict):
 
 
 def check_dependencies(model, model_queue, avaliable_models):
-    """ Check that all the depenedencies for this model are already in the queue. """
+    """Check that all the depenedencies for this model are already in the queue.
+
+    Args:
+        model:
+        model_queue:
+        avaliable_models:
+    """
     # A list of allowed links: existing fields, itself and the special case ContentType
     allowed_links = [m.model.__name__ for m in model_queue] + [model.__name__, 'ContentType']
 
@@ -743,16 +820,20 @@ def check_dependencies(model, model_queue, avaliable_models):
 # -------------------------------------------------------------------------------
 
 class SkipValue(Exception):
-    """ Value could not be parsed or should simply be skipped. """
+    """Value could not be parsed or should simply be skipped."""
 
 
 class DoLater(Exception):
-    """ Value could not be parsed or should simply be skipped. """
+    """Value could not be parsed or should simply be skipped."""
 
 
 class StrToCodeChanger:
 
     def __init__(self, string):
+        """
+        Args:
+            string:
+        """
         self.repr = string
 
     def __repr__(self):

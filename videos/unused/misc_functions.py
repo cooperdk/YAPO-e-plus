@@ -15,6 +15,11 @@ import videos.const as const
 
 
 def strip_char(objects, char_to_strip):
+    """
+    Args:
+        objects:
+        char_to_strip:
+    """
     for o in objects:
         if char_to_strip in o.name:
             print("Before: {o.name}")
@@ -24,12 +29,16 @@ def strip_char(objects, char_to_strip):
 
 
 def fix_profile_images(actors):
+    """
+    Args:
+        actors:
+    """
     for actor in actors:
         path_to_check = os.path.join(
             "E:","djangoProject",
             "YAPO",
             "videos",
-            "static",
+            "../static",
             "images",
             "actor",
             actor.name,

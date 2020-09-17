@@ -53,9 +53,7 @@ class ActorTag(models.Model):
     thumbnail = models.CharField(max_length=500, null=True, blank=True)
     actor_tag_alias = models.TextField(default="", blank=True)
     exclusions = models.TextField(default="", null=True, blank=True)
-    scene_tags = models.ManyToManyField(
-        SceneTag, blank=True, related_name="actor_tags" # null=True, 
-    )
+    scene_tags = models.ManyToManyField(SceneTag, blank=True, related_name="actor_tags")
     modified_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -89,9 +87,7 @@ class Actor(models.Model):
     tmdb_id = models.CharField(max_length=25, null=True, blank=True)
     tpdb_id = models.CharField(null=True, default="", max_length=48, blank=True)
     official_pages = models.TextField(default="", blank=True)
-    actor_tags = models.ManyToManyField(
-        ActorTag, blank=True, related_name="actors" # null=True, 
-    )
+    actor_tags = models.ManyToManyField(ActorTag, blank=True, related_name="actors")
     ethnicity = models.CharField(max_length=30, null=True, blank=True)
     weight = models.CharField(max_length=30, null=True, blank=True)
     country_of_origin = models.CharField(max_length=30, null=True, blank=True)
@@ -102,9 +98,7 @@ class Actor(models.Model):
     extra_text = models.TextField(default="", blank=True)
     last_lookup = models.DateTimeField(null=True, blank=True)
     is_exempt_from_one_word_search = models.BooleanField(default=False)
-    actor_aliases = models.ManyToManyField(
-        ActorAlias, blank=True, related_name="actors" # null=True, 
-    )
+    actor_aliases = models.ManyToManyField(ActorAlias, blank=True, related_name="actors")
     modified_date = models.DateTimeField(auto_now=True)
 
     def get_absolute_url(self):
@@ -130,7 +124,7 @@ class Website(models.Model):
     is_runner_up = models.BooleanField(default=False)
     rating = models.IntegerField(default=0)
     thumbnail = models.CharField(max_length=640, null=True, blank=True)
-    scene_tags = models.ManyToManyField(SceneTag, blank=True, related_name="websites") #null=True, 
+    scene_tags = models.ManyToManyField(SceneTag, blank=True, related_name="websites")
     website_alias = models.TextField(default="", blank=True)
     exclusions = models.TextField(default="", null=True, blank=True)
     modified_date = models.DateTimeField(auto_now=True)
@@ -159,13 +153,9 @@ class Scene(models.Model):
     rating = models.IntegerField(default=0)
     description = models.TextField(default="", blank=True)
     thumbnail = models.CharField(max_length=500, null=True, blank=True)
-    scene_tags = models.ManyToManyField(
-        SceneTag, blank=True, related_name="scenes" # null=True, 
-    )
-    actors = models.ManyToManyField(Actor, blank=True, related_name="scenes") # null=True, 
-    websites = models.ManyToManyField(
-        Website, blank=True, related_name="scenes" # null=True, 
-    )
+    scene_tags = models.ManyToManyField(SceneTag, blank=True, related_name="scenes")
+    actors = models.ManyToManyField(Actor, blank=True, related_name="scenes")
+    websites = models.ManyToManyField(Website, blank=True, related_name="scenes")
     width = models.IntegerField(null=True, blank=True)
     height = models.IntegerField(null=True, blank=True)
     bit_rate = models.IntegerField(null=True, blank=True)
@@ -191,7 +181,7 @@ class Folder(MPTTModel):
     parent = TreeForeignKey(
         "self", null=True, blank=True, related_name="children", db_index=True, on_delete=models.PROTECT
     )
-    scenes = models.ManyToManyField(Scene, related_name="folders_in_tree") # null=True, 
+    scenes = models.ManyToManyField(Scene, related_name="folders_in_tree")
     path_with_ids = models.CharField(null=True, blank=True, max_length=900)
     date_added = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
@@ -210,9 +200,7 @@ class LocalSceneFolders(models.Model):
 
 class Playlist(models.Model):
     name = models.CharField(max_length=500, unique=True)
-    scenes = models.ManyToManyField(
-        Scene, related_name="playlists", blank=True # null=True, 
-    )
+    scenes = models.ManyToManyField(Scene, related_name="playlists", blank=True)
     date_added = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
 

@@ -1,14 +1,13 @@
 import json
 import os, sys
 import os.path
-from os import path
 from videos import ffmpeg_process
 import django
 from videos import filename_parser
 from configuration import Config, Constants
 import videos.videosheet as videosheet
 from PIL import Image
-import videos.scrapers.scanners as scanners
+import videos.clients.apiclients as apiclients
 
 django.setup()
 
@@ -217,7 +216,7 @@ def create_scene(scene_path, make_sample_video):
 
                     print("Contact Sheet saved to %s"%(os.path.abspath(sheet_path)))
                 except:
-                   print("Error creating contact sheet!")
+                    print("Error creating contact sheet!")
 
 
 
@@ -246,9 +245,10 @@ def create_scene(scene_path, make_sample_video):
             ).order_by("-length")
 
             # This is the TpDB scanner invoker. Now, YAPO will only slowparse the scene if necessary
-            succ = False
-            succ = scanners.tpdb(current_scene.id, True) if Config().tpdb_enabled else False
-            if succ:
+            success_tpdb = False
+            filename_parser.scenehash(current_scene)
+            if Config().tpdb_enabled:
+                success_tpdb = apiclients.tpdb(current_scene.id, True)
                 scene_tags = list(
                     SceneTag.objects.extra(select={ "length": "Length(name)" }).order_by("-length")
                 )
@@ -264,11 +264,16 @@ def create_scene(scene_path, make_sample_video):
                     print("Parsing locally registered actors and aliases...")
                     scene_path = parse_actors_in_scene(scene, scene_path, actors, actors_alias)
 
+                if not success_tpdb:
+                    print("The scene was not found on TpDB, parsing it internally...")
+                    filename_parser.parse_scene_all_metadata(
+                        current_scene, actors, actors_alias, scene_tags, websites
+                    )
             else:
-                print("Scene was not found on TpDB, parsing it internally...")
-            filename_parser.parse_scene_all_metadata(
-                current_scene, actors, actors_alias, scene_tags, websites
-            )
+                print("The TpDB API client is turned off, parsing the scene internally...")
+                filename_parser.parse_scene_all_metadata(
+                    current_scene, actors, actors_alias, scene_tags, websites
+                )
         else:
             print(f"Failed to probe scene {current_scene.name}, skipping scene...")
 

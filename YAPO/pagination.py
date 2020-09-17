@@ -4,6 +4,10 @@ from rest_framework.response import Response
 
 class HeaderLimitOffsetPagination(pagination.LimitOffsetPagination):
     def get_paginated_response(self, data):
+        """
+        Args:
+            data:
+        """
         next_url = self.get_next_link()
         previous_url = self.get_previous_link()
         count = self.count

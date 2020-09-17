@@ -20,6 +20,10 @@ class DirPolicyChoices:
 
 
 def check_is_directory(value):
+    """
+    Args:
+        value:
+    """
     if value is None or not os.path.isdir(value):
         raise ArgumentTypeError("%s is not a directory!" % value)
     return value
@@ -27,6 +31,10 @@ def check_is_directory(value):
 
 class BadCustomDirectoryException(Exception):
     def __init__(self, value):
+        """
+        Args:
+            value:
+        """
         self.message = value + ' If --dir-policy is custom than you must set correct directory in ' \
                                '--dir option or in settings.RUNSCRIPT_CHDIR'
 
@@ -38,10 +46,19 @@ class Command(EmailNotificationCommand):
     help = 'Runs a script in django context.'
 
     def __init__(self, *args, **kwargs):
+        """
+        Args:
+            *args:
+            **kwargs:
+        """
         super(Command, self).__init__(*args, **kwargs)
         self.current_directory = os.getcwd()
 
     def add_arguments(self, parser):
+        """
+        Args:
+            parser:
+        """
         super(Command, self).add_arguments(parser)
         parser.add_argument('script', nargs='+')
         parser.add_argument(
@@ -80,6 +97,11 @@ class Command(EmailNotificationCommand):
 
     @signalcommand
     def handle(self, *args, **options):
+        """
+        Args:
+            *args:
+            **options:
+        """
         from django.conf import settings
 
         NOTICE = self.style.SQL_TABLE

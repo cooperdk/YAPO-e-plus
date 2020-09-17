@@ -4,7 +4,6 @@ import sys
 import platform
 
 os.environ["DJANGO_SETTINGS_MODULE"] = "settings"
-sys.path.append(os.path.abspath("E:\djangoProject\YAPO\YAPO"))
 
 import shutil
 import subprocess
@@ -50,8 +49,17 @@ if not os.path.exists(MEDIA_PATH):
     os.makedirs(MEDIA_PATH)
 
 
-def execute_subprocess(command_call, type_of_bin):
-    # command_call = "gibrish"
+def execute_subprocess(command_call, type_of_bin,):
+    """Function to execute a process like FFMPEG.
+
+    Args:
+        command_call (str): A string containing the executable to call
+        type_of_bin (str): Unused
+
+    Returns:
+        ans: response data
+    """
+
     command_call = command_call
 
     p = subprocess.Popen(
@@ -83,6 +91,13 @@ def execute_subprocess(command_call, type_of_bin):
 
 
 def ffmpeg_take_screenshot(screenshot_time, filename):
+    """Generate a screenshot of a scene.
+
+    Args:
+        screenshot_time: The time in the video that a screenshot should be
+            taken.
+        filename: The path to the file to generate a screenshot for.
+    """
     command_call = '{} -y -ss {} -i "{}" {} {}'.format(
         FFMPEG_BIN,
         screenshot_time,
@@ -97,6 +112,10 @@ def ffmpeg_take_screenshot(screenshot_time, filename):
 
 
 def ffprobe(filename):
+    """
+    Args:
+        filename:
+    """
     command_call = '{} {} "{}"'.format(FFPROBE_BIN, FFPROBE_JSON_ARGUMENTS, filename)
     # print("Calling ffprobe...")# command call: {}".format(command_call))
 
@@ -107,6 +126,10 @@ def get_length(filename):
     # result = subprocess.Popen([FFPROBE_BIN, filename],
     #                           stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
+    """
+    Args:
+        filename:
+    """
     command_call = '{} "{}"'.format(FFPROBE_BIN, filename)
 #    print("Getting video length...")  # (command_call)
 
@@ -128,6 +151,11 @@ def get_length(filename):
 
 # ffmpeg -i input.flv -vf fps=1 out%d.png
 def make_screenshots(fps_of_screenshots, filename):
+    """
+    Args:
+        fps_of_screenshots:
+        filename:
+    """
     input_argument = '-i "{}"'.format(filename)
     video_filters = "-q:v 4 -vf fps={},scale=640:-2".format(fps_of_screenshots)
 
@@ -139,6 +167,10 @@ def make_screenshots(fps_of_screenshots, filename):
 
 
 def make_video_from_screenshots(framerate):
+    """
+    Args:
+        framerate:
+    """
     framerate_argument = "-framerate {}".format(framerate)
     input_argument = "-i {}".format(FFMPEG_TEMP_OUTPUT_IMAGES)
     other_arguments = "-q:v 4 -c:v libx264 -pix_fmt yuv420p -preset ultrafast"
@@ -155,6 +187,10 @@ def make_video_from_screenshots(framerate):
 
 
 def seconds_to_string(seconds):
+    """
+    Args:
+        seconds:
+    """
     m, s = divmod(seconds, 60)
     h, m = divmod(m, 60)
 
@@ -167,6 +203,13 @@ def time_markers(
     last_segment_seconds_from_end,
     number_of_parts,
 ):
+    """
+    Args:
+        total_seconds:
+        first_segment_seconds_from_begining:
+        last_segment_seconds_from_end:
+        number_of_parts:
+    """
     mark_time_dict = {0: seconds_to_string(first_segment_seconds_from_begining)}
     part_marker = (total_seconds - 2) / number_of_parts
 
@@ -209,6 +252,16 @@ def make_sample_video(
 ):
     # if int(scene_resolution_width) < int(default_width_pixels):
     # default_width_pixels = scene_resolution_width
+    """
+    Args:
+        filename:
+        video_total_seconds:
+        sample_video_length_in_seconds:
+        number_of_segments:
+        input_fps:
+        first_segment_start_in_seconds:
+        last_segment_seconds_from_end:
+    """
     seconds_per_segment = sample_video_length_in_seconds / number_of_segments
 
     frames_per_segment = float(input_fps) * seconds_per_segment
@@ -238,6 +291,13 @@ def make_sample_video(
 
 
 def extract_frames_in_given_time(filename, seek_time, frames_per_segment, start_number):
+    """
+    Args:
+        filename:
+        seek_time:
+        frames_per_segment:
+        start_number:
+    """
     seek_argument = "-ss {}".format(seek_time)
     input_argument = '-i "{}"'.format(filename)
     number_of_frames_argument = "-vframes {}".format(frames_per_segment)
@@ -288,6 +348,15 @@ def extract_frames_in_given_time(filename, seek_time, frames_per_segment, start_
 def move_sample_movie_to_correct_dir(
     scene, success, dest_filename, dest_path, org_path, type_of_media
 ):
+    """
+    Args:
+        scene:
+        success:
+        dest_filename:
+        dest_path:
+        org_path:
+        type_of_media:
+    """
     if success:
 
         save_path = os.path.normpath(dest_path)
@@ -323,12 +392,22 @@ def move_sample_movie_to_correct_dir(
 
 
 def delete_temp_files():
+    """Function to remove any temporary files
+
+    :parameter None
+
+    Nothing :return: None
+    """
     files = glob.glob(os.path.join(TEMP_PATH, "*"))
     for f in files:
         os.remove(f)
 
 
 def parse_ffprobe_data(ffprobe_json_output):
+    """
+    Args:
+        ffprobe_json_output:
+    """
     ans = dict()
 
     ans["bitrate"] = int(ffprobe_json_output["format"]["bit_rate"])
@@ -371,6 +450,10 @@ def ffmpeg_take_scene_screenshot_without_save(scene):
     # if the video duration is half an hour the screenshot will be taken at 74 seconds
     # x=24.0468 y=0.584145
 
+    """
+    Args:
+        scene:
+    """
     x = 3.0468  ## was 24!
     y = 0.584145
 
@@ -391,6 +474,10 @@ def ffmpeg_take_scene_screenshot_without_save(scene):
 
 
 def ffprobe_get_data_without_save(scene):
+    """
+    Args:
+        scene:
+    """
     ans = False
     ffprobe_json_output = ffprobe(scene.path_to_file)
 
@@ -442,6 +529,10 @@ def ffprobe_get_data_without_save(scene):
 
 
 def ffmpeg_create_sammple_video(scene):
+    """
+    Args:
+        scene:
+    """
     filename = scene.path_to_file
     video_total_seconds = scene.duration
 
@@ -527,6 +618,8 @@ def ffmpeg_create_sammple_video(scene):
 
 
 def main():
+    """Calls functions to probe scenes for metadata and generate a screenshot"""
+    
     scenes = Scene.objects.all()
     counter = 0
     for scene in scenes:
