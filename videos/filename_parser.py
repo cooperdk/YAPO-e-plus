@@ -20,9 +20,9 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 
 def scenehash (scene):
     if not (scene.hash):
-        print("\r\nHashing scene... ", end="")
+        print("\r\nHashing: ", end="")
         scene.hash = get_hash(scene.path_to_file)  # NEW HASHER
-        print(f"ID: {scene.hash}")
+        print(f"{scene.hash}")
     else:
         print(f"Scene already hashed ({scene.hash})")
     scene.last_filename_tag_lookup = datetime.datetime.now()

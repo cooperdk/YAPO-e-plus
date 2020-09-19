@@ -101,6 +101,7 @@ def tpdb(scene_id: int, force: bool):
 
         if "id" and "title" in str(response):
             found = 1
+            print ("\n")
 
         else:
             aux.remove_text_inside_brackets(scene_name, brackets="[]")
@@ -114,8 +115,7 @@ def tpdb(scene_id: int, force: bool):
                         if alias.name in scene_name_formatted:
                             scene_name_formatted = scene_name_formatted.replace(alias.name, "")
             '''
-            log.sinfo(f'Not successful scanning with conventional search,\n \
-                      Now scanning with secondary parsetext: "{scene_name_formatted}"...')
+            log.sinfo(f'print "\n"Not successful scanning with conventional search,\nNow scanning with secondary parsetext: "{scene_name_formatted}"...')
             # scene_name = scene_name.replace(" ", "%20")
             url = 'https://api.metadataapi.net/scenes'
             params = {
@@ -464,11 +464,6 @@ def tpdb(scene_id: int, force: bool):
             newtitle = ""
             if title:
                 newtitle = title
-                # print(newtitle)
-
-            # if any([release_date, perflist, site]):
-            #    newtitle = f"{newtitle} - "
-            #    print (newtitle)
 
             if (perflist and len(perflist) > 4) and newtitle and \
                     perflist.lower().strip() != newtitle.lower().strip():
@@ -478,7 +473,7 @@ def tpdb(scene_id: int, force: bool):
             elif newtitle and not perflist.lower():
                 newtitle = f"{newtitle}"
 
-            if release_date:
+            if release_date is not None:
                 newtitle = f"{release_date} - {newtitle}"
                 # print(newtitle)
 

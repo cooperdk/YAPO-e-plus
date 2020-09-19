@@ -1086,6 +1086,7 @@ def getSearchSettings(mediaTitle: str):
         ('^dontbreakme ', "DontBreakMe "),
         ('^esp ', 'EuroSexParties '),
         ('^ete ', 'EuroTeenErotica '),
+        ('^etrasmall ', 'ExxxtraSmall '),
         ('^ext ', 'ExxxtraSmall '),
         ('^excogi ', 'ExploitedCollegeGirls '),
         ('^ecg ', 'ExploitedCollegeGirls '),
