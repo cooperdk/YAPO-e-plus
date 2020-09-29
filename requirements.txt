@@ -1,11 +1,11 @@
-beautifulsoup4>=4.9.1
+beautifulsoup4>=4.9.2
 colorama>=0.4.3
 Django==3.0.7
 waitress==1.4.4
 django-autocomplete-light==3.5.1
-django-extensions==3.0.8
+django-extensions==3.0.9
 django-mptt==0.11.0
-djangorestframework==3.11.1
+djangorestframework==3.12.1
 dj_static
 asgiref>=3.2.10
 static_ranges
@@ -26,7 +26,7 @@ texttable>=1.6.3
 psutil>=5.7.2
 selenium>=3.141.0
 PyYAML~=5.3.1
-zipp>=3.1.0
+zipp>=3.2.0
 dload>=0.6
 DateTime~=4.3
 six~=1.15.0

@@ -79,12 +79,12 @@ def banner():
 
 
 def main_is_frozen():
-   return (hasattr(sys, "frozen")) # old py2exe
+    return hasattr(sys, "frozen") # old py2exe
 
 def get_main_dir():
-   if main_is_frozen():
-       return os.path.dirname(sys.executable)
-   return os.path.dirname(os.path.realpath(__file__))
+    if main_is_frozen():
+        return os.path.dirname(sys.executable)
+    return os.path.dirname(os.path.realpath(__file__))
 
 
 
@@ -134,7 +134,7 @@ def configcheck ():
 
 
 def vercheck (): # Check the local version against Github
-
+    from distutils.version import LooseVersion
     try:
         if sys.frozen or sys.importers:
             SCRIPT_ROOT = os.path.dirname(sys.executable)
@@ -143,29 +143,36 @@ def vercheck (): # Check the local version against Github
         SCRIPT_ROOT = os.path.dirname(os.path.realpath(__file__))
         compiled = False
 
-    if not compiled:
-        #dirname of dirname of file results in parent directory
-        update = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "VERSION.md"))
 
-        if path.isfile(update):
-            with open(update, "r") as verfile:
-                ver = verfile.read()
-            ver = str(ver).strip()
-            print(f"--- Version {ver}")
-            try:
-                remoteVer = requests.get(
-                    "https://raw.githubusercontent.com/cooperdk/YAPO-e-plus/develop/VERSION.md"
-                ).text
-                remoteVer = remoteVer.strip()
-            except:
-                remoteVer = "?REQUEST ERROR"
-                pass
+    #dirname of dirname of file results in parent directory
+    update = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "VERSION.md"))
 
+    if path.isfile(update):
+        with open(update, "r") as verfile:
+            ver = verfile.read()
+        ver = str(ver).strip()
+        print(f"--- Version {ver}")
+        try:
+            remoteVer = requests.get(
+                "https://raw.githubusercontent.com/cooperdk/YAPO-e-plus/develop/VERSION.md"
+            ).text
+            remoteVer = remoteVer.strip()
+        except:
+            remoteVer = "?REQUEST ERROR"
+            pass
+
+        if not compiled:
             # print("Github version: "+str(remoteVer))
-            if str(ver) != str(remoteVer):
-                log.info(f'A new version of YAPO e+ is available ({remoteVer})!')
-    else:
-        print("This is a frozen build, check the website or Github releases for updates.")
+            if LooseVersion(ver) < LooseVersion(remoteVer):
+                log.info(f'A newer version of YAPO e+ is available ({remoteVer})!')
+            if ver == remoteVer:
+                print("No new version available.")
+
+        else:
+
+            log.info("This is a frozen build of version {ver}. The latest GIT version is {remoteVer}.")
+
+
 
 def stats (): # Prints statistics about your videos and metadata
     size = getsizeall()
@@ -271,7 +278,7 @@ def startup_sequence():
     if "runserver" in sys.argv[1]:
         site = Config().yapo_url
         if ":" in site:
-            if not ("http://") in site:
+            if not "http://" in site:
                 site="http://" + site + "/"
             print (f"Site to open: {site}\n")
             webbrowser.get().open_new_tab(site)
