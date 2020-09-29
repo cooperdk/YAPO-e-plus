@@ -115,7 +115,7 @@ def tpdb(scene_id: int, force: bool):
                         if alias.name in scene_name_formatted:
                             scene_name_formatted = scene_name_formatted.replace(alias.name, "")
             '''
-            log.sinfo(f'print "\n"Not successful scanning with conventional search,\nNow scanning with secondary parsetext: "{scene_name_formatted}"...')
+            log.sinfo(f'\nNot successful scanning with conventional search,\ntrying with an alternative parse text: "{scene_name_formatted}"...')
             # scene_name = scene_name.replace(" ", "%20")
             url = 'https://api.metadataapi.net/scenes'
             params = {

@@ -283,8 +283,8 @@ If you want YAPO to open your browser automatically, this needs to be set in set
 
 class ready:
     import time
-    startup_sequence()
-'''
+    #startup_sequence()
+
     try:
         if not 'migrat' in str(sys.argv):
             print("Not in migration mode. Executing startup sequence...")
@@ -295,4 +295,3 @@ class ready:
             print("\n")
     except:
         pass
-'''
