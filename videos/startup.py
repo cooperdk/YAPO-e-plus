@@ -1,21 +1,19 @@
 import os
 from os import path
 import sys
-#import json
 import shutil
 import requests
 import platform
 import webbrowser
-
 from videos.models import Scene, Actor, ActorTag, SceneTag, Folder
 import videos.aux_functions as aux
 from configuration import Config
 from utils import Constants
 from colorama import init
 from utils.printing import Logger
-
 init()
 log = Logger()
+
 
 def banner():
 
@@ -30,7 +28,6 @@ def banner():
         compiled = False
 
     if platform.system() == "Windows":
-        import win32console
         #os.system('mode con: cols=140 lines=4096')
         os.system('cls')
         cmd = 'color 07'
@@ -57,35 +54,34 @@ def banner():
     else:
         os.system('clear')
     print("\033[40m\033[1m\033[32m")
-    print("\t____    ____  ___       ______     ______         _______        ")
-    print("\t\   \  /   / /   \     |   _  \   /  __  \       |   ____|   _   ")
-    print("\t \   \/   / /  ^  \    |  |_)  | |  |  |  |      |  |__    _| |_ ")
-    print("\t  \_    _/ /  /_\  \   |   ___/  |  |  |  |      |   __|  |_   _|")
-    print("\t    |  |  /  _____  \  |  |      |  `--'  |      |  |____   |_|  ")
-    print("\t    |__| /__/     \__\ | _|       \______/       |_______|       ")
+    print("\t       ____    ____  ___       ______     ______         _______        ")
+    print("\t       \   \  /   / /   \     |   _  \   /  __  \       |   ____|   _   ")
+    print("\t        \   \/   / /  ^  \    |  |_)  | |  |  |  |      |  |__    _| |_ ")
+    print("\t         \_    _/ /  /_\  \   |   ___/  |  |  |  |      |   __|  |_   _|")
+    print("\t           |  |  /  _____  \  |  |      |  `--'  |      |  |____   |_|  ")
+    print("\t           |__| /__/     \__\ | _|       \______/       |_______|       ")
     print("\t")
-    print("\t              \033[37m\033[44mYET ANOTHER PORN ORGANIZER - extended\033[49m")
-    print("\t\033[1m\033[37m\033[40m=================================================================")
+    print("\t                     \033[37m\033[44mYET ANOTHER PORN ORGANIZER - extended\033[49m")
+    print("\t\033[1m\033[37m\033[40m       =================================================================")
     print("\t\033[0;10r")
     print(f"\033[22mExecuting YAPO from: {SCRIPT_ROOT}", end="")
     if compiled:
         print(f" (frozen/compiled build)")
     else:
         print(f" (running in a Python environment)")
-    print(f"Database dir is:     {Config().database_dir}")
-    print(f"Config dir is:       {Config().config_path}")
-    print(f"Media files dir is:  {Config().site_media_path}")
-    print("Consider making regular backup of the db, config and media directories.\n")
+    print(f"Database dir is:       {Config().database_dir}")
+    print(f"Config dir is:         {Config().config_path}")
+    print(f"Image storage dir is:  {Config().site_media_path}")
 
 
 def main_is_frozen():
     return hasattr(sys, "frozen") # old py2exe
 
+
 def get_main_dir():
     if main_is_frozen():
         return os.path.dirname(sys.executable)
     return os.path.dirname(os.path.realpath(__file__))
-
 
 
 def getsizeall () -> str: # Retrieves the total amount of bytes of registered scenes
@@ -111,29 +107,25 @@ def sizeformat (b: int) -> str: # returns a human-readable filesize depending on
         return f"{b/1000000000000:.1f}TB"
 
 
-
 def write_actors_to_file(): # Method to dump all actors alphabetically in a ready-to-insert manner.
     actortxt = os.path.join(Config().data_path, "actors_dump.txt")
     actors = Actor.objects.order_by("id")  # name
     actors_string = ",".join(actor.name for actor in actors)
     numactors = len(actors)
-
     with open(actortxt, "w") as file:
         file.write(actors_string)
-
-    print("For backup purposes, we just wrote all actors in alphabetical form to:")
-    print(actortxt)
-    print("To recover actor data, please consult the guide.")
+    print(f"Actors dumped to {actortxt}")
 
 
 def configcheck ():
     settings = os.path.join(Config().config_path, Constants().default_yaml_settings_filename)
     if not path.isfile(settings):
-        log.info("There is no config file, so one has been generated.")
+        log.info("There is no config file, so one has been generated.\n")
         Config().save()
+    else:
+        print(f"Configuration loaded from {settings}")
 
-
-def vercheck (): # Check the local version against Github
+def vercheck(): # Check the local version against Github
     from distutils.version import LooseVersion
     try:
         if sys.frozen or sys.importers:
@@ -142,16 +134,13 @@ def vercheck (): # Check the local version against Github
     except AttributeError:
         SCRIPT_ROOT = os.path.dirname(os.path.realpath(__file__))
         compiled = False
-
-
     #dirname of dirname of file results in parent directory
     update = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "VERSION.md"))
-
     if path.isfile(update):
         with open(update, "r") as verfile:
             ver = verfile.read()
         ver = str(ver).strip()
-        print(f"--- Version {ver}")
+        print(f"\n--- Version {ver.strip()}")
         try:
             remoteVer = requests.get(
                 "https://raw.githubusercontent.com/cooperdk/YAPO-e-plus/develop/VERSION.md"
@@ -159,22 +148,20 @@ def vercheck (): # Check the local version against Github
             remoteVer = remoteVer.strip()
         except:
             remoteVer = "?REQUEST ERROR"
-            pass
-
         if not compiled:
             # print("Github version: "+str(remoteVer))
             if LooseVersion(ver) < LooseVersion(remoteVer):
-                log.info(f'A newer version of YAPO e+ is available ({remoteVer})!')
+                log.sinfo(f'A newer version of YAPO e+ is available ({remoteVer})')
+                log.info(f'A newer version of YAPO e+ is available ({remoteVer})')
             if ver == remoteVer:
-                print("No new version available.")
-
+                print("    (no new version available)")
+            if ver > remoteVer:
+                print("    (your version is a dev copy newer than the Github version)")
         else:
-
-            log.info("This is a frozen build of version {ver}. The latest GIT version is {remoteVer}.")
-
+            log.info(f"    This is a frozen build of version {ver}. The latest Git version is {remoteVer}.")
 
 
-def stats (): # Prints statistics about your videos and metadata
+def stats (): # Prints statistics about videos and metadata
     size = getsizeall()
     row = Actor.objects.raw(
         "SELECT COUNT(*) AS total, id FROM videos_actor"
@@ -197,17 +184,15 @@ def stats (): # Prints statistics about your videos and metadata
     if row[0].total is not None:
         sctag = str(row[0].total)
     # TODO assign that all values got read correctly and have a valid value!
-
-    print(f"\nCurrently, there are {sce} videos registered in YAPO e+.\nThey take up {size} of disk space.")
-    print(f"There are {sctag} tags available for video clips.")
-    print(f"\nThere are {act} actors in the database.\nThese actors have {acttag} usable tags.\n\n")
-
+    print(f"Scenes: {sce} ({size} on disk). Scene tags available: {sctag}")
+    print(f"Actors: {act} Actor tags available: {acttag}.\n")
 
 def backupper (): # Generates a backup of the database
     src = Config().database_path
     dest = os.path.join(Config().database_dir, "db.sqlite3.backup")
     shutil.copy(src, dest)
     print(f"Performed a database backup to {dest}\n")
+
 
 def ffmpeg_check():
     import dload
@@ -246,9 +231,7 @@ def ffmpeg_check():
 def startup_sequence():
 
     banner()
-    print("")
     configcheck()
-    print("")
     vercheck()
     print("")
     stats()
@@ -259,18 +242,15 @@ def startup_sequence():
     cpucnt = aux.getCPUCount()
     global videoProcessing
     print(f"\nYou have {mem} GB available. CPU speed is {cpu} GHz and you have {cpucnt} cores available.")
-
-    if mem >= 2 and cpu > 1.2:
-        print("\nSince you have sufficient hardware, video processing features will be enabled.")
+    print(f"Video processing configuration is {Config().videoprocessing}.\n")
+    if (mem >= 2 or cpu > 1.2) and Config().videoprocessing != True:
         Config().videoprocessing = True
-        log.info("Video processing enabled, sufficient hardware specifications")
+        log.sinfo("Video processing enabled, you have the computer to handle it.")
         print("\n")
-    else:
-        print("\nSince you have insufficient hardware, video processing will be disabled.")
+    elif (mem < 2 or cpu < 1.2) and Config().videoprocessing != False:
         Config().videoprocessing = False
-        log.info("Video processing disabled, too low hardware specification")
+        log.sinfo("Video processing disabled, your computer specification is too low.")
         print("\n")
-
     ffmpeg_check()
 
     #aux.populate_actors()
@@ -283,15 +263,14 @@ def startup_sequence():
             print (f"Site to open: {site}\n")
             webbrowser.get().open_new_tab(site)
         else:
-            print('You\'re missing a defined port number in the /config/settings.yml variable "yapo_url".\n\
-If you want YAPO to open your browser automatically, this needs to be set in settings.\n')
-
+            print('You\'re missing a defined port number in the /config/settings.yml variable "yapo_url".')
+            print('If you want YAPO to open your browser automatically, this needs to be set in settings.')
+            print('Simply remove the above variable (manually or through settings) to disable auto browser.\n')
 
 
 class ready:
     import time
     #startup_sequence()
-
     try:
         if not 'migrat' in str(sys.argv):
             print("Not in migration mode. Executing startup sequence...")

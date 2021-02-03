@@ -42,7 +42,7 @@ def progress_end():
 
 def getMemory():
     import psutil
-    vmem = round(psutil.virtual_memory().total / 1000000000, 0)
+    vmem = round(psutil.virtual_memory().total / 1024000000, 0)
     return vmem  # "{:.2}".format(vmem.total/100000000) #shold that be 102400000?
 
 

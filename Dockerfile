@@ -1,4 +1,4 @@
-FROM python:3.7.7-slim
+FROM python:3.8.7-slim
 RUN apt-get update -y && apt-get upgrade -y && apt-get install gcc git -y
 # make a seperate layer for the ffmpeg related stuff
 RUN apt-get install ffmpeg libavcodec58 libavformat58 libavresample4 libavutil56 python-numpy -y

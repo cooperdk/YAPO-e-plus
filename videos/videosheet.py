@@ -12,11 +12,23 @@ videosheet.py "f:\SorteretXXX\Luna Bright\BraceFaced - Luna Bright - The Virgin 
 from __future__ import print_function
 import datetime
 import os
+import platform
 import shutil
 import subprocess
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
+
+
+if platform.system() == "Linux" or platform.system() == "Darwin":
+    # Linux or OS X
+    FFPROBE_BIN = "ffprobe"
+    FFMPEG_BIN = "ffmpeg"
+elif platform.system() == "Windows":
+    # Windows
+    FFPROBE_BIN = os.path.join("videos", "ffmpeg", "ffprobe")
+    FFMPEG_BIN = os.path.join("videos", "ffmpeg", "ffmpeg")
+
 
 try:
     from subprocess import DEVNULL
@@ -209,7 +221,7 @@ class MediaInfo(object):
         """Probe video file using ffprobe
         """
         ffprobe_command = [
-            "ffprobe",
+            FFPROBE_BIN,
             "-v",
             "quiet",
             "-print_format",
@@ -611,7 +623,7 @@ class MediaCapture(object):
         )
 
         ffmpeg_command = [
-            "ffmpeg",
+            FFMPEG_BIN,
             "-ss",
             time,
             "-i",
@@ -639,7 +651,7 @@ class MediaCapture(object):
 
             if skip_time_seconds < 0:
                 ffmpeg_command = [
-                    "ffmpeg",
+                    FFMPEG_BIN,
                     "-i",
                     self.path,
                     "-ss",
@@ -659,7 +671,7 @@ class MediaCapture(object):
                     skip_time_seconds, show_millis=True
                 )
                 ffmpeg_command = [
-                    "ffmpeg",
+                    FFMPEG_BIN,
                     "-ss",
                     skip_time,
                     "-i",

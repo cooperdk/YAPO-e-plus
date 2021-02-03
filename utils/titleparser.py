@@ -6,7 +6,7 @@ def search(title):
 
     trashTitle = (
         'RARBG', 'COM', '\d{3,4}x\d{3,4}', 'HEVC', 'H265', 'AVC', '\dK', '\d{3,4}p', 'TOWN.AG_', 'XXX', 'MP4',
-        'KLEENEX', 'SD'
+        'KLEENEX', 'SD', 'MP4-KT', 'MP4-KTR', 'SEXORS', 'MKV', 'DIVX', 'AVI', 'M4V', 'MP2', 'WEBM', 'MR4'
     )
 
     title = re.sub(r'\W', ' ', title)
@@ -50,7 +50,7 @@ def getSearchSiteName(siteID):
 
 def siteValues():
 
-    searchSites = [None] * 897
+    searchSites = [None] * 898 # one higher than the array below
 
     searchSites[0] = ("BlackedRaw", "BlackedRaw", "https://www.blackedraw.com", "https://www.blackedraw.com/api")
     searchSites[1] = ("Blacked", "Blacked", "https://www.blacked.com", "https://www.blacked.com/api")
@@ -929,7 +929,7 @@ def siteValues():
     searchSites[878] = ("Adult Time", "Adult Time", "https://freetour.adulttime.com", "https://tsmkfa364q-dsn.algolia.net/1/indexes/*/queries")
     searchSites[879] = ("RealJamVR", "RealJamVR", "https://www.realjamvr.com", "https://realjamvr.com/virtualreality/scene/id/")
     searchSites[880] = ("BBC Paradise", "BBC Paradise", "https://www.bbcparadise.com/", "https://www.bbcparadise.com/movies/")
-    searchSites[881] = ("Jesse Loads Monster Facials", "Jesse Loads Monster Facials", "https://jesseloadsmonsterfacials.com//", "https://jesseloadsmonsterfacials.com/visitors/tour_01.html")
+    searchSites[881] = ("Jesse Loads Monster Facials", "Jesse Loads Monster Facials", "https://jesseloadsmonsterfacials.com/", "https://jesseloadsmonsterfacials.com/visitors/tour_01.html")
     searchSites[882] = ("Assylum", "Assylum", "https://www.assylum.com/", "https://www.assylum.com/?home")
     searchSites[883] = ("Big Gulp Girls", "Big Gulp Girls", "https://tour.biggulpgirls.com/", "https://tour.biggulpgirls.com/videos/")
     searchSites[884] = ("Deepthroat Sirens", "Deepthroat Sirens", "https://tour.deepthroatsirens.com/", "https://tour.deepthroatsirens.com/videos/")
@@ -944,6 +944,7 @@ def siteValues():
     searchSites[894] = ("Exploited College Girls", "Exploited College Girls", "https://exploitedcollegegirls.com/", "https://exploitedcollegegirls.com/free/updates.php")
     searchSites[895] = ("FTV Girls", "FTV Girls", "https://www.ftvgirls.com/", "https://www.ftvgirls.com/updates.html")
     searchSites[896] = ("FTV Milfs", "FTV Milfs", "https://www.ftvmilfs.com/", "https://www.ftvmilfs.com/updates.html")
+    searchSites[897] = ("Jesh By Jesh", "Jesh By Jesh", "https://www.jeshbyjesh.com/", "https://www.jeshbyjesh.com/tour/categories/movies.html")
 
     return searchSites
 
@@ -1040,6 +1041,7 @@ def getSearchSettings(mediaTitle: str):
         ('^bblib ', 'BigButtsLikeItBig '),
         ('^bcasting ', 'BangCasting '),
         ('^bcb ', 'BigCockBully '),
+        ('^bcc ', 'Backroom Casting Couch'),
         ('^bch ', 'BigCockHero '),
         ('^bconfessions ', 'BangConfessions '),
         ('^bdpov ', 'BadDaddyPOV '),
@@ -1084,12 +1086,12 @@ def getSearchSettings(mediaTitle: str):
         ('^dwc ', 'DirtyWivesClub '),
         ('^dwp ', 'DayWithAPornstar '),
         ('^dontbreakme ', "DontBreakMe "),
+        ('^ecg ', 'ExploitedCollegeGirls '),
         ('^esp ', 'EuroSexParties '),
         ('^ete ', 'EuroTeenErotica '),
         ('^etrasmall ', 'ExxxtraSmall '),
         ('^ext ', 'ExxxtraSmall '),
         ('^excogi ', 'ExploitedCollegeGirls '),
-        ('^ecg ', 'ExploitedCollegeGirls '),
         ('^fams ', 'FamilyStrokes '),
         ('^faq ', 'FirstAnalQuest '),
         ('^fds ', 'FakeDrivingSchool '),
@@ -1123,6 +1125,7 @@ def getSearchSettings(mediaTitle: str):
         ('^ihaw ', 'IHaveAWife '),
         ('^iktg ', 'IKnowThatGirl '),
         ('^il ', 'ImmoralLive '),
+        ('^jbyj ', 'JeshByJesh '),
         ('^jp ', 'JaysPOV '),
         ('^jlmf ', 'JesseLoadsMonsterFacials '),
         ('^kha ', 'KarupsHA '),

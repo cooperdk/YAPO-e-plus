@@ -1,5 +1,46 @@
 # Changelog
 
+(WIN) = Windows exclusive, (LIN) = Linux exclusive
+
+## 210202 (0.7.4)
+
+### Changes
+
+* (WIN) The video contact sheet generator was unable to run if ffmpeg/ffprobe weren't placed in a path where the system looked for it. This is fixed. (#57)
+* (WIN) The "Open folder" button in the scene detail will now open the file explorer but also select the file. (#54)
+* Added more substrings for the title parser's filename cleaner
+* More adjustments to the scene title parser and YAPO detects more abbreviated websites
+
+### New
+
+* Video contact sheets in the scene list and grid view. The icon is placed on the scene thumbnail (#52)
+
+## 200910 (0.7.3u1)
+
+### Changes
+
+* YAPO has a new logo, and the version is displayed on the navigation bar in the web app
+* Changes to the TpDB scanner as their API changed
+* (WIN) Added a feature to auto-download FFMPEG so the user doesn't have to find a full installation
+* Changes in the versioning system. YAPO will now always notify when a new version is available
+
+## 200820 (0.7.3)
+
+## Changes
+
+* More websites supported by the title parser
+* Opened up an option to donate (on the right hand side on the Github page)
+
+
+## 200810 (0.7.1)
+
+### New
+
+* YAPO now "plugs into" The Porn DB and requests scene information if configured for this.
+* Autonomous registration of websites when found in TpDB
+* Ability to automatically re-title scenes so that they don't appear as their filename
+* Actors now scraped from four sources (in this order): IMDB, TMDB, TpDB and Freeones. Any information not already present will be added.
+
 ## 200628-0205 (0.6.12)
 
 ### Changes

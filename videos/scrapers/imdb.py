@@ -26,7 +26,7 @@ from videos.models import Actor, ActorAlias, ActorTag
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 
 def search_imdb(actor_to_search, alias, force):
-    return None
+    #return None
     success = False
     if Actor.objects.get(name=actor_to_search.name):
         actor_to_search = Actor.objects.get(name=actor_to_search.name)

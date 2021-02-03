@@ -438,7 +438,7 @@ angular.module('actorDetail').component('actorDetail', {
                 var birthday = new Date(dateTime);
                 var today = new Date();
                 var age = ((today - birthday) / (31557600000));
-                var age = Math.floor( age );
+                age = Math.floor( age );
                 console.log("Actor Age:" + age);
                 return age;
                 }

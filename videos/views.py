@@ -1481,7 +1481,12 @@ class PlayInVlc(views.APIView):
 
 def open_file_cross_platform(path):
     if platform.system() == "Windows":
-        os.startfile(path)
+        #os.startfile(path)
+        # This command will open the location of the file with the file selected
+        # explorer.exe /select,"C:\Folder\subfolder\file.txt"
+        print('explorer.exe /select "' + path + '"')
+        subprocess.Popen(r'explorer.exe /select,"' + path + '"')
+
     else:
         opener = "open" if platform.system() == "Darwin" else "xdg-open"
         subprocess.call([opener, path])

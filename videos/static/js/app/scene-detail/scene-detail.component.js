@@ -357,7 +357,7 @@ angular.module('sceneDetail').component('sceneDetail', {
 
                 return $http.get('open-folder/', {
                     params: {
-                        path: self.scene.path_to_dir
+                        path: self.scene.path_to_file
                     }
                 })
             };

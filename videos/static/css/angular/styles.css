@@ -44,6 +44,29 @@ div.a, td.a, li.a, a {
     text-align: justify;
 }
 
+.wrapper {
+   position: relative;
+}
+
+.col-md-12 .row-fluid .col-md-3 .wrapper .glyphicon {
+   position: absolute;
+   top: 190px;
+   right: -14px;
+   text-shadow: 0 0 8px black;
+}
+
+.wrapper .glyphicon {
+   position: absolute;
+   top: 158px;
+   right: 8px;
+   text-shadow: 0 0 8px black;
+}
+
+.increase-popover-width  {
+    max-width: 400px !important;
+    width: 400px !important;
+}
+
 #actor-list-row{
     white-space: nowrap;
     list-style: none;

@@ -20,8 +20,8 @@
              popover-trigger="mouseenter" popover-placement="bottom" class="glyphicon glyphicon-step-backward"></span></a>
 
         <a href="{{$ctrl.sheetPath}}" data-toggle="lightbox">
-            <button type="button" class="btn btn-default btn-sm" uib-popover-html="'Will open a contact sheet with 16 images from the video, if it has been generated. This resides in the videos/media/scenes/ folder together with the video thumbnail and video preview.<br>Click outside the box to close it.'" popover-trigger="mouseenter" popover-placement="right">
-            <span class="glyphicon glyphicon glyphicon-th"></span>  Contact Sheet</button></a>
+            <button type="button" class="btn btn-default btn-sm" uib-popover-html="'Will open a contact sheet with images from the video, if it has been generated. This resides in the videos/media/scenes/ folder together with the video thumbnail and video preview.<br>Click outside the box to close it.'" popover-trigger="mouseenter" popover-placement="right">
+            <span class="glyphicon glyphicon-th"></span>  Contact Sheet</button></a>
             <button style="right: 64px; down: 20px;" type="button" onclick="capture()" class="btn btn-default btn-sm"
             popover-trigger="mouseenter" popover-placement="right" uib-popover-html="'Draws a capture of the video and downloads it to your current download folder. You must replace it manually for now.<br>Copy the image to the scene folder with the ID of the scene (you can see it in the URL).<br>You have to pause the video to generate the thumbnail.'">
             <span class="glyphicon glyphicon-camera"></span>  New thumbnail
@@ -30,7 +30,8 @@
             <span class="glyphicon glyphicon-play-circle"></span>  Play with VLC
         </button>
 
-        <button type="button" ng-click="$ctrl.openFolder()" class="btn btn-default btn-sm">
+        <button type="button" ng-click="$ctrl.openFolder()" class="btn btn-default btn-sm"
+        popover-trigger="mouseenter" popover-placement="right" uib-popover-html="'Will oven a file browser and (Windows only) select the file.'" >
             <span class="glyphicon glyphicon-folder-open"></span>  Open Folder
         </button>
         <button type="button" ng-if="$ctrl.scene.path_to_file.toLowerCase().indexOf('mp4') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('webm') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('ogg') == -1" ng-click="$ctrl.generateSampleVideo($ctrl.scene)" class="btn btn-default btn-sm"

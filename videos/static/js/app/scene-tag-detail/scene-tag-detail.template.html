@@ -1,3 +1,13 @@
+<style>
+body {
+  background-image: linear-gradient(to bottom, rgba(20,20,20,0.9) 0%,rgba(20,20,20,0.5) 90%), url('media/tags/blonde.jpg');
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+  opacity: 0.8;
+}
+
+</style>
 <div align="left" style="position: absolute; z-index: 9; overflow; left: 64; top: 32;"><img style="max-width: 320px; max-height: 220px; height: auto; width: auto; cursor:default; border-style: none; border-bottom: none;" ng-src="media/tags/{{$ctrl.sceneTag.name | lowercase}}.jpg" onError=null;this.src="media/images/blank.png";this.style="width:0px;"> <!--{{$ctrl.website.thumbnail}}--></div>
 <div ng-if="image.is404">Uh oh!  Image 404'd.</div></center>
 

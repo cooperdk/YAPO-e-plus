@@ -1,7 +1,9 @@
 # YAPO e+
 ## Yet Another Porn Organizer (extended plus)
 
-#### *The YAPO website is coming soon!*
+#### *The YAPO website is (still) coming soon!*
+
+#### For information about updates, please refer to CHANGELOG
 
 *If you don't want to mess with Python and all the dependencies, there is an installer (Windows 10 64-bit) located here: https://github.com/cooperdk/YAPO-e-plus/releases. It may not include newer commits, please check the changelog and you can manually update the YAPO code after installation.*
 
@@ -19,11 +21,13 @@ Requirements: FFMPEG, VLC (for out-of-browser playback, if you prefer that) and 
 
 If something is not working, it is generally enough to make sure all dependencies are installed. Please consult step 3 and 4 under "Installation and upgrade instructions"  below.
 
-##### Discuss and share on Discord: https://discord.gg/zdm7Mdg
+##### Discuss and share on Discord: https://discord.gg/T6ybX4vs8u
 
 ---------------
 
 #### NEW FEATURES:
+
+(This list is no longer updated since august 2020, please find newer changes in CHANGELOG)
 
 - Automatic scene discovery (with TpDB). This will automatically rename your scene titles if you allow it.
   Will also automatically connect actors to scenes (auto-addition of non-existing actors, websites and tags to come).

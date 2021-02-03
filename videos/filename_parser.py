@@ -500,7 +500,7 @@ def parse_actors_in_scene (scene_to_parse, scene_path, actors, actors_alias):
                                     )
                                     if t > 1: print(" - ", end="")
                                     scene_to_parse.scene_tags.add(current_tag)
-                        t = +1
+                        t += 1
 
                         # print("Adding SceneTag '{}' to the scene {}".format(current_tag, scene_to_parse.name))
                         # scene_to_parse.scene_tags.add(current_tag)

@@ -2,18 +2,21 @@
 <div class="col-md-12" id="big-scroll-item">
 <div class="row-fluid" id="scene-list-grid">
     <div class="col-md-3" ng-repeat="scene in $ctrl.scenes">
+        <div class="wrapper">
         <a href="/#!/scene/{{ scene.id }}">
             <img
-                 uib-popover-template="'static/js/app/scene-list/scene-list-grid-popover.template.html'"
-                                        popover-append-to-body="true"
-                 popover-trigger="mouseenter" popover-placement="bottom"
-
-                 ng-src="{{ scene.thumbnail }}"
-                 alt="{{ scene.name }}"
-                 style="width: 360px;"/>
-
-
+             uib-popover-template="'static/js/app/scene-list/scene-list-grid-popover.template.html'"
+             popover-append-to-body="true"
+             popover-trigger="mouseenter" popover-placement="bottom"
+             ng-src="{{ scene.thumbnail }} class="thumb-wide"
+             alt="{{ scene.name }}"
+             style="width: 360px;"/>
         </a>
+            <a href="/media/scenes/{{ scene.id }}/sheet.jpg" data-toggle="lightbox">
+                <span class="glyphicon glyphicon-th" uib-popover="Will open a contact sheet with images from the video, if it has been generated. Click outside the box to close it." popover-class="increase-popover-width" popover-trigger="mouseenter" popover-placement="right">
+                </span>
+            </a>
+        </div>
     </div>
 </div>
 </div>

@@ -4,7 +4,7 @@ import os
 import sys
 
 # import settings
-from configuration import Config
+
 
 # os.environ("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 # os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
@@ -40,13 +40,22 @@ if __name__ == "__main__":
         compiled = False
 
     from django.core.management import execute_from_command_line
-
+    from configuration import Config
     # execute_from_command_line(sys.argv)
     # print(sys.argv)
-    if not any(["migrate" in sys.argv, "makemigrations" in sys.argv, "loaddata" in sys.argv,
-                "dumpdata" in sys.argv, "shell" in sys.argv, "dumpscript" in sys.argv, "sql" in sys.argv,
-                "showmigrations" in sys.argv, "runserver" in sys.argv, "clean_pyc" in sys.argv, "check" in sys.argv]):
+    if not any(["migrate" in str(sys.argv), "makemigrations" in str(sys.argv), "loaddata" in str(sys.argv),
+                "dumpdata" in str(sys.argv), "shell" in str(sys.argv), "help" in str(sys.argv),
+                "dumpscript" in str(sys.argv), "sql" in str(sys.argv),
+                "showmigrations" in str(sys.argv), "runserver" in str(sys.argv),
+                "clean_pyc" in str(sys.argv), "check" in str(sys.argv)]):
 
+        print(f"Config: {Config().yapo_url}")
+        quit()
         execute_from_command_line([SCRIPT_ROOT, 'runserver', Config().yapo_url, '--noreload'])
     else:
+        #if not "runserver" in str(sys.argv):
+        #    print("YAPO error -- started without a host in configuration file and without a job to do.\n")
+        #    print("Specify if you wish to run the server, migrate, make migrations .\n")
+        #    quit()
+
         execute_from_command_line(sys.argv)

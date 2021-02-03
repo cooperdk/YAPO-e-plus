@@ -1,5 +1,15 @@
 .actor-thumb { border-radius: 30px; }
 
+.wrapper {
+   position: relative;
+}
+
+.wrapper .glyphicon {
+   position: absolute;
+   bottom: 8px;
+   right: 8px;
+}
+
 .top-buffer { margin-top:20px; }
 
 .base-top-buffer {margin-top: 80px}
