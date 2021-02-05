@@ -1351,7 +1351,7 @@ def getSearchSettings(mediaTitle: str):
     ]
     date_obj = None
     for r, dateFormat in regex:
-        print(r + " - " + dateFormat)
+        #print(r + " - " + dateFormat)
         date = re.search(r, searchTitle)
         if date:
             try:
