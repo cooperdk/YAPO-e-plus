@@ -164,6 +164,7 @@ def tpdb(scene_id: int, force: bool):
                 # print(release_date)
                 try:
                     release_date = datetime.strptime(release_date, "%Y-%m-%d").date()
+
                 # release_date = strftime(release_date) + " 00:00:00"
                 # release_date = datetime.strptime(release_date, "%Y-%m-%d %H:%M:%S")
                     print(f'Release date: {release_date}')
@@ -479,12 +480,6 @@ def tpdb(scene_id: int, force: bool):
                 yy = release_date.strftime("%y")
                 yyyy = release_date.strftime("%Y")
 
-            if not release_date:
-                if any(['{dd}' in renameformat, '{mm}' in renameformat, '{mmmm}' in renameformat,
-                        '{yy}' in renameformat, '{yyyy}' in renameformat]):
-                    log.warn(
-                        f'TpDB: Scene {this_scene.id} - ERROR! Date unusable but required by the renaming format. Inserting placeholders.')
-                questiondate()
 
 
             if this_scene.websites.all().first():
@@ -496,6 +491,14 @@ def tpdb(scene_id: int, force: bool):
                 renamebase = "website format"
             renameformat = renameformat.replace('<', '{').replace('>', '}')
             log.sinfo(f'Renaming scene ID {scene_id} based on {renamebase}...')
+
+            if not release_date:
+                if any(['{dd}' in renameformat, '{mm}' in renameformat, '{mmmm}' in renameformat,
+                        '{yy}' in renameformat, '{yyyy}' in renameformat]):
+                    log.warn(
+                        f'TpDB: Scene {this_scene.id} - ERROR! Date unusable but required by the renaming format. Inserting placeholders.')
+                questiondate()
+
             newtitle = eval(f"f'''{renameformat}'''")
             log.sinfo(f'{newtitle}')
 

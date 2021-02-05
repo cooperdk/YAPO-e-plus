@@ -39,3 +39,4 @@ class Constants(metaclass=Singleton):
         self.tpdb_photos = 'false'
         self.tpdb_websites = 'false'
         self.tpdb_tags = 0
+        self.debug = "false"

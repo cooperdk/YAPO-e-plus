@@ -39,6 +39,9 @@ class Config(metaclass=Singleton):
   tpdb_photos: str
   tpdb_websites: str
   tpdb_tags: int
+  debug: bool
+
+
   def __init__(self):
     self.yapo_url = Constants().yapo_url
     self.renaming = Constants().renaming
@@ -66,6 +69,7 @@ class Config(metaclass=Singleton):
     self.tpdb_tags = Constants().tpdb_tags
     self.configfile_path = os.path.join(self.config_path, Constants().default_yaml_settings_filename)
     self.current_setting_version = 3
+    self.debug = Constants().debug
     if os.name == 'nt':
         self.vlc_path = Constants().vlc_path
     else:
@@ -124,6 +128,7 @@ class Config(metaclass=Singleton):
       self.tpdb_photos = settings_dict[__yaml_root_element__].get("tpdb_photos") or self.tpdb_photos
       self.tpdb_websites = settings_dict[__yaml_root_element__].get("tpdb_websites") or self.tpdb_websites
       self.tpdb_tags = settings_dict[__yaml_root_element__].get("tpdb_tags") or self.tpdb_tags
+      self.debug = settings_dict[__yaml_root_element__].get("debug") or self.debug
   def __settings_to_dict__(self):
     return {
       __yaml_root_element__: {
@@ -146,7 +151,8 @@ class Config(metaclass=Singleton):
         "tpdb_actors": self.tpdb_actors,
         "tpdb_photos": self.tpdb_photos,
         "tpdb_websites": self.tpdb_websites,
-        "tpdb_tags": self.tpdb_tags
+        "tpdb_tags": self.tpdb_tags,
+        "debug": self.debug
       }
     }
 

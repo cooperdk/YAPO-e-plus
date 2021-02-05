@@ -1,7 +1,7 @@
 import re
 from datetime import datetime
 from dateutil.parser import parse
-#import parsedatetime
+
 def search(title):
 
     trashTitle = (
@@ -1331,14 +1331,15 @@ def getSearchSettings(mediaTitle: str):
 
     #print("searchTitle (before date processing): " + searchTitle)
 
+
     # Search Type
     searchTitle = searchTitle.replace('#', '')
     searchDate = None
     regex = [
         (r'\b\d{4} \d{2} \d{2}\b', '%Y %m %d'),
+        (r'\b\d{2} \d{2} \d{2}\b', '%y %m %d'),
         (r'\b\d{2} \d{2} \d{4}\b', '%d %m %Y'),
         (r'\b\d{2} \d{2} \d{2}\b', '%d %m %y'),
-        (r'\b\d{2} \d{2} \d{2}\b', '%y %m %d'),
         (r'(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s\d{2}.*?\s\d{2}|\d{4}', '%b %d %Y'),
         (
         r'(January|February|March|April|May|June|July|August|September|October|November|December)\s\d{2}.*?\s\\d{2}|\d{4}',
@@ -1350,7 +1351,7 @@ def getSearchSettings(mediaTitle: str):
     ]
     date_obj = None
     for r, dateFormat in regex:
-        #print(r + " - " + dateFormat)
+        print(r + " - " + dateFormat)
         date = re.search(r, searchTitle)
         if date:
             try:
