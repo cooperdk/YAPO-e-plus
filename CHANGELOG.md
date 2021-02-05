@@ -2,6 +2,23 @@
 
 (WIN) = Windows exclusive, (LIN) = Linux exclusive
 
+## 210203 (0.7.5)
+
+_Requires migration as the database structure has changed! Check the README under "installation and upgrade instructions", section 4._
+ 
+_May also require you to enter settings and "save" the renaming format under "file renaming"._
+### Changes
+
+* The TpDB automatic re-titler now saves the clean, original title of a scene. This will be used soon.
+Also, the TpDB re-titler uses the same basic code as the renamer and re-titles based on your specification. What the TpDB module does NOT do is rename your file (an option will be added later)
+
+### New
+
+* YAPO now includes a file renamer. Currently only accessible from the scene detail page (scene view) and only renames one scene.
+  The renamer will rename your scene files based on your format (in settings). If a specific format is entered for a single website (in the website view), the particular website renaming format will be used.
+  If a scene belongs to more than one website (which is possible), the first will be selected.
+* Release date is now displayed on the scene detail page. Not yet editable so only dates pulled from TpDB are displayed.
+
 ## 210202 (0.7.4)
 
 ### Changes
@@ -23,6 +40,10 @@
 * Changes to the TpDB scanner as their API changed
 * (WIN) Added a feature to auto-download FFMPEG so the user doesn't have to find a full installation
 * Changes in the versioning system. YAPO will now always notify when a new version is available
+
+### New
+
+* Panic button. Press "ESC" while the browser is focused to quickly open weather.com in a new tab.
 
 ## 200820 (0.7.3)
 

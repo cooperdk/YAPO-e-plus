@@ -46,6 +46,7 @@ angular.module('settings').component('settings', {
                     params: {
                             pathToVlc: "",
                             yapoURL: "",
+                            renaming: "",
                             tpdb_enabled: false,
                             tpdb_website_logos: false,
                             tpdb_autorename: false,
@@ -59,6 +60,7 @@ angular.module('settings').component('settings', {
                     //self.response = response.data.vlc_path;
                     self.pathToVLC = response.data.vlc_path;
                     self.yapoURL = response.data.yapo_url;
+                    self.renaming = response.data.renaming;
                     self.tpdb_enabled = response.data.tpdb_enabled;
                     self.tpdb_website_logos = response.data.tpdb_website_logos;
                     self.tpdb_autorename = response.data.tpdb_autorename;
@@ -106,6 +108,23 @@ angular.module('settings').component('settings', {
                         self.addAlert("There was an error changing the YAPO url. Click to confirm.", 'danger', '1000000');
                     });
                 };
+
+                self.updateRenaming = function () {
+
+                    $http.get('settings/', {
+                        params: {
+                            renaming: self.renaming
+                        }
+
+                    }).then(function (response) {
+                        self.response = response.data.renaming;
+                        self.yapoURL = response.data.renaming;
+                        self.addAlert('The specified renaming format is stored.', 'success', '3000');
+                    }, function errorCallback(response) {
+                        self.addAlert("There was an error changing the renaming format. Click to confirm.", 'danger', '1000000');
+                    });
+                };
+
 
                 self.TpDB = function () {
 

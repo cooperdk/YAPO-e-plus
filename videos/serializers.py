@@ -111,6 +111,7 @@ class WebsiteSerializer(serializers.ModelSerializer):
             "exclusions",
             "scene_tags",
             "scene_tags_with_names",
+            "filename_format",
         ]
 
 
@@ -329,6 +330,7 @@ class SceneListSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "name",
+            "clean_title",
             "actors",
             "scene_tags",
             "websites",
@@ -360,6 +362,7 @@ class SceneSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "name",
+            "clean_title",
             "path_to_file",
             "path_to_dir",
             "hash",

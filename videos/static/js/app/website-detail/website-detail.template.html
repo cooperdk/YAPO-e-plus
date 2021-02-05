@@ -1,4 +1,4 @@
-		<div align="left" style="position: absolute; z-index: 9; overflow; left: 64; top: 32;"><img ng-if="$ctrl.website.thumbnail" style="max-width: 480px; max-height: 200px; height: auto; width: auto; cursor:default; border-style: none; border-bottom: none;" ng-src="{{$ctrl.website.thumbnail}}" onError=null;this.src="media/images/blank.png";this.style="width:0px;"> </div>
+    		<div align="left" style="position: absolute; z-index: 9; overflow; left: 64; top: 32;"><img ng-if="$ctrl.website.thumbnail" style="max-width: 480px; max-height: 200px; height: auto; width: auto; cursor:default; border-style: none; border-bottom: none;" ng-src="{{$ctrl.website.thumbnail}}" onError=null;this.src="media/images/blank.png";this.style="width:0px;"> </div>
 <div ng-if="image.is404">Uh oh!  Image 404'd.</div></center>
 
     <center><h1 align="center"><a href="#" editable-text="$ctrl.website.name"
@@ -21,17 +21,27 @@
         Website Aliases:
         <a href="#" editable-textarea="$ctrl.website.website_alias" e-rows="5" e-cols="100"
            onaftersave="$ctrl.update()">
-            {{ $ctrl.website.website_alias || 'no alias' }}
+            {{ $ctrl.website.website_alias || 'No aliases' }}
         </a>
     </label>
 	<br>
-	    	    <label
+	<label
             uib-popover-html="'The exclusions list prevent any words to trigger the website being tagged to a scene (fx the website Stepsiblings will be connected to every video on the website Stepsiblings Caught.<br>Using this field, you can enter &quot;stepsiblings&quot on the exclusion field for &quot;Stepsiblings Caught&quot; to avoid this. You can specify multiple exclusions by separating them with a comma.'"
             popover-trigger="mouseenter" popover-placement="right">
     Website Exclusions:
     <a href="#" editable-textarea="$ctrl.website.exclusions" e-rows="5" e-cols="100"
        onaftersave="$ctrl.update()">
-        {{ $ctrl.website.exclusions || 'no exclusions' }}
+        {{ $ctrl.website.exclusions || 'No exclusions' }}
+    </a>
+    </label>
+        	<br>
+    <label
+            uib-popover-html="'Specify a non-standard file naming definition here if this website should use it's own format.<br>Refer to the description under &quot;renaming&quot; in the settings module.'"
+            popover-trigger="mouseenter" popover-placement="right">
+    File Renaming Definition:
+    <a href="#" editable-textarea="$ctrl.website.filename_format" e-rows="1" e-cols="128"
+       onaftersave="$ctrl.update()">
+        {{ $ctrl.website.filename_format || 'Uses default format' }}
     </a>
     </label>
     <br></small>

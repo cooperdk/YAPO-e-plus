@@ -352,6 +352,24 @@ angular.module('sceneDetail').component('sceneDetail', {
                 })
             };
 
+            self.rename = function () {
+
+                return $http.get('rename-scene/', {
+                    params: {
+                        sceneId: self.scene.id,
+                        force: true
+
+                    }
+                }).then(function (response) {
+                    // alert(angular.toJson(response))
+                    self.addAlert("Succesfully renamed " + self.scene.name + ".", 'success', '5000');
+                    self.getCurrentScene()
+                }, function errorCallback(response) {
+                    self.addAlert("An error occured, please check the console/logfile. ", 'warning', '5000');
+                    console.log(angular.toJson(response))
+                });
+
+            };
 
             self.openFolder = function () {
 

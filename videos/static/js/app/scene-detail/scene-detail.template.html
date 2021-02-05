@@ -16,6 +16,7 @@
 
     <div class="col-md-7" style="text-align: center; vertical-align: middle; height: 22px;">
 <span style="vertical-align: middle;">
+    <span style="position: absolute; left: 64px;">
     <a href="#!/scene/{{ $ctrl.prev }}"><span uib-popover-html="'Go to previous scene in list'"
              popover-trigger="mouseenter" popover-placement="bottom" class="glyphicon glyphicon-step-backward"></span></a>
 
@@ -30,16 +31,21 @@
             <span class="glyphicon glyphicon-play-circle"></span>  Play with VLC
         </button>
 
+            <button type="button" ng-click="$ctrl.rename()" class="btn btn-default btn-sm" uib-popover-html="'Will rename the file based on your format.'" popover-trigger="mouseenter" popover-placement="right">
+            <span class="glyphicon glyphicon-import"></span>  Rename</button></a>
+
         <button type="button" ng-click="$ctrl.openFolder()" class="btn btn-default btn-sm"
         popover-trigger="mouseenter" popover-placement="right" uib-popover-html="'Will oven a file browser and (Windows only) select the file.'" >
             <span class="glyphicon glyphicon-folder-open"></span>  Open Folder
         </button>
-        <button type="button" ng-if="$ctrl.scene.path_to_file.toLowerCase().indexOf('mp4') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('webm') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('ogg') == -1" ng-click="$ctrl.generateSampleVideo($ctrl.scene)" class="btn btn-default btn-sm"
+
+        <button type="button" ng-if="$ctrl.scene.path_to_file.toLowerCase().indexOf('mp4') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('webm') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('ogg') == -1" && $ctrl.scene.path_to_file.toLowerCase().indexOf('mkv') == -1" ng-click="$ctrl.generateSampleVideo($ctrl.scene)" class="btn btn-default btn-sm"
                 uib-popover-html="'This video format cannot be played in a browser. Click here to generate a sample. <br>The sample size is about 10MB and its duration is between 30 and 90 seconds
                 , depending on the source duration. You will be notified when it is created if you stay on this page. The sample is stored in media/scenes/(sceneid)/sample.'"
                 popover-trigger="mouseenter" popover-placement="right">
         <span class="glyphicon glyphicon-facetime-video"></span>  Generate a sample
         </button>
+
 
         <button type="button" ng-click="$ctrl.scanScene('TPDB')" class="btn btn-default btn-sm">
             <span class="glyphicon glyphicon-play-circle"></span>  Scan The Porn DB
@@ -69,11 +75,13 @@
 </span>
     </div>
     <div class="col-md-5" style="top: -22px; text-align: center; vertical-align: middle; height: 22px;">
+        <span style="position: absolute; right: 46px;">
         <h2 align="center">
     <uib-rating ng-model="$ctrl.scene.rating" max="10" read-only="isReadonly" on-hover="hoveringOver(value)"
-                on-leave="overStar = null" titles="['one','two','three']"
+                on-leave="overStar = null" titles="[1,2,3,4,5,6,7,8,9,10]"
                 aria-labelledby="default-rating" ng-change="$root.patchEntity('scene', $ctrl.scene.id, 'rating', $ctrl.scene.rating, 'add',
                 false, false, null)"></uib-rating></h2>
+        </span>
     </div>
 
 </div>
@@ -135,30 +143,37 @@
 </ul>
 <div class="tab-content clearfix">
     <div class="tab-pane active" id="main">
-         <ul>
-    <li><span>Favorite:
-        <!-- Rounded switch -->
-        <label class="switch-header">
-  <input type="checkbox" class="hidden-box" ng-model="$ctrl.scene.is_fav"
-         ng-change="$root.patchEntity('scene', $ctrl.scene.id, 'is_fav', $ctrl.scene.is_fav, 'add',
-                                              false, false, null)">
-  <div class="slider round"></div></span>
-        </label>
 
-    </li>
-    <li>Runner up:
-        <label class="switch-header">
-            <input type="checkbox" class="hidden-box" ng-model="$ctrl.scene.is_runner_up"
-                   ng-change="$root.patchEntity('scene', $ctrl.scene.id, 'is_runner_up', $ctrl.scene.is_runner_up, 'add',
-                                              false, false, null)">
-            <div class="slider round"></div>
-        </label>
+         <ul style="line-height: 180%;">
+            <li><span>Favorite:
+                <!-- Rounded switch -->
+                <label class="switch-header">
+            <input type="checkbox" class="hidden-box" ng-model="$ctrl.scene.is_fav"
+                 ng-change="$root.patchEntity('scene', $ctrl.scene.id, 'is_fav', $ctrl.scene.is_fav, 'add',
+                                                      false, false, null)">
+            <div class="slider round"></div></span>
+                </label>
 
-    </li>
+            </li>
+            <li >Runner up:
+                <label class="switch-header">
+                    <input type="checkbox" class="hidden-box" ng-model="$ctrl.scene.is_runner_up"
+                           ng-change="$root.patchEntity('scene', $ctrl.scene.id, 'is_runner_up', $ctrl.scene.is_runner_up, 'add',
+                                                      false, false, null)">
+                    <div class="slider round"></div>
+                </label>
+
+            </li>
+
+            <li style="line-height: 133%;" margin-top: 8px;>Tags:
 
 
-            <li>Tags:
 
+
+                <span ng-repeat="tag in $ctrl.scene.scene_tags"> <a
+                        href="/#!/scene-tag/{{ tag.id }}">  {{ tag.name }}</a> <span
+                        class="glyphicon glyphicon-remove"
+                        ng-click="$ctrl.removeItem(tag,'scene_tags')"></span> {{$last ? '' : ', '}} </span>
                 <async-typeahead object="$ctrl.scene.scene_tags"
                                  object-type='scene_tags'
                                  sending-object="$ctrl.scene"
@@ -166,17 +181,16 @@
                                  selected-object="$ctrl.selectedSceneTag = $event.selected"
                 ></async-typeahead>
 
-
-                <span ng-repeat="tag in $ctrl.scene.scene_tags"> <a
-                        href="/#!/scene-tag/{{ tag.id }}">  {{ tag.name }}</a> <span
-                        class="glyphicon glyphicon-remove"
-                        ng-click="$ctrl.removeItem(tag,'scene_tags')"></span> {{$last ? '' : ', '}} </span>
-
-
             </li>
 
-            <li>Actors:
+            <li style="line-height: 133%; margin-top: 8px;">Actors:
 
+
+
+                 <span ng-repeat="actor in $ctrl.scene.actors">  <a
+                         href="/#!/actor/{{ actor.id }}">  {{ actor.name }}</a> <span
+                         class="glyphicon glyphicon-remove"
+                         ng-click="$ctrl.removeItem(actor,'actors')"></span> {{$last ? '' : ', '}} </span>
                 <async-typeahead object="$ctrl.scene.actors"
                                  object-type='actors'
                                  sending-object="$ctrl.scene"
@@ -184,40 +198,37 @@
                                  selected-object="$ctrl.selectedActor = $event.selected"
                 ></async-typeahead>
 
-                 <span ng-repeat="actor in $ctrl.scene.actors">  <a
-                         href="/#!/actor/{{ actor.id }}">  {{ actor.name }}</a> <span
-                         class="glyphicon glyphicon-remove"
-                         ng-click="$ctrl.removeItem(actor,'actors')"></span> {{$last ? '' : ', '}} </span>
-
-
             </li>
 
-            <li>Websites:
+            <li style="line-height: 133%; margin-top: 8px;">Websites:
 
+
+
+                <span ng-repeat="site in $ctrl.scene.websites"> <a
+                        href="/#!/website/{{ site.id }}">  {{ site.name }}</a> <span
+                        class="glyphicon glyphicon-remove"
+                        ng-click="$ctrl.removeItem(site,'websites')"></span> {{$last ? '' : ', '}} </span>
                 <async-typeahead object="$ctrl.scene.websites"
                                  object-type='websites'
                                  sending-object="$ctrl.scene"
                                  sending-object-type='Scene'
                                  selected-object="$ctrl.selectedWebsite = $event.selected"
                 ></async-typeahead>
-
-                <span ng-repeat="site in $ctrl.scene.websites"> <a
-                        href="/#!/website/{{ site.id }}">  {{ site.name }}</a> <span
-                        class="glyphicon glyphicon-remove"
-                        ng-click="$ctrl.removeItem(site,'websites')"></span> {{$last ? '' : ', '}} </span>
-
-                </span>
-
             </li>
-            <li>
-                <strong>Description:</strong> <br> <a href="#" editable-text="$ctrl.scene.description"
-       onaftersave="$root.patchEntity('scene', $ctrl.scene.id, 'description', $ctrl.scene.description, 'add',
+
+             <li style="line-height: 133%; margin-top: 8px;"><strong>Release date:</strong><br>{{$ctrl.scene.release_date |date : 'dd MMMM yyyy'}}</li>
+
+            <li style="line-height: 133%; margin-top: 8px;">
+                <strong>Description:</strong> <br> <a href="#" editable-textarea="$ctrl.scene.description"
+                e-rows="5" e-cols="100"
+                onaftersave="$root.patchEntity('scene', $ctrl.scene.id, 'description', $ctrl.scene.description, 'add',
                                               false, false, null)" style="cursor:text">
         {{ $ctrl.scene.description || 'NA' }}
     </a>
             </li>
 
         </ul>
+
     </div>
  <!-- </div>
 </div>

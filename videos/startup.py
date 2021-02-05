@@ -140,7 +140,7 @@ def vercheck(): # Check the local version against Github
         with open(update, "r") as verfile:
             ver = verfile.read()
         ver = str(ver).strip()
-        print(f"\n--- Version {ver.strip()}")
+        verprint = f"\n--- Version {ver.strip()}"
         try:
             remoteVer = requests.get(
                 "https://raw.githubusercontent.com/cooperdk/YAPO-e-plus/develop/VERSION.md"
@@ -152,14 +152,15 @@ def vercheck(): # Check the local version against Github
             # print("Github version: "+str(remoteVer))
             if LooseVersion(ver) < LooseVersion(remoteVer):
                 log.sinfo(f'A newer version of YAPO e+ is available ({remoteVer})')
-                log.info(f'A newer version of YAPO e+ is available ({remoteVer})')
+                verprint += (f'\n    A newer version of YAPO e+ is available ({remoteVer})')
             if ver == remoteVer:
-                print("    (no new version available)")
+                verprint += " (no new version available)"
             if ver > remoteVer:
-                print("    (your version is a dev copy newer than the Github version)")
+                verprint += "    (your version is a dev copy newer than the Github version)"
         else:
             log.info(f"    This is a frozen build of version {ver}. The latest Git version is {remoteVer}.")
-
+            verprint += f"    This is a frozen build of version {ver}. The latest Git version is {remoteVer}."
+        print(verprint)
 
 def stats (): # Prints statistics about videos and metadata
     size = getsizeall()
@@ -263,10 +264,8 @@ def startup_sequence():
             print (f"Site to open: {site}\n")
             webbrowser.get().open_new_tab(site)
         else:
-            print('You\'re missing a defined port number in the /config/settings.yml variable "yapo_url".')
-            print('If you want YAPO to open your browser automatically, this needs to be set in settings.')
-            print('Simply remove the above variable (manually or through settings) to disable auto browser.\n')
-
+            print('You\'re missing a defined IP and port number in the /config/settings.yml variable "yapo_url".')
+            print('To make YAPO auto-open your browser on startup, add your desired IP:port in settings.\n')
 
 class ready:
     import time

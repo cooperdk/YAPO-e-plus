@@ -64,6 +64,29 @@ def getCPUCount():
     return psutil.cpu_count(logical=False)  # set Logical to true if treads are to be included
 
 
+def restest(height:int):
+    if not isinstance(height, int):
+        return "???"
+    if height < 240:
+        res = "240p"
+    if 240 < height <= 360:
+        res = "360p"
+    if 360 < height <= 480:
+        res = "480p"
+    if 480 < height <= 576:
+        res = "576p"
+    if 576 < height <= 720:
+        res = "720p"
+    if 720 < height <= 1080:
+        res = "1080p"
+    if 1080 < height <= 1440:
+        res = "1440p"
+    if 1440 < height <= 2160:
+        res = "4K"
+    if 2160 < height <= 4320:
+        res = "8K"
+    return res
+
 def send_piercings_to_actortag (actor):
     piercings = actor.piercings
     if piercings:

@@ -460,11 +460,46 @@ def tpdb(scene_id: int, force: bool):
                 else:
                     print("Website already registered to scene.")
                     aux.save_website_logo(site_logo, site, False, this_scene.id)
-
+            #try:
             newtitle = ""
             if title:
-                newtitle = title
+                this_scene.clean_title = title
 
+            if perflist: actors = perflist
+            else: actors = "None"
+            if this_scene.actors.all().first(): actor = this_scene.actors.all().first().name
+            else: actor = "?"
+            if this_scene.websites.all().first(): site = this_scene.websites.all().first().name
+            else: site = "?"
+            res = aux.restest(this_scene.height)
+            if release_date:
+                dd = release_date.strftime("%d")
+                mm = release_date.strftime("%m")
+                mmmm = release_date.strftime("%B")
+                yy = release_date.strftime("%y")
+                yyyy = release_date.strftime("%Y")
+
+            if not release_date:
+                if any(['{dd}' in renameformat, '{mm}' in renameformat, '{mmmm}' in renameformat,
+                        '{yy}' in renameformat, '{yyyy}' in renameformat]):
+                    log.warn(
+                        f'TpDB: Scene {this_scene.id} - ERROR! Date unusable but required by the renaming format. Inserting placeholders.')
+                questiondate()
+
+
+            if this_scene.websites.all().first():
+                renameformat = this_scene.websites.all().first().filename_format  # find out if the website has it's own rename format
+            if len(renameformat) < 5:  # This will tell to get the default rename format
+                renameformat = Config().renaming
+                renamebase = "default format"
+            else:
+                renamebase = "website format"
+            renameformat = renameformat.replace('<', '{').replace('>', '}')
+            log.sinfo(f'Renaming scene ID {scene_id} based on {renamebase}...')
+            newtitle = eval(f"f'''{renameformat}'''")
+            log.sinfo(f'{newtitle}')
+
+            '''
             if (perflist and len(perflist) > 4) and newtitle and \
                     perflist.lower().strip() != newtitle.lower().strip():
                 newtitle = f"{perflist} - {newtitle}"
@@ -480,7 +515,7 @@ def tpdb(scene_id: int, force: bool):
             if site:
                 newtitle = f"{site} - {newtitle}"
                 # print(newtitle)
-
+            '''
             # print(Config().tpdb_autorename.lower())
             if "true" in Config().tpdb_autorename.lower():
                 if not this_scene.orig_name:
@@ -492,7 +527,8 @@ def tpdb(scene_id: int, force: bool):
 
             success = True
             # print(f"Description:\n{description}")
-
+            #except:
+            #    log.error(f'An error occured while trying to give scene {this_scene.id} a new title!')
             try:
                 if found:
                     tagcounter = 0
@@ -508,7 +544,8 @@ def tpdb(scene_id: int, force: bool):
                             else:
                                 break
                         print("\n")
-                        log.sinfo(f"Added {tagcounter} tags from TpDB to this scene.")
+                        if Config().debug:
+                            log.sinfo(f"Added {tagcounter} tags from TpDB to this scene.")
             except:
                 pass
 
@@ -532,8 +569,9 @@ def tpdb(scene_id: int, force: bool):
             insert_scene_tag(this_scene, "TpDB: Scanned")
             # print("Tagged the scene with a TpDB tag.")
 
-            log.sinfo(f"Found and registered data for scene ID {scene_id}")
-            print(this_scene)
+            if Config().debug:
+                log.sinfo(f"Found and registered data for scene ID {scene_id}")
+            #print(this_scene)
             this_scene.save(force_update=True)
 
         else:
@@ -547,6 +585,14 @@ def tpdb(scene_id: int, force: bool):
         log.warn(f"Issue(s) occured: {sys.exc_info()}")
         return success
         # pass
+
+
+def questiondate():
+    dd = "??"
+    mm = "??"
+    mmmm = "????"
+    yy = "??"
+    yyyy = "????"
 
 
 def strip_bad_chars(name):

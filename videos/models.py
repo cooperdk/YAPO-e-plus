@@ -130,12 +130,15 @@ class Website(models.Model):
     modified_date = models.DateTimeField(auto_now=True)
     url = models.TextField(max_length=256, default="", null=True, blank=True)
     tpdb_id = models.IntegerField(default=0)
+    filename_format = models.TextField(max_length=256, default="", null=True, blank=True)
+
     def __str__(self):
         return f"{self.name} "
 
 
 class Scene(models.Model):
     name = models.CharField(max_length=500)
+    clean_title = models.CharField(max_length=320, null=True, blank=True)
     tpdb_id = models.CharField(null=True, default="", max_length=48, blank=True)
     release_id = models.CharField(null=True, default="", max_length=64, blank=True)
     release_date = models.DateTimeField(null=True, blank=True)

@@ -9,7 +9,8 @@
   <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#tpdb" aria-expanded="true" aria-controls="tpdb">TpDB scanning</button>
   <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#scrapeclean" aria-expanded="true" aria-controls="scrapeclean">Scraping, dupecheck and cleaning</button>
   <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#rescan" aria-expanded="false" aria-controls="rescan">Folder re-scanning</button>
-  <button class="btn btn-primary" type="button" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false" aria-controls="paths tpdb scrapeclean rescan">Toggle all</button>
+  <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#rename" aria-expanded="false" aria-controls="rename">File renaming</button>
+  <button class="btn btn-primary" type="button" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false" aria-controls="paths tpdb scrapeclean rescan rename">Toggle all</button>
 </p>
     <div class="collapse multi-collapse" id="paths">
       <div class="card card-body toggle">
@@ -17,8 +18,7 @@
           <div class="row">
               <div class="col-lg-5">
     <label>URL that YAPO should open on startup (blank if you don't wish your browser to open automatically)</label>
-    <input class="form-control" id="inputdefault" type="text"
-    ng-model="$ctrl.yapoURL">
+
     <button style="color: #33ccff;" type="button" ng-click="$ctrl.updateYAPOurl()" class="btn btn-default btn-sm"
             uib-popover-html="'If this is a conventional URL (ip.ip.ip.ip:port or host:port), YAPO will open this URL in your default browser on startup. You can edit the value (yapo_url) manually in the settings.yml file which is in the config directory (/config)'"
             popover-trigger="mouseenter" popover-placement="right-top"
@@ -34,7 +34,8 @@
     <button style="color: #33ccff;" type="button" ng-click="$ctrl.updateVlcPath()" class="btn btn-default btn-sm"
             uib-popover-html="'Sets YAPO\'s VLC path to the path in the text input. Only for Windows, as we run vlc without specifying path on Linux. Replace any backslash in the path with a forward slash, otherwise it will break YAPO. You can edit the value (yapo_url) manually in the settings.yml file which is in the config directory (/config)'"
             popover-trigger="mouseenter" popover-placement="right-top"
-    
+    <input class="form-control" id="inputdefault" type="text"
+    ng-model="$ctrl.yapoURL">
         <span style="width:10%" class="glyphicon glyphicon-cog"></span> Set VLC Path
     </button>
           </div>
@@ -245,3 +246,46 @@
     </table>
 </div>
       </div></div>
+
+<div class="collapse multi-collapse" id="rename">
+      <div class="card card-body toggle">
+    <h4>File renaming</h4>
+          <div class="row">
+              <div class="col-lg-5">
+    <label>Renaming format</label>
+<input class="form-control" id="inputdefault" type="text"
+    ng-model="$ctrl.renaming">
+    <button style="color: #33ccff;" type="button" ng-click="$ctrl.updateRenaming()" class="btn btn-default btn-sm"
+
+<span style="width:10%" class="glyphicon glyphicon-cog"></span> Save
+    </button>
+              </div>
+              <div class="col-lg-1"></div>
+
+      </div>
+            <div class="divider"></div>
+
+                <table class="table-striped table-hover thin" style="line-height: 1.5 !important;">
+                    <tbody class="">
+                        <tr>
+                            <td>Tag</td><td>&nbsp;</td><td>Description</td>
+                        </tr>
+                        <tr>
+                            <td>&lt;website&gt;</td><td></td><td>The website name</td>
+                        </tr><tr>
+                            <td>&lt;date&gt;</td><td></td><td>Release date, formatted after the definition in settings.yml (log_timeformat)<br>Available formats: &lt;dd&gt;, &lt;mm&gt;, &lt;mmmm&gt;, &lt;yy&gt;, &lt;yy&gt; where mm is month number, mmmm is month name, yy is 2 digit year and yyyy is 4 digit year</td>
+                        </tr>
+                        <tr>
+                            <td>&lt;actor&gt;</td><td></td><td>The first actor registered to the scene</td>
+                        </tr><tr>
+                            <td>&lt;actors&gt;</td><td></td><td>All actors registered to the scene</td>
+                        </tr>
+                        <tr>
+                            <td>&lt;title&gt;</td><td></td><td>The scene title<br>(<b>NOTE</b>: this is the title shown for each scene and may default to the original filename<br>if not renamed by the TpDB scanner or manually!)</td>
+                        </tr><tr>
+                            <td>&lt;res&gt;</td><td></td><td>Video resolution (ex. 480p, 1080p, 4K)</td>
+                        </tr>
+                    </tbody>
+                </table>
+      </div>
+    </div>

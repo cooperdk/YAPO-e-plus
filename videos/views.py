@@ -304,77 +304,86 @@ def populate_websites(force):
 
     log.sinfo(f"Traversing websites for logos...")
 
+    nexturl = 'https://api.metadataapi.net/sites?page=1'
+
     # if current_scene.tpdb_id is not None and current_scene.tpdb_id != "" and len(current_scene.tpdb_id) > 12:
     #     parsetext = current_scene.tpdb_id
-    url = 'https://api.metadataapi.net/sites'
 
-    params = {'limit': 99999}
-    headers = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'User-Agent': 'YAPO e+ 0.73',
-    }
-    print("Downloading site information... ", end="")
-    response = requests.request('GET', url, headers=headers, params=params) #, params=params
-    print("\n")
+    while nexturl:
 
-    try:
-        response = response.json()
-    except:
-        pass
-    print("\n")
-    websites = Website.objects.all()
-    for site in websites:
-        oldname = site.name
-        found = False
-        #print (response['data'].keys())
-        #print(response['data'][0].keys())
-        for tpdb in response['data']: #[0]:
+        params = {'limit': 99999}
+        headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'User-Agent': 'YAPO e+ 0.73',
+        }
+        print("Downloading site information... ", end="")
+        response = requests.request('GET', nexturl, headers=headers, params=params) #, params=params
+
+        print("\n")
+
+        try:
+            response = response.json()
+        except:
+            pass
+        print("\n")
+
+
+
+
+        websites = Website.objects.all()
+        for site in websites:
+            oldname = site.name
             found = False
-            tsid = tpdb['id']
-            tsn = tpdb['name']
-            tss = tpdb['short_name']
-            tsurl = tpdb['url']
-            tslogo = tpdb['logo']
+            #print (response['data'].keys())
+            #print(response['data'][0].keys())
+            for tpdb in response['data']: #[0]:
+                found = False
+                tsid = tpdb['id']
+                tsn = tpdb['name']
+                tss = tpdb['short_name']
+                tsurl = tpdb['url']
+                tslogo = tpdb['logo']
 
-            #print (f"Site: {site.name} - {tsn}                    \r", end="")
+                #print (f"Site: {site.name} - {tsn}                    \r", end="")
 
-            if site.name == tsn:
-                found = True
+                if site.name == tsn:
+                    found = True
 
-            if (site.name != tsn) and (site.name.lower() == tsn.lower()):
-                log.info(f'Renaming site "{site.name}" to "{tsn}" for consistency')
-                site.name = tsn
-                found = True
+                if (site.name != tsn) and (site.name.lower() == tsn.lower()):
+                    log.info(f'Renaming site "{site.name}" to "{tsn}" for consistency')
+                    site.name = tsn
+                    found = True
 
-            if (site.name.lower() == tss.lower()) and (site.name.lower() != tsn.lower()):
-                log.info(f'Renaming site "{site.name}" to "{tsn}" because it is truncated')
-                site.name = tsn
-                found = True
+                if (site.name.lower() == tss.lower()) and (site.name.lower() != tsn.lower()):
+                    log.info(f'Renaming site "{site.name}" to "{tsn}" because it is truncated')
+                    site.name = tsn
+                    found = True
 
 
-            if found:
-                try:
-                    newname = site.name
-                    if not tss.lower() in site.website_alias.lower():
-                        if len(site.website_alias) > 1:
-                            site.website_alias += f",{tss.lower()}"
-                        else:
-                            site.website_alias = tss.lower()
-                    if not site.url:
-                        site.url = tsurl
-                    if not site.tpdb_id:
-                        site.tpdb_id = int(tsid)
+                if found:
+                    try:
+                        newname = site.name
+                        if not tss.lower() in site.website_alias.lower():
+                            if len(site.website_alias) > 1:
+                                site.website_alias += f",{tss.lower()}"
+                            else:
+                                site.website_alias = tss.lower()
+                        if not site.url:
+                            site.url = tsurl
+                        if not site.tpdb_id:
+                            site.tpdb_id = int(tsid)
 
-                    aux.save_website_logo(tslogo, site.name, force)
+                        aux.save_website_logo(tslogo, site.name, force)
 
-                    site.save()
-                except:
-                    log.error(
-                        f'Attempting to rename {oldname} to {newname} resulted in an error. New name probably already exists!')
-                    break
-                print("\n")
-
+                        site.save()
+                    except:
+                        log.error(
+                            f'Attempting to rename {oldname} to {newname} resulted in an error. New name probably already exists!')
+                        break
+                    print("\n")
+        nexturl = response['links']['next']
+        print(f"Getting next JSON page ({nexturl})...")
 
 
     print("Done.")
@@ -1098,7 +1107,23 @@ def settings(request):
                 Config().save()
 
                 return Response(status=200)
+        if "renaming" in request.query_params:
 
+            if request.query_params["renaming"]:
+
+                if request.query_params["renaming"] != "":
+
+                    new_renaming = request.query_params["renaming"]
+
+                else:
+
+                    new_renaming = "none"
+
+                log.info(f'Renaming format set to "{new_renaming}"')
+                Config().renaming = new_renaming
+                Config().save()
+
+                return Response(status=200)
 
         '''
         if all(["pathToVlc" not in request.query_params, "enable_tpdb" not in request.query_params,
@@ -1478,6 +1503,22 @@ class PlayInVlc(views.APIView):
 
         return Response(status=200)
 
+def dorename(scene_id: int, force: bool):
+    from utils import scenerenamer as renamer
+    result = renamer.rename(scene_id, force)
+    return result
+
+class renameScene(views.APIView):
+    def get (self, request, format=None):
+        from utils import scenerenamer as renamer
+        scene_id = request.query_params["sceneId"]
+        force = request.query_params["force"]
+
+        result = dorename(scene_id, force)
+        if not result:
+            return Response(status=500)
+        else:
+            return Response(status=200)
 
 def open_file_cross_platform(path):
     if platform.system() == "Windows":

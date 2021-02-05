@@ -78,6 +78,7 @@ urlpatterns = [
                   url(r'^upload/', views.AssetAdd.as_view()),
                   url(r'^scrape-actor/', views.ScrapeActor.as_view()),
                   url(r'^play-scene/', views.play_in_vlc),
+                  url(r'^rename-scene/', views.renameScene.as_view()),
                   url(r'^open-folder/', views.OpenFolder.as_view()),
                   url(r'^add-items/', views.AddItems.as_view()),
                   url(r'^settings/', views.settings),
