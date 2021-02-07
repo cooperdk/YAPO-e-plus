@@ -43,7 +43,7 @@ def sendAllPiercings():
     for actor in actors:
         aux.send_piercings_to_actortag(actor)
 
-def search_freeones(actor_to_search, alias, force):
+def search_freeones(actor_to_search: object, alias: object, force: bool = False):
     num = 0
     success = False
     if Actor.objects.get(name=actor_to_search.name):
@@ -58,7 +58,7 @@ def search_freeones(actor_to_search, alias, force):
     else:
         name_with_plus = name.replace(' ', '+')
         name_with_dash = name.replace(' ', '-')
-        print(f"Searching Freeones for: {actor_to_search.name}... ",end="")
+        print(f"Searching Freeones for {actor_to_search.name}... ",end="")
     r = requests.get(f"https://www.freeones.com/babes?q={name_with_dash}", verify=False)
 
     soup = BeautifulSoup(r.content, "html5lib")
@@ -392,42 +392,42 @@ def search_freeones(actor_to_search, alias, force):
                                 doneY=False
                                 while not doneY:
                                     for cupSizePart in cupSize:
-                                        if (cupSizePart in accepted_stringsTiny):
+                                        if (cupSizePart in accepted_stringsTiny and len(cupSizePart) < 5):
                                             insert_actor_tag(actor_to_search, "Tiny tits")
                                             #print("Added tag: Tiny tits")
                                             doneY=True
 
-                                        if (cupSizePart in accepted_stringsSmall):
+                                        if (cupSizePart in accepted_stringsSmall and len(cupSizePart) < 5):
                                             insert_actor_tag(actor_to_search, "Small tits")
                                             #print("Added tag: Small tits")
                                             doneY=True
 
-                                        if (cupSizePart in accepted_stringsReg):
+                                        if (cupSizePart in accepted_stringsReg and len(cupSizePart) < 5):
                                             insert_actor_tag(actor_to_search, "Medium tits")
                                             #print("Added tag: Medium tits")
                                             doneY=True
                                 
-                                        elif (cupSizePart in accepted_stringsBig):
+                                        elif (cupSizePart in accepted_stringsBig and len(cupSizePart) < 5):
                                             insert_actor_tag(actor_to_search, "Big tits")
                                             #print("Added tag: Big tits")
                                             doneY=True
 
-                                        elif (cupSizePart in accepted_stringsVBig):
+                                        elif (cupSizePart in accepted_stringsVBig and len(cupSizePart) < 5):
                                             insert_actor_tag(actor_to_search, "Very big tits")                  
                                             #print("Added tag: Very big tits")
                                             doneY=True
 
-                                        elif (cupSizePart in accepted_stringsHuge):
+                                        elif (cupSizePart in accepted_stringsHuge and len(cupSizePart) < 5):
                                             insert_actor_tag(actor_to_search, "Huge tits")    
                                             #print("Added tag: Huge tits")
                                             doneY=True
 
-                                        elif (cupSizePart in accepted_stringsMassive):
+                                        elif (cupSizePart in accepted_stringsMassive and len(cupSizePart) < 5):
                                             insert_actor_tag(actor_to_search, "Massively huge tits")     
                                             #print("Added tag: Massively huge tits")
                                             doneY=True
 
-                                        elif (cupSizePart in accepted_stringsExtreme):
+                                        elif (cupSizePart in accepted_stringsExtreme and len(cupSizePart) < 5):
                                             insert_actor_tag(actor_to_search, "Extremely huge tits")                            
                                             #print("Added tag: Extremely huge tits")
                                             doneY=True

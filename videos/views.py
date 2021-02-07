@@ -630,7 +630,8 @@ class scanScene(views.APIView):
             force = True
         else:
             force = False
-        print("Now entering the TPDB scene scanner API REST view")
+        if Config().debug=="true":
+            log.sinfo("Now entering the TPDB scene scanner API REST view")
 
         success = apiclients.tpdb(scene_id, force)
 
@@ -650,7 +651,8 @@ class ScrapeActor(views.APIView):
             force = True
         else:
             force = False
-        print("Now entering the scrape actor API REST view")
+        if Config().debug=="true":
+            log.sinfo("Now entering the scrape actor API REST view")
         print(f"Scanning for {Actor.objects.get(pk=actor_id).name} on {search_site}")
 
         if search_site == "TMDb":

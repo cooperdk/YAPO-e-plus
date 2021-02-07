@@ -15,6 +15,7 @@ from http.client import IncompleteRead, BadStatusLine
 import argparse
 import ssl
 import datetime
+import platform
 import json
 import re
 http.client._MAXHEADERS = 1000
@@ -63,6 +64,12 @@ def getCPUCount():
     import psutil
     return psutil.cpu_count(logical=False)  # set Logical to true if treads are to be included
 
+
+def sysclear():
+    if platform.system() == "Windows":
+        os.system("cls")
+    else:
+        os.system("clear")
 
 def restest(height:int):
     if not isinstance(height, int):
@@ -222,7 +229,8 @@ def tpdb_formatter (name):
     trashTitle = (
         'RARBG', 'COM', '\d{3,4}x\d{3,4}', 'HEVC', 'H265', 'AVC', '\d{2,4}K', '\d{3,4}p', 'TOWN.AG_', 'XXX', 'MP4',
         'KLEENEX', 'SD', 'H264', 'repack', '1500k', '500k', '1000k', 'rq', 'NEW', 'APT', '[TK]', 'TK', 'hd\d{3,4}p',
-        '1500', '1000'
+        '1500', '1000', 'SD', 'MP4-KT', 'MP4-KTR', 'SEXORS', 'MKV', 'DIVX', 'AVI', 'M4V', 'MP2', 'WEBM', 'MR4', 'GUSH',
+        '[TK]', 'rq', ' Unknown -', 'Unknown', '\ss\s'
     )
 
     name = re.sub(r'(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s\d{2},\s\d{4}', '', name)

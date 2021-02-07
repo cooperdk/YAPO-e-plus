@@ -5,8 +5,10 @@ from dateutil.parser import parse
 def search(title):
 
     trashTitle = (
-        'RARBG', 'COM', '\d{3,4}x\d{3,4}', 'H264', 'HEVC', 'H265', 'AVC', '\dK', '\d{3,4}p', 'TOWN.AG_', 'XXX', 'MP4',
-        'KLEENEX', 'SD', 'MP4-KT', 'MP4-KTR', 'SEXORS', 'MKV', 'DIVX', 'AVI', 'M4V', 'MP2', 'WEBM', 'MR4'
+        'RARBG', 'COM', '\d{3,4}x\d{3,4}', 'HEVC', 'H265', 'AVC', '\d{2,4}K', '\d{3,4}p', 'TOWN.AG_', 'XXX', 'MP4',
+        'KLEENEX', 'SD', 'H264', 'repack', '1500k', '500k', '1000k', 'rq', 'NEW', 'APT', '[TK]', 'TK', 'hd\d{3,4}p',
+        '1500', '1000', 'SD', 'MP4-KT', 'MP4-KTR', 'SEXORS', 'MKV', 'DIVX', 'AVI', 'M4V', 'MP2', 'WEBM', 'MR4', '-GUSH',
+        '[TK]', '.rq', '-rq', ' rq', ' Unknown -', 'Unknown', '\ss\s'
     )
 
     title = re.sub(r'\W', ' ', title)
@@ -50,7 +52,7 @@ def getSearchSiteName(siteID):
 
 def siteValues():
 
-    searchSites = [None] * 898 # one higher than the array below
+    searchSites = [None] * 899 # one higher than the array below
 
     searchSites[0] = ("BlackedRaw", "BlackedRaw", "https://www.blackedraw.com", "https://www.blackedraw.com/api")
     searchSites[1] = ("Blacked", "Blacked", "https://www.blacked.com", "https://www.blacked.com/api")
@@ -945,7 +947,7 @@ def siteValues():
     searchSites[895] = ("FTV Girls", "FTV Girls", "https://www.ftvgirls.com/", "https://www.ftvgirls.com/updates.html")
     searchSites[896] = ("FTV Milfs", "FTV Milfs", "https://www.ftvmilfs.com/", "https://www.ftvmilfs.com/updates.html")
     searchSites[897] = ("Jesh By Jesh", "Jesh By Jesh", "https://www.jeshbyjesh.com/", "https://www.jeshbyjesh.com/tour/categories/movies.html")
-
+    searchSites[898] = ("18Eighteen", "18Eighteen", "https://www.18eighteen.com/", "https://www.18eighteen.com/")
     return searchSites
 
 def getSearchSiteIDByFilter(searchFilter):
@@ -1055,6 +1057,7 @@ def getSearchSettings(mediaTitle: str):
         ('^bmf ', 'BigMouthfuls '),
         ('^bp ', 'ButtPlays '),
         ('^brealteens ', 'BangRealTeens '),
+        ('^brf', 'BackRoomFacials '),
         ('^btas ', 'BigTitsatSchool '),
         ('^btaw ', 'BigTitsatWork '),
         ('^btc', 'BigTitCreampie '),

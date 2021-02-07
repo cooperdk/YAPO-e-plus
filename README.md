@@ -82,6 +82,26 @@ If something is not working, it is generally enough to make sure all dependencie
 - Function to move all videos belonging to a website or actor so that they reside in the same folder and an ability to set this automatically
 - An API for videohashes, tags and actors to avoid hundreds of people re-inventing the wheel
 
+#### Management commands
+
+`get-clean-titles`
+
+This will get clean scene titles from TpDB, which are needed for the scene filename renamer (may consume some time).
+
+`mark-scenes`
+
+This command will update scenes with TpDB registrations by setting a field in the database to True.
+
+
+`convert-tags`
+
+This converts the old YAPO TpDB tags (TpDB: Scanned: True, TpDB, Match: Good, etc) by setting fields in the database (this is time consuming, 0.5-1 seconds per scene).
+
+`makemigrations` and `migrate`
+
+These commands, which are built into Django, are required to update the database schema. You will use it often, unless you use the compiled version of YAPO in which these functions are run by starting a separate program.
+
+
 #### Installation and upgrade instructions
 
 ##### Local install

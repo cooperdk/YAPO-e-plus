@@ -232,6 +232,7 @@ def ffmpeg_check():
 def startup_sequence():
 
     banner()
+
     configcheck()
     vercheck()
     print("")
@@ -271,12 +272,14 @@ class ready:
     import time
     #startup_sequence()
     try:
-        if not 'migrat' in str(sys.argv):
-            print("Not in migration mode. Executing startup sequence...")
+        if not any(['migrat' in str(sys.argv), 'get-clean-titles' in str(sys.argv), 'convert-tags' in str(sys.argv),
+                 'mark-scenes' in str(sys.argv)]):
+            print("Not in migration/maintenance mode. Executing startup-sequence...")
             time.sleep(2)
             startup_sequence()
-        else:
-            log.info(f'User entered migration mode.')
+        if any(['migrat' in str(sys.argv), 'get-clean-titles' in str(sys.argv), 'convert-tags' in str(sys.argv),
+                'mark-scenes' in str(sys.argv)]):
+            log.info(f'User entered migration/maintenance mode. The web GUI is disabled.')
             print("\n")
     except:
         pass

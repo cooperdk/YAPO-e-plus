@@ -55,10 +55,18 @@ def rename (scene_id: int, force: bool = False):
             actlist.append(act2.name)
         #actlist = scene.actors.values_list
         #actors = ', '.join(str(y) for x in actlist for y in x if len(x) > 0)
-        actors = ','.join(actlist)
-    actor = scene.actors.all().first().name
+        actors = ', '.join(actlist)
+    if actlist == None:
+        actlist = "Unknown"
+    if scene.actors.all().first():
+        actor = scene.actors.all().first().name
+    else:
+        actor = "Unknown"
     res = aux.restest(scene.height)
-    site = scene.websites.all().first().name
+    if scene.websites.all().first():
+        site = scene.websites.all().first().name
+    else:
+        site = "Unknown"
     if scene.clean_title:
         title = scene.clean_title
     else:
@@ -106,11 +114,11 @@ def rename (scene_id: int, force: bool = False):
 
         else:
             log.info(f"REN: Scene ID {scene.id} - date mismatch ({date})")
-            questiondate()
+            usedate = False
     else:
         log.info(f"REN: Scene ID {scene.id} - date not found ({date}).")
         usedate = False
-        questiondate()
+
 
     renameformat = scene.websites.all().first().filename_format # find out if the website has it's own rename format
     if len(renameformat) <5:  #This will tell to get the default rename format
@@ -126,7 +134,7 @@ def rename (scene_id: int, force: bool = False):
         if any(['{dd}' in renameformat, '{mm}' in renameformat, '{mmmm}' in renameformat,
                 '{yy}' in renameformat, '{yyyy}' in renameformat]):
             log.warn(f'REN: Scene {scene_id} - ERROR! Date unusable but required by the renaming format. Inserting placeholders.')
-
+            questiondate()
 
     newname = eval(f"f'''{renameformat}'''")    # This replaces the strings specified by the user with their value.
                                                 # Triple quotes are required to allow quotes in the string.

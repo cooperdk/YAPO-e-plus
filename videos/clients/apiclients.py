@@ -51,14 +51,42 @@ def tpdb(scene_id: int, force: bool):
 
     this_scene = Scene.objects.get(pk=scene_id)
     scene_name = this_scene.name
-    # scene_name = scene_name.replace(" ", "%20")
-
     searched = False
+
     for scene_tag in this_scene.scene_tags.all():
-        if any([scene_tag.name == "TpDB: Match: Good", scene_tag.name == "TpDB: Match: Questionable"]):
-            searched = True
+        if scene_tag.name == "TpDB: Match: None":
+            this_scene.tpdb_scanned = True
+            this_scene.tpdb_scanned_match = False
+            this_scene.tpdb_scanned_unsure = False
+            try:
+                this_scene.scene_tags.remove(SceneTag.objects.get(name="TpDB: Match: None"))
+            except:
+                pass
+
+        if scene_tag.name == "TpDB: Match: Questionable":
+            this_scene.tpdb_scanned = True
+            this_scene.tpdb_scanned_match = True
+            this_scene.tpdb_scanned_unsure = True
+            try:
+                this_scene.scene_tags.remove(SceneTag.objects.get(name="TpDB: Match: Questionable"))
+            except:
+                pass
+
+        if scene_tag.name == "TpDB: Match: Good":
+            this_scene.tpdb_scanned = True
+            this_scene.tpdb_scanned_match = True
+            this_scene.tpdb_scanned_unsure = False
+            try:
+                this_scene.scene_tags.remove(SceneTag.objects.get(name="TpDB: Match: Good"))
+            except:
+                pass
+
+
+    if this_scene.tpdb_scanned_match:
+        searched = True
+
     if searched and not force:
-        log.sinfo(f"Scene #{this_scene.id} is already searched!")
+        log.sinfo(f"Scene #{this_scene.id} was already checked by the TpDB scanner. To re-scan, use force.")
         return # Scene is searched already, exit
 
     log.sinfo(f'Scanning for "{scene_name}" on TpDB...')
@@ -467,11 +495,11 @@ def tpdb(scene_id: int, force: bool):
                 this_scene.clean_title = title
 
             if perflist: actors = perflist
-            else: actors = "None"
+            else: actors = "Unknown"
             if this_scene.actors.all().first(): actor = this_scene.actors.all().first().name
-            else: actor = "?"
+            else: actor = "Unknown"
             if this_scene.websites.all().first(): site = this_scene.websites.all().first().name
-            else: site = "?"
+            else: site = "Unknown"
             res = aux.restest(this_scene.height)
             if release_date:
                 dd = release_date.strftime("%d")
@@ -519,6 +547,7 @@ def tpdb(scene_id: int, force: bool):
                 newtitle = f"{site} - {newtitle}"
                 # print(newtitle)
             '''
+
             # print(Config().tpdb_autorename.lower())
             if "true" in Config().tpdb_autorename.lower():
                 if not this_scene.orig_name:
@@ -547,32 +576,27 @@ def tpdb(scene_id: int, force: bool):
                             else:
                                 break
                         print("\n")
-                        if Config().debug:
+                        if Config().debug=="true":
                             log.sinfo(f"Added {tagcounter} tags from TpDB to this scene.")
             except:
                 pass
 
-            try:
-                tg = SceneTag.objects.get(name="TpDB: Match: Good")
-                tq = SceneTag.objects.get(name="TpDB: Match: Questionable")
-                tn = SceneTag.objects.get(name="TpDB: Match: None")
-                this_scene.scene_tags.remove(tg)
-                this_scene.scene_tags.remove(tq)
-                this_scene.scene_tags.remove(tn)
-                # tpdbtag.  this_scene.scene_tags.remove(tpdbtag.id)
-            except:
-                pass
+
             if found == 1:
-                insert_scene_tag(this_scene, "TpDB: Match: Good")
+                this_scene.tpdb_scanned = True
+                this_scene.tpdb_scanned_match = True
+                this_scene.tpdb_scanned_unsure = False
             elif found == 2:
-                insert_scene_tag(this_scene, "TpDB: Match: Questionable")
+                this_scene.tpdb_scanned = True
+                this_scene.tpdb_scanned_match = True
+                this_scene.tpdb_scanned_unsure = True
             elif not success:
-                insert_scene_tag(this_scene, "TpDB: Match: None")
+                this_scene.tpdb_scanned = True
+                this_scene.tpdb_scanned_match = False
+                this_scene.tpdb_scanned_unsure = False
 
-            insert_scene_tag(this_scene, "TpDB: Scanned")
             # print("Tagged the scene with a TpDB tag.")
-
-            if Config().debug:
+            if Config().debug=="true":
                 log.sinfo(f"Found and registered data for scene ID {scene_id}")
             #print(this_scene)
             this_scene.save(force_update=True)

@@ -14,8 +14,9 @@ class Logger(metaclass=Singleton):
       timeprint(f"[\033[31mWARN!\033[39m] {message}")
 
     def debug(self, message: str):
-      timeprint(f"[\033[34mDEBUG\033[39m] {message}")
-      logsave(f"[DEBUG] {message}")
+      if Config().debug == 'true':
+        timeprint(f"[\033[34mDEBUG\033[39m] {message}")
+        dbgsave(f"[DEBUG] {message}")
 
     def info(self, message: str):
       timeprint(f"[\033[33mINFO\033[39m ] {message}")
@@ -28,10 +29,16 @@ class Logger(metaclass=Singleton):
       timeprint(f"\033[31m[ERROR]\033[39m {message}")
       logsave(f"[ERROR] {message}")
 
+
 def timeprint(message: str):
     print(f"{datetime.now().strftime('%H:%M:%S')}-> {message}")
 
 def logsave(message: str):
-    logfile = open(os.path.join(Config().data_path,'yapo-eplus.log'), 'a+')
+    logfile = open(os.path.join(Config().data_path,'yapo-eplus_' + datetime.now().strftime("%Y-%m-%d") +'.log'), 'a+')
+    logfile.write(f"{datetime.now().strftime(Config().timeprint_format)}-> {message}\n")
+    logfile.close()
+
+def dbgsave(message: str):
+    logfile = open(os.path.join(Config().data_path,'yapo-eplus-debug_' + datetime.now().strftime("%Y-%m-%d") +'.log'), 'a+')
     logfile.write(f"{datetime.now().strftime(Config().timeprint_format)}-> {message}\n")
     logfile.close()

@@ -2,6 +2,24 @@
 
 (WIN) = Windows exclusive, (LIN) = Linux exclusive
 
+## 210305 (0.7.5.1)
+
+_Requires migration as the database structure has changed! Check the README under "installation and upgrade instructions", section 4._
+
+### Changes
+
+* The TpDB scanner now stores the original video URL of scenes. Requires a re-scan.
+
+* The TpDB scanner no longer uses tags to keep track of scanned scenes and scan validity. It will however convert the tags to fields in the database during a rescan, or using the tool below.
+
+### New
+
+* YAPO now has a few management commands (just like "migrate" and "makemigrations"). They were necessary in order to allow users to scan TpDB (The Porn Database).
+  - The first tool (get-clean-titles) will get clean scene titles from TpDB, which are needed for the scene filename renamer (may consume some time).
+  - The second tool (mark-scenes) will update scenes with TpDB registrations by setting a field in the database to True.
+  - The third tool (convert-tags) will convert the old YAPO TpDB tags (TpDB: Scanned: True, TpDB, Match: Good, etc) by setting fields in the database (this is time consuming).
+
+  You can start YAPO's Django management CLI by typing "python manage.py" (or yapo-eplus.exe for the compiled version) followed by any of the commands above, or "help <command>" for more information about the individual commands.
 ## 210203 (0.7.5)
 
 _Requires migration as the database structure has changed! Check the README under "installation and upgrade instructions", section 4._

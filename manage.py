@@ -47,7 +47,8 @@ if __name__ == "__main__":
                 "dumpdata" in str(sys.argv), "shell" in str(sys.argv), "help" in str(sys.argv),
                 "dumpscript" in str(sys.argv), "sql" in str(sys.argv),
                 "showmigrations" in str(sys.argv), "runserver" in str(sys.argv),
-                "clean_pyc" in str(sys.argv), "check" in str(sys.argv)]):
+                "clean_pyc" in str(sys.argv), "check" in str(sys.argv), "get-clean-titles" in str(sys.argv),
+                "convert-tags" in str(sys.argv), "mark-scenes" in str(sys.argv)]):
 
         print(f"Config: {Config().yapo_url}")
         quit()
