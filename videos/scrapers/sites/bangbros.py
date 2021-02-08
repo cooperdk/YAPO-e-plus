@@ -14,7 +14,6 @@ def getinfo(scene_id: int, search: str = ""): #returns ID, site, title and rlsda
     if search == "":
         return false
     title = ""
-    id = ""
     site = ""
     dt = ""
 
@@ -30,7 +29,7 @@ def getinfo(scene_id: int, search: str = ""): #returns ID, site, title and rlsda
         print(f'Expecting scene release ID name to be "{search2}", so searching bangbros.com for that...')
         x = scrape(search2)
         if not x:
-            log.swarn(f'BANGBROS: No match for scene ID {scene_id}> BBID: {id}')
+            log.swarn(f'BANGBROS: No match for scene ID {scene_id}> BBID: {search2}')
             return False
 
         id = x[0]
@@ -47,7 +46,6 @@ def getinfo(scene_id: int, search: str = ""): #returns ID, site, title and rlsda
     
     
 def scrape(scene: str = ""):
-    bbid = None
     title = None
     rlsdate = None
     site = None
@@ -92,7 +90,7 @@ def scrape(scene: str = ""):
     except:
         pass
 
-    return bbid, site, title, rlsdate
+    return scene, site, title, rlsdate
 
 
 def match(match1: str = ""):

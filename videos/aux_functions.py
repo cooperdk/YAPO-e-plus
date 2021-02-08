@@ -248,6 +248,7 @@ def tpdb_formatter (name):
     name = name.replace("]", " ")
     name = name.replace("!", " ")
     name = name.replace("?", " ")
+    name = name.replace("_", " ")
     name = remove_text_inside_brackets(name)
     name = re.sub(' +', ' ', name)
 

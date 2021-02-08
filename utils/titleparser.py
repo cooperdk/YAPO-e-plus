@@ -1,6 +1,8 @@
 import re
 from datetime import datetime
 from dateutil.parser import parse
+from utils.printing import Logger
+log = Logger()
 
 def search(title):
 
@@ -19,16 +21,16 @@ def search(title):
     fullsitename = ""
     searchTitle = ""
     searchDate = ""
-    print("----> Siteparser: " + title)
+    #log.info(f"Parsing: {title}")
     searchSettings = getSearchSettings(title)
     searchSiteID = searchSettings[0]
     fullsitename = searchSettings[1]
     searchTitle = searchSettings[2]
     searchDate = searchSettings[3]
-    print("  --> Title: " + searchTitle)
-    print("  --> Site:  " + fullsitename)
+    # Debug
+    #print(f"Parsed. Site: {fullsitename}\n             {searchTitle}\n",end="")
     if searchDate:
-        print("  --> Date:  " + searchDate)
+        print(f"Release date parsed: {searchDate}")
 
     return searchSiteID, fullsitename, searchTitle, searchDate
 
@@ -52,7 +54,7 @@ def getSearchSiteName(siteID):
 
 def siteValues():
 
-    searchSites = [None] * 899 # one higher than the array below
+    searchSites = [None] * 900 # one higher than the array below
 
     searchSites[0] = ("BlackedRaw", "BlackedRaw", "https://www.blackedraw.com", "https://www.blackedraw.com/api")
     searchSites[1] = ("Blacked", "Blacked", "https://www.blacked.com", "https://www.blacked.com/api")
@@ -948,6 +950,7 @@ def siteValues():
     searchSites[896] = ("FTV Milfs", "FTV Milfs", "https://www.ftvmilfs.com/", "https://www.ftvmilfs.com/updates.html")
     searchSites[897] = ("Jesh By Jesh", "Jesh By Jesh", "https://www.jeshbyjesh.com/", "https://www.jeshbyjesh.com/tour/categories/movies.html")
     searchSites[898] = ("18Eighteen", "18Eighteen", "https://www.18eighteen.com/", "https://www.18eighteen.com/")
+    searchSites[899] = ("Facial Cum Targets", "Facial Cum Targets", "https://www.facialcumtargets.com/", "www.facialcumtargets.com/")
     return searchSites
 
 def getSearchSiteIDByFilter(searchFilter):
@@ -968,8 +971,8 @@ def getSearchSiteIDByFilter(searchFilter):
 
     if searchResults:
         from operator import itemgetter
-
-        print('  --> Site found with method #3 - ',end='')
+        # Debug
+        print('Site found with method #3: ',end='')
         return max(searchResults, key=itemgetter(1))[0]
 
     # Method #2
@@ -980,7 +983,8 @@ def getSearchSiteIDByFilter(searchFilter):
             siteNameF = sites[0].lower().replace(" ", "").replace("'", "")
 
             if searchFilterF == siteNameF:
-                print('  --> Site found with method #2 - ',end='')
+                # Debug
+                print('Site found with method #2: ',end='')
                 return searchID
         except:
             pass
@@ -1001,11 +1005,12 @@ def getSearchSiteIDByFilter(searchFilter):
             siteNameF = sites[0].lower().replace(" ", "").replace("'", "")
 
             if siteNameF in searchFilterF[0] or siteNameF in searchFilterF[1]:
-                print('  --> Site found with method #1 - ',end='')
+                # Debug
+                print('Site found with method #1: ',end='')
                 return searchID
         except:
             pass
-
+    # Debug
     print(f'Search Filter: {searchFilterF}')
     return # was None
 
@@ -1098,6 +1103,7 @@ def getSearchSettings(mediaTitle: str):
         ('^excogi ', 'ExploitedCollegeGirls '),
         ('^fams ', 'FamilyStrokes '),
         ('^faq ', 'FirstAnalQuest '),
+        ('fct ', 'FacialCumTargets'),
         ('^fds ', 'FakeDrivingSchool '),
         ('^ff ', 'Facial Fest'),
         ('^fft ', 'FemaleFakeTaxi '),
@@ -1263,7 +1269,8 @@ def getSearchSettings(mediaTitle: str):
             break
 
     if abbFixed:
-        print(f" ---> Possible abbreviation fixed: {mediaTitle}")
+        # Debug
+        print(f"\n(abbrev fixed) ")
 
     # Search Site ID
     searchSiteID = None
@@ -1279,7 +1286,8 @@ def getSearchSettings(mediaTitle: str):
     # Remove Site from Title
     searchSiteID = getSearchSiteIDByFilter(mediaTitle)
     if searchSiteID:
-        print(f"  --> siteID: {searchSiteID} - {searchSites[searchSiteID][0]}")
+        # Debug
+        print(f"site ID: {searchSiteID} ({searchSites[searchSiteID][0]})")
         if searchSites[searchSiteID][0]:
             fullsitename = searchSites[searchSiteID][0]
         # searchSites [0] matches madiaTitle

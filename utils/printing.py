@@ -31,14 +31,14 @@ class Logger(metaclass=Singleton):
 
 
 def timeprint(message: str):
-    print(f"{datetime.now().strftime('%H:%M:%S')}-> {message}")
+    print(f"{datetime.now().strftime('%H:%M:%S')} {message}")
 
 def logsave(message: str):
     logfile = open(os.path.join(Config().data_path,'yapo-eplus_' + datetime.now().strftime("%Y-%m-%d") +'.log'), 'a+')
-    logfile.write(f"{datetime.now().strftime(Config().timeprint_format)}-> {message}\n")
+    logfile.write(f"{datetime.now().strftime(Config().timeprint_format)} {message}\n")
     logfile.close()
 
 def dbgsave(message: str):
     logfile = open(os.path.join(Config().data_path,'yapo-eplus-debug_' + datetime.now().strftime("%Y-%m-%d") +'.log'), 'a+')
-    logfile.write(f"{datetime.now().strftime(Config().timeprint_format)}-> {message}\n")
+    logfile.write(f"{datetime.now().strftime(Config().timeprint_format)} {message}\n")
     logfile.close()

@@ -105,7 +105,7 @@ def tpdb(scene_id: int, force: bool):
         else:
             parsetext = parsedict[2]
 
-        log.sinfo(f"Parser will search for: {parsetext}")
+        log.sinfo(f"I'm going to search for: {parsetext}")
         # if this_scene.tpdb_id is not None and this_scene.tpdb_id != "" and len(this_scene.tpdb_id) > 12:
         #     parsetext = this_scene.tpdb_id
         url = 'https://api.metadataapi.net/scenes'
@@ -119,7 +119,7 @@ def tpdb(scene_id: int, force: bool):
             'Accept': 'application/json',
             'User-Agent': 'YAPO e+ 0.73',
         }
-        print("Scanning... ", end="")
+
         response = requests.request('GET', url, headers=headers, params=params)
 
         try:
@@ -147,7 +147,7 @@ def tpdb(scene_id: int, force: bool):
                         if alias.name in scene_name_formatted:
                             scene_name_formatted = scene_name_formatted.replace(alias.name, "")
             '''
-            log.sinfo(f'\nNot successful scanning with conventional search,\ntrying with an alternative parse text: "{scene_name_formatted}"...')
+            #log.sinfo(f'\nParse unsuccessful, trying an alternative method.')
             # scene_name = scene_name.replace(" ", "%20")
             url = 'https://api.metadataapi.net/scenes'
             params = {
@@ -498,6 +498,9 @@ def tpdb(scene_id: int, force: bool):
             if title:
                 this_scene.clean_title = title
 
+            if bbcheck:
+                this_scene.release_id = bbcheck[0]
+
             if perflist: actors = perflist
             else: actors = "Unknown"
             if this_scene.actors.all().first(): actor = this_scene.actors.all().first().name
@@ -602,11 +605,13 @@ def tpdb(scene_id: int, force: bool):
             # print("Tagged the scene with a TpDB tag.")
             if Config().debug=="true":
                 log.sinfo(f"Found and registered data for scene ID {scene_id}")
+            if found == 2:
+                log.info(f"Scene ID {scene_id} may have incorrect data, marked that in the database. Please check manually.")
             #print(this_scene)
             this_scene.save(force_update=True)
 
         else:
-            log.sinfo("Scene not found in TpDB")
+            log.sinfo(f"Scene {scene_id} was not found in TpDB.")
             this_scene.save(force_update=True)
 
         return success
