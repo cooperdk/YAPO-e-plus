@@ -2,7 +2,22 @@
 
 (WIN) = Windows exclusive, (LIN) = Linux exclusive
 
-## 210305 (0.7.5.1)
+## 210208 (0.7.6)
+
+### Changes
+
+* More sites recognized by the title parser
+
+### New
+
+* Bangbros sites will now be identified if they have the original Bangbros filenames.
+  
+  TpDB does not support the Bangbros release IDs so I had to create a script to parse it and send a request to the Bangbros site. If the scene title (filename) is a Bangbros release ID, the title the TpDB scanner uses will change causing TpDB to be able to find the scene information.
+   
+
+* Beginning code to enable backup creation/restoration from the web UI
+
+## 210205 (0.7.5.1)
 
 _Requires migration as the database structure has changed! Check the README under "installation and upgrade instructions", section 4._
 

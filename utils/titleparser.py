@@ -1039,6 +1039,7 @@ def getSearchSettings(mediaTitle: str):
         ('^am ', 'AssMasterpiece '),
         ('^analb ', 'AnalBeauty '),
         ('^ap ', 'AssParade '),
+        ('^av ', 'AvaSpice '),
         ('^baebz ', 'Baeb '),
         ('^bblib ', 'BigButtsLikeItBig '),
         ('^bcasting ', 'BangCasting '),

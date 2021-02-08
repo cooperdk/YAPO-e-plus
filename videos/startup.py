@@ -273,7 +273,7 @@ class ready:
     #startup_sequence()
     try:
         if not any(['migrat' in str(sys.argv), 'get-clean-titles' in str(sys.argv), 'convert-tags' in str(sys.argv),
-                 'mark-scenes' in str(sys.argv)]):
+                 'mark-scenes' in str(sys.argv), 'dumpdata' in str(sys.argv), 'loaddata' in str(sys.argv)]):
             print("Not in migration/maintenance mode. Executing startup-sequence...")
             time.sleep(2)
             startup_sequence()

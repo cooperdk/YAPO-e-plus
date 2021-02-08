@@ -8,7 +8,7 @@ import sys
 import urllib
 import urllib.request
 from datetime import datetime
-
+from videos.scrapers.sites.bangbros import getinfo as bb_getinfo
 # import json
 from django.db import transaction
 # import subprocess
@@ -52,6 +52,10 @@ def tpdb(scene_id: int, force: bool):
     this_scene = Scene.objects.get(pk=scene_id)
     scene_name = this_scene.name
     searched = False
+
+    bbcheck = bb_getinfo(scene_id, scene_name)
+    if bbcheck:
+        scene_name = f'{bbcheck[1]} - {bbcheck[3]} - {bbcheck [2]}'
 
     for scene_tag in this_scene.scene_tags.all():
         if scene_tag.name == "TpDB: Match: None":
