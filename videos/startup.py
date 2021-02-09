@@ -260,7 +260,7 @@ def startup_sequence():
     if "runserver" in sys.argv[1]:
         site = Config().yapo_url
         if ":" in site:
-            if not "http://" in site:
+            if "http://" not in site:
                 site="http://" + site + "/"
             print (f"Site to open: {site}\n")
             webbrowser.get().open_new_tab(site)
