@@ -21,7 +21,7 @@ from wsgiref.util import FileWrapper
 from django.http import StreamingHttpResponse
 import mimetypes
 from datetime import timedelta
-
+from datetime import datetime
 # For REST framework
 
 import platform
@@ -1282,6 +1282,7 @@ def settings(request):
                 return Response(status=200)
 
         if "folderToScan" in request.query_params:
+            start = datetime.datetime.now()
             if request.query_params["folderToScan"] != "":
                 local_folder = LocalSceneFolders.objects.get(
                     id=int(request.query_params["folderToScan"])
@@ -1291,7 +1292,8 @@ def settings(request):
                 all_folders = LocalSceneFolders.objects.all()
                 for folder in all_folders:
                     videos.addScenes.get_files(folder.name, False)
-            print("\nDone.")
+            log.timer("Folder scan", start, datetime.datetime.now())
+            #print("\nDone.")
             return Response(status=200)
 
 
