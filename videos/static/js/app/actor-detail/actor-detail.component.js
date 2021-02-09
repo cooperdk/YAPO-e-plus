@@ -204,7 +204,6 @@ angular.module('actorDetail').component('actorDetail', {
 
             self.updateActor = function (object) {
 
-                //
                 // var id = object.id + '/';
                 // alert(id);
 
