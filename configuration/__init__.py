@@ -70,10 +70,7 @@ class Config(metaclass=Singleton):
     self.configfile_path = os.path.join(self.config_path, Constants().default_yaml_settings_filename)
     self.current_setting_version = 3
     self.debug = Constants().debug
-    if os.name == 'nt':
-        self.vlc_path = Constants().vlc_path
-    else:
-        self.vlc_path = None
+    self.vlc_path = Constants().vlc_path if os.name == 'nt' else None
     self.last_all_scene_tag = None
 
     self.__update_config_from_file__()

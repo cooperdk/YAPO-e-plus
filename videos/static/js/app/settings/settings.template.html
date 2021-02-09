@@ -18,7 +18,7 @@
           <div class="row">
               <div class="col-lg-5">
     <label>URL that YAPO should open on startup (blank if you don't wish your browser to open automatically)</label>
-
+<input class="form-control" id="inputdefault" type="text" ng-model="$ctrl.yapoURL">
     <button style="color: #33ccff;" type="button" ng-click="$ctrl.updateYAPOurl()" class="btn btn-default btn-sm"
             uib-popover-html="'If this is a conventional URL (ip.ip.ip.ip:port or host:port), YAPO will open this URL in your default browser on startup. You can edit the value (yapo_url) manually in the settings.yml file which is in the config directory (/config)'"
             popover-trigger="mouseenter" popover-placement="right-top"
@@ -34,8 +34,6 @@
     <button style="color: #33ccff;" type="button" ng-click="$ctrl.updateVlcPath()" class="btn btn-default btn-sm"
             uib-popover-html="'Sets YAPO\'s VLC path to the path in the text input. Only for Windows, as we run vlc without specifying path on Linux. Replace any backslash in the path with a forward slash, otherwise it will break YAPO. You can edit the value (yapo_url) manually in the settings.yml file which is in the config directory (/config)'"
             popover-trigger="mouseenter" popover-placement="right-top"
-    <input class="form-control" id="inputdefault" type="text"
-    ng-model="$ctrl.yapoURL">
         <span style="width:10%" class="glyphicon glyphicon-cog"></span> Set VLC Path
     </button>
           </div>

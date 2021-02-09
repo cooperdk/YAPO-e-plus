@@ -1,11 +1,11 @@
 import json
-import os, sys
+import os
 import os.path
 from videos import ffmpeg_process
 import django
 from videos import filename_parser
-from configuration import Config, Constants
-import videos.videosheet as videosheet
+from configuration import Config
+import utils.videosheet as videosheet
 from PIL import Image
 import videos.clients.apiclients as apiclients
 
@@ -41,9 +41,7 @@ def get_files(walk_dir, make_video_sample):
                 filename_extension = os.path.splitext(file_path)[1]
                 for filename_extension_to_test in ACCEPTED_VIDEO_EXTENSIONS:
                     if filename_extension_to_test.lower() == filename_extension.lower():
-                        print(
-                            f"Filename is {file_path}\nExtension is {filename_extension}\n"
-                        )
+                        print(f"File: {file_path}\n")
 
                         create_scene(file_path, make_video_sample)
                         print(
@@ -56,12 +54,14 @@ def get_files(walk_dir, make_video_sample):
 
 
 def create_sample_video(scene):
-    print(f"Trying to create a sample video for scene: {scene.name}")
+    # debug
+    #print(f"Trying to create a sample video for scene {scene.id}")
     success = ffmpeg_process.ffmpeg_create_sammple_video(scene)
     if success:
-        print(f"Sample video for scene: {scene.name} created successfully.")
+        #print(f"Sample video for scene: {scene.name} created successfully.")
+        x=x
     else:
-        print(f"Something went wrong while trying to create video sample for scene: {scene.name}")
+        log.info(f"Something went wrong while trying to create video sample for scene: {scene.name}")
 
 
 def create_scene(scene_path, make_sample_video):
@@ -422,7 +422,7 @@ def recursive_function(parent, folder):
 
 def write_actors_to_file():
     actors = Actor.objects.all()
-    actors_string = ",".join([actor.name for actor in actors])
+    actors_string = ",".join(actor.name for actor in actors)
 
     file = open("actors.txt", "w")
 
