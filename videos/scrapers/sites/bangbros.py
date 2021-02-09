@@ -18,38 +18,37 @@ def getinfo(scene_id: int, search: str = ""): #returns ID, site, title and rlsda
     dt = ""
 
     search2 = match(search)
-    
+
     if not re.search('^[a-zA-Z]+[0-9]+$', search2):
         #print(f'EXIT: ({search2}): Scene does not follow the Bangbros naming convention.')
         return False
+    bangbros = get_sites(search2)
+
+    print(f"The scene is likely from the Bangbros site {bangbros}.")
+    print(f'Expecting scene release ID name to be "{search2}", so searching bangbros.com for that...')
+    x = scrape(search2)
+    if not x:
+        log.swarn(f'BANGBROS: No match for scene ID {scene_id}> BBID: {search2}')
+        return False
+
+    id = x[0]
+    site = x[1]
+    title = x[2]
+    dt = x[3]
+
+    if title is not None:
+        #print(f'Found the scene:\nID   : {scene_id}\nRLSID: {id}\nSite : {site}\nTitle: {title}\nDate : {dt}')
+        log.sinfo(f'BANGBROS: Match scene ID {scene_id}: (BBID: {id}) > {title} ({dt})')
+        return id, site, title, dt
     else:
-        bangbros = get_sites(search2)
-        
-        print(f"The scene is likely from the Bangbros site {bangbros}.")
-        print(f'Expecting scene release ID name to be "{search2}", so searching bangbros.com for that...')
-        x = scrape(search2)
-        if not x:
-            log.swarn(f'BANGBROS: No match for scene ID {scene_id}> BBID: {search2}')
-            return False
-
-        id = x[0]
-        site = x[1]
-        title = x[2]
-        dt = x[3]
-
-        if title is not None:
-            #print(f'Found the scene:\nID   : {scene_id}\nRLSID: {id}\nSite : {site}\nTitle: {title}\nDate : {dt}')
-            log.sinfo(f'BANGBROS: Match scene ID {scene_id}: (BBID: {id}) > {title} ({dt})')
-            return id, site, title, dt
-        else:
-            return False
+        return False
     
     
 def scrape(scene: str = ""):
     title = None
     rlsdate = None
     site = None
-    
+
     url =  f"https://bangbros.com/search/{scene}"
     #print(url)
     response = requests.get(url, verify=False, timeout=10)
@@ -64,13 +63,12 @@ def scrape(scene: str = ""):
 
     scrape = dom.xpath('//a[contains(@class, "thmb_lnk")]/@id')
     try:
-        if scrape[0]:
-            if scene in scrape[0]:
-                bbid = scene
+        if scrape[0] and scene in scrape[0]:
+            bbid = scene
 
     except:
         pass
-        
+
     scrape = dom.xpath('//span[contains(@class, "faTxt")]/text()')
     try:
         if scrape[0]:
@@ -82,7 +80,7 @@ def scrape(scene: str = ""):
         pass
     if rlsdate:
         rlsdate = datetime.strptime(rlsdate, "%b %d, %Y").strftime("%Y-%m-%d")
-    
+
     scrape = dom.xpath('//span[contains(@class, "thmb_ttl")]/text()')
     try:
         if scrape[0]:
@@ -120,9 +118,8 @@ def get_sites(search: str):
             ("My Life In Brazil","mb"),("Working Latinas","lw"),("Casting","ca"),("BangBros Angels","bng"), \
             ("Penny Show","ps"),("Bangbros Vault","bv"),("Bang Tryouts","bto"),("Slutty White Girls","swg"), \
             ("AvaSpice","av")]
-            
+
     for site in sites:
         if site[1] in search:
             return site[0]
-            break
     return False

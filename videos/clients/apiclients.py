@@ -1,4 +1,4 @@
-import django
+#import django
 import http.client
 import os
 import os.path
@@ -10,7 +10,7 @@ import urllib.request
 from datetime import datetime
 from videos.scrapers.sites.bangbros import getinfo as bb_getinfo
 # import json
-from django.db import transaction
+#from django.db import transaction
 # import subprocess
 # import _thread
 import requests
@@ -120,7 +120,7 @@ def tpdb(scene_id: int, force: bool):
             'User-Agent': 'YAPO e+ 0.73',
         }
 
-        response = requests.request('GET', url, headers=headers, params=params)
+        response = requests.request('GET', url, headers=headers, params=params, timeout=5)
 
         try:
             response = response.json()
@@ -161,7 +161,7 @@ def tpdb(scene_id: int, force: bool):
                 'Accept': 'application/json',
                 'User-Agent': 'YAPO e+ 0.73',
             }
-            response = requests.request('GET', url, headers=headers, params=params)
+            response = requests.request('GET', url, headers=headers, params=params, timeout=5)
             try:
                 response = response.json()
             except requests.exceptions.RequestException as e:
@@ -675,39 +675,39 @@ def namecheck(actor: str):
         new_actor = "Abbey Rain"
     if new_actor == "Ms Addie Juniper":
         new_actor = "Addie Juniper"
-    if new_actor == "Adrianna Chechik" or new_actor == "Adriana Chechick":
+    if new_actor in ["Adrianna Chechik", "Adriana Chechick"]:
         new_actor = "Adriana Chechik"
     if new_actor == "Alex D":
         new_actor = "Alex D."
-    if new_actor == "Alura Tnt Jenson" or new_actor == "Alura 'Tnt' Jenson":
+    if new_actor in ["Alura Tnt Jenson", "Alura 'Tnt' Jenson"]:
         new_actor = "Alura Jenson"
     if new_actor == "Amia Moretti":
         new_actor = "Amia Miley"
     if new_actor == "Amy Reid":
         new_actor = "Amy Ried"
-    if new_actor == "Ana Fox" or new_actor == "Ana Foxx":
+    if new_actor in ["Ana Fox", "Ana Foxx"]:
         new_actor = "Ana Foxxx"
-    if new_actor == "Andreina De Lux" or new_actor == "Andreina De Luxe" or new_actor == "Andreina Dlux":
+    if new_actor in ["Andreina De Lux", "Andreina De Luxe", "Andreina Dlux"]:
         new_actor = "Andreina Deluxe"
-    if new_actor == "Angela Piaf" or new_actor == "Angel Piaf":
+    if new_actor in ["Angela Piaf", "Angel Piaf"]:
         new_actor = "Angel Piaff"
-    if new_actor == "Ani Black Fox" or new_actor == "Ani Black":
+    if new_actor in ["Ani Black Fox", "Ani Black"]:
         new_actor = "Ani Blackfox"
     if new_actor == "Anikka Albrite":
         new_actor = "Annika Albrite"
     if new_actor == "Anita Bellini":
         new_actor = "Anita Bellini Berlusconi"
-    if new_actor == "Anjelica" or new_actor == "Ebbi" or new_actor == "Abby H" or new_actor == "Katherine A":
+    if new_actor in ["Anjelica", "Ebbi", "Abby H", "Katherine A"]:
         new_actor = "Krystal Boyd"
     if new_actor == "Anna Morna":
         new_actor = "Anastasia Morna"
-    if new_actor == "April ONeil" or new_actor == "April Oneil" or new_actor == "April O'neil":
+    if new_actor in ["April ONeil", "April Oneil", "April O'neil"]:
         new_actor = "April O'Neil"
     if new_actor == "Ashley Graham":
         new_actor = "Ashlee Graham"
     if new_actor == "Bella Danger":
         new_actor = "Abella Danger"
-    if new_actor == "Bibi Jones" or new_actor == "Bibi Jones™":
+    if new_actor in ["Bibi Jones", "Bibi Jones™"]:
         new_actor = "Britney Beth"
     if new_actor == "Bridgette B.":
         new_actor = "Bridgette B"
@@ -727,7 +727,7 @@ def namecheck(actor: str):
         new_actor = "Paula Shy"
     if new_actor == "CléA Gaultier":
         new_actor = "Clea Gaultier"
-    if new_actor == "Crissy Kay" or new_actor == "Emma Hicks" or new_actor == "Emma Hixx":
+    if new_actor in ["Crissy Kay", "Emma Hicks", "Emma Hixx"]:
         new_actor = "Emma Hix"
     if new_actor == "Crystal Rae":
         new_actor = "Cyrstal Rae"
@@ -739,7 +739,7 @@ def namecheck(actor: str):
         new_actor = "Elsa Jean"
     if new_actor == "Eve Lawrence":
         new_actor = "Eve Laurence"
-    if new_actor == "Francesca Di Caprio" or new_actor == "Francesca Dicaprio":
+    if new_actor in ["Francesca Di Caprio", "Francesca Dicaprio"]:
         new_actor = "Francesca DiCaprio"
     if new_actor == "Guiliana Alexis":
         new_actor = "Gulliana Alexis"
@@ -753,17 +753,17 @@ def namecheck(actor: str):
         new_actor = "Pristine Edge"
     if new_actor == "Jade Indica":
         new_actor = "Miss Jade Indica"
-    if new_actor == "Jassie Gold" or new_actor == "Jaggie Gold":
+    if new_actor in ["Jassie Gold", "Jaggie Gold"]:
         new_actor = "Jessi Gold"
-    if new_actor == "Jenna J Ross" or new_actor == "Jenna J. Ross":
+    if new_actor in ["Jenna J Ross", "Jenna J. Ross"]:
         new_actor = "Jenna Ross"
     if new_actor == "Jenny Ferri":
         new_actor = "Jenny Fer"
-    if new_actor == "Jessica Blue" or new_actor == "Jessica Cute":
+    if new_actor in ["Jessica Blue", "Jessica Cute"]:
         new_actor = "Jessica Foxx"
     if new_actor == "Jo Jo Kiss":
         new_actor = "Jojo Kiss"
-    if new_actor == "Josephine" or new_actor == "Conny" or new_actor == "Conny Carter" or new_actor == "Connie":
+    if new_actor in ["Josephine", "Conny", "Conny Carter", "Connie"]:
         new_actor = "Connie Carter"
     if new_actor == "Kagney Lynn Karter":
         new_actor = "Kagney Linn Karter"
@@ -773,52 +773,65 @@ def namecheck(actor: str):
         new_actor = "Katerina Hartlova"
     if new_actor == "Kendra May Lust":
         new_actor = "Kendra Lust"
-    if new_actor == "Khloe Capri" or new_actor == "Chloe Capri":
+    if new_actor in ["Khloe Capri", "Chloe Capri"]:
         new_actor = "Khloe Kapri"
     if new_actor == "Lara Craft":
         new_actor = "Lora Craft"
-    if new_actor == "Lilly LaBeau" or new_actor == "Lilly Labuea" or new_actor == "Lily La Beau" or \
-            new_actor == "Lily Lebeau" or new_actor == "Lily Luvs":
+    if new_actor in [
+        "Lilly LaBeau",
+        "Lilly Labuea",
+        "Lily La Beau",
+        "Lily Lebeau",
+        "Lily Luvs",
+    ]:
         new_actor = "Lily Labeau"
     if new_actor == "Lilly Lit":
         new_actor = "Lilly Ford"
-    if new_actor == "Maddy OReilly" or new_actor == "Maddy Oreilly" or new_actor == "Maddy O'reilly":
+    if new_actor in ["Maddy OReilly", "Maddy Oreilly", "Maddy O'reilly"]:
         new_actor = "Maddy O'Reilly"
-    if new_actor == "Maria Rya" or new_actor == "Melena Maria":
+    if new_actor in ["Maria Rya", "Melena Maria"]:
         new_actor = "Melena Maria Rya"
     if new_actor == "Moe The Monster Johnson":
         new_actor = "Moe Johnson"
-    if new_actor == "Nadya Nabakova" or new_actor == "Nadya Nabokova":
+    if new_actor in ["Nadya Nabakova", "Nadya Nabokova"]:
         new_actor = "Bunny Colby"
-    if new_actor == "Nancy A." or new_actor == "Nancy A":
+    if new_actor in ["Nancy A.", "Nancy A"]:
         new_actor = "Nancy Ace"
-    if new_actor == "Nathaly" or new_actor == "Nathalie Cherie" or new_actor == "Natalie Cherie" \
-            or new_actor == "Nathaly Cherie":
+    if new_actor in [
+        "Nathaly",
+        "Nathalie Cherie",
+        "Natalie Cherie",
+        "Nathaly Cherie",
+    ]:
         new_actor = "Nathaly Heaven"
     if new_actor == "Nika Noir":
         new_actor = "Nika Noire"
-    if new_actor == "Noe Milk" or new_actor == "Noemiek":
+    if new_actor in ["Noe Milk", "Noemiek"]:
         new_actor = "Noemilk"
     if new_actor == "Rebel Lynn (Contract Star)":
         new_actor = "Rebel Lynn"
     if new_actor == "Remy La Croix":
         new_actor = "Remy Lacroix"
-    if new_actor == "Riley Jenson" or new_actor == "Riley Anne" or new_actor == "Rilee Jensen":
+    if new_actor in ["Riley Jenson", "Riley Anne", "Rilee Jensen"]:
         new_actor = "Riley Jensen"
     if new_actor == "Sara Luv":
         new_actor = "Sara Luvv"
-    if new_actor == "Dylann Vox" or new_actor == "Dylan Vox":
+    if new_actor in ["Dylann Vox", "Dylan Vox"]:
         new_actor = "Skylar Vox"
-    if new_actor == "Sedona" or new_actor == "Stefanie Renee":
+    if new_actor in ["Sedona", "Stefanie Renee"]:
         new_actor = "Stephanie Renee"
-    if new_actor == "Stella Bankxxx" or new_actor == "Stella Ferrari":
+    if new_actor in ["Stella Bankxxx", "Stella Ferrari"]:
         new_actor = "Stella Banxxx"
     if new_actor == "Steven St.Croix":
         new_actor = "Steven St. Croix"
-    if new_actor == "Sybil Kailena" or new_actor == "Sybil":
+    if new_actor in ["Sybil Kailena", "Sybil"]:
         new_actor = "Sybil A"
-    if new_actor == "Tiny Teen" or new_actor == "Tieny Mieny" or new_actor == "Lady Jay" \
-            or new_actor == "Tiny Teen / Eva Elfie":
+    if new_actor in [
+        "Tiny Teen",
+        "Tieny Mieny",
+        "Lady Jay",
+        "Tiny Teen / Eva Elfie",
+    ]:
         new_actor = "Eva Elfie"
     if new_actor == "Veronica Vega":
         new_actor = "Veronica Valentine"

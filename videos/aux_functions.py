@@ -51,13 +51,8 @@ def getCPU():
     import psutil
     cpuinfo = psutil.cpu_freq()
     # On some systems, 'max' will be 0.0. In this case, use the current speed.
-    if cpuinfo.max == 0.0:
-        cpufreqMhz = cpuinfo.current
-    else:
-        cpufreqMhz = cpuinfo.max
-
-    cpufreqGhz = round(cpufreqMhz / 1000, 1)
-    return cpufreqGhz
+    cpufreqMhz = cpuinfo.current if cpuinfo.max == 0.0 else cpuinfo.max
+    return round(cpufreqMhz / 1000, 1)
 
 
 def getCPUCount():
@@ -300,11 +295,10 @@ def checkTpDB():
     return result
 
 
-def save_website_logo (image_link, website, force, *args):
+def save_website_logo(image_link, website, force, *args):
     website = website.strip()
 
     try:
-        hasarg = 0
         ws = None
         print("Website scan, method 1...")
         ws = Website.objects.filter(name=website)
@@ -322,6 +316,7 @@ def save_website_logo (image_link, website, force, *args):
                 website = ws.name
         if not ws and Config().tpdb_websites:
             print(f"Adding website: {website}")
+            hasarg = 0
             for arg in args:
                 hasarg += 1
                 sceneid = arg
@@ -515,7 +510,7 @@ def populate_actors():
             success = False
 
 
-def download_image (image_url, path):
+def download_image(image_url, path):
 
     try:
         req = Request(image_url, headers={
@@ -529,9 +524,8 @@ def download_image (image_url, path):
             response.close()
 
             try:
-                output_file = open(path, 'wb')
-                output_file.write(data)
-                output_file.close()
+                with open(path, 'wb') as output_file:
+                    output_file.write(data)
             except OSError as e:
                 download_status = 'fail'
                 download_message = f"OSError on an image... Error: {e}"
@@ -562,17 +556,23 @@ def download_image (image_url, path):
             return_image_name = ''
             absolute_path = ''
 
-    except HTTPError as e:  # If there is any HTTPError
-        download_status = 'fail'
-        log.info(f"HTTPError on an image...trying next one... Error: {e}")
-        return_image_name = ''
-        absolute_path = ''
+        except HTTPError as e:  # If there is any HTTPError
+            download_status = 'fail'
+            log.info(f"HTTPError on an image...trying next one... Error: {e}")
+            return_image_name = ''
+            absolute_path = ''
 
-    except URLError as e:
-        download_status = 'fail'
-        log.info(f"URLError on an image...trying next one... Error: {e}")
-        return_image_name = ''
-        absolute_path = ''
+        except ssl.CertificateError as e:
+            download_status = 'fail'
+            log.info(f"CertificateError on an image...trying next one... Error: {e}")
+            return_image_name = ''
+            absolute_path = ''
+
+        except IOError as e:  # If there is any IOError
+            download_status = 'fail'
+            log.info(f"IOError on an image...trying next one... Error: {e}")
+            return_image_name = ''
+            absolute_path = ''
 
     except ssl.CertificateError as e:
         download_status = 'fail'
@@ -619,7 +619,7 @@ def save_actor_profile_image_from_web (image_link, actor, force):
 
 
 
-def actor_folder_from_name_to_id ():
+def actor_folder_from_name_to_id():
     actors = Actor.objects.all()
 
     for actor in actors:
@@ -640,9 +640,7 @@ def actor_folder_from_name_to_id ():
            f"Actor {actor.name} thumb path is: {actor.thumbnail} \n and it should be {as_uri}"
         )
         print(actor.thumbnail != as_uri)
-        if (actor.thumbnail != Config().unknown_person_image_path) and (
-                actor.thumbnail != as_uri
-        ):
+        if actor.thumbnail not in [Config().unknown_person_image_path, as_uri]:
             try:
                 os.rename(
                     os.path.join(Config().site_media_path, "actor", actor.name),
