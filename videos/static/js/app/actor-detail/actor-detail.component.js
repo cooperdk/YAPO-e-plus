@@ -46,13 +46,13 @@ angular.module('actorDetail').component('actorDetail', {
                     patchData.push(itemToAdd.id);
                     self.actor = $rootScope.addItemToScene(self.actor, itemToAdd, typeOfItemToAdd);
                     // function (sceneToPatchId, patchType, patchData, addOrRemove, multiple, permDelete)
-                    $rootScope.patchEntity('actor', self.actor.id, typeOfItemToAdd, patchData, 'add', false, false, null)
+                    $rootScope.patchEntity('actor', self.actor.id, typeOfItemToAdd, patchData, 'add', false, false, null);
                 } else {
                     var newItem = $rootScope.createNewItem(typeOfItemToAdd, itemToAdd.value);
                     newItem.$save().then(function (res) {
                         self.scene = $rootScope.addItemToScene(self.actor, res, typeOfItemToAdd);
                         patchData.push(res.id);
-                        $rootScope.patchEntity('actor', self.actor.id, typeOfItemToAdd, patchData, 'add', false, false, null)
+                        $rootScope.patchEntity('actor', self.actor.id, typeOfItemToAdd, patchData, 'add', false, false, null);
                     });
 
                 }
@@ -63,7 +63,7 @@ angular.module('actorDetail').component('actorDetail', {
                 var patchData = [];
                 patchData.push(itemToRemove.id);
                 self.actor = $rootScope.removeItemFromScene(self.actor, itemToRemove, typeOfItemToRemove);
-                $rootScope.patchEntity('actor', self.actor.id, typeOfItemToRemove, patchData, 'remove', false, false, null)
+                $rootScope.patchEntity('actor', self.actor.id, typeOfItemToRemove, patchData, 'remove', false, false, null);
             };
 
 
@@ -72,25 +72,25 @@ angular.module('actorDetail').component('actorDetail', {
 
             var checkHideDetailButton = function () {
                 if (self.hideDetail) {
-                    self.hideDetailButtomLable = 'Show Detail'
+                    self.hideDetailButtomLable = 'Show Detail';
                 } else {
-                    self.hideDetailButtomLable = 'Hide Detail'
+                    self.hideDetailButtomLable = 'Hide Detail';
                 }
             };
 
             self.hideDetailClick = function () {
                 if (self.hideDetail) {
                     self.hideDetail = false;
-                    self.hideDetailButtomLable = "Hide Detail"
+                    self.hideDetailButtomLable = "Hide Detail";
                 } else {
                     self.hideDetail = true;
-                    self.hideDetailButtomLable = "Show Detail"
+                    self.hideDetailButtomLable = "Show Detail";
                 }
             };
 
 
             var checkGridOption = function () {
-                if ((helperService.getGridView() != undefined) && (helperService.getGridView()['scene'] != undefined)) {
+                if ((helperService.getGridView() !== undefined) && (helperService.getGridView()['scene'] !== undefined)) {
                     self.hideDetail = helperService.getGridView()['scene'];
                     checkHideDetailButton();
                 }
@@ -290,14 +290,14 @@ angular.module('actorDetail').component('actorDetail', {
                         scopeWatchService.addActorTagToList(res);
 
                         // self.updateActor(self.actor);
-                    })
+                    });
 
                 }
             };
 
             self.st = function (v) {
                 // alert(self.states.toString());
-                return self.states
+                return self.states;
 
             };
 
@@ -425,7 +425,7 @@ angular.module('actorDetail').component('actorDetail', {
                     self.updateImage = true;
                 }, function errorCallback(response) {
                     self.addAlert(scrapeSite + " could not find: " + self.actor.name + " - Try a different scraper or try looking manually! ", 'warning', '5000');
-                    console.log(angular.toJson(response))
+                    console.log(angular.toJson(response));
                 });
 
 
@@ -439,7 +439,7 @@ angular.module('actorDetail').component('actorDetail', {
                 age = Math.floor( age );
                 console.log("Actor Age:" + age);
                 return age;
-                }
+                };
 
             self.howOld = function (datetime) { // Deprecated. The previous function works,
                                                 // this one will make an actor a year older already on New Years Day.
@@ -453,7 +453,7 @@ angular.module('actorDetail').component('actorDetail', {
 
                 console.log("Actor Age:" + nowYear - actorDobYear);
 
-                return (nowYear - actorDobYear)
+                return (nowYear - actorDobYear);
 
             };
 
@@ -466,7 +466,7 @@ angular.module('actorDetail').component('actorDetail', {
 
                 var ans = {'inches': inches, 'feet': feet};
 
-                return (ans)
+                return (ans);
 
             };
 
@@ -474,7 +474,7 @@ angular.module('actorDetail').component('actorDetail', {
 
                 var pounds = Math.round(val * 2.2);
 
-                return (pounds)
+                return (pounds);
 
             };
 

@@ -19,7 +19,7 @@ angular.module('actorList').component('actorList', {
             //     self.gridView = true;
             //     return 'static/js/app/actor-list/actor-list-grid.template.html'
         } else {
-            return 'static/js/app/actor-list/actor-list.template.html'
+            return 'static/js/app/actor-list/actor-list.template.html';
         }
 
 
@@ -46,15 +46,15 @@ angular.module('actorList').component('actorList', {
 
 
             var checkGridOption = function () {
-                if ((helperService.getGridView() != undefined) && (helperService.getGridView()['actor'] != undefined)) {
-                    self.gridView = helperService.getGridView()['actor']
+                if ((helperService.getGridView() !== undefined) && (helperService.getGridView()['actor'] !== undefined)) {
+                    self.gridView = helperService.getGridView()['actor'];
                 }
             };
 
             checkGridOption();
 
             $scope.$on("gridViewOptionChnaged", function (event, pageInfo) {
-                checkGridOption()
+                checkGridOption();
             });
 
 
@@ -102,7 +102,7 @@ angular.module('actorList').component('actorList', {
 
             $scope.$on("paginationChange", function (event, pageInfo) {
                 if (pageInfo.pageType == self.pageType) {
-                    self.nextPage(pageInfo.page)
+                    self.nextPage(pageInfo.page);
                 }
             });
 
@@ -114,7 +114,7 @@ angular.module('actorList').component('actorList', {
                 self.actors = [];
                 self.actorTag = loadedActorTag;
                 self.nextPage(0);
-                didActorTagLoad = true
+                didActorTagLoad = true;
 
             });
 
@@ -143,15 +143,15 @@ angular.module('actorList').component('actorList', {
             });
 
             if (!didSceneLoad) {
-                scopeWatchService.didSceneLoad('a')
+                scopeWatchService.didSceneLoad('a');
             }
 
             if (!didActorTagLoad) {
-                scopeWatchService.didActorTagLoad('a')
+                scopeWatchService.didActorTagLoad('a');
             }
 
             if (!didSectionListWrapperLoad) {
-                scopeWatchService.didSectionListWrapperLoaded('ActorList')
+                scopeWatchService.didSectionListWrapperLoaded('ActorList');
             }
 
 
@@ -232,20 +232,20 @@ angular.module('actorList').component('actorList', {
 
             self.patchActor = function (actorToPatch, patchInfo) {
 
-                Actor.patch({actorId: actorToPatch.id}, patchInfo)
+                Actor.patch({actorId: actorToPatch.id}, patchInfo);
             };
 
             self.setRating = function (actor) {
                 var patchInfo = {'rating': actor.rating};
 
-                self.patchActor(actor, patchInfo)
+                self.patchActor(actor, patchInfo);
 
             };
 
             self.toggleRunnerUp = function (actor) {
                 var patchInfo = {'is_runner_up': actor.is_runner_up};
 
-                self.patchActor(actor, patchInfo)
+                self.patchActor(actor, patchInfo);
 
             };
 

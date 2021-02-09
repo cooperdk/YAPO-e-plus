@@ -465,7 +465,7 @@ def populate_actors():
                 if desc:
                     # print("chg desc")
                     if len(desc) > 72:
-                        actor.description = aux.strip_html(desc)
+                        actor.description = strip_html(desc)
                         changed = True
                         success = True
                         photo += " [ Description ]"

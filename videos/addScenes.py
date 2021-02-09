@@ -3,7 +3,7 @@ import os
 import os.path
 from videos import ffmpeg_process
 import django
-from videos import filename_parser
+from videos import filename_parser as filename_parser
 from configuration import Config
 import utils.videosheet as videosheet
 from PIL import Image
@@ -258,11 +258,11 @@ def create_scene(scene_path, make_sample_video):
 
                 if not Config().tpdb_websites:
                     print("Parsing locally registered websites...")
-                    scene_path = parse_website_in_scenes(scene, scene_path, websites)
+                    scene_path = filename_parser.parse_website_in_scenes(current_scene, scene_path, websites)
 
                 if not Config().tpdb_actors:
                     print("Parsing locally registered actors and aliases...")
-                    scene_path = parse_actors_in_scene(scene, scene_path, actors, actors_alias)
+                    scene_path = filename_parser.parse_actors_in_scene(current_scene, scene_path, actors, actors_alias)
 
                 if not success_tpdb:
                     print("The scene was not found on TpDB, parsing it internally...")

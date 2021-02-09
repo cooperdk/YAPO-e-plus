@@ -228,7 +228,7 @@ angular.module('sceneList').component('sceneList', {
             });
 
             if (!didSectionListWrapperLoad) {
-                scopeWatchService.didSectionListWrapperLoaded('SceneList')
+                scopeWatchService.didSectionListWrapperLoaded('SceneList');
             }
 
 

@@ -12,7 +12,7 @@ log = Logger()
 def getinfo(scene_id: int, search: str = ""): #returns ID, site, title and rlsdate as a list
 
     if search == "":
-        return false
+        return False
     title = ""
     site = ""
     dt = ""
