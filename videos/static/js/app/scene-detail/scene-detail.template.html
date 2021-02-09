@@ -10,8 +10,7 @@
     </a>
 </h1>
 <h5 align="center">{{$ctrl.scene.path_to_dir}}</h5>
-<h5 align="center" style="color: #aa6666;" ng-if="$ctrl.scene.path_to_file.toLowerCase().indexOf('mp4') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('webm') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('ogg') == -1">This is an incompatible video file, you need to generate a sample or transcode it to be able to play it in YAPO e+.</h5>
-
+<h5 align="center" style="color: #aa6666;" ng-if="$ctrl.scene.path_to_file.toLowerCase().indexOf('mp4') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('webm') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('ogg') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('mkv') == -1">This is an incompatible video file, you need to generate a sample or transcode it to be able to play it in YAPO e+.</h5>
 <div class="row">
 
     <div class="col-md-7" style="text-align: center; vertical-align: middle; height: 22px;">
@@ -39,7 +38,7 @@
             <span class="glyphicon glyphicon-folder-open"></span>  Open Folder
         </button>
 
-        <button type="button" ng-if="$ctrl.scene.path_to_file.toLowerCase().indexOf('mp4') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('webm') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('ogg') == -1" && $ctrl.scene.path_to_file.toLowerCase().indexOf('mkv') == -1" ng-click="$ctrl.generateSampleVideo($ctrl.scene)" class="btn btn-default btn-sm"
+        <button type="button" ng-if="$ctrl.scene.path_to_file.toLowerCase().indexOf('mp4') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('webm') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('ogg') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('mkv') == -1" ng-click="$ctrl.generateSampleVideo($ctrl.scene)" class="btn btn-default btn-sm"
                 uib-popover-html="'This video format cannot be played in a browser. Click here to generate a sample. <br>The sample size is about 10MB and its duration is between 30 and 90 seconds
                 , depending on the source duration. You will be notified when it is created if you stay on this page. The sample is stored in media/scenes/(sceneid)/sample.'"
                 popover-trigger="mouseenter" popover-placement="right">
@@ -92,7 +91,7 @@
 
 <div class="row">
 
-    <div style="left: -16px;" class="col-md-6" ng-if="$ctrl.scene.path_to_file.toLowerCase().indexOf('mp4') > -1 || $ctrl.scene.path_to_file.toLowerCase().indexOf('webm') > -1 || $ctrl.scene.path_to_file.toLowerCase().indexOf('ogg') > -1" id="videoDiv" class="col-md-6">
+    <div style="left: -16px;" class="col-md-6" ng-if="$ctrl.scene.path_to_file.toLowerCase().indexOf('mp4') > -1 || $ctrl.scene.path_to_file.toLowerCase().indexOf('webm') > -1 || $ctrl.scene.path_to_file.toLowerCase().indexOf('ogg') > -1 || $ctrl.scene.path_to_file.toLowerCase().indexOf('mkv') > -1" id="videoDiv" class="col-md-6">
 
         <span><video controls preload="none" id="video" class="video-box" poster="{{ $ctrl.scene.thumbnail }}" ng-src="/play/{{ $ctrl.scene.id }}"
                width="720" height="405"></video>
@@ -120,7 +119,7 @@
   }
 }
 </script>
-    <div style="left: -16px;" ng-if="$ctrl.scene.path_to_file.toLowerCase().indexOf('mp4') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('webm') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('ogg') == -1" id="videoDiv" class="col-md-6">
+    <div style="left: -16px;" ng-if="$ctrl.scene.path_to_file.toLowerCase().indexOf('mp4') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('webm') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('ogg') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('mkv') == -1" id="videoDiv" class="col-md-6">
 		<span><video controls preload="none" ng-click="$ctrl.generateSampleVideo($ctrl.scene)" id="video" class="video-box" ng-if="$ctrl.updatedSample" poster="{{ $ctrl.scene.thumbnail }}" ng-src="{{ $ctrl.samplePath }}"
                width="720" height="405"></video>
         </span>
