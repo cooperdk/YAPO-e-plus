@@ -59,7 +59,7 @@ def create_sample_video(scene):
     success = ffmpeg_process.ffmpeg_create_sammple_video(scene)
     if success:
         #print(f"Sample video for scene: {scene.name} created successfully.")
-        x=x
+        x=0
     else:
         log.info(f"Something went wrong while trying to create video sample for scene: {scene.name}")
 
