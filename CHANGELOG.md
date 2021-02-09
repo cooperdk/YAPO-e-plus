@@ -8,6 +8,7 @@
 
 * An error had occured in the settings template which made it impossible to alter the URL and port that YAPO listens to.
 * Miscellaneous refactoring
+* Now requires at least Django 3.1
 
 ## 210208 (0.7.6)
 
