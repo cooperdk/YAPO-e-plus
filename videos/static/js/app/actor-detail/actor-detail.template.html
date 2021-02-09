@@ -57,7 +57,6 @@
     </li>
 </ul>
 
-
 <div class="row">
     <div ng-if="$ctrl.hideDetail" class="col-md-12 ">
 
@@ -65,14 +64,12 @@
 
         <section-list-wrapper main-page="false" section-type="'SceneList'"></section-list-wrapper>
 
-
     </div>
     <div ng-if="!$ctrl.hideDetail" style="width: 70%;" class="col-md-10 ">
 
         <h3>{{ $ctrl.actor.scenes.length }} scene(s) with {{ $ctrl.actor.name }}: </h3>
 
         <section-list-wrapper main-page="false" section-type="'SceneList'"></section-list-wrapper>
-
 
     </div>
     <div ng-if="!$ctrl.hideDetail" class="col-md-1 pull-right"
@@ -104,13 +101,8 @@
                                     class="btn btn-default btn-sm">
                                 <span class="glyphicon glyphicon-plus"></span><small> Freeones</small>
                             </button>
-
-
-
                     </div>
                     <detail-profile-image ng-if="$ctrl.updateImage" actor="$ctrl.actor"></detail-profile-image>
-
-
                 </td>
             </tr>
             <tr>
@@ -123,8 +115,6 @@
                         </a>
                     </div>
                 </td>
-
-
             </tr>
 
             <tr>

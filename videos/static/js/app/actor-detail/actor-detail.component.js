@@ -195,7 +195,6 @@ angular.module('actorDetail').component('actorDetail', {
                 var mm = self.birthdate.getMonth() + 1; //January is 0!
                 var yyyy = self.birthdate.getFullYear();
 
-
                 actor.date_of_birth = yyyy + '-' + mm + '-' + dd;
 
                 $rootScope.patchEntity('actor', self.actor.id, 'date_of_birth', self.actor.date_of_birth, 'add',
