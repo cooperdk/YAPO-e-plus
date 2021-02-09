@@ -168,9 +168,9 @@ angular.module('actorDetail').component('actorDetail', {
                     var d = new Date(res.date_of_birth);
                     d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
                     self.birthdate = d;
-
+                    //alert(self.birthdate);
                     //self.birthdate = new Date(res.date_of_birth);
-                    // alert(self.birthdate);
+                    //alert(self.birthdate);
 
                     gotPromise = true;
                     // $scope.actor = res;
@@ -198,9 +198,9 @@ angular.module('actorDetail').component('actorDetail', {
 
                 actor.date_of_birth = yyyy + '-' + mm + '-' + dd;
 
-                $rootScope.patchEntity('actor', self.actor.id, 'date_of_birth', $ctrl.actor.date_of_birth, 'add',
+                $rootScope.patchEntity('actor', self.actor.id, 'date_of_birth', self.actor.date_of_birth, 'add',
                     false, false, null)
-
+                //self.updateActor(actor);
             };
 
             self.updateActor = function (object) {

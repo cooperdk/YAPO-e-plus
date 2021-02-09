@@ -194,10 +194,10 @@ class Folder(MPTTModel):
     modified_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.name} "
+        return "%s " % (self.name,)
 
     class MPTTMeta:
-        order_insertion_by = ["name"]
+        order_insertion_by = ['name']
 
 
 class LocalSceneFolders(models.Model):
