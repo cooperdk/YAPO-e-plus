@@ -429,7 +429,7 @@ def parse_ffprobe_data(ffprobe_json_output):
             framerate_denominator = int(m.group(2))
 
             try:
-                ans["framerate"] = framerate_numerator / framerate_denominator
+                ans["framerate"] = round(framerate_numerator / framerate_denominator)
             except ZeroDivisionError:
                 print(
                     "Average framerate in JSON is "

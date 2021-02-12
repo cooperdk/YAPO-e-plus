@@ -2,6 +2,16 @@
 
 (WIN) = Windows exclusive, (LIN) = Linux exclusive
 
+## 210212 (0.7.6.2)
+
+### Changes
+
+* Once again, Freeones has changed their site structure and the actor scraper did not work.
+  It has now been converted to make use of XPATH instead of pure BeautifulSoup parsing, making it much easier to update.
+* Whenever a scraper has no record of an actor, the error code will now be 404 Not Found and not 501 not Implemented. 
+* FPS will always be an integer. Videos with a framerate of 29.97 will now be registered as 30 fps.
+
+
 ## 210209 (0.7.6.1)
 
 ### Changes

@@ -670,7 +670,7 @@ class ScrapeActor(views.APIView):
                 return Response(status=200)
 
             else:
-                return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+                return Response(status=status.HTTP_404_NOT_FOUND)
 
         elif search_site == "TpDB":
 
@@ -685,7 +685,7 @@ class ScrapeActor(views.APIView):
                 return Response(status=200)
 
             else:
-                return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+                return Response(status=status.HTTP_404_NOT_FOUND)
 
         elif search_site == "Freeones":
 
@@ -704,7 +704,7 @@ class ScrapeActor(views.APIView):
                 return Response(status=200)
 
             else:
-                return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+                return Response(status=status.HTTP_404_NOT_FOUND)
 
         elif search_site == "IMDB":
 
@@ -723,7 +723,7 @@ class ScrapeActor(views.APIView):
                 return Response(status=200)
 
             else:
-                return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+                return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 
