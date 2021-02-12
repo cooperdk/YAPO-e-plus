@@ -19,6 +19,7 @@ from videos import ffmpeg_process
 import urllib.request
 from wsgiref.util import FileWrapper
 from django.http import StreamingHttpResponse
+from django.http import HttpResponse
 import mimetypes
 from datetime import timedelta
 from datetime import datetime
@@ -53,6 +54,21 @@ import urllib.request
 import http.client
 
 http.client._MAXHEADERS = 1000
+
+def timer(start: datetime, stop: datetime):
+    import time
+    from datetime import datetime
+    delta = stop - start
+    result = time.gmtime(delta.total_seconds())
+    hr = "hour" if result.tm_hour == 1 else "hours"
+    mn = "minute" if result.tm_min == 1 else "minutes"
+    sc = "second" if result.tm_sec == 1 else "seconds"
+    if result.tm_hour > 0:
+        return f"{result.tm_hour} {hr}, {result.tm_min} {mn} and {result.tm_sec} {sc}"
+    elif result.tm_min > 0:
+        return f"{result.tm_min} {mn} and {result.tm_sec} {sc}"
+    else:
+        return f"{result.tm_sec} {sc}"
 
 def get_scenes_in_folder_recursive(folder, scene_list):
     scenes = list(folder.scenes.all())
@@ -1179,11 +1195,16 @@ def settings(request):
 
         if "scrapAllActors" in request.query_params:
             if request.query_params["scrapAllActors"] == "True":
+                start = datetime.datetime.now()
                 if request.query_params["force"] == "true":
                     force = True
                 else:
                     force = False
+                #scrape_all_actors(force)
                 threading.Thread(target=scrape_all_actors, args=(force,)).start()
+                #log.timer("Actor scraping", start, datetime.datetime.now())
+                #return HttpResponse (f'Done scraping actors in {timer(start,datetime.datetime.now())}.')
+
 
                 return Response(status=200)
 
@@ -1204,36 +1225,39 @@ def settings(request):
         if "checkDupes" in request.query_params:
             if request.query_params["checkDupes"] == "True":
                 print("Checking database for duplicates by hash...")
+                start = datetime.datetime.now()
                 total_saved = 0
                 total_deleted = 0
                 anumber = 0
                 for scene_1 in Scene.objects.all():
                     anumber += 1
-                    # if not anumber % 100:
-                    print("Checked " + str(anumber) + "...\r", end="")
-                    if checkDupeHash(scene_1.hash) > 1:
-                        log.info(f'Scene {scene_1.id} has at least one dupe ({scene_1.hash}), scanning...')
-                        for scene_2 in Scene.objects.all():
-                            if scene_1.path_to_file == scene_2.path_to_file and not (scene_1.pk == scene_2.pk):
-                                log.warn(f'Scene IDs {scene_1.pk} and {scene_2.pk} refer to the same file: {scene_1.path_to_file}')
-                                break
-                            if (not scene_1.pk == scene_2.pk) or (not scene_1.path_to_file == scene_2.path_to_file):
-                                # if scene_2.path_to_file == scene_1.path_to_file:
-                                #    print("!!! Found duplicate scene (exact path): " +
-                                #    str(scene_1.id) + " - " + scene_1.name + "\nFile path: " + scene_1.path_to_file +
-                                #    "\nis duplicate of " +
-                                #    str(scene_2.id) + " - " + scene_2.name + "\nFile path: " + scene_2.path_to_file)
-                                if scene_2.hash == scene_1.hash:
-                                    total_deleted += 1
-                                    total_saved = total_saved + scene_2.size
-                                    log.info(f'Confirmed! Removing duplicate scene: {scene_2.path_to_file} (hash: {scene_2.hash})')
-                                    # print("Passing ID " + str(scene_2.id) + " to delete function...")
-                                    permanently_delete_scene_and_remove_from_db(scene_2)
+                    if not anumber > 500:
+                        print("Checked " + str(anumber) + "...\r", end="")
+                        if checkDupeHash(scene_1.hash) > 1:
+                            log.info(f'Scene {scene_1.id} has at least one dupe ({scene_1.hash}), scanning...')
+                            for scene_2 in Scene.objects.all():
+                                if scene_1.path_to_file == scene_2.path_to_file and not (scene_1.pk == scene_2.pk):
+                                    log.warn(f'Scene IDs {scene_1.pk} and {scene_2.pk} refer to the same file: {scene_1.path_to_file}')
+                                    break
+                                if (not scene_1.pk == scene_2.pk) or (not scene_1.path_to_file == scene_2.path_to_file):
+                                    # if scene_2.path_to_file == scene_1.path_to_file:
+                                    #    print("!!! Found duplicate scene (exact path): " +
+                                    #    str(scene_1.id) + " - " + scene_1.name + "\nFile path: " + scene_1.path_to_file +
+                                    #    "\nis duplicate of " +
+                                    #    str(scene_2.id) + " - " + scene_2.name + "\nFile path: " + scene_2.path_to_file)
+                                    if scene_2.hash == scene_1.hash:
+                                        total_deleted += 1
+                                        total_saved = total_saved + scene_2.size
+                                        log.info(f'Confirmed! Removing duplicate scene: {scene_2.path_to_file} (hash: {scene_2.hash})')
+                                        # print("Passing ID " + str(scene_2.id) + " to delete function...")
+                                        permanently_delete_scene_and_remove_from_db(scene_2)
                 if total_deleted > 0:
                     # print(f"Deleted {total_deleted} files, saving {sizeformat(total_saved)}")
                     log.info(f"Deleted {total_deleted} files, saving {sizeformat(total_saved)}")
-                return Response(status=200)
-
+                print('')
+                log.timer("Duplicate check", start, datetime.datetime.now())
+                return HttpResponse (f'Deleted {total_deleted} files, saving {sizeformat(total_saved)} in {timer(start,datetime.datetime.now())}.')
+                #return Response(status=200)
 
         # populate_last_folder_name_in_virtual_folders()
         #    write_actors_to_file()
@@ -1244,6 +1268,7 @@ def settings(request):
 
         if "cleanDatabase" in request.query_params:
             if request.query_params["cleanDatabase"]:
+                start = datetime.datetime.now()
                 scenes = Scene.objects.all()
                 count = scenes.count()
                 counter = 1
@@ -1279,7 +1304,9 @@ def settings(request):
 
                 print("Cleaning website dirs that are no longer in database...")
                 clean_dir("websites")
-                return Response(status=200)
+                log.timer("Database Cleanup", start, datetime.datetime.now())
+                return HttpResponse (f'Performed database cleanup in {timer(start,datetime.datetime.now())}.')
+
 
         if "folderToScan" in request.query_params:
             start = datetime.datetime.now()
@@ -1294,7 +1321,7 @@ def settings(request):
                     videos.addScenes.get_files(folder.name, False)
             log.timer("Folder scan", start, datetime.datetime.now())
             #print("\nDone.")
-            return Response(status=200)
+            return HttpResponse (f'Completed folder scan in {timer(start,datetime.datetime.now())}.')
 
 
 @api_view(["GET"])
@@ -1358,7 +1385,6 @@ class AddItems(views.APIView):
 
         if request.query_params["folderToAddPath"] != "":
             folders_to_add_path = request.query_params["folderToAddPath"]
-
             for folder_to_add_path in folders_to_add_path.split(","):
                 folder_to_add_path_stripped = folder_to_add_path.strip()
                 if os.path.isdir(folder_to_add_path_stripped):

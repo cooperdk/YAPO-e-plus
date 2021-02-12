@@ -221,7 +221,8 @@ angular.module('settings').component('settings', {
                             // self.pathToVLC = response.data.vlc_path;
                             // alert("Got response from server: " + self.pathToFolderToAdd);
                             //alert("Done checking for dupes, check the console.");
-                            self.addAlert("Done checking for duplicate files.", 'success', '10000000');
+                            self.addAlert(response.data, 'success', '10000000');
+                            //self.addAlert("Done checking for duplicate files.", 'success', '10000000');
                         }, function errorCallback(response) {
                             //alert("Something went wrong!");
                             self.addAlert("Something went wrong while checking for dupes! Click to confirm.", 'danger', '10000');
@@ -231,7 +232,7 @@ angular.module('settings').component('settings', {
                 
                 self.scrapAllActor = function () {
                     if (confirm("Are you sure? This may take a long time. The process can only be interrupted by force quitting YAPO.")) {
-                       self.addAlert("Starting scrape, please hold on... (you will get no further status unless an error occurs).", 'info', '5000');
+                       self.addAlert("Starting scrape (threaded mode), please hold on... (no further messages will be given in UI).", 'info', '5000');
                         $http.get('settings/', {
                             params: {
                                 scrapAllActors: 'True',
@@ -243,7 +244,7 @@ angular.module('settings').component('settings', {
                         // self.response = response.data.vlc_path;
                         // self.pathToVLC = response.data.vlc_path;
                         // alert("Got response from server: " + self.pathToFolderToAdd);
-                        //self.addAlert("Done scraping actors.", 'success', '10000000');
+                        // self.addAlert(response.data, 'success', '10000000');
                         }, function errorCallback(response) {
                         self.addAlert("Something went wrong. Click to confirm.", 'danger', '1000000');
                         });
@@ -305,7 +306,7 @@ angular.module('settings').component('settings', {
                         // self.response = response.data.vlc_path;
                         // self.pathToVLC = response.data.vlc_path;
                         // alert("Got response from server: " + self.pathToFolderToAdd);
-                        self.addAlert("Done cleaning the system.", 'success', '10000');
+                        self.addAlert(response.data, 'success', '10000');
                     }, function errorCallback(response) {
                         self.addAlert("Something went wrong while cleaning the system.", 'warning', '1000000');
                     });
@@ -372,7 +373,7 @@ angular.module('settings').component('settings', {
                         // self.response = response.data.vlc_path;
                         // self.pathToVLC = response.data.vlc_path;
                         // alert("Got response from server: " + self.pathToFolderToAdd);
-						self.addAlert("Scanning complete.", 'success', '10000');
+						self.addAlert(response.data, 'success', '10000');
                     }, function errorCallback(response) {
                         self.addAlert("Something went wrong while scanning.", 'warning', '1000000');
                     });
