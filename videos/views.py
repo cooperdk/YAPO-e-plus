@@ -1363,22 +1363,29 @@ class AddItems(views.APIView):
                 folder_to_add_path_stripped = folder_to_add_path.strip()
                 if os.path.isdir(folder_to_add_path_stripped):
                     # if the second argument is true - tries to make a sample video when inserting scene to db.
-                    if request.query_params["createSampleVideo"] == "true":
-                        videos.addScenes.get_files(folder_to_add_path_stripped, True)
-                    else:
-                        videos.addScenes.get_files(folder_to_add_path_stripped, False)
-
                     temp = os.path.abspath(folder_to_add_path_stripped)
+
                     try:
+                        if platform.system() == "Windows":
+                            for test in Folder.objects.all():
+                                if temp.lower() in test.name.lower(): # Check f the new folder exists in the set of registered paths
+                                    raise Exception(f'Folder already registered')
+                        if request.query_params["createSampleVideo"] == "true":
+                            videos.addScenes.get_files(folder_to_add_path_stripped, True)
+                        else:
+                            videos.addScenes.get_files(folder_to_add_path_stripped, False)
                         local_scene_folder = LocalSceneFolders(name=temp)
                         local_scene_folder.save()
-                    except django.db.IntegrityError as e:
-                        print(
-                            f"{e} while trying to add {local_scene_folder.name} to folder list"
+                        log.info(
+                            f"Added folder {temp} to folder list..."
                         )
-                    print(
-                        f"Added folder {local_scene_folder.name} to folder list..."
-                    )
+                    except (django.db.IntegrityError, Exception) as e:
+                        log.error(
+                            f"{e} while trying to add {temp} to folder list"
+                        )
+
+
+
                 else:
                     content = {"Path does not exist!": "Can't find path!"}
                     return Response(
