@@ -1212,10 +1212,10 @@ def settings(request):
                     # if not anumber % 100:
                     print("Checked " + str(anumber) + "...\r", end="")
                     if checkDupeHash(scene_1.hash) > 1:
-                        print(f"Scene {scene_1.id} at least one dupe, scanning...")
+                        log.info(f'Scene {scene_1.id} has at least one dupe ({scene_1.hash}), scanning...')
                         for scene_2 in Scene.objects.all():
                             if scene_1.path_to_file == scene_2.path_to_file and not (scene_1.pk == scene_2.pk):
-                                log.warn(f"Scene IDs {scene_1.pk} and {scene_2.pk} refer to the same file: {scene_1.path_to_file}")
+                                log.warn(f'Scene IDs {scene_1.pk} and {scene_2.pk} refer to the same file: {scene_1.path_to_file}')
                                 break
                             if (not scene_1.pk == scene_2.pk) or (not scene_1.path_to_file == scene_2.path_to_file):
                                 # if scene_2.path_to_file == scene_1.path_to_file:
@@ -1226,7 +1226,7 @@ def settings(request):
                                 if scene_2.hash == scene_1.hash:
                                     total_deleted += 1
                                     total_saved = total_saved + scene_2.size
-                                    log.info(f"Confirmed! Removing duplicate scene: {scene_2.path_to_file} (hash: {scene_2.hash)}")
+                                    log.info(f'Confirmed! Removing duplicate scene: {scene_2.path_to_file} (hash: {scene_2.hash})')
                                     # print("Passing ID " + str(scene_2.id) + " to delete function...")
                                     permanently_delete_scene_and_remove_from_db(scene_2)
                 if total_deleted > 0:
