@@ -6,6 +6,7 @@ import requests
 import platform
 import webbrowser
 from videos.models import Scene, Actor, ActorTag, SceneTag, Folder
+from django.db.models import Count
 import videos.aux_functions as aux
 from configuration import Config
 from utils import Constants
@@ -93,6 +94,10 @@ def getsizeall () -> str: # Retrieves the total amount of bytes of registered sc
     else:
         return "no space"
 
+def dupes() -> int:
+    dupes = Scene.objects.values('hash').annotate(name_count=Count('hash')).exclude(name_count=1)
+    if len(dupes)>0:
+        log.info(f'There are {len(dupes)} duplicate scenes in your collection. Use the duplicate checker to clean them out.')
 
 def sizeformat (b: int) -> str: # returns a human-readable filesize depending on the file's size
     if b < 1000:
@@ -254,7 +259,7 @@ def startup_sequence():
         log.sinfo("Video processing disabled, your computer specification is too low.")
         print("\n")
     ffmpeg_check()
-
+    dupes()
     #aux.populate_actors()
 
     if "runserver" in sys.argv[1]:
