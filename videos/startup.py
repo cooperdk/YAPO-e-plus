@@ -6,6 +6,7 @@ import requests
 import platform
 import webbrowser
 from videos.models import Scene, Actor, ActorTag, SceneTag, Folder
+from django.db.models import Count
 import videos.aux_functions as aux
 from configuration import Config
 from utils import Constants
@@ -93,6 +94,10 @@ def getsizeall () -> str: # Retrieves the total amount of bytes of registered sc
     else:
         return "no space"
 
+def dupes() -> int:
+    dupes = Scene.objects.values('hash').annotate(name_count=Count('hash')).exclude(name_count=1)
+    if len(dupes)>0:
+        log.info(f'There are {len(dupes)} duplicate scenes in your collection. Use the duplicate checker to clean them out.')
 
 def sizeformat (b: int) -> str: # returns a human-readable filesize depending on the file's size
     if b < 1000:
@@ -243,18 +248,18 @@ def startup_sequence():
     cpu = aux.getCPU()
     cpucnt = aux.getCPUCount()
     global videoProcessing
-    print(f"\nYou have {mem} GB available. CPU speed is {cpu} GHz and you have {cpucnt} cores available.")
+    print(f"\nYou have {aux.get_human_readable_size(mem)} available. CPU speed is {cpu} GHz and you have {cpucnt} cores available.")
     print(f"Video processing configuration is {Config().videoprocessing}.\n")
-    if (mem >= 2 or cpu > 1.2) and Config().videoprocessing != True:
+    if ((mem >> 30) >= 2 or cpu > 1.2) and Config().videoprocessing != True:
         Config().videoprocessing = True
         log.sinfo("Video processing enabled, you have the computer to handle it.")
         print("\n")
-    elif (mem < 2 or cpu < 1.2) and Config().videoprocessing != False:
+    elif ((mem >> 30) < 2 or cpu < 1.2) and Config().videoprocessing != False:
         Config().videoprocessing = False
         log.sinfo("Video processing disabled, your computer specification is too low.")
         print("\n")
     ffmpeg_check()
-
+    dupes()
     #aux.populate_actors()
 
     if "runserver" in sys.argv[1]:
@@ -270,7 +275,7 @@ def startup_sequence():
 
 class ready:
     import time
-    #startup_sequence()
+
     try:
         if not any(['migrat' in str(sys.argv), 'get-clean-titles' in str(sys.argv), 'convert-tags' in str(sys.argv),
                  'mark-scenes' in str(sys.argv), 'dumpdata' in str(sys.argv), 'loaddata' in str(sys.argv)]):

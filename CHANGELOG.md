@@ -2,6 +2,16 @@
 
 (WIN) = Windows exclusive, (LIN) = Linux exclusive
 
+## 210215 (0.7.6.3)
+
+### Changes
+
+* The duplicate checker no longer recurses the entire dataset. I found a way to filter duplicates and designed it so that the first copy is the original, and any subsequent copies are marked as duplicates. Instead of taking about two minutes for a 11,000 scene database, it now completes in less than one tenth of a second (not counting the file deletion and database removal).
+  A warning about duplicates now fires in the startup sequence if there are any.
+  Also, I have implemented a further check so the duplicate checker only deletes files with identical hashes as well as identical filesizes.
+
+
+
 ## 210212 (0.7.6.2)
 
 ### Changes

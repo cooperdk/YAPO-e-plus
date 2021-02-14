@@ -5,10 +5,10 @@ import requests.packages.urllib3
 from bs4 import BeautifulSoup
 from lxml import etree
 
-requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
 from datetime import datetime
 from utils.printing import Logger
 
+requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
 log = Logger()
 
 
