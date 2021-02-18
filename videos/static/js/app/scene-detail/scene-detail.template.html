@@ -50,7 +50,7 @@
             <span class="glyphicon glyphicon-play-circle"></span>  Scan The Porn DB
         </button>
         <input type="checkbox" ng-model="$ctrl.forceScan"
-            uib-popover-html="Force scanning."
+            uib-popover-html="'Force the scan, otherwise the scan will only occur if no data exists for this scene.'"
 
             popover-trigger="mouseenter" popover-placement="top"> Force
 
@@ -93,7 +93,7 @@
 
     <div style="left: -16px;" class="col-md-6" ng-if="$ctrl.scene.path_to_file.toLowerCase().indexOf('mp4') > -1 || $ctrl.scene.path_to_file.toLowerCase().indexOf('webm') > -1 || $ctrl.scene.path_to_file.toLowerCase().indexOf('ogg') > -1 || $ctrl.scene.path_to_file.toLowerCase().indexOf('mkv') > -1" id="videoDiv" class="col-md-6">
 
-        <span><video controls preload="none" id="video" class="video-box" poster="{{ $ctrl.scene.thumbnail }}" ng-src="/play/{{ $ctrl.scene.id }}"
+        <span><video controls preload="none" id="video" class="video-box" poster="/{{$ctrl.scene.thumbnail}}" ng-src="/play/{{ $ctrl.scene.id }}"
                width="720" height="405"></video>
 
 
@@ -120,7 +120,7 @@
 }
 </script>
     <div style="left: -16px;" ng-if="$ctrl.scene.path_to_file.toLowerCase().indexOf('mp4') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('webm') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('ogg') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('mkv') == -1" id="videoDiv" class="col-md-6">
-		<span><video controls preload="none" ng-click="$ctrl.generateSampleVideo($ctrl.scene)" id="video" class="video-box" ng-if="$ctrl.updatedSample" poster="{{ $ctrl.scene.thumbnail }}" ng-src="{{ $ctrl.samplePath }}"
+		<span><video controls preload="none" ng-click="$ctrl.generateSampleVideo($ctrl.scene)" id="video" class="video-box" ng-if="$ctrl.updatedSample" poster="/{{$ctrl.scene.thumbnail}}" ng-src="{{ $ctrl.samplePath }}"
                width="720" height="405"></video>
         </span>
     </div>
@@ -215,7 +215,7 @@
                 ></async-typeahead>
             </li>
 
-             <li style="line-height: 133%; margin-top: 8px;"><strong>Release date:</strong><br>{{$ctrl.scene.release_date |date : 'dd MMMM yyyy'}}</li>
+             <li style="line-height: 133%; margin-top: 8px;"><strong>Release date:</strong><br>{{$ctrl.scene.release_date |date : 'd MMMM yyyy'}}</li>
 
             <li style="line-height: 133%; margin-top: 8px;">
                 <strong>Description:</strong> <br> <a href="#" editable-textarea="$ctrl.scene.description"
@@ -271,32 +271,33 @@
     <div class="tab-pane" id="file">
             <ul>
             <br>
-            <b>File Info:</b><hr>
+            <li>
+            {{ $ctrl.scene.path_to_file }}
+            </li><hr>
              <li>
-             File Hash: {{ $ctrl.scene.hash || 'N/A' }}
+            File Hash: {{ $ctrl.scene.hash || 'N/A' }}
              </li>
              <li>
-                Date Added: {{ $ctrl.scene.date_added | date:'dd.MM.yyyy HH:mm'}}
+            Date Added: {{ $ctrl.scene.date_added | date:'dd.MM.yyyy HH:mm'}}
             </li>
             <li>
-                Video Bitrate: {{ $ctrl.scene.bit_rate / 1000  | number:0}} kbps
+            Video Bitrate: {{ $ctrl.scene.bit_rate / 1000  | number:0}} kbps
             </li>
             <li>
-                Video Size: {{ $ctrl.scene.size / 1000000 | number:0}} MB
+            Video Size: {{ $ctrl.scene.size / 1000000 | number:0}} MB
             </li>
             <li>
-                Video Resolution: {{ $ctrl.scene.width}}x{{ $ctrl.scene.height}}
+            Video Resolution: {{ $ctrl.scene.width}}x{{ $ctrl.scene.height}}
             </li>
             <li>
-                Video Codec: {{ $ctrl.scene.codec_name }}
+            Video Codec: {{ $ctrl.scene.codec_name }}
             </li>
             <li>
-                Video Framerate: {{ $ctrl.scene.framerate }}
+            Video Framerate: {{ $ctrl.scene.framerate }}
             </li>
             <li>
-                Video Duration: {{ $ctrl.scene.duration / 60 | number:0 }} Minutes
+            Video Duration: {{ $ctrl.scene.duration / 60 | number:0 }} Minutes
             </li>
-            <li>Thumb: /{{ $ctrl.scene.thumbnail }}</li>
         </ul>
     </div>
  <!--   </div>-->

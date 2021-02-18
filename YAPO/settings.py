@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import sys
 from configuration import Config, Constants
 from utils.printing import Logger
@@ -8,6 +9,8 @@ import videos.const
 import shutil
 import colorama
 log = Logger()
+import _locale
+_locale._getdefaultlocale = (lambda *args: ['en_US', 'utf8'])
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
@@ -16,7 +19,7 @@ log = Logger()
 SECRET_KEY = "0px^lshd1lsf6uq#%90lre3$iqkz9=i7a0ko2_83b$n@=&(*d5"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 LOGGING_CONFIG = None
 # SILENCED_SYSTEM_CHECKS = ["fields.W340"]
 ALLOWED_HOSTS = ['*']
@@ -37,63 +40,6 @@ else:
             'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
         }
     }
-
-
-# First of all, check if the db is located in the old folder (root)
-
-if not 'migrat' or "passcheck" in str(sys.argv[1:]): # Check if the user runs migration. Don't execute this if that's the case.
-    src = Config().root_path
-    dest = os.path.join(Config().database_dir)
-    okmoved = True
-
-    try:
-        if sys.frozen or sys.importers:
-            compiled = True
-    except AttributeError:
-        compiled = False
-
-    if not os.path.isfile(os.path.join(src, "db.sqlite3")) and not os.path.isfile(os.path.join(dest, "db.sqlite3")):
-        print("\n")
-        print("No database")
-        print(f"There is no database installed at: {os.path.join(dest, 'db.sqlite3')}")
-        print(
-            "Please run the below commands from your YAPO main directory to create the database,\nor place your database at the above location.\n\nConsult the guide or website for help.")
-        print("\nCOMMAND(S) TO RUN:\n")
-        if not compiled:
-            print("python manage.py makemigrations")
-            print("python manage.py migrate\n")
-        else:
-            print('migrate.exe (or \"migrate\"\n')
-            print("Please follow the directions provided.")
-        input("\nPress enter to exit YAPO and take care of the above. >")
-        sys.exit()
-
-    if os.path.isfile(os.path.join(src, "db.sqlite3")):
-        if not os.path.isfile(os.path.join(dest, "db.sqlite3")):
-            try:
-                shutil.move(src, dest)
-                okmoved = True
-            except:
-                print("Error moving the database")
-                print("There was an error moving the database to it's new location:")
-                print(f"{src} -> {dest}")
-                input("Please check the source and destination. Press enter to exit YAPO. >")
-                sys.exit()
-        else:
-            print("Databases at two locations")
-            print(f"There is a database file at both the below listed locations. You need to delete the one")
-            print("you don't wish to use and make sure the other is in the listed destination directory.")
-            print("This is a check because we have moved the database to a subdirectory.")
-            print("")
-            print(f"SOURCE: {src}")
-            print(f"DESTINATION: {src}")
-            input("Press enter to exit YAPO, and start it again when the above is taken care of. >")
-            sys.exit()
-        if okmoved:
-            print(f"The database was moved to {dest}.")
-
-
-
 
 # Application definition
 
@@ -191,6 +137,52 @@ BASE_URL = "/"
 MEDIA_ROOT = Config().site_media_path
 MEDIA_URL = f"/{Constants().site_media_subdir}/"
 
+
+IGNORABLE_404_URLS = [
+    re.compile(r'[^\\s]+(.*?)\\.(jpg|jpeg|png|gif|JPG|JPEG|PNG|GIF)$'),
+]
+
+LOGGING_CONFIG = None
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+    },
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        }
+    },
+    'handlers': {
+        'null': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.NullHandler',
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler',
+        },
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['null', 'default'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+#        'requests': {
+#            # The requests library is too verbose in it's logging, reducing the verbosity in our logs.
+#            'handlers': ['null', 'default'],
+#            'level': 'WARNING',
+#            'propagate': True,
+#        },
+#        'urllib3': {
+#            'handers': ['null', 'default'],
+#            'level': 'WARNING',
+#            'propagate': True
+#        },
+    }
+}
 # APPEND_SLASH = True
 
 REST_FRAMEWORK = {

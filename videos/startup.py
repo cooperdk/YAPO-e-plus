@@ -20,8 +20,10 @@ def banner():
 
     SCRIPT_ROOT = get_main_dir()
 
+    SCRIPT_ROOT = os.path.dirname(os.path.realpath(__file__))
+    compiled = False
     try:
-        if sys.frozen or sys.importers:
+        if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
             SCRIPT_ROOT = os.path.dirname(sys.executable)
             compiled = True
     except AttributeError:
@@ -72,7 +74,7 @@ def banner():
         print(f" (running in a Python environment)")
     print(f"Database dir is:       {Config().database_dir}")
     print(f"Config dir is:         {Config().config_path}")
-    print(f"Image storage dir is:  {Config().site_media_path}")
+    print(f"Image storage dir is:  {Config().site_media_path}\n")
 
 
 def main_is_frozen():
@@ -96,8 +98,10 @@ def getsizeall () -> str: # Retrieves the total amount of bytes of registered sc
 
 def dupes() -> int:
     dupes = Scene.objects.values('hash').annotate(name_count=Count('hash')).exclude(name_count=1)
-    if len(dupes)>0:
+    if not any([len(dupes)==0, len(dupes)==1]):
         log.info(f'There are {len(dupes)} duplicate scenes in your collection. Use the duplicate checker to clean them out.')
+    elif len(dupes)==1:
+        log.info(f'There is one duplicate scene in your collection. Use the duplicate checker to clean them out.')
 
 def sizeformat (b: int) -> str: # returns a human-readable filesize depending on the file's size
     if b < 1000:
@@ -125,10 +129,10 @@ def write_actors_to_file(): # Method to dump all actors alphabetically in a read
 def configcheck ():
     settings = os.path.join(Config().config_path, Constants().default_yaml_settings_filename)
     if not path.isfile(settings):
-        log.info("There is no config file, so one has been generated.\n")
+        log.info("No config file found, so one has been generated.\n")
         Config().save()
     else:
-        print(f"Configuration loaded from {settings}")
+        print(f"Configuration loaded from {settings}\n")
 
 def vercheck(): # Check the local version against Github
     from distutils.version import LooseVersion
@@ -156,16 +160,16 @@ def vercheck(): # Check the local version against Github
         if not compiled:
             # print("Github version: "+str(remoteVer))
             if LooseVersion(ver) < LooseVersion(remoteVer):
-                log.sinfo(f'A newer version of YAPO e+ is available ({remoteVer})')
-                verprint += (f'\n    A newer version of YAPO e+ is available ({remoteVer})')
-            if ver == remoteVer:
-                verprint += " (no new version available)"
-            if ver > remoteVer:
-                verprint += "    (your version is a dev copy newer than the Github version)"
+                verprint = (f'VERCHK: A newer version of YAPO e+ is available ({remoteVer})')
+                #verprint += (f'\n    A newer version of YAPO e+ is available ({remoteVer})')
+            if LooseVersion(ver) == LooseVersion(remoteVer):
+                verprint = "VERCHK: No new version available)"
+            if LooseVersion(ver) > LooseVersion(remoteVer):
+                verprint = "VERCHK: Your version is a dev copy newer than the Github version"
         else:
-            log.info(f"    This is a frozen build of version {ver}. The latest Git version is {remoteVer}.")
-            verprint += f"    This is a frozen build of version {ver}. The latest Git version is {remoteVer}."
-        print(verprint)
+            verprint = (f"    This is a compiled build of version {ver}. The latest Git version is {remoteVer}.")
+
+        log.info(verprint)
 
 def stats (): # Prints statistics about videos and metadata
     size = getsizeall()
@@ -205,31 +209,31 @@ def ffmpeg_check():
     if platform.system() == "Windows":
         dir_to_check = os.path.join(Config().site_path, 'ffmpeg')
         ffmpeg = os.path.exists(os.path.abspath(os.path.join(dir_to_check, 'ffmpeg.exe')))
-        ffplay = os.path.exists(os.path.abspath(os.path.join(dir_to_check, 'ffplay.exe')))
         ffprobe = os.path.exists(os.path.abspath(os.path.join(dir_to_check, 'ffprobe.exe')))
-        if not all([ffmpeg, ffplay, ffprobe]):
+        if not all([ffmpeg, ffprobe]):
             print("\n")
             print("You don't have a copy of FFMPEG in your YAPO system.")
-            print("I am going to install a copy of FFPMEG (4.3.1 static, YAPO build).")
+            print("I am going to install a copy of FFPMEG (4.3.1 static, GPL, Non-Free, YAPO build).")
             print(f"It will be placed at {dir_to_check}")
             input("Press enter to acknowledge... >")
-            print("Getting https://porn-organizer.org/dl/ffmpeg-latest.zip...")
+            print("Getting https://porn-organizer.org/dl/ffmpeg-latest.zip...",end="")
             try:
-                print("Downloading... ",end="")
+                #print("Downloading... ",end="")
                 dload.save_unzip("https://porn-organizer.org/dl/ffmpeg-latest.zip", dir_to_check, True)
-                print("\nCopying ffmpeg", end="")
-                print(os.path.abspath(os.path.join(dir_to_check, 'https://porn-organizer.org/dl/ffmpeg-latest', 'bin', 'ffmpeg.exe')))
-                shutil.move(os.path.abspath(os.path.join(dir_to_check, 'https://porn-organizer.org/dl/ffmpeg-latest', 'bin', 'ffmpeg.exe')), os.path.abspath(dir_to_check))
-                print(" - ffplay", end="")
-                shutil.move(os.path.abspath(os.path.join(dir_to_check, 'https://porn-organizer.org/dl/ffmpeg-latest', 'bin', 'ffplay.exe')), os.path.abspath(dir_to_check))
-                print(" - ffprobe", end="")
-                shutil.move(os.path.abspath(os.path.join(dir_to_check, 'https://porn-organizer.org/dl/ffmpeg-latest', 'bin', 'ffprobe.exe')), os.path.abspath(dir_to_check))
-                print("\nRemoving temp dir... ", end="")
-                shutil.rmtree(os.path.abspath(os.path.join(dir_to_check, 'https://porn-organizer.org/dl/ffmpeg-latest')))
-                print("\nDone.")
+                #print("\nFFMpeg and supplement tools copied.", end="")
+                #print(os.path.abspath(os.path.join(dir_to_check, 'https://porn-organizer.org/dl/ffmpeg-latest', 'bin', 'ffmpeg.exe')))
+                #shutil.move(os.path.abspath(os.path.join(dir_to_check, 'ffmpeg-latest', 'ffmpeg.exe')), os.path.abspath(dir_to_check))
+                #print(" - ffprobe", end="")
+                #shutil.move(os.path.abspath(os.path.join(dir_to_check, 'ffmpeg-latest', 'ffprobe.exe')), os.path.abspath(dir_to_check))
+                #print(" - ffplay", end="")
+                #shutil.move(os.path.abspath(os.path.join(dir_to_check, 'ffmpeg-latest', 'ffplay.exe')), os.path.abspath(dir_to_check))
+                #print("\nRemoving temp dir... ", end="")
+                #shutil.rmtree(os.path.abspath(os.path.join(dir_to_check, 'https://porn-organizer.org/dl/ffmpeg-latest')))
+                #print("\nDone.")
+                #input("Press enter to boot YAPO. >")
             except:
-                print(f"An error occured, please download FFMPEG manually from the above link")
-                print(f"and place it in {dir_to_check}")
+                print(f"An error may have occured, please download FFMPEG manually")
+                print(f"(preferably from the above link) and place it in {dir_to_check}")
                 input("YAPO will exit now. Press enter to acknowledge... >")
                 sys.exit()
 
@@ -262,7 +266,15 @@ def startup_sequence():
     dupes()
     #aux.populate_actors()
 
-    if "runserver" in sys.argv[1]:
+    try:
+        if sys.frozen or sys.importers:
+            SCRIPT_ROOT = os.path.dirname(sys.executable)
+            compiled = True
+    except AttributeError:
+        SCRIPT_ROOT = os.path.dirname(os.path.realpath(__file__))
+        compiled = False
+
+    if "runserver" in sys.argv or compiled:
         site = Config().yapo_url
         if ":" in site:
             if "http://" not in site:
@@ -279,12 +291,12 @@ class ready:
     try:
         if not any(['migrat' in str(sys.argv), 'get-clean-titles' in str(sys.argv), 'convert-tags' in str(sys.argv),
                  'mark-scenes' in str(sys.argv), 'dumpdata' in str(sys.argv), 'loaddata' in str(sys.argv)]):
-            print("Not in migration/maintenance mode. Executing startup-sequence...")
-            time.sleep(2)
+            print("\nExecuting startup-sequence...")
+            time.sleep(3)
             startup_sequence()
         if any(['migrat' in str(sys.argv), 'get-clean-titles' in str(sys.argv), 'convert-tags' in str(sys.argv),
                 'mark-scenes' in str(sys.argv)]):
-            log.info(f'User entered migration/maintenance mode. The web GUI is disabled.')
+            log.info(f'YAPO is in migration/maintenance mode.\nSuppressing startup-sequence. The web GUI is disabled.')
             print("\n")
     except:
         pass

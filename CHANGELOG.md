@@ -2,12 +2,25 @@
 
 (WIN) = Windows exclusive, (LIN) = Linux exclusive
 
+## 210217 (0.7.6.4)
+
+  *This update requires a requirements upgrade*
+
+### Changes
+
+* YAPO now has a naughty waitress! I switched the webserver part from the built-in Django development server to the Waitress WSGI server, and it's (a lot) faster.
+  It is started in a slightly different way. I have changed the startup so generally you will now start YAPO by executing:
+  `python yapo.py`
+  The old manage.py (which is used to enter the emergency shell, etc) is still available in the Github build. The frozen build will have a companion app instead.
+* On startup, YAPO now checks if there is a database present, and one is generated if not.
+* I am beginning to adapt the UI and view backends to display various results in the UI alert field on top of the page. For now, it works with the database cleanup utility and the duplicate scanner, among others.
+
 ## 210215 (0.7.6.3)
 
 ### Changes
 
 * The duplicate checker no longer recurses the entire dataset. I found a way to filter duplicates and designed it so that the first copy is the original, and any subsequent copies are marked as duplicates. Instead of taking about two minutes for a 11,000 scene database, it now completes in less than one tenth of a second (not counting the file deletion and database removal).
-  A warning about duplicates now fires in the startup sequence if there are any.
+  A warning about duplicates is now displayed in the startup-sequence (Hail Amiga!) if there are any.
   Also, I have implemented a further check so the duplicate checker only deletes files with identical hashes as well as identical filesizes.
 
 

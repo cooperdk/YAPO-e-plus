@@ -1,13 +1,13 @@
 # YAPO e+
 ## Yet Another Porn Organizer (extended plus)
 
-#### *The YAPO website is (still) coming soon!*
+#### *The YAPO website is (still) coming soon, but look at how nice it looks at http://www.porn-organizer.org!*
 
 #### For information about updates, please refer to CHANGELOG
 
 *If you don't want to mess with Python and all the dependencies, there is an installer (Windows 10 64-bit) located here: https://github.com/cooperdk/YAPO-e-plus/releases. It may not include newer commits, please check the changelog and you can manually update the YAPO code after installation.*
 
-##### This is a branch of the original YAPO on which I'm making improvements, such as in-browser playback, file matching and more scraping options. Find the original readme at the bottom (delimited with a line of "=" signs).
+##### This is a heavily changed fork of the original YAPO on which originally planned features have been added, such as in-browser playback, actual scene scraping (plugged into API's), automatic website recognition and more actor discovery options. Find the original readme at the bottom (delimited with a line of "=" signs).
 
 There is a setup available for an easy install. On the releases page, there is a "Getting Started" guide which also includes setup instructions.
 
@@ -15,23 +15,21 @@ There's also a Docker image which is described further down.
 
 A copy of the setup with pre-registered actors, websites and tags (thousands of them) is available. It will be available on Patreon shortly. Until then, contact me here to gain access to it.
 
-There is a **set of logos** available for websites, thanks to @GernBlanston#0168 from Porn Organizing (https://discord.gg/6TvpGA) - get them here: https://gitea.unknown.name/Trizkat/site-logos - they should be unpacked to your YAPO root. YAPO simply matches the website name in your installation with a PNG image in videos/media/logos and if there's a name match, the logo will be shown on the website view. Currently, the filename MUST match the  website name (not case-sensitive). This means that you should rename the logos to whatever you call your websites, or vice versa. I will be working on an automatic website addition tool in the future.
+Requirements: FFMPEG, VLC (for out-of-browser playback, if you prefer that or if you have many .wmv videos, which the HTML5 player will not play) and Python 3.7+ installed. If you use the installer, nothing is needed since it will all be taken care of.
 
-Requirements: FFMPEG, VLC (for out-of-browser playback, if you prefer that) and Python 3.7+ installed. If you use the installer, everything is pre-installed for you.
+If something is not working, it is generally enough to make sure all dependencies are installed. Please consult step 3 and 4 under "Installation and upgrade instructions"  below. If this doesn't work, register an issue.
 
-If something is not working, it is generally enough to make sure all dependencies are installed. Please consult step 3 and 4 under "Installation and upgrade instructions"  below.
-
-##### Discuss and share on Discord: https://discord.gg/zdm7Mdg
+##### Discuss and share on Discord: https://discord.gg/T6ybX4vs8u
 
 ---------------
 
 #### NEW FEATURES:
 
-(This list is no longer updated since august 2020, please find newer changes in CHANGELOG)
+(This list ceased to receive updates in August 2020. New functions are described above. For smaller additions and changes, please read the CHANGELOG)
 
 - Automatic scene discovery (with TpDB). This will automatically rename your scene titles if you allow it.
   Will also automatically connect actors to scenes (auto-addition of non-existing actors, websites and tags to come).
-- Streaming scene playback from within YAPO e+ (with working seek bar).
+- Streaming scene playback from within YAPO e+ (with working seek bar). There is no thumbnail based seek function (yet).
 - Working dockerfile
 - Contact sheets.
   These are generated in each scene's folder under videos/media/scenes. They can be displayed by clicking the appropriate button on the scene detail view.
@@ -43,11 +41,10 @@ If something is not working, it is generally enough to make sure all dependencie
   For example, the word "floral" in the filename would trigger a tag named "oral" - by excluding "floral" you can prevent this).
   Another example is the fact that there is a website named "Stepsiblings Caught" and another one just named "Stepsiblings".
   By adding "Stepsiblings" in the exclusion list for "Stepsiblings Caught", the system will not incorrectly register the website "Stepsiblings" for a file that should only be registered to "Stepsiblings Caught".
+    
+- Now supports the new Freeones site layout. The scraper now shows a progress bar for each actor scrape. Also, it is now based on XPATHs and therefore easier to update.
 
-
-- Now supports the new Freeones site layout. The scraper now shows a progress bar for each actor scrape.
-
-- As mentioned, we now offer website/producer logos in the website view, if the logo exists in videos/media/logos. Thanks to GernBlanston for sharing them.
+- As mentioned, YAPO now offers website/producer logos in the website view, if the website and logo has been scraped.
 
 - New Python module requirements, it may be necessary to upgrade your modules.
 
@@ -82,7 +79,9 @@ If something is not working, it is generally enough to make sure all dependencie
 - Function to move all videos belonging to a website or actor so that they reside in the same folder and an ability to set this automatically
 - An API for videohashes, tags and actors to avoid hundreds of people re-inventing the wheel
 
-#### Management commands
+#### Maintenance/management parameters (both for Github and compiled)
+
+*For the compiled version of YAPO, you must run these with "yapo-maintenance <command>" instead of "python manage.py <command>".*
 
 `get-clean-titles`
 
@@ -99,14 +98,22 @@ This converts the old YAPO TpDB tags (TpDB: Scanned: True, TpDB, Match: Good, et
 
 `makemigrations` and `migrate`
 
-These commands, which are built into Django, are required to update the database schema. You will use it often, unless you use the compiled version of YAPO in which these functions are run by starting a separate program.
+These commands, which are built into Django, are required to update the database schema.
+You will use it often, unless you use the compiled version of YAPO in which these functions are run by starting a separate program ("yapo-maintenance" without any parameters).
+The commands are no longer needed to initialize a new database - YAPO will do that for you.
+
+`shell`
+
+If you know what you're doing, this parameter will start a Python shell with the Django environment set up. You can import the database models and work directly with them, but you should know what you're doing.
 
 
 #### Installation and upgrade instructions
 
 ##### Local install
 
-1. **Get a copy of YAPO onto your computer**. Either by downloading the zip, by getting the [docker image](https://hub.docker.com/repository/docker/cooperdk/yapo-eplus/general), or by [cloning from git](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository). The docker image will require some work to setup, since every video folder must be mounted in the image.
+*If you don't know much about Python or getting this kind of stuff to work, you may want to turn to my compiled version of YAPO instead. Look under "releases" here on Github, or visit http://www.porn-organizer.org for the latest release.*
+
+1. **Get a copy of YAPO onto your computer**. Either by downloading the zip, by getting the [docker image](https://hub.docker.com/repository/docker/cooperdk/yapo-eplus/general), or by [cloning from git](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository). The docker image will require some work to setup, since every video folder must be mounted in the container.
 
 1. **Clone the git branch of your choice** - master or develop. Do this by doing:
 
@@ -121,25 +128,27 @@ These commands, which are built into Django, are required to update the database
     * **Linux specific:**
 
       Install FFMPEG using your package manager, or compile it. It should be as complete as possible, with H.264/H.265, AAC, MP3 etc.
-      Personally, I use [this package]() (Ubuntu). After following the directions on the page, just do apt-get install ffmpeg and you have a copy with all the libraries you're ever going to need.
+      Personally, I compile it myself but you can use [this package](https://www.johnvansickle.com/ffmpeg/) (John makes it available for all platforms, even ARM). After following the directions on the page, just do apt-get install ffmpeg and you have a copy with all the libraries you're ever going to need.
 
     * **Windows specific:**
 
-      Download [FFMPEG](https://ffmpeg.zeranoe.com/builds/) and move ffmpeg.exe, ffplay.exe and ffprobe.exe in the archive's `bin/` folder to the subfolder `videos/ffmpeg` in the YAPO e+ root folder. On Windows, YAPO looks for them there and only there. This binary includes everything needed by YAPO. I advise you to update it regularly, Zeranoe builds new versions all the time.
+      YAPO will download a copy of FFMPEG if you don't have one in the videos/ffmpeg folder.
+      Or you can compile it yourself or download a copy [here](https://github.com/BtbN/FFmpeg-Builds/releases)  (or compile it yourself) and move ffmpeg.exe, ffplay.exe and ffprobe.exe in the archive's `bin/` folder to the subfolder `videos/ffmpeg` in the YAPO e+ root folder. On Windows, YAPO looks for them there and only there. This binary includes everything needed by YAPO. I advise you to update it regularly, Zeranoe builds new versions all the time.
 
 1. **Install all Python dependencies by executing:**
 
-    `pip install -R requirements.txt`
-    from the main YAPO e+ folder. This installs Django and any other libraries in their minimum required versions.
+    ```pip install -R requirements.txt```
+   
+    from the main YAPO e+ folder. This installs Django and all of the other required libraries in their minimum required versions.
 
 1. **Since the YAPO e+ models occasionally change, it may be necessary to migrate**.
 
     1. Prepare database migration:
-        ```bash
+        ```bash    
         python manage.py makemigrations
         ```
 
-        This will look over the new code and create scripts to make the adjustments to the database.
+        These commands will look over the new code and create scripts to make the adjustments to the database.
 
     1. Execute the database migration scripts:
         ```bash
@@ -162,37 +171,47 @@ These commands, which are built into Django, are required to update the database
    If you have configured an IP and port in settings, YAPO will start in a new browser tab.
    If you want to avoid this, set the IP/port to "no" or something similar.
 
-1. **Runtime issues and installation problems**
+---
 
-    **If you get this error when you're done:**
-    ```bash
-    You are trying to add a non-nullable field **'date_added'** to folder without a default; we can't do that (the database needs  something to populate existing rows).
-    ```
+###Runtime issues and installation problems
+
+**If you get this error when you're done:**
+    
+    
+*"You are trying to add a non-nullable field 'date_added' to folder without a default; we can't do that (the database needs  something to populate existing rows)."*
+    
        
-    When asked to select a fix, select option 1 and type in `datetime.datetime.now()` and press enter.
+When asked to select a fix, select option 1 and type in `datetime.datetime.now()` and press enter.
+
+If you need more help installing the software, first look towards the end of this document (the old author's README), there's a section named "Installation".
+Only if you really have difficulties, register an issue on Github. I will offer installation help, by mail or through Teamviewer, for a coffee donation.
+    
+**If you get errors other that any of the above, try to do:**
+    
+`python manage.py migrate --fake`
+
+(or `yapo-maintenance migrate --fake` for the compiled release)
    
-    If you need more help installing the software, first look towards the end of this document, there's a section named "Installation".
-    Only if you really have difficulties, register an issue on Github. I will offer installation help, by mail or through Teamviewer, for a coffee donation.
-        
-    **If you get errors other that those in part 3 above, try to do**
-        
-    `python manage.py migrate --fake`
-       
-    (or replace fake with fake-initial if you don't have a db.sqlite3 database file in your main YAPO e+ folder)
-        
-    You can also secure your database with the command:
-        
-    `python manage.py dumpdata --indent=4 > database.json`
-        
-    Which will export your database tables to json format. You can then import it after executing step 1 and 2 above to generate a new database with the command:
-        
-    `python manage.py loaddata database.json --ignorenonexistent`
-        
-    If you have any issues with this, I will fix your database for a small donation. There are sometimes problems due to Django's way of updating databases. Typically, it is due to primary keys in built-in tables.
+or,  replace fake with fake-initial if you don't have a db.sqlite3 database file in your main YAPO e+ folder
+   
+ 
+####You can secure a copy of your database with the command:
+    
+`python manage.py dumpdata --indent=4 > database.json`
+    
+Which will export your database tables to json format. You can then import it after executing step 1 and 2 above to generate a new database with the command:
+    
+`python manage.py loaddata database.json --ignorenonexistent`
+    
+Once again, replace `python manage.py` with `yapo-maintenance` for the compiled build.
+
+If you have any issues with this, I will fix your database for a small donation. There are sometimes problems due to Django's way of updating databases. Typically, it is due to primary keys in built-in tables.
 
 
 
-**Running YAPO in a Docker environment**
+###Running YAPO in a Docker environment
+
+*Note: I am looking for help in setting this up for ARM and for generally making it work as intended. I am getting somewhere, but the Docker image available may not be current, due to occasional issues.*
 
 - To do this, you will need a working [Docker installation](https://www.docker.com/get-started) (on Windows, only Docker Desktop is supported, since I had no luck in connecting to my Docker Toolbox environment).
 
@@ -206,15 +225,15 @@ These commands, which are built into Django, are required to update the database
 
   The -i argument is needed if YAPO needs to ask you a question, and the -t argument makes sure that you have TTY abilities for your session. The Docker image is hardcoded to serve on port 8000, which is why it has to be opened with the -p argument.
 
-  The database should be setup the first time you run the environment, and you can use the Docker CLI to mount your video folders as Samba shares. On Windows, this requires you to create network shares for each of your main video folders that you want YAPO to access. I don't suggest that you copy the files over to the Docker image.
+  The database should be setup the first time you run the environment, and you can use the Docker CLI to mount your video folders as shared folders.
 
   Docker Desktop requires the May 2020 update of Windows 10 Home (build 2004), or any version of Windows 10 Professional. You cannot install Docker Desktop on an older release of Windows 10 Home.
   
   The docker image is built on a Debian system. Please read up on the above if you're not sure what I mean. If you need support for this, I offer my help for a donation.
 
-8. **Enjoy**!
+###Enjoy!
 
-For visual help setting up your YAPO system, I am preparing guides and tips. You can find a "getting started" guide on the [releases page](https://github.com/cooperdk/YAPO-e-plus/releases).
+For visual help setting up your YAPO system, I am preparing guides and tips. You can find a (not necessarily current) "getting started" guide on the [releases page](https://github.com/cooperdk/YAPO-e-plus/releases).
 
 This concludes this document. Below you'll find the document created by the author of YAPO redux, which was forked from the original YAPO.
 

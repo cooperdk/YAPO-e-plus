@@ -96,7 +96,7 @@ angular.module('sceneDetail').component('sceneDetail', {
 
                 self.scene = Scene.get({sceneId: $routeParams.sceneId}).$promise.then(function (res) {
                     self.currentScene = res.id;
-                    console.log("scene-detail: current id is " + angular.toJson(self.currentScene));
+                    console.log("Scene detail: current id is " + angular.toJson(self.currentScene));
                     self.scene = res;
                     gotPromise = true;
 					self.scene.framerate = self.scene.framerate.toFixed(2);

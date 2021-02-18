@@ -1063,7 +1063,7 @@ def clean_dir(type_of_model_to_clean):
 
         except ValueError:
             print(
-                f"Dir name '{dir_in_path}' Could not be converted to an integer, skipping..."
+                f"Dir name '{dir_in_path}' is not a database reference, skipping..."
             )
             index += 1
             pass
@@ -1902,55 +1902,58 @@ def display_video(request):
         resp['Content-Length'] = str(size)
     resp['Accept-Ranges'] = 'bytes'
     return resp
+    #except requests.exceptions.ConnectionError
+    #    print("Error")
+    #    pass
 
-'''
-    from django.http import StreamingHttpResponse
-    from wsgiref.util import FileWrapper
-    from datetime import timedelta
-    import mimetypes
-    
-    cont = 0
- 
-    def read_video(path):
+    '''
+        from django.http import StreamingHttpResponse
+        from wsgiref.util import FileWrapper
+        from datetime import timedelta
+        import mimetypes
         
-        with open(path, 'rb') as f:
-            while True:
-                data = f.read(10 * 1024)
-                if data:
-                    yield data
-                    cont = 1
-                else:
-                    break
-
-    #dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-    #if x is None:
-        #return HttpResponse("No Video")
-    sceneid = x.path
-    sceneid = sceneid.split('/')[-1]
-    print (f"Requesting scene ID {sceneid}...\r", end="")
-    scene = Scene.objects.get(pk=sceneid)
-    pathname = scene.path_to_file
-    size = scene.size
+        cont = 0
+     
+        def read_video(path):
+            
+            with open(path, 'rb') as f:
+                while True:
+                    data = f.read(10 * 1024)
+                    if data:
+                        yield data
+                        cont = 1
+                    else:
+                        break
     
-    now = datetime.datetime.now()
-    if scene.date_last_played is not None:
-        then = scene.date_last_played
-    else:
-        then = datetime.datetime.now() - timedelta(hours = 12)
-    if now > then + timedelta(hours=3):
-        print (f"Playback: [{pathname}] ({size//1048576} MB)")#1048576 is 1024^2
-        scene.play_count+=1
-        scene.date_last_played=datetime.datetime.now()
-        scene.save()
-        print(f"Play count for scene {scene.id} is now {scene.play_count} and the last played date and time is updated.")
-    try:
-        response = StreamingHttpResponse(FileWrapper(open(pathname, 'rb'), 8192),
-            content_type=mimetypes.guess_type(pathname)[0]) #(open(pathname, 'rb')) #(read_video(pathname), status=206)
-        #response = StreamingHttpResponse(read_video(pathname)) #(open(pathname, 'rb')) #(read_video(pathname), status=206)
-        #response['Content-Length'] = size
-        #response['Content-Disposition'] = "attachment; filename=%s" % filename
-    #response["Content-Range"] = 'bytes 0-%s' % (size)
-    #response['Content-Disposition'] = f'attachement; filename="{pathname}"'
+        #dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+        #if x is None:
+            #return HttpResponse("No Video")
+        sceneid = x.path
+        sceneid = sceneid.split('/')[-1]
+        print (f"Requesting scene ID {sceneid}...\r", end="")
+        scene = Scene.objects.get(pk=sceneid)
+        pathname = scene.path_to_file
+        size = scene.size
+        
+        now = datetime.datetime.now()
+        if scene.date_last_played is not None:
+            then = scene.date_last_played
+        else:
+            then = datetime.datetime.now() - timedelta(hours = 12)
+        if now > then + timedelta(hours=3):
+            print (f"Playback: [{pathname}] ({size//1048576} MB)")#1048576 is 1024^2
+            scene.play_count+=1
+            scene.date_last_played=datetime.datetime.now()
+            scene.save()
+            print(f"Play count for scene {scene.id} is now {scene.play_count} and the last played date and time is updated.")
+        
+            response = StreamingHttpResponse(FileWrapper(open(pathname, 'rb'), 8192),
+                content_type=mimetypes.guess_type(pathname)[0]) #(open(pathname, 'rb')) #(read_video(pathname), status=206)
+            #response = StreamingHttpResponse(read_video(pathname)) #(open(pathname, 'rb')) #(read_video(pathname), status=206)
+            #response['Content-Length'] = size
+            #response['Content-Disposition'] = "attachment; filename=%s" % filename
+        #response["Content-Range"] = 'bytes 0-%s' % (size)
+        #response['Content-Disposition'] = f'attachement; filename="{pathname}"'
     except:
         print("Error")
     return response
