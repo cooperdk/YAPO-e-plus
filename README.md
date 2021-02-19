@@ -237,7 +237,7 @@ For visual help setting up your YAPO system, I am preparing guides and tips. You
 
 This concludes this document. Below you'll find the document created by the author of YAPO redux, which was forked from the original YAPO.
 
-------
+---
 
 # YAPO
 YAPO - Yet Another Porn Organizer
