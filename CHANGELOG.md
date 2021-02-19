@@ -4,7 +4,7 @@
 
 ## 210217 (0.7.6.4)
 
-  *This update requires a requirements upgrade*
+  *This update requires a [requirements upgrade](https://pip.pypa.io/en/stable/reference/pip_install/#examples)*
 
 ### Changes
 
