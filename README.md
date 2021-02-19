@@ -121,7 +121,7 @@ If you know what you're doing, this parameter will start a Python shell with the
 
     `git clone -b https://github.com/cooperdk/YAPO-e-plus.git <install dir>`
 
-    The install dir should be <drive>\YAPO (Windows) or \YAPO (Linux).
+    The install dir should preferrably be in the root of a drive, e.g. <drive>\YAPO (Windows) or /YAPO (Linux).
 
     You can also just download the branch of your choice by selecting that branch on the Github page, and pressing the green "Clone" button and then clicking "Download zip".
 
