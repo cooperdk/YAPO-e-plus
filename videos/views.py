@@ -1858,11 +1858,6 @@ def display_video(request):
 
     sceneid = request.path
     sceneid = sceneid.split('/')[-1]
-
-    #print(request.headers)
-    #print(request.META)
-    #print(request.GET)
-
     scene = Scene.objects.get(pk=sceneid)
     pathname = scene.path_to_file
     path = pathname
@@ -1872,13 +1867,12 @@ def display_video(request):
         then = scene.date_last_played
     else:
         then = datetime.datetime.now() - timedelta(hours = 12)
-    if now > then + timedelta(hours=3):
-        print(f"Requesting scene ID {sceneid}...\r", end="")
-        print (f"Playback: [{pathname}] ({size//1048576} MB)")#1048576 is 1024^2
+    if now > then + timedelta(hours=2):
+        log.sinfo(f"Playback: [{pathname}] ({size//1048576} MB)")#1048576 is 1024^2
         scene.play_count+=1
         scene.date_last_played=datetime.datetime.now()
         scene.save()
-        print(f"Play count for scene {scene.id} is now {scene.play_count} and the last played date and time is updated.")
+        log.sinfo(f"Playback count {scene.play_count} for scene ID {scene.id}. Last played date/time updated.")
 
 
     range_header = request.META.get('HTTP_RANGE', '').strip()     #request.META.get('HTTP_RANGE', '').strip()
