@@ -6,4 +6,4 @@ COPY . /YAPO
 WORKDIR /YAPO
 RUN pip install --upgrade pip && pip install -r requirements.txt && rm -r ~/.cache/pip
 EXPOSE 8000
-ENTRYPOINT ["/bin/bash", "/YAPO/startup.sh"]
+ENTRYPOINT ["/bin/bash", "/YAPO/yapo.sh"]

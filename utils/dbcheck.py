@@ -4,7 +4,7 @@ from django.core.management import call_command
 from YAPO.wsgi import application
 
 # First of all, check if the db is located in the old folder (root)
-def boot(): -> None
+def boot():
     dest = os.path.join(Config().database_dir)
     okmoved = True
 

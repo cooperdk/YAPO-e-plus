@@ -19,6 +19,8 @@ Requirements: FFMPEG, VLC (for out-of-browser playback, if you prefer that or if
 
 If something is not working, it is generally enough to make sure all dependencies are installed. Please consult step 3 and 4 under "Installation and upgrade instructions"  below. If this doesn't work, register an issue.
 
+I have a tool that will help you with flattening your porn clips directories down to main dirs. Check it out [here](https://github.com/cooperdk/XXX-Folder-Flattener).
+
 ##### Discuss and share on Discord: https://discord.gg/T6ybX4vs8u
 
 ---------------

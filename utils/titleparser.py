@@ -54,7 +54,7 @@ def getSearchSiteName(siteID):
 
 def siteValues():
 
-    searchSites = [None] * 900 # one higher than the array below
+    searchSites = [None] * 901 # one higher than the array below
 
     searchSites[0] = ("BlackedRaw", "BlackedRaw", "https://www.blackedraw.com", "https://www.blackedraw.com/api")
     searchSites[1] = ("Blacked", "Blacked", "https://www.blacked.com", "https://www.blacked.com/api")
@@ -950,7 +950,9 @@ def siteValues():
     searchSites[896] = ("FTV Milfs", "FTV Milfs", "https://www.ftvmilfs.com/", "https://www.ftvmilfs.com/updates.html")
     searchSites[897] = ("Jesh By Jesh", "Jesh By Jesh", "https://www.jeshbyjesh.com/", "https://www.jeshbyjesh.com/tour/categories/movies.html")
     searchSites[898] = ("18Eighteen", "18Eighteen", "https://www.18eighteen.com/", "https://www.18eighteen.com/")
-    searchSites[899] = ("Facial Cum Targets", "Facial Cum Targets", "https://www.facialcumtargets.com/", "www.facialcumtargets.com/")
+    searchSites[899] = ("Facial Cum Targets", "Facial Cum Targets", "https://www.facialcumtargets.com/", "https://www.facialcumtargets.com/")
+    searchSites[900] = ("True Anal", "True Anal", "https://www.trueanal.com/", "https://www.trueanal.com/search/")
+
     return searchSites
 
 def getSearchSiteIDByFilter(searchFilter):
@@ -1239,6 +1241,7 @@ def getSearchSettings(mediaTitle: str):
         ('^tlm ', 'Teens Love Money '),
         ('^togc ', 'Tonights Girlfriend Classic '),
         ('^tog ', 'Tonights Girlfriend '),
+        ('^tra ', 'True Anal')
         ('^tspa ', 'Tricky Spa '),
         ('^tss ', 'That Sitcom Show '),
         ('^tuf ', 'The Upper Floor '),
