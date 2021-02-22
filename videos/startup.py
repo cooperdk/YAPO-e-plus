@@ -266,25 +266,16 @@ def startup_sequence():
     dupes()
     #aux.populate_actors()
 
-    try:
-        if sys.frozen or sys.importers:
-            SCRIPT_ROOT = os.path.dirname(sys.executable)
-            compiled = True
-    except AttributeError:
-        SCRIPT_ROOT = os.path.dirname(os.path.realpath(__file__))
-        compiled = False
 
-    if "runserver" in sys.argv or compiled:
+    if not "no-browser" in str(sys.argv):
         site = Config().yapo_url
         if ":" in site:
             if "http://" not in site:
                 site="http://" + site + "/"
             print (f"Site to open: {site}\n")
             webbrowser.get().open_new_tab(site)
-        else:
-            print('You\'re missing a defined IP and port number in the /config/settings.yml variable "yapo_url".')
-            print('To make YAPO auto-open your browser on startup, add your desired IP:port in settings.\n')
 
+"""
 class ready:
     import time
 
@@ -300,3 +291,4 @@ class ready:
             print("\n")
     except:
         pass
+"""

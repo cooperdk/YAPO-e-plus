@@ -9,12 +9,13 @@ from YAPO.wsgi import application
 
 #import migrater
 from videos import startup
-if __name__ == '__main__':
-
+a = 0
+if __name__ == '__main__' and a == 0:
     startup.startup_sequence()
-    print(f'YAPO configured URL: "{Config().yapo_url}"')
-    if Config().yapo_url and (Config().yapo_url != "no" or Config().yapo_url) != "":
-        serve(application, listen=Config().yapo_url)
-    else:
-        print("Fallback: No configured host or port. Using fallback URL (localhost:8000)")
-        serve(application, listen='localhost:8000')
+    config = Config().yapo_url
+    print(f'YAPO configured URL: "{config}"')
+    if config == None:
+        print("Using default host/port until one is properly configured.")
+        config == "127.0.0.1:8000"
+    a += 1
+    serve(application, listen=str(Config().yapo_url), threads=10, ident="YAPO", log_socket_errors=False)

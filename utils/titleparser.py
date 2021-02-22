@@ -1241,7 +1241,7 @@ def getSearchSettings(mediaTitle: str):
         ('^tlm ', 'Teens Love Money '),
         ('^togc ', 'Tonights Girlfriend Classic '),
         ('^tog ', 'Tonights Girlfriend '),
-        ('^tra ', 'True Anal')
+        ('^tra ', 'True Anal'),
         ('^tspa ', 'Tricky Spa '),
         ('^tss ', 'That Sitcom Show '),
         ('^tuf ', 'The Upper Floor '),

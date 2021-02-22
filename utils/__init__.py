@@ -14,7 +14,7 @@ class Singleton(type):
 
 class Constants(metaclass=Singleton):
     def __init__ (self):
-        self.yapo_url = 'localhost:8000'
+        self.yapo_url = '127.0.0.1:8000'
         self.renaming = "<site> - <dd>-<mm>-<yyyy> - <actors> - <title> (<res>)"
         self.code_subdir = 'YAPO'
         self.data_subdir = 'data'
