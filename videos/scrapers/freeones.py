@@ -290,22 +290,29 @@ def search_freeones(actor_to_search: object, alias: object, force: bool = False)
             aux.progress(16,29,"Weight")
 
         cupSize = ""
+        #os.system('cls')
         if not actor_to_search.measurements or actor_to_search.measurements=="":
+            #print("Testing measurements")
             mea = dom.xpath("//span[contains(text(),'Measurements')]//following::span[2]//a//span/text()")
+            measlen = 0
+            measure = "???-??-??"
+            #print(f"\n\n\nMEAS RAW: {mea[0]} -- {len(mea)}\n\n")
             if len(mea)>0:
                 if mea[0].lower()!="unknown":
                     try:
                         measlen = len(mea)
-                        if measlen == 2 and mea[1] == "": measlen = 1
-                        if measlen == 3 and mea[2] == "": measlen = 2
-                        che = mea[0]
-                        if che.lower() == "unknown":
+                        if measlen == 1: measlen = 1
+                        if measlen == 2 and mea[1].strip() == "": measlen = 1
+                        if measlen == 3 and mea[2].strip() == "": measlen = 2
+                        if mea[0]:
+                            che = mea[0].strip()
+                        if che.lower() == "unknown" or che == "?" or che == "??" or che == "":
                             che = "???"
-                        if measlen > 0:
+                        if measlen > 1:
                             wai = mea[1]
                         else:
                             wai = "??"
-                        if measlen > 1:
+                        if measlen > 2:
                             hip = mea[2]
                         else:
                             hip = "??"
@@ -313,40 +320,53 @@ def search_freeones(actor_to_search: object, alias: object, force: bool = False)
                         #print(measure)
                     except Exception as e:
                         log.error(f'FO: MEA: {e}')
+                        pass
                     measurements = measure            #next_td_tag1.get_text(strip=True)  #text.strip("'/\n/\t")
                     actor_to_search.measurements = measurements
                 else:
-                    measurements = "??-??-??"
+                    measurements = "???-??-??"
                 aux.progress(17,29,"Measurements")
+
 
             if len(measurements)>8  or len(measurements)==3:
                 #print(f"CONV > {measurements}")
                 che=""
                 wai=""
                 hip=""
-                #try:
-                measure=re.findall(r'[\d]+', measurements)
-                che=int(measure[0])
-                wai=int(measure[1])
-                hip=int(measure[2])
-                #print(che)
-                #print(wai)
-                #print(hip)
-                #che=int(che*2.54)
-                #wai=int(wai*2.54)
-                #hip=int(hip*2.54)
-                cupSize = onlyChars(measurements)
-                #print(cupSize)
-                if len(measurements)==3:
-                    actor_to_search.measurements=str(che)+cupSize
-                else:
-                    actor_to_search.measurements=str(che)+cupSize+"-"+str(wai)+"-"+str(hip)
-                num += 1
-                            #except Exception as e:
-                            #    log.error(f'FO: MEA: {e}')
-                            #    pass
+                try:
+                    measure=re.findall(r'[\d]+', measurements)
+                    if len(measure) >= 1:
+                        che=int(measure[0])
+                    else:
+                        che = "???"
+                    if len(measure) >= 2:
+                        wai=int(measure[1])
+                    else:
+                        wai = ""
+                    if len(measure) >= 3:
+                        hip=int(measure[2])
+                    else:
+                        hip = ""
+                    #print(che)
+                    #print(wai)
+                    #print(hip)
+                    #che=int(che*2.54)
+                    #wai=int(wai*2.54)
+                    #hip=int(hip*2.54)
+                    if not "un" in measurements[0:1] and not "?" in measurements[0:3]:
+                        cupSize = onlyChars(measurements)
+                    #print(f"\n\n{cupSize} - {len(measure)} - {len(measurements)}  - {measurements}")
+
+                    if len(measure)==1:
+                        actor_to_search.measurements=str(che)+cupSize
+                    else:
+                        actor_to_search.measurements=str(che)+cupSize+"-"+str(wai)+"-"+str(hip)
+                    num += 1
+                except Exception as e:
+                    log.error(f'FO: MEA: {e}')
+                    pass
             else:
-                actor_to_search.measurements="??-??-??"
+                actor_to_search.measurements="???-??-??"
             actor_to_search.save()
 
 
@@ -385,6 +405,7 @@ def search_freeones(actor_to_search: object, alias: object, force: bool = False)
 
                     except Exception as e:
                         log.error(f'FO: CUPS: {e}')
+                        pass
                 aux.progress(19, 29, "Measurements [Tits description]")
 
         if not actor_to_search.actor_tags.filter(name="Natural tits") or not actor_to_search.actor_tags.filter(name="Fake tits"):
@@ -610,6 +631,7 @@ def insert_aliases(actor_to_insert, aliases):
                 actor_to_insert.actor_aliases.add(alias_to_insert)
             except django.db.IntegrityError as e:
                 print(e)
+                pass
 
 
 def match_link_to_query(soup_links, text_to_find):
