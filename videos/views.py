@@ -307,7 +307,7 @@ def tpdb_scanner(force):
 
     scenes = Scene.objects.all()
     for scene in scenes:
-        apiclients.tpdb(scene.id, force)
+        success = apiclients.tpdb(scene.id, force)
     return Response(status=200)
 
 def populate_websites(force):
@@ -652,11 +652,12 @@ class scanScene(views.APIView):
 
         success = apiclients.tpdb(scene_id, force)
 
-        if success:
-            return Response(status=200)
-
+        if success == 1:
+            return HttpResponse("Successfully scanned the scene.", status=200)
+        elif success == 2:
+            return HttpResponse("The file has already been scanned, and you didn't force the scan.", status=403)
         else:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return HttpResponse("The scene was not found using The Porn Database's API.", status=404)
 
 
 class ScrapeActor(views.APIView):

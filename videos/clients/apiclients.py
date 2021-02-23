@@ -51,7 +51,7 @@ def tpdb(scene_id: int, force: bool):
 
     this_scene = Scene.objects.get(pk=scene_id)
     scene_name = this_scene.name
-    searched = False
+    searched = 0
 
     bbcheck = bb_getinfo(scene_id, scene_name)
     if bbcheck:
@@ -87,11 +87,11 @@ def tpdb(scene_id: int, force: bool):
 
 
     if this_scene.tpdb_scanned_match:
-        searched = True
+        searched = 2
 
     if searched and not force:
         log.sinfo(f"Scene #{this_scene.id} was already checked by the TpDB scanner. To re-scan, use force.")
-        return # Scene is searched already, exit
+        return 2  # Scene is searched already, exit
 
     log.sinfo(f'Scanning for "{scene_name}" on TpDB...')
 
@@ -562,7 +562,7 @@ def tpdb(scene_id: int, force: bool):
                 this_scene.name = newtitle
                 log.sinfo(f'Scene name is now \"{newtitle}\".')
             else:
-                print('Renaming is disabled, but we suggest: \"{newtitle}\".')
+                print(f'Renaming is disabled, but we suggest: \"{newtitle}\".')
 
             success = True
             # print(f"Description:\n{description}")
@@ -609,12 +609,12 @@ def tpdb(scene_id: int, force: bool):
                 log.info(f"Scene ID {scene_id} may have incorrect data, marked that in the database. Please check manually.")
             #print(this_scene)
             this_scene.save(force_update=True)
+            return 1
 
         else:
             log.sinfo(f"Scene {scene_id} was not found in TpDB.")
             this_scene.save(force_update=True)
-
-        return success
+            return 0
 
     except KeyError:
         success = False

@@ -391,10 +391,10 @@ angular.module('sceneDetail').component('sceneDetail', {
                     }
                 }).then(function (response) {
                     // alert(angular.toJson(response))
-                    self.addAlert("Succesfully scraped: " + self.scene.name + " from " + scanSite, 'success', '5000');
+                    self.addAlert(response.data, 'success', '10000');
                     self.getCurrentScene()
                 }, function errorCallback(response) {
-                    self.addAlert(scanSite + " could not find: " + self.scene.name + " - Try a different scanner or try to rename the title! ", 'warning', '5000');
+                    self.addAlert(response.data, 'warning', '10000');
                     console.log(angular.toJson(response))
                 });
 
