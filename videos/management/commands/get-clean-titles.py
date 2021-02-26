@@ -61,7 +61,7 @@ class Command(BaseCommand):
                 headers = {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'User-Agent': 'YAPO e+ 0.73',
+                    'User-Agent': 'YAPO 0.7.6',
                 }
                 #print("Scanning... ", end="")
                 response = requests.request('GET', url, headers=headers, params=params, timeout=8)
@@ -95,7 +95,7 @@ class Command(BaseCommand):
                     headers = {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
-                        'User-Agent': 'YAPO e+ 0.73',
+                        'User-Agent': 'YAPO 0.7.6',
                     }
                     response = requests.request('GET', url, headers=headers, params=params, timeout=8)
                     try:

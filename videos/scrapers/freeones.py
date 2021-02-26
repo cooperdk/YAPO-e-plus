@@ -292,6 +292,8 @@ def search_freeones(actor_to_search: object, alias: object, force: bool = False)
         cupSize = ""
         #os.system('cls')
         if not actor_to_search.measurements or actor_to_search.measurements=="":
+            mea = []
+            measurements = []
             #print("Testing measurements")
             mea = dom.xpath("//span[contains(text(),'Measurements')]//following::span[2]//a//span/text()")
             measlen = 0
@@ -368,7 +370,6 @@ def search_freeones(actor_to_search: object, alias: object, force: bool = False)
             else:
                 actor_to_search.measurements="???-??-??"
             actor_to_search.save()
-
 
             if len(measurements) > 8 or len(measurements) == 3:
 

@@ -117,7 +117,7 @@ def tpdb(scene_id: int, force: bool):
         headers = {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'User-Agent': 'YAPO e+ 0.73',
+            'User-Agent': 'YAPO 0.7.6',
         }
 
         response = requests.request('GET', url, headers=headers, params=params, timeout=5)
@@ -159,7 +159,7 @@ def tpdb(scene_id: int, force: bool):
             headers = {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
-                'User-Agent': 'YAPO e+ 0.73',
+                'User-Agent': 'YAPO 0.7.6',
             }
             response = requests.request('GET', url, headers=headers, params=params, timeout=5)
             try:

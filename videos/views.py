@@ -127,19 +127,6 @@ def search_in_get_queryset(original_queryset, request):
         if search_string:
             search_field = request.query_params["searchField"]
 
-            # if request.query_params['pageType']:
-            #     if request.query_params['pageType'] == 'DbFolder':
-            #         if request.query_params['parent']:
-            #             folder = Folder.objects.get(pk=int(request.query_params['parent']))
-            #             qs_list = get_folders_recursive(folder, qs_list)
-            #             term_is_not_null = True
-            #             tmp_list = list()
-            #             for i in qs_list:
-            #                 if search_string in getattr(i,search_field):
-            #                     tmp_list.append(i)
-            #
-            #             qs_list = tmp_list
-
             if search_string.startswith("<"):
                 string_keyarg = "{search_field}__lte"
                 search_string = search_string.replace("<", "")
@@ -154,7 +141,6 @@ def search_in_get_queryset(original_queryset, request):
                     **{string_keyarg: search_string}
                 )
                 was_searched = True
-                # qs_list = [i for i in qs_list if (search_string in i.name)]
         else:
             if request.query_params["pageType"]:
                 if request.query_params["pageType"] == "DbFolder":
@@ -201,12 +187,6 @@ def search_in_get_queryset(original_queryset, request):
                     and (qp != "search")
                 ):
 
-                    # if qp == 'sortBy':
-                    #     sort_by = term_string
-                    #     if sort_by == 'random':
-                    #         random = True
-                    #
-                    # else:
                     term_is_not_null = True
                     terms = term_string.split(",")
 
@@ -245,10 +225,6 @@ def search_in_get_queryset(original_queryset, request):
             # qs_temp1 = original_queryset.values()
             # qs_list = qs_temp1
             qs_list = list(original_queryset)
-
-            # temp = original_queryset.values()
-            # list_temp = [entry for entry in temp]
-            # qs_list = list_temp
 
     if term_is_not_null:
         if random:
@@ -318,42 +294,27 @@ def populate_websites(force):
     import videos.aux_functions as aux
     if not aux.is_domain_reachable("api.metadataapi.net"):
         return Response(status=500)
-
     log.sinfo(f"Traversing websites for logos...")
-
     nexturl = 'https://api.metadataapi.net/sites?page=1'
-
-    # if current_scene.tpdb_id is not None and current_scene.tpdb_id != "" and len(current_scene.tpdb_id) > 12:
-    #     parsetext = current_scene.tpdb_id
-
     while nexturl:
-
         params = {'limit': 99999}
         headers = {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'User-Agent': 'YAPO e+ 0.73',
+            'User-Agent': 'YAPO 0.7.6',
         }
         print("Downloading site information... ", end="")
         response = requests.request('GET', nexturl, headers=headers, params=params) #, params=params
-
         print("\n")
-
         try:
             response = response.json()
         except:
             pass
         print("\n")
-
-
-
-
         websites = Website.objects.all()
         for site in websites:
             oldname = site.name
             found = False
-            #print (response['data'].keys())
-            #print(response['data'][0].keys())
             for tpdb in response['data']: #[0]:
                 found = False
                 tsid = tpdb['id']
@@ -361,23 +322,16 @@ def populate_websites(force):
                 tss = tpdb['short_name']
                 tsurl = tpdb['url']
                 tslogo = tpdb['logo']
-
-                #print (f"Site: {site.name} - {tsn}                    \r", end="")
-
                 if site.name == tsn:
                     found = True
-
                 if (site.name != tsn) and (site.name.lower() == tsn.lower()):
                     log.info(f'Renaming site "{site.name}" to "{tsn}" for consistency')
                     site.name = tsn
                     found = True
-
                 if (site.name.lower() == tss.lower()) and (site.name.lower() != tsn.lower()):
                     log.info(f'Renaming site "{site.name}" to "{tsn}" because it is truncated')
                     site.name = tsn
                     found = True
-
-
                 if found:
                     try:
                         newname = site.name
@@ -390,9 +344,7 @@ def populate_websites(force):
                             site.url = tsurl
                         if not site.tpdb_id:
                             site.tpdb_id = int(tsid)
-
                         aux.save_website_logo(tslogo, site.name, force)
-
                         site.save()
                     except:
                         log.error(
@@ -401,17 +353,11 @@ def populate_websites(force):
                     print("\n")
         nexturl = response['links']['next']
         print(f"Getting next JSON page ({nexturl})...")
-
-
-    print("Done.")
-
     return Response(status=200)
-
 
 
 def tpdb_scan_actor(actor, force: bool):
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
     import videos.aux_functions as aux
     if not aux.is_domain_reachable("api.metadataapi.net"):
         return Response(status=500)
@@ -419,23 +365,19 @@ def tpdb_scan_actor(actor, force: bool):
     photo = actor.thumbnail
     desc = actor.description
     url = 'https://api.metadataapi.net/performers'
-
     log.sinfo(f'Contacting TpDB API for info about {actor.name}.')
-
     params = { 'q': actor.name }
     headers = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'User-Agent': 'YAPO e+ 0.73',
+        'User-Agent': 'YAPO 0.7.6',
     }
-
     response = requests.request('GET', url, headers=headers, params=params)  # , params=params
     #print("\n")
     try:
         response = response.json()
     except:
         pass
-
     pid = ""
     img = ""
     bio = ""
@@ -443,85 +385,71 @@ def tpdb_scan_actor(actor, force: bool):
     changed = False
     success = False
     photo = ""
-
     if all([response['data'], len(str(response['data'])) > 15]):
         #print("1")
-        #try:
-        if 'id' in response['data'][0].keys():
-            pid = response['data'][0]['id']
-            #print("id")
-        if 'image' in response['data'][0].keys():
-            img = response['data'][0]['image']
-            #print("i")
-        elif 'thumbnail' in response['data'][0].keys():
-            img = response['data'][0]['thumbnail']
-            #print("t")
-        if 'bio' in response['data'][0].keys():
-            desc = response['data'][0]['bio']
-            #print("d")
-        if actor.thumbnail == Constants().unknown_person_image_path or force:
-            #print(f"No image, downloading ({img}) - ", end="")
-            save_path = os.path.join(Config().site_media_path, 'actor', str(actor.id), 'profile')
-            # print("Profile pic path: " + save_path)
-            save_file_name = os.path.join(save_path, 'profile.jpg')
-            if img and (not os.path.isfile(save_file_name) or force):
-                if not os.path.exists(save_path):
-                    os.makedirs(save_path)
-                maxretries = 3
-                attempt = 0
-                #while attempt < maxretries:
-                    #try:
-                if aux.download_image(img, save_file_name):
-                    rel_path = os.path.relpath(save_file_name, start="videos")
-                    as_uri = urllib.request.pathname2url(rel_path)
-                    actor.thumbnail = as_uri
-                    photo += " [ Photo ]"
-                    success = True
-                else:
-                    log.swarn(f"DOWNLOAD ERROR: Photo ({actor.name}): {img}")
+        try:
+            if 'id' in response['data'][0].keys():
+                pid = response['data'][0]['id']
+                #print("id")
+            if 'image' in response['data'][0].keys():
+                img = response['data'][0]['image']
+                #print("i")
+            elif 'thumbnail' in response['data'][0].keys():
+                img = response['data'][0]['thumbnail']
+                #print("t")
+            if 'bio' in response['data'][0].keys():
+                desc = response['data'][0]['bio']
+                #print("d")
+            if actor.thumbnail == Constants().unknown_person_image_path or force:
+                save_path = os.path.join(Config().site_media_path, 'actor', str(actor.id), 'profile')
+                save_file_name = os.path.join(save_path, 'profile.jpg')
+                if img and (not os.path.isfile(save_file_name) or force):
+                    if not os.path.exists(save_path):
+                        os.makedirs(save_path)
+                    if aux.download_image(img, save_file_name):
+                        rel_path = os.path.relpath(save_file_name, start="videos")
+                        as_uri = urllib.request.pathname2url(rel_path)
+                        actor.thumbnail = as_uri
+                        photo += " [ Photo ]"
+                        success = True
+                    else:
+                        log.swarn(f"DOWNLOAD ERROR: Photo ({actor.name}): {img}")
 
-        if any([force, not actor.description, len(actor.description) < 128, "freeones" in actor.description.lower()]):
-            #print("no good desc")
-            if desc:
-                #print("chg desc")
-                if len(desc) > 72:
-                    actor.description = aux.strip_html(desc)
+            if any([force, not actor.description, len(actor.description) < 128, "freeones" in actor.description.lower()]):
+                if desc:
+                    if len(desc) > 72:
+                        actor.description = aux.strip_html(desc)
+                        changed = True
+                        success = True
+                        photo += " [ Description ]"
+            if pid:
+                if not actor.tpdb_id or force:
+                    actor.tpdb_id = pid
+                    photo += " [ TpDB ID ]"
                     changed = True
                     success = True
-                    photo += " [ Description ]"
-        if pid:
-            #print("id")
-            if not actor.tpdb_id or force:
-                actor.tpdb_id = pid
-                photo += " [ TpDB ID ]"
-                changed = True
-                success = True
+            if success:
+                actor.last_lookup = datetime.datetime.now()
+                actor.modified_date = datetime.datetime.now()
+                actor.save()
+                log.sinfo(f'Information about {actor.name} was successfully gathered from TpDB: {photo}.')
+            else:
+                save_path = os.path.join(Config().site_media_path, 'actor', str(actor.id), 'profile')
+                save_file_name = os.path.join(save_path, 'profile.jpg')
 
-        if success:
-            #print("yep, done")
-            actor.last_lookup = datetime.datetime.now()
-            actor.modified_date = datetime.datetime.now()
-            actor.save()
-            log.sinfo(f'Information about {actor.name} was successfully gathered from TpDB: {photo}.')
+                if not force and ((actor.tpdb_id == pid) and (len(actor.description) > 125) and (os.path.isfile(save_file_name))):
+                    success = True
+                    log.sinfo(f'Your installation has good details about {actor.name}. You can force this operation.')
 
-        else:
+                elif force and ((actor.tpdb_id == pid) and (len(actor.description) > 125) and (os.path.isfile(save_file_name))):
+                    success = True
+                    log.sinfo(f'It seems that there is no better information about {actor.name} on TpDB.')
+            return success
 
-            save_path = os.path.join(Config().site_media_path, 'actor', str(actor.id), 'profile')
-            save_file_name = os.path.join(save_path, 'profile.jpg')
-
-            if not force and ((actor.tpdb_id == pid) and (len(actor.description) > 125) and (os.path.isfile(save_file_name))):
-                success = True
-                log.sinfo(f'Your installation has good details about {actor.name}. You can force this operation.')
-
-            elif force and ((actor.tpdb_id == pid) and (len(actor.description) > 125) and (os.path.isfile(save_file_name))):
-                success = True
-                log.sinfo(f'It seems that there is no better information about {actor.name} on TpDB.')
-        return success
-
-        #except:
-            #success = False
-            #log.swarn(f'There was an error downloading a photo for and/or getting information about {actor.name}!')
-            #return success
+        except:
+            success = False
+            log.swarn(f'There was an error downloading a photo for and/or getting information about {actor.name}!')
+            return success
 
     else:
         log.swarn(f'It seems that TpDB might not know anything about {actor.name}!')
@@ -529,17 +457,10 @@ def tpdb_scan_actor(actor, force: bool):
         return success
 
 
-
-
-
-
 def scrape_all_actors(force):
     actors = Actor.objects.all()
 
     for actor in actors:
-    
-        #print("\r")
-
         if not force:
             if actor.last_lookup is None:
                 print("Searching in TMDb")
@@ -558,8 +479,7 @@ def scrape_all_actors(force):
             else:
                 print(f"{actor.name} was already searched...                                                                        \r",end="")
         else:
-
-            print("Searching in TMDb")
+            print("Searching TMDb...")
             scraper_tmdb.search_person_with_force_flag(actor, True)
             print("Finished TMDb search")
             print("Searching TpDB...")
@@ -568,9 +488,8 @@ def scrape_all_actors(force):
             print("Searching IMDB...")
             scraper_imdb.search_imdb_with_force_flag(actor, True)
             print("Finished IMDB Search")
-
             if actor.gender != "M":
-                print("Searching in Freeones")
+                print("Searching Freeones")
                 scraper_freeones.search_freeones_with_force_flag(actor, True)
                 print("Finished Freeones search.")
     print("\rDone scraping actors.                                                                                               ")
@@ -590,9 +509,7 @@ def tag_all_scenes(ignore_last_lookup):
             print(
                 f"Added scene tag {scenetag} to actor tag {actorTag.name}"
             )
-
     filename_parser.parse_all_scenes(False)
-
     return Response(status=200)
 
 
@@ -614,28 +531,6 @@ def tag_all_scenes_ignore_last_lookup(ignore_last_lookup):
 
     return Response(status=200)
 
-    # scenes = Scene.objects.all()
-    # scene_count = scenes.count()
-    # counter = 1
-    #
-    # actors = list(Actor.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
-    # actors_alias = list(ActorAlias.objects.extra(select={'length': 'Length(name)'}).order_by('-length'))
-    # scene_tags = SceneTag.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
-    # websites = Website.objects.extra(select={'length': 'Length(name)'}).order_by('-length')
-    #
-    # filtered_alias = list()
-    #
-    # for alias in actors_alias:
-    #     if ' ' in alias.name or alias.is_exempt_from_one_word_search:
-    #         filtered_alias.append(alias)
-    #
-    # for scene in scenes:
-    #     print("Scene {} out of {}".format(counter, scene_count))
-    #     filename_parser.parse_scene_all_metadata(scene, actors, filtered_alias, scene_tags, websites)
-    #     counter += 1
-
-
-# views
 
 class scanScene(views.APIView):
     def get(self, request, format=None):

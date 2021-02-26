@@ -412,7 +412,8 @@ angular.module('sceneDetail').component('sceneDetail', {
                     self.updatedSample = false;
                     self.updatedSample = true;
                     self.closeAlert();
-                    self.addAlert("Successfully generated the sample video. Reload to check it out.", 'success', '5000');
+                    self.getCurrentScene()
+                    self.addAlert("Successfully generated the sample video.", 'success', '5000');
                 }, function errorCallback(response) {
                     self.closeAlert();
                     self.addAlert("Something went wrong while generating the sample video, please check the console.", 'danger', '100000');
