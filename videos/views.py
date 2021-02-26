@@ -1539,10 +1539,12 @@ class AssetAdd(views.APIView):
                     actor.thumbnail = as_uri
                     actor.save()
 
-                    if not os.path.exists(current_tumb):
-                        os.makedirs(os.path.dirname(current_tumb))
-                    shutil.move(save_dest, current_tumb)
-
+                    try:
+                        if not os.path.exists(current_tumb):
+                            os.makedirs(os.path.dirname(current_tumb))
+                        shutil.move(save_dest, current_tumb)
+                    except (IOError, OSError) as exc:
+                        log.warn(f"PROFILEPIC: {exc}")
             return Response(status=200)
 
         return Response(status=500)
