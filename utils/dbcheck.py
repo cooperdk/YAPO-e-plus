@@ -2,6 +2,8 @@ from configuration import Config
 import sys, os, time
 from django.core.management import call_command
 from YAPO.wsgi import application
+from utils.printing import Logger
+log = Logger()
 
 # First of all, check if the db is located in the old folder (root)
 def boot():
@@ -26,5 +28,9 @@ def boot():
         call_command('makemigrations')
         call_command('migrate')
         return
-
-
+    else:
+        check = call_command('makemigrations','--check','--dry-run')
+        if check is not None:
+            log.info(f'DBCHK: Database needs an upgrade, migration commencing.')
+            call_command('makemigrations')
+            call_command('migrate')
