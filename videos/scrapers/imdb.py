@@ -14,7 +14,7 @@ import requests
 import videos.aux_functions as aux
 from bs4 import BeautifulSoup
 from dateutil.parser import parse
-import videos.const as const
+#import videos.const as const
 from django.utils import timezone
 
 import requests.packages.urllib3

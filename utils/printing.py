@@ -3,6 +3,8 @@ from configuration import Config
 from utils import Singleton
 import re
 import os
+from colorama import init
+init()
 from os import path
 class Logger(metaclass=Singleton):
 

@@ -5,7 +5,7 @@ import sys
 from configuration import Config, Constants
 from utils.printing import Logger
 from datetime import datetime
-import videos.const
+#import videos.const
 import shutil
 import colorama
 log = Logger()
@@ -131,11 +131,11 @@ USE_L10N = True
 
 SITE_ROOT = Config().site_path
 STATIC_ROOT = Config().site_static_path
-STATIC_URL = f"/{Constants().site_static_subdir}/"
+STATIC_URL = Config().site_static_url
 BASE_URL = "/"
 
 MEDIA_ROOT = Config().site_media_path
-MEDIA_URL = f"/{Constants().site_media_subdir}/"
+MEDIA_URL = Config().site_media_url  #f"/{Constants().site_media_subdir}/"
 
 
 IGNORABLE_404_URLS = [

@@ -43,7 +43,6 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import status
 from operator import attrgetter
 from random import shuffle
-import videos.const as const
 from django.utils.datastructures import MultiValueDictKeyError
 import threading
 import videos.startup
@@ -374,88 +373,92 @@ def tpdb_scan_actor(actor, force: bool):
     }
     response = requests.request('GET', url, headers=headers, params=params)  # , params=params
     #print("\n")
-    try:
-        response = response.json()
-    except:
-        pass
-    pid = ""
-    img = ""
-    bio = ""
-    desc = ""
-    changed = False
-    success = False
-    photo = ""
-    if all([response['data'], len(str(response['data'])) > 15]):
-        #print("1")
+    if response.status_code < 300:
         try:
-            if 'id' in response['data'][0].keys():
-                pid = response['data'][0]['id']
-                #print("id")
-            if 'image' in response['data'][0].keys():
-                img = response['data'][0]['image']
-                #print("i")
-            elif 'thumbnail' in response['data'][0].keys():
-                img = response['data'][0]['thumbnail']
-                #print("t")
-            if 'bio' in response['data'][0].keys():
-                desc = response['data'][0]['bio']
-                #print("d")
-            if actor.thumbnail == Constants().unknown_person_image_path or force:
-                save_path = os.path.join(Config().site_media_path, 'actor', str(actor.id), 'profile')
-                save_file_name = os.path.join(save_path, 'profile.jpg')
-                if img and (not os.path.isfile(save_file_name) or force):
-                    if not os.path.exists(save_path):
-                        os.makedirs(save_path)
-                    if aux.download_image(img, save_file_name):
-                        rel_path = os.path.relpath(save_file_name, start="videos")
-                        as_uri = urllib.request.pathname2url(rel_path)
-                        actor.thumbnail = as_uri
-                        photo += " [ Photo ]"
-                        success = True
-                    else:
-                        log.swarn(f"DOWNLOAD ERROR: Photo ({actor.name}): {img}")
+            response = response.json()
+        except:
+            pass
+        pid = ""
+        img = ""
+        bio = ""
+        desc = ""
+        changed = False
+        success = False
+        photo = ""
+        if all([response['data'], len(str(response['data'])) > 15]):
+            #print("1")
+            try:
+                if 'id' in response['data'][0].keys():
+                    pid = response['data'][0]['id']
+                    #print("id")
+                if 'image' in response['data'][0].keys():
+                    img = response['data'][0]['image']
+                    #print("i")
+                elif 'thumbnail' in response['data'][0].keys():
+                    img = response['data'][0]['thumbnail']
+                    #print("t")
+                if 'bio' in response['data'][0].keys():
+                    desc = response['data'][0]['bio']
+                    #print("d")
+                if actor.thumbnail == Constants().unknown_person_image_path or force:
+                    save_path = os.path.join(Config().site_media_path, 'actor', str(actor.id), 'profile')
+                    save_file_name = os.path.join(save_path, 'profile.jpg')
+                    if img and (not os.path.isfile(save_file_name) or force):
+                        if not os.path.exists(save_path):
+                            os.makedirs(save_path)
+                        if aux.download_image(img, save_file_name):
+                            rel_path = os.path.relpath(save_file_name, start="data")
+                            as_uri = urllib.request.pathname2url(rel_path)
+                            actor.thumbnail = as_uri
+                            photo += " [ Photo ]"
+                            success = True
+                        else:
+                            log.swarn(f"DOWNLOAD ERROR: Photo ({actor.name}): {img}")
 
-            if any([force, not actor.description, len(actor.description) < 128, "freeones" in actor.description.lower()]):
-                if desc:
-                    if len(desc) > 72:
-                        actor.description = aux.strip_html(desc)
+                if any([force, not actor.description, len(actor.description) < 128, "freeones" in actor.description.lower()]):
+                    if desc:
+                        if len(desc) > 72:
+                            actor.description = aux.strip_html(desc)
+                            changed = True
+                            success = True
+                            photo += " [ Description ]"
+                if pid:
+                    if not actor.tpdb_id or force:
+                        actor.tpdb_id = pid
+                        photo += " [ TpDB ID ]"
                         changed = True
                         success = True
-                        photo += " [ Description ]"
-            if pid:
-                if not actor.tpdb_id or force:
-                    actor.tpdb_id = pid
-                    photo += " [ TpDB ID ]"
-                    changed = True
-                    success = True
-            if success:
-                actor.last_lookup = datetime.datetime.now()
-                actor.modified_date = datetime.datetime.now()
-                actor.save()
-                log.sinfo(f'Information about {actor.name} was successfully gathered from TpDB: {photo}.')
-            else:
-                save_path = os.path.join(Config().site_media_path, 'actor', str(actor.id), 'profile')
-                save_file_name = os.path.join(save_path, 'profile.jpg')
+                if success:
+                    actor.last_lookup = datetime.datetime.now()
+                    actor.modified_date = datetime.datetime.now()
+                    actor.save()
+                    log.sinfo(f'Information about {actor.name} was successfully gathered from TpDB: {photo}.')
+                else:
+                    save_path = os.path.join(Config().site_media_path, 'actor', str(actor.id), 'profile')
+                    save_file_name = os.path.join(save_path, 'profile.jpg')
 
-                if not force and ((actor.tpdb_id == pid) and (len(actor.description) > 125) and (os.path.isfile(save_file_name))):
-                    success = True
-                    log.sinfo(f'Your installation has good details about {actor.name}. You can force this operation.')
+                    if not force and ((actor.tpdb_id == pid) and (len(actor.description) > 125) and (os.path.isfile(save_file_name))):
+                        success = True
+                        log.sinfo(f'Your installation has good details about {actor.name}. You can force this operation.')
 
-                elif force and ((actor.tpdb_id == pid) and (len(actor.description) > 125) and (os.path.isfile(save_file_name))):
-                    success = True
-                    log.sinfo(f'It seems that there is no better information about {actor.name} on TpDB.')
-            return success
+                    elif force and ((actor.tpdb_id == pid) and (len(actor.description) > 125) and (os.path.isfile(save_file_name))):
+                        success = True
+                        log.sinfo(f'It seems that there is no better information about {actor.name} on TpDB.')
+                return success
 
-        except:
+            except:
+                success = False
+                log.warn(f'Error downloading a photo for and/or getting information about {actor.name}!')
+                return success
+
+        else:
+            log.swarn(f'It seems that TpDB might not know anything about {actor.name}!')
             success = False
-            log.swarn(f'There was an error downloading a photo for and/or getting information about {actor.name}!')
             return success
-
     else:
-        log.swarn(f'It seems that TpDB might not know anything about {actor.name}!')
+        log.warn(f"An error occured while retrieving data about {actor.name}.")
         success = False
         return success
-
 
 def scrape_all_actors(force):
     actors = Actor.objects.all()
@@ -661,7 +664,7 @@ def permanently_delete_scene_and_remove_from_db(scene):
             )
 
     media_path = os.path.relpath(
-        os.path.join(const.MEDIA_PATH, "scenes", str(scene.id))
+        os.path.join(Config().site_media_path, "scenes", str(scene.id))
     )
     print(os.path.dirname(os.path.abspath(__file__)))
     try:
@@ -908,12 +911,12 @@ def tag_multiple_items(request):
 
 def clean_dir(type_of_model_to_clean):
     number_of_folders = len(
-        os.listdir(os.path.join(const.MEDIA_PATH, type_of_model_to_clean))
+        os.listdir(os.path.join(Config().site_media_path, type_of_model_to_clean))
     )
     index = 1
 
     for dir_in_path in os.listdir(
-        os.path.join(const.MEDIA_PATH, type_of_model_to_clean)
+        os.path.join(Config().site_media_path, type_of_model_to_clean)
     ):
 
         print(f"Checking {type_of_model_to_clean} folder {index} out of {number_of_folders}\r", end="")
@@ -925,7 +928,7 @@ def clean_dir(type_of_model_to_clean):
                     actor = Actor.objects.get(pk=dir_in_path_int)
                 except Actor.DoesNotExist:
                     dir_to_delete = os.path.join(
-                        const.MEDIA_PATH, type_of_model_to_clean, dir_in_path
+                        Config().site_media_path, type_of_model_to_clean, dir_in_path
                     )
                     print(
                         f"Actor id {dir_in_path_int} is not in the database... Deleting folder {dir_to_delete}"
@@ -937,7 +940,7 @@ def clean_dir(type_of_model_to_clean):
                     scene = Scene.objects.get(pk=dir_in_path_int)
                 except Scene.DoesNotExist:
                     dir_to_delete = os.path.join(
-                        const.MEDIA_PATH, type_of_model_to_clean, dir_in_path
+                        Config().site_media_path, type_of_model_to_clean, dir_in_path
                     )
                     print(
                         f"Scene id {dir_in_path_int} is not in the database... Deleting folder {dir_to_delete}"
@@ -949,7 +952,7 @@ def clean_dir(type_of_model_to_clean):
                     website = Website.objects.get(pk=dir_in_path_int)
                 except Website.DoesNotExist:
                     dir_to_delete = os.path.join(
-                        const.MEDIA_PATH, type_of_model_to_clean, dir_in_path
+                        Config().site_media_path, type_of_model_to_clean, dir_in_path
                     )
                     print(
                         f"Website id {dir_in_path_int} is not in the database... Deleting folder {dir_to_delete}"
@@ -1256,7 +1259,7 @@ def add_comma_seperated_items_to_db(string_of_comma_seperated_items, type_of_ite
 
         if type_of_item == "actor":
             object_to_insert = Actor()
-            object_to_insert.thumbnail = const.UNKNOWN_PERSON_IMAGE_PATH
+            object_to_insert.thumbnail = Config().unknown_person_image_path
         elif type_of_item == "scene tag":
             object_to_insert = SceneTag()
         elif type_of_item == "website":
@@ -1342,7 +1345,7 @@ class AddItems(views.APIView):
 def play_scene_vlc(scene, random):
     file_path = os.path.normpath(scene.path_to_file)
     if platform.system() == "Windows":
-        vlc_path = Config().vlc_path #os.path.normpath(const.VLC_PATH)
+        vlc_path = Config().vlc_path
     else:
         vlc_path = "vlc"
     p = subprocess.Popen([vlc_path, file_path])
@@ -1487,9 +1490,9 @@ class AssetAdd(views.APIView):
     )
 
     def post(self, request, format=None):
-        my_file = "alala"
         # my_file = request.FILES['file']
-        save_path = const.TEMP_PATH
+        save_path = Config().temp_path
+
         # os.path.abspath('D:\\aria2')
         save_file_name = "temp.jpg"
 
@@ -1513,7 +1516,6 @@ class AssetAdd(views.APIView):
             data = request.data["file"]
             if data.startswith("data:image"):
                 # base64 encoded image - decode
-
                 format, imgstr = data.split(";base64,")  # format ~= data:image/X,
                 ext = format.split("/")[-1]  # guess file extension
                 # id = uuid.uuid4()
@@ -1524,16 +1526,16 @@ class AssetAdd(views.APIView):
                 if request.data["type"] == "Actor":
                     actor = Actor.objects.get(pk=request.data["id"])
 
-                    current_tumb = os.path.join(
-                        const.MEDIA_PATH,
+                    current_tumb = os.path.abspath(os.path.join(
+                        Config().site_media_path,
                         "actor",
                         f"{actor.id}",
                         "profile",
                         "profile.jpg",
-                    )
-                    print(current_tumb)
+                    ))
+                    log.sinfo(f"Profile thumbnail set: {current_tumb}")
 
-                    rel_path = os.path.relpath(current_tumb, start="videos")
+                    rel_path = os.path.relpath(current_tumb, start="data")
                     as_uri = urllib.request.pathname2url(rel_path)
 
                     actor.thumbnail = as_uri

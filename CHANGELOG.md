@@ -2,6 +2,20 @@
 
 (WIN) = Windows exclusive, (LIN) = Linux exclusive
 
+## 210227 (0.7.6.5)
+
+  *This update may require a [requirements upgrade](https://pip.pypa.io/en/stable/reference/pip_install/#examples)
+  as well as various changes as described below.*
+
+### Changes
+
+* The media directory has been moved away from the videos/ directory, as it is modified by the user, it really had no place within the codebase.
+  Moving the directory can be done manually, but I advise you to let YAPO do it (by simply starting it). The yapo.py script will catch your old directory, move it, and make sure your configuration reflects the change. The stored data was prepared for this move, so no data loss will occur.
+* There are no more hardcoded constants. In essence, all paths and modifiable settings are controlled with the configuration file (config/settings.yml) and default values for those not set in that file.
+* Working directories like /config and /database are now generated on first startup.
+* The scene details view generated a 404 error for each video preview picture. This has been fixed (AngularJS template).
+
+
 ## 210217 (0.7.6.4)
 
   *This update requires a [requirements upgrade](https://pip.pypa.io/en/stable/reference/pip_install/#examples)*

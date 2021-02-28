@@ -8,11 +8,7 @@ import django
 django.setup()
 
 from videos.models import *
-import videos.const as const
-
-
 # coding=<UTF-8>
-
 
 def strip_char(objects, char_to_strip):
     """
@@ -55,7 +51,7 @@ def fix_profile_images(actors):
             actor.save()
         else:
             print("No Image")
-            actor.thumbnail = const.UNKNOWN_PERSON_IMAGE_PATH
+            actor.thumbnail = Config().unknown_person_image_path
             actor.save()
 
 

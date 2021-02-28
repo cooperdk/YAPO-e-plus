@@ -93,7 +93,7 @@
 
     <div style="left: -16px;" class="col-md-6" ng-if="$ctrl.scene.path_to_file.toLowerCase().indexOf('mp4') > -1 || $ctrl.scene.path_to_file.toLowerCase().indexOf('webm') > -1 || $ctrl.scene.path_to_file.toLowerCase().indexOf('ogg') > -1 || $ctrl.scene.path_to_file.toLowerCase().indexOf('mkv') > -1" id="videoDiv" class="col-md-6">
 
-        <span><video controls preload="none" id="video" class="video-box" poster="/{{$ctrl.scene.thumbnail}}" ng-src="/play/{{ $ctrl.scene.id }}"
+        <span><video controls preload="none" id="video" class="video-box" ng-attr-poster="/{{$ctrl.scene.thumbnail}}" ng-src="/play/{{ $ctrl.scene.id }}"
                width="720" height="405"></video>
 
 
@@ -120,7 +120,7 @@
 }
 </script>
     <div style="left: -16px;" ng-if="$ctrl.scene.path_to_file.toLowerCase().indexOf('mp4') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('webm') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('ogg') == -1 && $ctrl.scene.path_to_file.toLowerCase().indexOf('mkv') == -1" id="videoDiv" class="col-md-6">
-		<span><video controls preload="none" ng-click="$ctrl.generateSampleVideo($ctrl.scene)" id="video" class="video-box" ng-if="$ctrl.updatedSample" poster="/{{$ctrl.scene.thumbnail}}" ng-src="{{ $ctrl.samplePath }}"
+		<span><video controls preload="none" ng-click="$ctrl.generateSampleVideo($ctrl.scene)" id="video" class="video-box" ng-if="$ctrl.updatedSample" ng-attr-poster="/{{$ctrl.scene.thumbnail}}" ng-src="{{ $ctrl.samplePath }}"
                width="720" height="405"></video>
         </span>
     </div>

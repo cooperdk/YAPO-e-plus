@@ -3,9 +3,10 @@ from datetime import datetime
 import django
 import tmdbsimple as tmdb
 import videos.aux_functions as aux
-import videos.const as const
+from configuration import Config
 from utils import Constants
-
+from utils.printing import Logger
+log = Logger()
 django.setup()
 
 from videos.models import Actor, ActorAlias
@@ -13,9 +14,6 @@ from videos.models import Actor, ActorAlias
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 
 tmdb.API_KEY = '04308f6d1c14608e9f373b84ad0e4e4c'
-
-MEDIA_PATH = os.path.join('videos', 'media')
-
 
 def search_person(actor_in_question, alias, force):
     """Function to search for an actor using the TMDB API.
@@ -86,7 +84,7 @@ def search_person(actor_in_question, alias, force):
                 actor_in_question.tmdb_id = person_info['id']
                 actor_in_question.imdb_id = person_info['imdb_id']
 
-            if actor_in_question.thumbnail == const.UNKNOWN_PERSON_IMAGE_PATH or force:
+            if actor_in_question.thumbnail == Config().unknown_person_image_path or force:
                 if person_info['profile_path'] is not None:
                     picture_link = f"https://image.tmdb.org/t/p/original/{person_info['profile_path']}"
                     print(f"\033[KTrying to get image from TMDB: {picture_link}\r",end="")

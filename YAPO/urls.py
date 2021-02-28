@@ -21,7 +21,7 @@ from django.conf.urls import url, include
 from django.conf.urls.static import static
 from django.contrib import admin
 from rest_framework.routers import DefaultRouter
-import videos.const
+#import videos.const
 import YAPO.settings
 import videos.aux_functions
 from videos import views

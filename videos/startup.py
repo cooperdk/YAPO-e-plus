@@ -67,14 +67,14 @@ def banner():
     print("\t                     \033[37m\033[44mYET ANOTHER PORN ORGANIZER - extended\033[49m")
     print("\t\033[1m\033[37m\033[40m       =================================================================")
     print("\t\033[0;10r")
-    print(f"\033[22mExecuting YAPO from: {SCRIPT_ROOT}", end="")
+    print(f"\033[22mExecuting YAPO from:  {SCRIPT_ROOT}", end="")
     if compiled:
         print(f" (frozen/compiled build)")
     else:
         print(f" (running in a Python environment)")
-    print(f"Database dir is:       {Config().database_dir}")
-    print(f"Config dir is:         {Config().config_path}")
-    print(f"Image storage dir is:  {Config().site_media_path}\n")
+    print(f"Database dir is:      {Config().database_dir}")
+    print(f"Config dir is:        {Config().config_path}")
+    print(f"Image storage dir is: {Config().site_media_path}\n")
 
 
 def main_is_frozen():
@@ -160,12 +160,12 @@ def vercheck(): # Check the local version against Github
         if not compiled:
             # print("Github version: "+str(remoteVer))
             if LooseVersion(ver) < LooseVersion(remoteVer):
-                verprint = (f'VERCHK: A newer version of YAPO e+ is available ({remoteVer})')
+                verprint = (f'VERCHK: {ver}: A newer version of YAPO e+ is available ({remoteVer})')
                 #verprint += (f'\n    A newer version of YAPO e+ is available ({remoteVer})')
             if LooseVersion(ver) == LooseVersion(remoteVer):
-                verprint = "VERCHK: No new version available)"
+                verprint = (f"VERCHK: {ver}: No new version available)")
             if LooseVersion(ver) > LooseVersion(remoteVer):
-                verprint = "VERCHK: Your version is a dev copy newer than the Github version"
+                verprint = (f"VERCHK: {ver}: Your version is a dev copy newer than the Github version ({remoteVer})")
         else:
             verprint = (f"    This is a compiled build of version {ver}. The latest Git version is {remoteVer}.")
 

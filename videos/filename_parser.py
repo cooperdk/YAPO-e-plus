@@ -8,7 +8,6 @@ import django
 
 from configuration import Config
 from utils.printing import Logger
-from videos import const
 
 log = Logger()
 django.setup()
@@ -90,7 +89,7 @@ def filter_alias (actor_alias):
 
 
 def if_new_actors ():
-    actors = list(Actor.objects.filter(modified_date__gt=const.LAST_ALL_SCENE_TAG))
+    actors = list(Actor.objects.filter(modified_date__gt=Config().last_all_scene_tag))
     if len(actors) > 0:
         return [True, actors]
     else:
@@ -98,7 +97,7 @@ def if_new_actors ():
 
 
 def if_new_alias ():
-    alias = list(ActorAlias.objects.filter(date_added__gt=const.LAST_ALL_SCENE_TAG))
+    alias = list(ActorAlias.objects.filter(date_added__gt=Config().last_all_scene_tag))
     if len(alias) > 0:
         return [True, alias]
     else:
@@ -106,7 +105,7 @@ def if_new_alias ():
 
 
 def if_new_tags ():
-    tags = list(SceneTag.objects.filter(modified_date__gt=const.LAST_ALL_SCENE_TAG))
+    tags = list(SceneTag.objects.filter(modified_date__gt=Config().last_all_scene_tag))
     if len(tags) > 0:
         return [True, tags]
     else:
@@ -114,7 +113,7 @@ def if_new_tags ():
 
 
 def if_new_websites ():
-    website = list(Website.objects.filter(modified_date__gt=const.LAST_ALL_SCENE_TAG))
+    website = list(Website.objects.filter(modified_date__gt=Config().last_all_scene_tag))
     if len(website) > 0:
         return [True, website]
     else:
@@ -153,7 +152,7 @@ def parse_all_scenes (ignore_last_lookup):
             counter += 1
 
     else:
-        if const.LAST_ALL_SCENE_TAG:
+        if Config().last_all_scene_tag:
 
             a = if_new_actors()
             if a[0]:
@@ -262,7 +261,8 @@ def parse_all_scenes (ignore_last_lookup):
 
     Config().save()
 
-    const.LAST_ALL_SCENE_TAG = now
+    Config().last_all_scene_tag = now
+    Config().save()
 
     print("Finished parsing...")
 

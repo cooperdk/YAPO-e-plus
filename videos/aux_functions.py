@@ -420,7 +420,7 @@ def save_website_logo(image_link, website, force, *args):
         if download_image(image_link, save_file_name):
             ws = Website.objects.get(name=website)
             print("OK")
-            rel_path = os.path.relpath(save_file_name, start="videos")
+            rel_path = os.path.relpath(save_file_name, start="data")
             as_uri = urllib.request.pathname2url(rel_path)
             ws.thumbnail = as_uri
             print(f"Saved {as_uri} to DB ({rel_path})")
@@ -488,7 +488,7 @@ def populate_actors():
                     if not os.path.exists(save_path):
                         os.makedirs(save_path)
                     if download_image(img, save_file_name):
-                        rel_path = os.path.relpath(save_file_name, start="videos")
+                        rel_path = os.path.relpath(save_file_name, start="data")
                         as_uri = urllib.request.pathname2url(rel_path)
                         actor.thumbnail = as_uri
                         photo += " [ Photo ]"
@@ -648,7 +648,7 @@ def save_actor_profile_image_from_web (image_link, actor, force):
     if not os.path.isfile(save_file_name) or force:
 
         if download_image(image_link, save_file_name):
-            rel_path = os.path.relpath(save_file_name, start="videos")
+            rel_path = os.path.relpath(save_file_name, start="data")
             as_uri = urllib.request.pathname2url(rel_path)
             actor.thumbnail = as_uri
         else:

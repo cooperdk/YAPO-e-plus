@@ -354,7 +354,7 @@ def tpdb(scene_id: int, force: bool):
                                         if not os.path.exists(save_path):
                                             os.makedirs(save_path)
                                         aux.download_image(img, save_file_name)
-                                        rel_path = os.path.relpath(save_file_name, start="videos")
+                                        rel_path = os.path.relpath(save_file_name, start="data")
                                         as_uri = urllib.request.pathname2url(rel_path)
                                         act.thumbnail = as_uri
 

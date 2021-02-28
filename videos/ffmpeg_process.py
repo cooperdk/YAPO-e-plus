@@ -14,7 +14,7 @@ import django
 import json
 import re
 import urllib.request as urllib
-
+from configuration import Config
 django.setup()
 
 from videos.models import Scene
@@ -29,24 +29,24 @@ elif platform.system() == "Windows":
     FFPROBE_BIN = os.path.join("videos", "ffmpeg", "ffprobe")
     FFMPEG_BIN = os.path.join("videos", "ffmpeg", "ffmpeg")
 
-FFMPEG_TEMP_OUTPUT_IMAGES = os.path.join("videos", "ffmpeg", "temp", "img%03d.jpg")
+if not os.path.exists(Config().temp_path):
+    os.makedirs(Config().temp_path)
+
+if not os.path.exists(Config().site_media_path):
+    os.makedirs(Config().site_media_path)
+
+FFMPEG_TEMP_OUTPUT_IMAGES = os.path.join(Config().temp_path, "img%03d.jpg")
 OUTPUT_VIDEO_FRAMERATE = 15
-OUTPUT_VIDEO_NAME = os.path.join("videos", "ffmpeg", "temp", "out.mp4")
-TEMP_PATH = os.path.join("videos", "ffmpeg", "temp")
+OUTPUT_VIDEO_NAME = os.path.join(Config().temp_path, "out.mp4")
 FFPROBE_JSON_ARGUMENTS = "-v quiet -print_format json -show_format -show_streams"
 FFMPEG_SCREENSHOT_ARGUMENTS = (
     '-vf "thumbnail,scale=1280:720,pad=ih*16/9:ih:(ow-iw)/2:(oh-ih)/2" -frames:v 1'
 )
 DEFAULT_SCREENSHOT_TIME = "00:01:30"
-SCREENSHOT_OUTPUT_PATH = os.path.join("videos", "ffmpeg", "temp", "thumb.jpg")
-MEDIA_PATH = os.path.join("videos", "media")
+SCREENSHOT_OUTPUT_PATH = os.path.join(Config().temp_path, "thumb.jpg")
 SAMPLE_RESOLUTION = "640:360"
 
-if not os.path.exists(TEMP_PATH):
-    os.makedirs(TEMP_PATH)
 
-if not os.path.exists(MEDIA_PATH):
-    os.makedirs(MEDIA_PATH)
 
 
 def execute_subprocess(command_call, type_of_bin,):
@@ -398,7 +398,7 @@ def delete_temp_files():
 
     Nothing :return: None
     """
-    files = glob.glob(os.path.join(TEMP_PATH, "*"))
+    files = glob.glob(os.path.join(Config().temp_path, "*"))
     for f in files:
         os.remove(f)
 
@@ -463,12 +463,12 @@ def ffmpeg_take_scene_screenshot_without_save(scene):
 
     if a["success"]:
         print("Screenshot Taken")
-        dest_path = os.path.join(MEDIA_PATH, "scenes", str(scene.id), "thumb")
+        dest_path = os.path.join(Config().site_media_path, "scenes", str(scene.id), "thumb")
         z = move_sample_movie_to_correct_dir(
             scene, True, "thumb.jpg", dest_path, SCREENSHOT_OUTPUT_PATH, "image"
         )
         time.sleep(1)
-        thumb_path = os.path.relpath(z, start="videos")
+        thumb_path = os.path.relpath(z, start="data")
         as_uri = urllib.pathname2url(thumb_path)
         scene.thumbnail = as_uri
 
@@ -600,13 +600,13 @@ def ffmpeg_create_sammple_video(scene):
             make_video_from_screenshots(scene.framerate)
             time.sleep(5)
 
-            dest_path = os.path.join(MEDIA_PATH, "scenes", str(scene.id), "sample")
+            dest_path = os.path.join(Config().site_media_path, "scenes", str(scene.id), "sample")
             move_sample_movie_to_correct_dir(
                 scene,
                 success,
                 "sample.mp4",
                 dest_path,
-                os.path.join(TEMP_PATH, "out.mp4"),
+                os.path.join(Config().temp_path, "out.mp4"),
                 "video",
             )
 

@@ -18,6 +18,7 @@ class Constants(metaclass=Singleton):
         self.renaming = "<site> - <dd>-<mm>-<yyyy> - <actors> - <title> (<res>)"
         self.code_subdir = 'YAPO'
         self.data_subdir = 'data'
+        self.temp_subdir = 'temp'
         self.site_subdir = 'videos'
         self.config_subdir = 'config'
         self.db_filename = 'db.sqlite3'

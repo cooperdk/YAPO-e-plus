@@ -17,10 +17,10 @@
     <h4>YAPO URL and VLC path</h4>
           <div class="row">
               <div class="col-lg-5">
-    <label>URL that YAPO should open on startup (blank if you don't wish your browser to open automatically)</label>
+    <label>IP-based URL that YAPO should open on startup (blank if you don't wish your browser to open automatically)</label>
 <input class="form-control" id="inputdefault" type="text" ng-model="$ctrl.yapoURL">
     <button style="color: #33ccff;" type="button" ng-click="$ctrl.updateYAPOurl()" class="btn btn-default btn-sm"
-            uib-popover-html="'If this is a conventional URL (ip.ip.ip.ip:port or host:port), YAPO will open this URL in your default browser on startup. You can edit the value (yapo_url) manually in the settings.yml file which is in the config directory (/config)'"
+            uib-popover-html="'If this is a conventional IP-based URL (ip.ip.ip.ip:port or host:port), YAPO will open this URL in your default browser on startup. You can edit the value (yapo_url) manually in the settings.yml file which is in the config directory (/config)'"
             popover-trigger="mouseenter" popover-placement="right-top"
 
 <span style="width:10%" class="glyphicon glyphicon-cog"></span> Set YAPO URL

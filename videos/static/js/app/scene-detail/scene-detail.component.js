@@ -362,7 +362,7 @@ angular.module('sceneDetail').component('sceneDetail', {
                     }
                 }).then(function (response) {
                     // alert(angular.toJson(response))
-                    self.addAlert("Succesfully renamed " + self.scene.name + ".", 'success', '5000');
+                    self.addAlert("Renamed " + self.scene.name + ".", 'success', '5000');
                     self.getCurrentScene()
                 }, function errorCallback(response) {
                     self.addAlert("An error occured, please check the console/logfile. ", 'warning', '5000');
