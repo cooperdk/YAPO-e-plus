@@ -222,21 +222,13 @@ angular.module('actorDetail').component('actorDetail', {
                 var newAlias = new ActorAlias();
                 newAlias.name = a;
                 newAlias.$save().then(function (res) {
-                    // alert(newAlias.id)
-
-                    // alert(self.actor.actor_aliases.toString());
-
+                    //alert(newAlias.id)
+                    //alert(self.actor.actor_aliases.toString());
                     self.actor.actor_aliases.push(newAlias.id);
-
-                    // alert(self.actor.actor_aliases.toString());
+                    //alert(self.actor.actor_aliases.toString());
                     self.updateActor(self.actor);
-
                     scopeWatchService.addAliasToList(newAlias);
-
-
                 });
-
-
             };
 
             self.states = [];

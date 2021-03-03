@@ -243,10 +243,11 @@ class ActorSerializer(serializers.ModelSerializer):
     # actor_tags = ActorIdNameSerializer(many=True, read_only=True)
 
     actor_tags = ActorTagListSerializer(many=True, read_only=True)
-
+    actor_aliases = ActorAliasSerializer(many=True, read_only=True)
+    
     class Meta:
         model = Actor
-        # depth = 2
+        #depth = 2
         fields = [
             "id",
             "name",
@@ -278,6 +279,57 @@ class ActorSerializer(serializers.ModelSerializer):
             "is_exempt_from_one_word_search",
             "actor_aliases",
             "scenes",
+        ]
+
+class ActorOutputSerializer(serializers.ModelSerializer):
+    # url = serializers.HyperlinkedIdentityField(view_name='actor-detail')
+
+    # alias = serializers.HyperlinkedRelatedField(read_only=True, many=True, view_name='actor-alias-details-rest',
+    #                                             lookup_field='actor-alias')
+
+    # actor_aliases = ActorAliasSerializer()
+
+    # actor_aliases = serializers.HyperlinkedRelatedField(allow_null=True, many=True, queryset=ActorAlias.objects.all(),
+    #                                                     required=False, view_name='actor-alias-details-rest')
+
+    # scenes = SceneIdNameSerializer(many=True, read_only=True)
+    # actor_tags = ActorIdNameSerializer(many=True, read_only=True)
+
+    actor_tags = ActorTagListSerializer(many=True, read_only=True)
+    actor_aliases = ActorAliasSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = Actor
+        depth = 2
+        fields = [
+            "id",
+            "name",
+            "date_added",
+            "date_fav",
+            "date_runner_up",
+            "date_of_birth",
+            "play_count",
+            "is_fav",
+            "is_runner_up",
+            "rating",
+            "description",
+            "thumbnail",
+            "gender",
+            "imdb_id",
+            "tmdb_id",
+            "official_pages",
+            "actor_tags",
+            "ethnicity",
+            "weight",
+            "country_of_origin",
+            "tattoos",
+            "piercings",
+            "height",
+            "measurements",
+            "extra_text",
+            "tpdb_id",
+            "is_exempt_from_one_word_search",
+            "actor_aliases",
         ]
 
         # exclude = ['actor_tags']

@@ -267,7 +267,7 @@ def startup_sequence():
     #aux.populate_actors()
 
 
-    if not "no-browser" in str(sys.argv):
+    if "no-browser" not in str(sys.argv):
         site = Config().yapo_url
         if ":" in site:
             if "http://" not in site:

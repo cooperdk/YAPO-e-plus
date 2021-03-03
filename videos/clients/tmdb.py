@@ -68,7 +68,7 @@ def search_person(actor_in_question, alias, force):
                 actor_in_question.description = ""
             if not person_info['birthday'] == "":
                 actor_in_question.date_of_birth = person_info['birthday']
-                print(f"\033[KAdded Birthday to: {actor_in_question.name}", end="")
+                print(f"\033[KAdded Birthday to: {actor_in_question.name}", end="")         
             if not actor_in_question.gender:
                 person_gender = person_info['gender']
                 if person_gender == 2:
@@ -81,8 +81,8 @@ def search_person(actor_in_question, alias, force):
                 actor_in_question.official_pages = person_info['homepage']
                 print(f"\033[KAdded Homepage to: {actor_in_question.name}\r",end="")
 
-                actor_in_question.tmdb_id = person_info['id']
-                actor_in_question.imdb_id = person_info['imdb_id']
+            actor_in_question.tmdb_id = person_info['id']
+            actor_in_question.imdb_id = person_info['imdb_id']
 
             if actor_in_question.thumbnail == Config().unknown_person_image_path or force:
                 if person_info['profile_path'] is not None:

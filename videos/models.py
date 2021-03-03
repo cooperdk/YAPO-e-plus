@@ -19,6 +19,9 @@ class ActorAlias(models.Model):
 
     # actor = models.ForeignKey(Actor, on_delete=models.CASCADE)
 
+    def natural_key(self):
+        return (self.name)
+
     def __str__(self):
         return f"{self.name} "
 
@@ -36,6 +39,9 @@ class SceneTag(models.Model):
     scene_tag_alias = models.TextField(default="", blank=True)
     exclusions = models.TextField(default="", null=True, blank=True)
     modified_date = models.DateTimeField(auto_now=True)
+
+    def natural_key(self):
+        return (self.name)
 
     def __str__(self):
         return f"{self.name} "
@@ -55,6 +61,9 @@ class ActorTag(models.Model):
     exclusions = models.TextField(default="", null=True, blank=True)
     scene_tags = models.ManyToManyField(SceneTag, blank=True, related_name="actor_tags")
     modified_date = models.DateTimeField(auto_now=True)
+
+    def natural_key(self):
+        return (self.name)
 
     def __str__(self):
         return f"{self.name} "
@@ -101,6 +110,9 @@ class Actor(models.Model):
     actor_aliases = models.ManyToManyField(ActorAlias, blank=True, related_name="actors")
     modified_date = models.DateTimeField(auto_now=True)
 
+    def natural_key(self):
+        return (self.name)
+
     def get_absolute_url(self):
         return reverse("videos:actor-details", kwargs={"pk": self.pk})
 
@@ -131,6 +143,9 @@ class Website(models.Model):
     url = models.TextField(max_length=256, default="", null=True, blank=True)
     tpdb_id = models.IntegerField(default=0)
     filename_format = models.TextField(max_length=256, default="", null=True, blank=True)
+
+    def natural_key(self):
+        return (self.name)
 
     def __str__(self):
         return f"{self.name} "
@@ -174,6 +189,8 @@ class Scene(models.Model):
     orig_name = models.CharField(null=True, max_length=500)
     orig_path_to_file = models.CharField(null=True, default="", max_length=500, blank=True)
 
+    def natural_key(self):
+        return (self.name)
 
     def __str__(self):
         return f"{self.name} "
