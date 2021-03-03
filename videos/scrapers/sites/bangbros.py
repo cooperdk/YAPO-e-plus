@@ -19,13 +19,16 @@ def getinfo (scene_id: int, search: str = ""):  # returns ID, site, title and rl
     title = ""
     site = ""
     dt = ""
-
+    x=None
+    search=re.sub(r'^i\.','',search, flags=re.IGNORECASE)
+    search=re.sub(r'^i-','',search, flags=re.IGNORECASE)
     search2 = match(search)
 
     if not re.search('^[a-zA-Z]+[0-9]+$', search2):
         # print(f'EXIT: ({search2}): Scene does not follow the Bangbros naming convention.')
         return False
     bangbros = get_sites(search2)
+    #print(bangbros)
     if bangbros is not None:
         print(f"The scene is likely from the Bangbros site {bangbros}.")
         print(f'Expecting scene release ID name to be "{search2}", so searching bangbros.com for that...')
@@ -33,16 +36,16 @@ def getinfo (scene_id: int, search: str = ""):  # returns ID, site, title and rl
         if not x:
             log.swarn(f'BANGBROS: No match for scene ID {scene_id}> BBID: {search2}')
             return False
+        else:
+            id = x[0]
+            site = x[1]
+            title = x[2]
+            dt = x[3]
 
-    id = x[0]
-    site = x[1]
-    title = x[2]
-    dt = x[3]
-
-    if title is not None:
-        # print(f'Found the scene:\nID   : {scene_id}\nRLSID: {id}\nSite : {site}\nTitle: {title}\nDate : {dt}')
-        log.sinfo(f'BANGBROS: Match scene ID {scene_id}: (BBID: {id}) > {title} ({dt})')
-        return id, site, title, dt
+            if title is not None:
+                # print(f'Found the scene:\nID   : {scene_id}\nRLSID: {id}\nSite : {site}\nTitle: {title}\nDate : {dt}')
+                log.sinfo(f'BANGBROS: Match scene ID {scene_id}: (BBID: {id}) > {title} ({dt})')
+                return id, site, title, dt
     else:
         return False
 

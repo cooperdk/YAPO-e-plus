@@ -10,7 +10,7 @@ def search(title):
         'RARBG', 'COM', '\d{3,4}x\d{3,4}', 'HEVC', 'H265', 'AVC', '\d{2,4}K', '\d{3,4}p', 'TOWN.AG_', 'XXX', 'MP4',
         'KLEENEX', 'SD', 'H264', 'repack', '1500k', '500k', '1000k', 'rq', 'NEW', 'APT', '[TK]', 'TK', 'hd\d{3,4}p',
         '1500', '1000', 'SD', 'MP4-KT', 'MP4-KTR', 'SEXORS', 'MKV', 'DIVX', 'AVI', 'M4V', 'MP2', 'WEBM', 'MR4', '-GUSH',
-        '[TK]', '.rq', '-rq', ' rq', ' Unknown -', 'Unknown', '\ss\s'
+        '[TK]', '.rq', '-rq', ' rq', ' Unknown -', 'Unknown', '\ss\s', '\bi\.'
     )
 
     title = re.sub(r'\W', ' ', title)
