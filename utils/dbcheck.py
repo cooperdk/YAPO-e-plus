@@ -1,5 +1,6 @@
 from configuration import Config
 import sys, os, time
+import django
 from django.core.management import call_command
 from YAPO.wsgi import application
 from utils.printing import Logger
@@ -25,12 +26,20 @@ def boot():
         print("No database\n===========")
         print(f"There is no database installed at: {os.path.join(dest, 'db.sqlite3')}\nGenerating a new database...\n\n")
         time.sleep(4)
-        call_command('makemigrations')
-        call_command('migrate')
+        a=call_command('makemigrations')
+        b=call_command('migrate')
         return
     else:
-        check = call_command('makemigrations','--check','--dry-run')
-        if check is not None:
-            log.info(f'DBCHK: Database needs an upgrade, migration commencing.')
-            call_command('makemigrations')
-            call_command('migrate')
+        '''
+        This needs to be modified to actually check for pending migrations
+        '''
+        #try:
+        #    check = call_command('makemigrations','--check','--dry-run')
+        #except Exception as e:
+        #    print(e.args[0])
+        #    #sys.exit(0)
+        #if check is not None:
+        #    log.info(f'DBCHK: Database needs an upgrade, migration commencing.')
+        a=call_command('makemigrations')
+        a=call_command('migrate')
+        return

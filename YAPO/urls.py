@@ -86,6 +86,7 @@ urlpatterns = [
                   url(r'^tag-multiple-items/', views.tag_multiple_items),
                   url(r'^play/', views.display_video),
                   url(r'^scan-scene/', views.scanScene.as_view()),
+                  url(r'^get-tag/', views.getTags.as_view()),
               ]
 urlpatterns += static(Config().site_media_url, document_root=Config().site_media_path)
 

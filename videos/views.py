@@ -1,6 +1,7 @@
 import os
 import re
 import os.path
+from pathlib import Path
 import subprocess
 import django.db
 import errno
@@ -52,7 +53,7 @@ log = Logger()
 import urllib3
 import urllib.request
 import http.client
-
+import json
 http.client._MAXHEADERS = 1000
 
 def timer(start: datetime, stop: datetime):
@@ -277,21 +278,155 @@ def search_in_get_queryset(original_queryset, request):
             return original_queryset.order_by(sort_by)
 
 def tpdb_scanner(force):
-
     ### This is the TpDB scanner. It calls the TpDB function in videos.scanners
 
     scenes = Scene.objects.all()
     for scene in scenes:
         success = apiclients.tpdb(scene.id, force)
+        if not success: log.error('TPDB: SCAN: There was an error scanning scene ID {scene.id}.')
     return Response(status=200)
 
-def populate_websites(force):
+def populate_tag(searchtag, tagtype, force) -> int:
+    """
+    Function to scan a scene using the YAPO Tags API (api.porn-organizer.org/records/tags).
+    Populates a single scene or actor tag with description and images from the YAPO API.
 
+    Args:
+        searchtag (int): The row ID of a tag to scan
+        tagtype (str): Indicates if the tag is a SceneTag or ActorTag
+        force (bool): Indicates if the operation should be forced
+
+    Returns:
+        int: Success/Error code
+    """
+
+    import videos.aux_functions as aux
+    tag = None
+    found = 0
+    response = None
+    if not aux.is_domain_reachable("https://api.porn-organizer.org/records/tags/"):
+        return 3
+
+
+    if tagtype == "ActorTag":
+        tag = ActorTag.objects.filter(pk=searchtag)[0]
+        scf = "actor"
+    elif tagtype == "SceneTag":
+        tag = SceneTag.objects.filter(pk=searchtag)[0]
+        scf = "scene"
+    if not tag:
+        return 0
+    searchtagname=tag.name
+    if tag.yapo_id and not force:
+        return 2
+
+    log.sinfo(f'Adding data to the {scf} tag "{tag.name}"')
+
+    url="https://api.porn-organizer.org/records/tags"
+    params = {'filter': (f'tag,eq,{searchtagname.lower()}'),
+              'join': 'taggroups',
+              'join': 'aliases' }
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'User-Agent': 'YAPO 0.7.6',
+    }
+    print("Downloading tag information... ", end="")
+    response = requests.request('GET', url, headers=headers, params=params) #, params=params
+    print("\n")
+    try:
+        response = response.json()
+    except:
+        pass
+    #print(response)
+    if "tag" and "id" in str(response):
+
+        #get tag from main tag json
+        yapoid = response["records"][0]["id"]
+        image = response["records"][0]["image"]
+        desc = response["records"][0]["description"]
+        found=1
+    else:
+        print("No primary tag name found, looking for aliases...")
+
+        url = "https://api.porn-organizer.org/records/aliases"
+        params = { 'filter': (f'alias,eq,{searchtagname.lower()}'),
+                    'join': 'tags' }
+        headers = {
+                'Content-Type': 'application/json',
+                'Accept'      : 'application/json',
+                'User-Agent'  : 'YAPO 0.7.6',
+        }
+        print("Downloading tag information... ", end="")
+        response = requests.request('GET', url, headers=headers, params=params)  # , params=params
+        print("\n")
+        try:
+            response = response.json()
+        except:
+            pass
+
+        if "tags_id" and "alias" in str(response):
+
+            #get tag from alias json
+            yapoid=image=response["records"][0]["tags_id"]["id"]
+            image=response["records"][0]["tags_id"]["image"]
+            desc=response["records"][0]["tags_id"]["description"]
+            found=1
+        else:
+            return 0
+
+    if image:
+        img=json.loads(image)
+        #print("img: " + str(img))
+        imgsave=img[0]["name"]
+        imgthumb=img[0]["thumbnail"]
+        imgsave = imgsave.replace("\\\\", "").split("/")[1]
+        imgthumb = imgthumb.replace("\\\\", "").split("/")[1]
+        #log.sinfo(f"Downloading tag image {imgsave} with thumbnail...")
+        suf=Path(imgsave).suffix
+        folder = os.path.join(Config().site_media_path, 'tags', scf, str(tag.id))
+        fimg = os.path.join(folder,"tagimg"+suf)
+        fthumb = os.path.join(folder,"tagthumb"+suf)
+        if not os.path.isdir(folder):
+            os.makedirs(folder)
+
+        aux.download_image("http://api.porn-organizer.org/photos/"+imgsave,fimg)
+
+        if aux.download_image("http://api.porn-organizer.org/thumbs/"+imgthumb,fthumb):
+            relpath = os.path.relpath(fthumb, start="data")
+            asuri = urllib.request.pathname2url(relpath)
+            tag.thumbnail = asuri
+
+    if yapoid:
+        tag.yapo_id = yapoid
+    if desc:
+        tag.description = desc
+
+    if searchtag == "SceneTag":
+        try:
+            extags = tag.aliases.split(",")
+            for x in response["records"]["aliases"]:
+                found=False
+                for extag in extags:
+                    if x[alias] == extag.strip():
+                        found=True
+                        break
+                    else:
+                        found=False
+                if not found:
+                    extag.append(x[alias])
+            tag.aliases = ",".join(extag)
+        except:
+            log.warn("TAGS: Error while enumerating tag aliases.")
+    tag.save()
+    return 1
+
+def populate_websites(force):
     ### Populates website logos, URLs and checks YAPO website names against TpDB names.
     ### Force will re-download logos.
 
     import videos.aux_functions as aux
-    if not aux.is_domain_reachable("api.metadataapi.net"):
+    if not aux.is_domain_reachable("https://api.metadataapi.net/sites"):
         return Response(status=500)
     log.sinfo(f"Traversing websites for logos...")
     nexturl = 'https://api.metadataapi.net/sites?page=1'
@@ -358,7 +493,7 @@ def populate_websites(force):
 def tpdb_scan_actor(actor, force: bool):
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     import videos.aux_functions as aux
-    if not aux.is_domain_reachable("api.metadataapi.net"):
+    if not aux.is_domain_reachable("api.metadataapi.net/performers"):
         return Response(status=500)
 
     photo = actor.thumbnail
@@ -534,6 +669,35 @@ def tag_all_scenes_ignore_last_lookup(ignore_last_lookup):
 
     return Response(status=200)
 
+
+class getTags(views.APIView):
+    def get(self, request, format=None) -> HttpResponse:
+        """Function to scan a scene using the TpDB API (metadataapi.net).
+
+        Args:
+            request (list): A list of parameters sent from the UI
+            force (bool): Indicates if the operation should be forced
+
+        Returns:
+            HttpResponse (object)
+        """
+        tagid=request.query_params["tag_id"]
+        tagtype=request.query_params["tag_type"]
+        if request.query_params["force"] == "true":
+            force = True
+        else:
+            force = False
+
+        success=populate_tag(tagid,tagtype,force)
+
+        if success == 1:
+            return HttpResponse("Successfully registered data for the tag.", status=200)
+        elif success == 2:
+            return HttpResponse("The tag has already been scanned, and you didn't force the scan.", status=403)
+        elif success == 3:
+            return HttpResponse("The YAPO Tags API is unreachable. Try again later.", status=503)
+        else:
+            return HttpResponse("This tag was not found using The YAPO Tags API.", status=404)
 
 class scanScene(views.APIView):
     def get(self, request, format=None):
