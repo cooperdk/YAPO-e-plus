@@ -319,12 +319,12 @@ def is_domain_reachable(host, timeout=5) -> bool:
         log.error(f"{host} did not answer within {timeout} seconds. Try again later.")
         result = False
         return result
-    if response.status < 400:
+    if response.status_code < 400:
         result =  True
-    elif response.status < 500:
+    elif response.status_code < 500:
         result = False
         log.warn(f"{host} reported a response error {response.status}. Please report this to Team YAPO.")
-    elif response.status >= 500:
+    else:
         result = False
         log.warn(f"{host} reported a server error {response.status}.")
 
