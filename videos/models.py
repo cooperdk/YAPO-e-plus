@@ -35,10 +35,12 @@ class SceneTag(models.Model):
     is_fav = models.BooleanField(default=False)
     is_runner_up = models.BooleanField(default=False)
     rating = models.IntegerField(default=0)
+    description = models.TextField(default="", blank=True)
     thumbnail = models.CharField(max_length=500, null=True, blank=True)
     scene_tag_alias = models.TextField(default="", blank=True)
     exclusions = models.TextField(default="", null=True, blank=True)
     modified_date = models.DateTimeField(auto_now=True)
+    yapo_id = models.CharField(max_length=32, null=True, blank=True)
 
     def natural_key(self):
         return (self.name)
@@ -56,11 +58,13 @@ class ActorTag(models.Model):
     is_fav = models.BooleanField(default=False)
     is_runner_up = models.BooleanField(default=False)
     rating = models.IntegerField(default=0)
+    description = models.TextField(default="", blank=True)
     thumbnail = models.CharField(max_length=500, null=True, blank=True)
     actor_tag_alias = models.TextField(default="", blank=True)
     exclusions = models.TextField(default="", null=True, blank=True)
     scene_tags = models.ManyToManyField(SceneTag, blank=True, related_name="actor_tags")
     modified_date = models.DateTimeField(auto_now=True)
+    yapo_id = models.CharField(max_length=32, null=True, blank=True)
 
     def natural_key(self):
         return (self.name)

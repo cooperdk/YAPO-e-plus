@@ -2,6 +2,16 @@
 
 (WIN) = Windows exclusive, (LIN) = Linux exclusive
 
+## 210304 (0.7.6.51)
+
+ *This update requires migrations. This happens automatically.*
+
+**Note: this small update will not be compiled, unless requested.**
+
+### New
+
+* The YAPO Tags API is now in use. Currently, I have only had time to plug it into single tag views, but it works for both actor tags and scene tags and saves backdrop images and thumbnails to disk as well as descriptions to the database together with aliases (hopefully, not tested yet).
+
 ## 210227 (0.7.6.5)
 
   *This update may require a [requirements upgrade](https://pip.pypa.io/en/stable/reference/pip_install/#examples)

@@ -306,18 +306,29 @@ def strip_bad_chars (name):
     return name
 
 
-def is_domain_reachable(host):
+def is_domain_reachable(host, timeout=5):
     """ This function checks to see if a host name has a DNS entry by checking
         for socket info. If the website gets something in return,
         we know it's available to DNS.
     """
+    result = True
     try:
-        socket.gethostbyname(host)
-    except socket.gaierror:
+        response=requests.head(host, timeout=timeout)
+        #socket.gethostbyname(host)
+    except Exception as e: #socket.gaierror:
+        log.error(f"{host} did not answer within {timeout} seconds. Try again later.")
         result = False
-    else:
+        return result
+    if response.status < 400:
         result =  True
-    return result
+    elif response.status < 500:
+        result = False
+        log.warn(f"{host} reported a response error {response.status}. Please report this to Team YAPO.")
+    elif response.status >= 500:
+    result = False
+    log.warn(f"{host} reported a server error {response.status}.")
+
+return result
 
 
 def checkTpDB():

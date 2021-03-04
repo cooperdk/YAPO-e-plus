@@ -46,7 +46,7 @@ def tpdb(scene_id: int, force: bool):
     success = False
     found = 0
 
-    if not aux.is_domain_reachable("api.metadataapi.net") or not aux.checkTpDB():
+    if not aux.is_domain_reachable("https://api.metadataapi.net/scenes") or not aux.checkTpDB():
         return False
 
     this_scene = Scene.objects.get(pk=scene_id)

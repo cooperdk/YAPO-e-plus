@@ -1,16 +1,16 @@
-<style>
+<style ng-if="$ctrl.sceneTag.thumbnail">
 body {
-  background-image: linear-gradient(to bottom, rgba(20,20,20,0.9) 0%,rgba(20,20,20,0.5) 90%), url('media/tags/blonde.jpg');
+  background-image: linear-gradient(to bottom, rgba(20,20,20,0.8) 0%,rgba(20,20,20,0.5) 80%), url('media/tags/scene/{{$ctrl.sceneTag.id}}/tagimg.jpg');
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-size: cover;
-  opacity: 0.8;
+  opacity: 0.9;
 }
-
 </style>
-<div align="left" style="position: absolute; z-index: 9; overflow; left: 64; top: 32;"><img style="max-width: 320px; max-height: 220px; height: auto; width: auto; cursor:default; border-style: none; border-bottom: none;" ng-src="media/tags/{{$ctrl.sceneTag.name | lowercase}}.jpg" onError=null;this.src="media/images/blank.png";this.style="width:0px;"> <!--{{$ctrl.website.thumbnail}}--></div>
-<div ng-if="image.is404">Uh oh!  Image 404'd.</div></center>
-
+<uib-alert ng-repeat="alert in $ctrl.alerts" class="enter" type="{{ alert.type }}" close="$ctrl.closeAlert($index)"
+           dismiss-on-timeout="{{ alert.timeout }}">{{ alert.msg }}
+</uib-alert>
+<div ng-if="$ctrl.sceneTag.thumbnail" align="left" style="position: absolute; z-index: 9; overflow; left: 64; top: 32;"><img style="max-width: 320px; max-height: 220px; height: auto; width: auto; cursor:default; border-style: none; border-bottom: none;"  ng-src="{{$ctrl.sceneTag.thumbnail}}" onError=null;this.src="media/images/blank.png";this.style="width:0px;"> <!--{{$ctrl.website.thumbnail}}--></div>
 <h1 align="center">
     <a href="#" editable-text="$ctrl.sceneTag.name"
        onaftersave="$ctrl.update()" style="cursor:text">
@@ -22,13 +22,18 @@ body {
     <uib-rating ng-model="$ctrl.sceneTag.rating" max="10" read-only="isReadonly" on-hover="hoveringOver(value)"
                 on-leave="overStar = null" titles="['one','two','three']"
                 aria-labelledby="default-rating" ng-change="$ctrl.update()"></uib-rating>
-    <br>
+        </h2>
+    <button type="button" ng-click="$ctrl.scanTag()" class="btn btn-default btn-sm">
+        <span class="glyphicon glyphicon-plus"></span><small> Get tag info</small>
+    </button>
+    <input type="checkbox" ng-model="$ctrl.forceScan"
+           uib-popover-html="'Force the scan, override existing values'"
+           popover-trigger="mouseenter" popover-placement="top"> Force
    <h3>This tag is used {{$ctrl.sceneTag.scenes.length}} times </h3>
 
-    </h2>
+
     <label
-            uib-popover-html="'Aliases that will be used when auto-tagging scenes. You can specify multiple aliases by separating them with a comma.
-            Also &quot;.&quot; is used to represent any character so an alias such as &quot;P.O.V&quot; will match &quot;pov&quot;,&quot;p1o2v&quot;,&quot;po?v&quot; etc...'"
+            uib-popover-html="'Aliases that will be used when auto-tagging scenes. You can specify multiple aliases by separating them with a comma.<br>Also a dot is used to represent any character so an alias such as P.O.V will match pov, p1o2v etc...'"
             popover-trigger="mouseenter" popover-placement="right">
     Scene Tag Aliases:
     <a href="#" editable-textarea="$ctrl.sceneTag.scene_tag_alias" e-rows="5" e-cols="100"
@@ -49,6 +54,3 @@ body {
 
 
 <section-list-wrapper main-page="false" section-type="'SceneList'"></section-list-wrapper>
-
-
-

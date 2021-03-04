@@ -148,6 +148,7 @@ class SceneTagSerializer(serializers.ModelSerializer):
             "is_fav",
             "is_runner_up",
             "rating",
+            "description",
             "thumbnail",
             "websites",
             "scenes",
@@ -229,18 +230,6 @@ class ActorListSerializer(serializers.ModelSerializer):
 
 
 class ActorSerializer(serializers.ModelSerializer):
-    # url = serializers.HyperlinkedIdentityField(view_name='actor-detail')
-
-    # alias = serializers.HyperlinkedRelatedField(read_only=True, many=True, view_name='actor-alias-details-rest',
-    #                                             lookup_field='actor-alias')
-
-    # actor_aliases = ActorAliasSerializer()
-
-    # actor_aliases = serializers.HyperlinkedRelatedField(allow_null=True, many=True, queryset=ActorAlias.objects.all(),
-    #                                                     required=False, view_name='actor-alias-details-rest')
-
-    # scenes = SceneIdNameSerializer(many=True, read_only=True)
-    # actor_tags = ActorIdNameSerializer(many=True, read_only=True)
 
     actor_tags = ActorTagListSerializer(many=True, read_only=True)
     actor_aliases = ActorAliasSerializer(many=True, read_only=True)
@@ -295,12 +284,12 @@ class ActorOutputSerializer(serializers.ModelSerializer):
     # scenes = SceneIdNameSerializer(many=True, read_only=True)
     # actor_tags = ActorIdNameSerializer(many=True, read_only=True)
 
-    actor_tags = ActorTagListSerializer(many=True, read_only=True)
-    actor_aliases = ActorAliasSerializer(many=True, read_only=True)
+    #actor_tags = ActorTagListSerializer(many=True, read_only=True)
+    #actor_aliases = ActorAliasSerializer(many=True, read_only=True)
     
     class Meta:
         model = Actor
-        depth = 2
+        #depth = 2
         fields = [
             "id",
             "name",
@@ -469,6 +458,7 @@ class ActorTagSerializer(serializers.ModelSerializer):
             "is_fav",
             "is_runner_up",
             "rating",
+            "description",
             "thumbnail",
             "actors",
             "scene_tags",

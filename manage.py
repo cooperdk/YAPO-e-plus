@@ -31,7 +31,7 @@ if __name__ == "__main__":
     # a = pagination
     SCRIPT_ROOT = get_main_dir()
 
-    dbcheck.boot()
+    #dbcheck.boot()
     try:
         if sys.frozen or sys.importers:
             SCRIPT_ROOT = os.path.dirname(sys.executable)
