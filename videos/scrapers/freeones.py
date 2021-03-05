@@ -16,10 +16,9 @@ from dateutil.parser import parse
 from django.utils import timezone
 from utils.printing import Logger
 log = Logger()
-from configuration import Config, Constants
 
 django.setup()
-
+from configuration import Config, Constants
 from videos.models import Actor, ActorAlias, ActorTag
 
 
@@ -27,14 +26,14 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YAPO.settings")
 
 # MEDIA_PATH = "videos\\media"
 
-def onlyChars(input):
-    return "".join(char for char in input if char.isalpha())
+def onlychars(chars):
+    return "".join(char for char in chars if char.isalpha())
 
-def inchtocm(input):
-    if cm.isdigit(): cm=int(cm)*2.54
+def inchtocm(inch):
+    if inch.isdigit(): cm=int(inch)*2.54
     return cm
 
-def sendAllPiercings():
+def sendallpiercings():
     actors = Actor.objects.all()
     for actor in actors:
         aux.send_piercings_to_actortag(actor)
@@ -103,12 +102,12 @@ def search_freeones(actor_to_search: object, alias: object, force: bool = False)
         if has_image:
             images_page = href
 
-            if ("freeones.com" in images_page.lower()):
+            if "freeones.com" in images_page.lower():
                 r = requests.get(images_page)
                 soup = BeautifulSoup(r.content, "html5lib")
 
             if actor_to_search.thumbnail == Constants().unknown_person_image_path:
-                if not("freeones.com" in images_page.lower()):
+                if not "freeones.com" in images_page.lower():
                     aux.progress(3,27,"Searching for Photo")
                 elif soup.find("section", {'id': 'fxgp-gallery'}):
                     aux.progress(3,27,"Searching for Photo")
@@ -121,13 +120,13 @@ def search_freeones(actor_to_search: object, alias: object, force: bool = False)
                         if not os.path.isfile(save_file_name):
                             if first_picture['href']:
                                 if re.match(r'^\/\/', first_picture['href']):
-                                        first_picture_link = f"https:{first_picture['href']}"
-                                        aux.save_actor_profile_image_from_web(first_picture_link, actor_to_search,force)
-                                        aux.progress(4,27,"Storing photo")
+                                    first_picture_link = f"https:{first_picture['href']}"
+                                    aux.save_actor_profile_image_from_web(first_picture_link, actor_to_search,force)
+                                    aux.progress(4,27,"Storing photo")
                                 elif re.match(r'^.*jpg$', first_picture['href']):
-                                        first_picture_link = first_picture['href']
-                                        aux.save_actor_profile_image_from_web(first_picture_link, actor_to_search,force)
-                                        aux.progress(4,27,"Storing photo")
+                                    first_picture_link = first_picture['href']
+                                    aux.save_actor_profile_image_from_web(first_picture_link, actor_to_search,force)
+                                    aux.progress(4,27,"Storing photo")
                         else:
                             aux.progress(4,29,"Not saving photo, one exists")
 
@@ -196,7 +195,7 @@ def search_freeones(actor_to_search: object, alias: object, force: bool = False)
             x = dom.xpath("//p[contains(text(),'Aliases')]//following::p[1]/text()")
             if len(x)>0 and x is not None:
                 actor_aliases = [0].strip()
-                if not("unknown" in actor_aliases.lower()):
+                if not "unknown" in actor_aliases.lower():
                     actor_aliases = actor_aliases.replace(", ", ",")
                     insert_aliases(actor_to_search, actor_aliases)
                     num += 1
@@ -220,7 +219,7 @@ def search_freeones(actor_to_search: object, alias: object, force: bool = False)
         if len(x)>0 and x is not None:
             eyes = x[0].strip()
             eye_color = eyes + ' eyes'
-            if eye_color and len(eye_color)>7 and not "unknown" in eye_color.lower() and not (actor_to_search.actor_tags.filter(name=eye_color)):
+            if eye_color and len(eye_color)>7 and not "unknown" in eye_color.lower() and not actor_to_search.actor_tags.filter(name=eye_color):
                 insert_actor_tag(actor_to_search, eye_color)
                 num += 1
 
@@ -228,7 +227,7 @@ def search_freeones(actor_to_search: object, alias: object, force: bool = False)
 
         hair = dom.xpath("//span[contains(text(),'Hair Color')]//following::span[2]/text()")[0].strip()
         hair_color = hair + ' hair'
-        if hair_color and len(hair_color)>7 and not "unknown" in hair_color.lower() and not (actor_to_search.actor_tags.filter(name=hair_color)):
+        if hair_color and len(hair_color)>7 and not "unknown" in hair_color.lower() and not actor_to_search.actor_tags.filter(name=hair_color):
             insert_actor_tag(actor_to_search, hair_color)
             num += 1
 
@@ -240,7 +239,7 @@ def search_freeones(actor_to_search: object, alias: object, force: bool = False)
             x = dom.xpath("//span[contains(text(),'Height')]//following::span[2]/text()")
             if len(x)>0 and x is not None:
                 height = x[0].strip()
-                if len(height)<1 or height.lower()=="unknown" or height == None: height="0"
+                if len(height)<1 or height.lower()=="unknown" or height is None: height="0"
 
                 height=re.findall(r'^[0-9]+', height)
                 height=int(height[0])
@@ -278,16 +277,16 @@ def search_freeones(actor_to_search: object, alias: object, force: bool = False)
             if len(x)>0 and x is not None:
                 weight = x[0].strip()
             else: weight = "0"
-            if len(weight)<1 or weight.lower()=="unknown" or weight==None: weight="0"
+            if len(weight)<1 or weight.lower()=="unknown" or weight is None: weight="0"
             weight = re.findall(r'^[0-9]+', weight)
             weight = int(weight[0])
             actor_to_search.weight = weight
             num += 1
             aux.progress(16,29,"Weight")
 
-        cupSize = ""
+        cupsize = ""
         #os.system('cls')
-        if not actor_to_search.measurements or actor_to_search.measurements=="":
+        if not actor_to_search.measurements or actor_to_search.measurements == "":
             mea = []
             measurements = []
             #print("Testing measurements")
@@ -318,13 +317,11 @@ def search_freeones(actor_to_search: object, alias: object, force: bool = False)
                         #print(measure)
                     except Exception as e:
                         log.error(f'FO: MEA: {e}')
-                        pass
                     measurements = measure            #next_td_tag1.get_text(strip=True)  #text.strip("'/\n/\t")
                     actor_to_search.measurements = measurements
                 else:
                     measurements = "???-??-??"
                 aux.progress(17,29,"Measurements")
-
 
             if len(measurements)>8  or len(measurements)==3:
                 #print(f"CONV > {measurements}")
@@ -352,57 +349,55 @@ def search_freeones(actor_to_search: object, alias: object, force: bool = False)
                     #wai=int(wai*2.54)
                     #hip=int(hip*2.54)
                     if not "un" in measurements[0:1] and not "?" in measurements[0:3]:
-                        cupSize = onlyChars(measurements)
-                    #print(f"\n\n{cupSize} - {len(measure)} - {len(measurements)}  - {measurements}")
+                        cupsize = onlychars(measurements)
+                    #print(f"\n\n{cupsize} - {len(measure)} - {len(measurements)}  - {measurements}")
 
                     if len(measure)==1:
-                        actor_to_search.measurements=str(che)+cupSize
+                        actor_to_search.measurements=str(che)+cupsize
                     else:
-                        actor_to_search.measurements=str(che)+cupSize+"-"+str(wai)+"-"+str(hip)
+                        actor_to_search.measurements=str(che)+cupsize+"-"+str(wai)+"-"+str(hip)
                     num += 1
                 except Exception as e:
                     log.error(f'FO: MEA: {e}')
-                    pass
             else:
                 actor_to_search.measurements="???-??-??"
             actor_to_search.save()
 
             if len(measurements) > 8 or len(measurements) == 3:
 
-                cupSize = onlyChars(actor_to_search.measurements).upper().strip()
-                if len(cupSize)>0 and not actor_to_search.actor_tags.filter(name=cupSize + " Cup"):
-                    insert_actor_tag(actor_to_search, cupSize + " Cup")
+                cupsize = onlychars(actor_to_search.measurements).upper().strip()
+                if len(cupsize)>0 and not actor_to_search.actor_tags.filter(name=cupsize + " Cup"):
+                    insert_actor_tag(actor_to_search, cupsize + " Cup")
                     num += 1
-                    aux.progress(18,29,f"Measurements ({cupSize} Cup)")
+                    aux.progress(18,29,f"Measurements ({cupsize} Cup)")
                     try:
-                        if cupSize[0] in 'A' and len(cupSize) < 5 and not actor_to_search.actor_tags.filter(name="Tiny tits"):
+                        if cupsize[0] in 'A' and len(cupsize) < 5 and not actor_to_search.actor_tags.filter(name="Tiny tits"):
                             insert_actor_tag(actor_to_search, "Tiny tits")
                             num += 1
-                        if cupSize[0] in 'B' and len(cupSize) < 5 and not actor_to_search.actor_tags.filter(name="Small tits"):
+                        if cupsize[0] in 'B' and len(cupsize) < 5 and not actor_to_search.actor_tags.filter(name="Small tits"):
                             insert_actor_tag(actor_to_search, "Small tits")
                             num += 1
-                        if cupSize[0] in 'C' and len(cupSize) < 5 and not actor_to_search.actor_tags.filter(name="Medium tits"):
+                        if cupsize[0] in 'C' and len(cupsize) < 5 and not actor_to_search.actor_tags.filter(name="Medium tits"):
                             insert_actor_tag(actor_to_search, "Medium tits")
                             num += 1
-                        elif cupSize[0] in 'DEF' and len(cupSize) < 5 and not actor_to_search.actor_tags.filter(name="Big tits"):
+                        elif cupsize[0] in 'DEF' and len(cupsize) < 5 and not actor_to_search.actor_tags.filter(name="Big tits"):
                             insert_actor_tag(actor_to_search, "Big tits")
                             num += 1
-                        elif cupSize[0] in 'GHI' and len(cupSize) < 5 and not actor_to_search.actor_tags.filter(name="Very big tits"):
+                        elif cupsize[0] in 'GHI' and len(cupsize) < 5 and not actor_to_search.actor_tags.filter(name="Very big tits"):
                             insert_actor_tag(actor_to_search, "Very big tits")
                             num += 1
-                        elif cupSize[0] in 'JKLM' and len(cupSize) < 5 and not actor_to_search.actor_tags.filter(name="Huge tits"):
+                        elif cupsize[0] in 'JKLM' and len(cupsize) < 5 and not actor_to_search.actor_tags.filter(name="Huge tits"):
                             insert_actor_tag(actor_to_search, "Huge tits")
                             num += 1
-                        elif cupSize[0] in 'NOPQRS' and len(cupSize) < 5 and not actor_to_search.actor_tags.filter(name="Extremely huge tits"):
+                        elif cupsize[0] in 'NOPQRS' and len(cupsize) < 5 and not actor_to_search.actor_tags.filter(name="Extremely huge tits"):
                             insert_actor_tag(actor_to_search, "Extremely huge tits")
                             num += 1
-                        elif cupSize[0] in 'TUVWXYZ' and len(cupSize) < 5 and not actor_to_search.actor_tags.filter(name="Gigantic tits"):
+                        elif cupsize[0] in 'TUVWXYZ' and len(cupsize) < 5 and not actor_to_search.actor_tags.filter(name="Gigantic tits"):
                             insert_actor_tag(actor_to_search, "Gigantic tits")
                             num += 1
 
                     except Exception as e:
                         log.error(f'FO: CUPS: {e}')
-                        pass
                 aux.progress(19, 29, "Measurements [Tits description]")
 
         if not actor_to_search.actor_tags.filter(name="Natural tits") or not actor_to_search.actor_tags.filter(name="Fake tits"):
@@ -565,7 +560,7 @@ def search_freeones(actor_to_search: object, alias: object, force: bool = False)
             result = aux.send_piercings_to_actortag(actor_to_search)
             num += result
             aux.progress(27,29,"Sending piercings to tags")
-            #    sendAllPiercings() #    use this whenever you want to update all piercings in db
+            #    sendallpiercings() #    use this whenever you want to update all piercings in db
 
 
             actor_to_search.last_lookup = datetime.datetime.now()
@@ -627,8 +622,7 @@ def insert_aliases(actor_to_insert, aliases):
                 alias_to_insert.save()
                 actor_to_insert.actor_aliases.add(alias_to_insert)
             except django.db.IntegrityError as e:
-                print(e)
-                pass
+                log.error(f"SCRAPER: FO: {e}")
 
 
 def match_link_to_query(soup_links, text_to_find):

@@ -323,10 +323,10 @@ def is_domain_reachable(host, timeout=5) -> bool:
         result =  True
     elif response.status_code < 500:
         result = False
-        log.warn(f"{host} reported a response error {response.status}. Please report this to Team YAPO.")
+        log.warn(f"{host} reported a response error {response.status_code}. Please report this to Team YAPO.")
     else:
         result = False
-        log.warn(f"{host} reported a server error {response.status}.")
+        log.warn(f"{host} reported a server error {response.status_code}.")
 
     return result
 
