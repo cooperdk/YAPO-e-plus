@@ -374,28 +374,32 @@ def populate_tag(searchtag, tagtype, force) -> int:
             found=1
         else:
             return 0
+    try:
+        if image and len(image)<5:
+            found=4
+        if image and len(image)>5:
+            img=json.loads(image)
+            #print("img: " + str(img))
+            imgsave=img[0]["name"]
+            imgthumb=img[0]["thumbnail"]
+            imgsave = imgsave.replace("\\\\", "").split("/")[1]
+            imgthumb = imgthumb.replace("\\\\", "").split("/")[1]
+            #log.sinfo(f"Downloading tag image {imgsave} with thumbnail...")
+            suf=Path(imgsave).suffix
+            folder = os.path.join(Config().site_media_path, 'tags', scf, str(tag.id))
+            fimg = os.path.join(folder,"tagimg.jpg")
+            fthumb = os.path.join(folder,"tagthumb.jpg")
+            if not os.path.isdir(folder):
+                os.makedirs(folder)
 
-    if image:
-        img=json.loads(image)
-        #print("img: " + str(img))
-        imgsave=img[0]["name"]
-        imgthumb=img[0]["thumbnail"]
-        imgsave = imgsave.replace("\\\\", "").split("/")[1]
-        imgthumb = imgthumb.replace("\\\\", "").split("/")[1]
-        #log.sinfo(f"Downloading tag image {imgsave} with thumbnail...")
-        suf=Path(imgsave).suffix
-        folder = os.path.join(Config().site_media_path, 'tags', scf, str(tag.id))
-        fimg = os.path.join(folder,"tagimg"+suf)
-        fthumb = os.path.join(folder,"tagthumb"+suf)
-        if not os.path.isdir(folder):
-            os.makedirs(folder)
+            aux.download_image("http://api.porn-organizer.org/photos/"+imgsave,fimg)
 
-        aux.download_image("http://api.porn-organizer.org/photos/"+imgsave,fimg)
-
-        if aux.download_image("http://api.porn-organizer.org/thumbs/"+imgthumb,fthumb):
-            relpath = os.path.relpath(fthumb, start="data")
-            asuri = urllib.request.pathname2url(relpath)
-            tag.thumbnail = asuri
+            if aux.download_image("http://api.porn-organizer.org/thumbs/"+imgthumb,fthumb):
+                relpath = os.path.relpath(fthumb, start="data")
+                asuri = urllib.request.pathname2url(relpath)
+                tag.thumbnail = asuri
+    except Exception as e:
+        log.warn(f'YAPOAPI: TAG: Error occured when getting image')
 
     if yapoid:
         tag.yapo_id = yapoid
@@ -403,22 +407,27 @@ def populate_tag(searchtag, tagtype, force) -> int:
         tag.description = desc
 
     if searchtag == "SceneTag":
+        foundx=False
         try:
             extags = tag.aliases.split(",")
             for x in response["records"]["aliases"]:
-                found=False
+                foundx=False
                 for extag in extags:
                     if x[alias] == extag.strip():
-                        found=True
+                        foundx=True
                         break
                     else:
-                        found=False
-                if not found:
+                        foundx=False
+                if not foundx:
                     extag.append(x[alias])
             tag.aliases = ",".join(extag)
         except:
             log.warn("TAGS: Error while enumerating tag aliases.")
     tag.save()
+
+    if found==4:
+        return 4
+
     return 1
 
 def populate_websites(force):
@@ -696,6 +705,8 @@ class getTags(views.APIView):
             return HttpResponse("The tag has already been scanned, and you didn't force the scan.", status=403)
         elif success == 3:
             return HttpResponse("The YAPO Tags API is unreachable. Try again later.", status=503)
+        elif success == 4:
+            return HttpResponse("Successfully registered data for the tag, but there was no image.", status=200)
         else:
             return HttpResponse("This tag was not found using The YAPO Tags API.", status=404)
 

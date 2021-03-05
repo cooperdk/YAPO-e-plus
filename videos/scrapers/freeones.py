@@ -18,10 +18,6 @@ from utils.printing import Logger
 log = Logger()
 from configuration import Config, Constants
 
-import requests.packages.urllib3
-requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
-#urllib3.disable_warnings()
-
 django.setup()
 
 from videos.models import Actor, ActorAlias, ActorTag
@@ -59,7 +55,7 @@ def search_freeones(actor_to_search: object, alias: object, force: bool = False)
         name_with_plus = name.replace(' ', '+')
         name_with_dash = name.replace(' ', '-')
         print(f"Searching Freeones for {actor_to_search.name}... ")
-    r = requests.get(f"https://www.freeones.com/babes?q={name_with_dash}", verify=False)
+    r = requests.get(f"https://www.freeones.com/babes?q={name_with_dash}")
 
     soup = BeautifulSoup(r.content, "html5lib")
 
@@ -77,7 +73,7 @@ def search_freeones(actor_to_search: object, alias: object, force: bool = False)
         actor_to_search.gender = 'F'
         actor_to_search.save()
         actor_page = urllib_parse.urljoin("https://www.freeones.com/", href_found)
-        r = requests.get(actor_page, verify=False)
+        r = requests.get(actor_page)
 
         soup = BeautifulSoup(r.content, "html5lib")
         content = BeautifulSoup(r.content, "html.parser")
@@ -108,7 +104,7 @@ def search_freeones(actor_to_search: object, alias: object, force: bool = False)
             images_page = href
 
             if ("freeones.com" in images_page.lower()):
-                r = requests.get(images_page, verify=False)
+                r = requests.get(images_page)
                 soup = BeautifulSoup(r.content, "html5lib")
 
             if actor_to_search.thumbnail == Constants().unknown_person_image_path:
@@ -141,7 +137,7 @@ def search_freeones(actor_to_search: object, alias: object, force: bool = False)
         #return success
 
 
-        r = requests.get(biography_page, verify=False,timeout=7)
+        r = requests.get(biography_page)
         soup = BeautifulSoup(r.content, "html5lib")
         soup_links = soup.find_all("p", {'class': ['heading', "text-center", "pt-1"]}) # {'class': ['heading', 'mb1']})    ("p", {'class': ['profile-meta-item']})
         content = BeautifulSoup(r.content, "html.parser")
