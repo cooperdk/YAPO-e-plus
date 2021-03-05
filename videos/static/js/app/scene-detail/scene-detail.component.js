@@ -130,13 +130,6 @@ angular.module('sceneDetail').component('sceneDetail', {
             };
 
             self.updateScene = function (scene) {
-
-
-                // if (self.scene.actors == '-1') {
-                //     self.scene.actors = [];
-                // }
-
-
                 Scene.update({sceneId: scene.id}, scene);
             };
 
@@ -394,7 +387,7 @@ angular.module('sceneDetail').component('sceneDetail', {
                     self.addAlert(response.data, 'success', '10000');
                     self.getCurrentScene()
                 }, function errorCallback(response) {
-                    self.addAlert(response.data, 'warning', '10000');
+                    self.addAlert(response.data, 'warning', '20000');
                     console.log(angular.toJson(response))
                 });
 

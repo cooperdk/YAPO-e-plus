@@ -1,6 +1,7 @@
 <style ng-if="$ctrl.actorTag.thumbnail">
 body {
-  background-image: linear-gradient(to bottom, rgba(20,20,20,0.8) 0%,rgba(20,20,20,0.5) 80%), url('media/tags/actor/{{$ctrl.actorTag.id}}/tagimg.jpg');
+  background-image: linear-gradient(to top, rgba(75, 75, 75, 0.9), rgba(50, 50, 50, 0.95)),
+  url('media/tags/actor/{{$ctrl.actorTag.id}}/tagimg.jpg');
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-size: cover;
@@ -10,7 +11,7 @@ body {
 <uib-alert ng-repeat="alert in $ctrl.alerts" class="enter" type="{{ alert.type }}" close="$ctrl.closeAlert($index)"
            dismiss-on-timeout="{{ alert.timeout }}">{{ alert.msg }}
 </uib-alert>
-<div ng-if="$ctrl.actorTag.thumbnail" align="left" style="position: absolute; z-index: 9; overflow; left: 64; top: 32;"><img style="max-width: 320px; max-height: 220px; height: auto; width: auto; cursor:default; border-style: none; border-bottom: none;" ng-src="{{$ctrl.actorTag.thumbnail}}" onError=null;this.src="media/images/blank.png";this.style="width:0px;"> <!--{{$ctrl.website.thumbnail}}--></div>
+<div ng-if="$ctrl.actorTag.thumbnail" align="left" style="position: absolute; z-index: 9; overflow; left: 64; top: 32;"><img style="max-width: 320px; max-height: 220px; height: auto; width: auto; cursor:default; " class="sceneactorthumb img-responsive shadow-2" ng-src="{{$ctrl.actorTag.thumbnail}}" onError=null;this.src="media/images/blank.png";this.style="width:0px;"> <!--{{$ctrl.website.thumbnail}}--></div>
 
 <h1 align="center">
     <a href="#" editable-text="$ctrl.actorTag.name"

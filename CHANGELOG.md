@@ -2,6 +2,15 @@
 
 (WIN) = Windows exclusive, (LIN) = Linux exclusive
 
+## (0.7.6.55)
+
+### Changes
+
+* Another command argument is introduced (works in both compiled and Python version).
+It is now possible to disable both the automatic browser opening (command argument: no-browser) as well as automatic 
+  migration (command argument: no-migration). This makes YAPO boot faster, but it will error out if a migration is 
+  actually needed.
+
 ## 210304 (0.7.6.51)
 
  *This update requires migrations. This happens automatically.*

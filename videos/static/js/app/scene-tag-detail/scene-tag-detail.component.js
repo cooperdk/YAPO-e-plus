@@ -13,6 +13,7 @@ angular.module('sceneTagDetail').component('sceneTagDetail', {
             self.closeAlert = function (index) {
                 self.alerts.splice(index, 1);
             };
+
             self.sceneTag = SceneTag.get({sceneTagId: $routeParams.sceneTagId}).$promise.then(function (res) {
                 scopeWatchService.sceneTagLoaded(res);
                 self.sceneTag = res;
@@ -21,11 +22,23 @@ angular.module('sceneTagDetail').component('sceneTagDetail', {
                 gotPromise = true
             });
 
+                self.getCurrentTag = function () {
+                self.sceneTag = SceneTag.get({sceneTagId: $routeParams.sceneTagId}).$promise.then(function (res) {
+                    self.currentTag = res.id;
+                    console.log("SceneTag detail: current id is " + angular.toJson(self.currentTag));
+                    self.sceneTag = res;
+                    gotPromise = true;
+                    scopeWatchService.sceneTagLoaded(res);
+
+                });
+                };
+
             $scope.$on("didSceneTagLoad", function (event, sceneTag) {
                 if (gotPromise){
                     scopeWatchService.sceneTagLoaded(self.sceneTag);
                 }
             });
+
 
             self.scanTag = function () {
             console.log('Scanning scene tag ID '+self.sceneTag.id);
@@ -39,8 +52,8 @@ angular.module('sceneTagDetail').component('sceneTagDetail', {
                 }
             }).then(function (response) {
                 // alert(angular.toJson(response))
-                self.addAlert(response.data, 'success', '10000');
-                self.getCurrentScene()
+                self.addAlert(response.data, 'success', '3000');
+                self.getCurrentTag()
             }, function errorCallback(response) {
                 self.addAlert(response.data, 'warning', '10000');
                 console.log(angular.toJson(response))

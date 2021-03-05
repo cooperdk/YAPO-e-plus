@@ -26,12 +26,13 @@ def boot():
         print("No database\n===========")
         print(f"There is no database installed at: {os.path.join(dest, 'db.sqlite3')}\nGenerating a new database...\n\n")
         time.sleep(4)
-        a=call_command('makemigrations')
-        b=call_command('migrate')
+        a=call_command('makemigrations, interactive = False')
+        b=call_command('migrate, interactive = False')
         return
     else:
         '''
-        This needs to be modified to actually check for pending migrations
+        This needs to be modified to actually check for pending migrations.
+        As it is now, migration is always performed on startup.
         '''
         #try:
         #    check = call_command('makemigrations','--check','--dry-run')
@@ -40,6 +41,6 @@ def boot():
         #    #sys.exit(0)
         #if check is not None:
         #    log.info(f'DBCHK: Database needs an upgrade, migration commencing.')
-        a=call_command('makemigrations')
-        a=call_command('migrate')
+        a=call_command('makemigrations', interactive = False)
+        a=call_command('migrate', interactive = False)
         return

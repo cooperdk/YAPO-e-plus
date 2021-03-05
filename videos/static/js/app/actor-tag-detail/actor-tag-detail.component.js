@@ -27,6 +27,18 @@ angular.module('actorTagDetail').component('actorTagDetail', {
                 // alert(self.actorPks)
             });
 
+                self.getCurrentTag = function () {
+                self.actorTag = ActorTag.get({actorTagId: $routeParams.actorTagId}).$promise.then(function (res) {
+                    self.currentTag = res.id;
+                    console.log("ActorTag detail: current id is " + angular.toJson(self.currentTag));
+                    self.actorTag = res;
+                    gotPromise = true;
+                    scopeWatchService.actorTagLoaded(res);
+
+                });
+
+            };
+
              $scope.$on("didActorTagLoad", function (event, scene) {
 
                 if (gotPromise){
@@ -43,23 +55,21 @@ angular.module('actorTagDetail').component('actorTagDetail', {
                         tag_id: self.actorTag.id,
                         tag_type: 'ActorTag',
                         force: self.forceScan
-
                     }
                 }).then(function (response) {
                     // alert(angular.toJson(response))
-                    self.addAlert(response.data, 'success', '10000');
-                    self.getCurrentScene()
+                    self.addAlert(response.data, 'success', '3000');
+                    self.getCurrentTag()
                 }, function errorCallback(response) {
-                    self.addAlert(response.data, 'warning', '10000');
+                    self.addAlert(response.data, 'warning', '20000');
                     console.log(angular.toJson(response))
                 });
             };
 
 
-
             self.update = function () {
                 ActorTag.update({actorTagId: self.actorTag.id}, self.actorTag)
-            }
+            };
 
         }
     ]

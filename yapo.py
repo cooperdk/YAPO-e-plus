@@ -56,8 +56,8 @@ if not os.path.exists(os.path.join(Config().site_media_path,"websites")):
 
 if not os.path.exists(Config().database_dir):
     os.makedirs(Config().database_dir)
-
-dbcheck.boot()
+if "no-migration" not in str(sys.argv):
+    dbcheck.boot()
 
 from waitress import serve
 from YAPO.wsgi import application
