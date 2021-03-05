@@ -75,19 +75,14 @@ def get_scenes_in_folder_recursive(folder, scene_list):
     scenes = list(folder.scenes.all())
     scene_list = list(chain(scene_list, scenes))
 
-    if folder.children.count() == 0:
-        return scene_list
-
-    else:
+    if folder.children.count() != 0:
         for child in folder.children.all():
             scene_list = get_scenes_in_folder_recursive(child, scene_list)
-
-        return scene_list
+    return scene_list
 
 
 def onlyChars(input):
-    valids = "".join(character for character in input if character.isalpha())
-    return valids
+    return "".join(character for character in input if character.isalpha())
 
 
 def get_folders_recursive(folder, folder_list):
@@ -97,16 +92,13 @@ def get_folders_recursive(folder, folder_list):
     if folder.children.count() == 0:
         return list()
 
-    else:
+    for child in folder.children.all():
+        temp_list = get_folders_recursive(child, folder_list)
+        folders = list(folder.children.all())
+        # folder_list = list(chain(folder_list, folders))
+        folder_list = list(chain(folders, temp_list))
 
-        for child in folder.children.all():
-            temp_list = get_folders_recursive(child, folder_list)
-
-            folders = list(folder.children.all())
-            # folder_list = list(chain(folder_list, folders))
-            folder_list = list(chain(folders, temp_list))
-
-        return folder_list
+    return folder_list
 
 
 def lambda_attrgetter(string, x):
@@ -116,7 +108,7 @@ def lambda_attrgetter(string, x):
 
 
 def search_in_get_queryset(original_queryset, request):
-    qs_list = list()
+    qs_list = []
     term_is_not_null = False
     random = False
     sort_by = "name"
@@ -142,9 +134,11 @@ def search_in_get_queryset(original_queryset, request):
                 )
                 was_searched = True
         else:
-            if request.query_params["pageType"]:
-                if request.query_params["pageType"] == "DbFolder":
-                    original_queryset = original_queryset.filter(level=0)
+            if (
+                request.query_params["pageType"]
+                and request.query_params["pageType"] == "DbFolder"
+            ):
+                original_queryset = original_queryset.filter(level=0)
 
     if (
         "recursive" in request.query_params
@@ -160,10 +154,12 @@ def search_in_get_queryset(original_queryset, request):
     else:
         z = False
         try:
-            if request.query_params["pageType"]:
-
-                if request.query_params["pageType"] == "DbFolder" and was_searched:
-                    z = True
+            if (
+                request.query_params["pageType"]
+                and request.query_params["pageType"] == "DbFolder"
+                and was_searched
+            ):
+                z = True
         except MultiValueDictKeyError:
             pass
 
@@ -192,7 +188,7 @@ def search_in_get_queryset(original_queryset, request):
 
                     for term in terms:
                         if qs_list:
-                            t_list = list()
+                            t_list = []
                             for i in qs_list:
                                 if type(getattr(i, qp)) is bool:
                                     if bool(term) == getattr(i, qp):
@@ -478,7 +474,7 @@ def populate_websites(force):
                 if found:
                     try:
                         newname = site.name
-                        if not tss.lower() in site.website_alias.lower():
+                        if tss.lower() not in site.website_alias.lower():
                             if len(site.website_alias) > 1:
                                 site.website_alias += f",{tss.lower()}"
                             else:
@@ -516,6 +512,7 @@ def tpdb_scan_actor(actor, force: bool):
         'User-Agent': 'YAPO 0.7.6',
     }
     response = requests.request('GET', url, headers=headers, params=params)  # , params=params
+    success = False
     #print("\n")
     if response.status_code < 300:
         try:
@@ -527,7 +524,6 @@ def tpdb_scan_actor(actor, force: bool):
         bio = ""
         desc = ""
         changed = False
-        success = False
         photo = ""
         if all([response['data'], len(str(response['data'])) > 15]):
             #print("1")
@@ -559,19 +555,27 @@ def tpdb_scan_actor(actor, force: bool):
                         else:
                             log.swarn(f"DOWNLOAD ERROR: Photo ({actor.name}): {img}")
 
-                if any([force, not actor.description, len(actor.description) < 128, "freeones" in actor.description.lower()]):
-                    if desc:
-                        if len(desc) > 72:
-                            actor.description = aux.strip_html(desc)
-                            changed = True
-                            success = True
-                            photo += " [ Description ]"
-                if pid:
-                    if not actor.tpdb_id or force:
-                        actor.tpdb_id = pid
-                        photo += " [ TpDB ID ]"
-                        changed = True
-                        success = True
+                if (
+                    any(
+                        [
+                            force,
+                            not actor.description,
+                            len(actor.description) < 128,
+                            "freeones" in actor.description.lower(),
+                        ]
+                    )
+                    and desc
+                    and len(desc) > 72
+                ):
+                    actor.description = aux.strip_html(desc)
+                    changed = True
+                    success = True
+                    photo += " [ Description ]"
+                if pid and (not actor.tpdb_id or force):
+                    actor.tpdb_id = pid
+                    photo += " [ TpDB ID ]"
+                    changed = True
+                    success = True
                 if success:
                     actor.last_lookup = datetime.datetime.now()
                     actor.modified_date = datetime.datetime.now()
@@ -601,7 +605,6 @@ def tpdb_scan_actor(actor, force: bool):
             return success
     else:
         log.warn(f"An error occured while retrieving data about {actor.name}.")
-        success = False
         return success
 
 def scrape_all_actors(force):
@@ -692,11 +695,7 @@ class getTags(views.APIView):
         """
         tagid=request.query_params["tag_id"]
         tagtype=request.query_params["tag_type"]
-        if request.query_params["force"] == "true":
-            force = True
-        else:
-            force = False
-
+        force = request.query_params["force"] == "true"
         success=populate_tag(tagid,tagtype,force)
 
         if success == 1:
@@ -716,10 +715,7 @@ class scanScene(views.APIView):
         search_site = request.query_params["scanSite"]
         scene_id = request.query_params["scene"]
 
-        if request.query_params["force"] == "true":
-            force = True
-        else:
-            force = False
+        force = request.query_params["force"] == "true"
         if Config().debug=="true":
             log.sinfo("Now entering the TPDB scene scanner API REST view")
 
@@ -738,10 +734,7 @@ class ScrapeActor(views.APIView):
     def get(self, request, format=None):
         search_site = request.query_params["scrapeSite"]
         actor_id = request.query_params["actor"]
-        if request.query_params["force"] == "true":
-            force = True
-        else:
-            force = False
+        force = request.query_params["force"] == "true"
         if Config().debug=="true":
             log.sinfo("Now entering the scrape actor API REST view")
         print(f"Scanning for {Actor.objects.get(pk=actor_id).name} on {search_site}")
@@ -873,215 +866,216 @@ def checkDupeHash(hash):
 
 @api_view(["GET", "POST"])
 def tag_multiple_items(request):
-    if request.method == "POST":
-        # print("We got a post request!")
+    if request.method != "POST":
+        return
+    # print("We got a post request!")
 
-        params = request.data["params"]
+    params = request.data["params"]
 
-        if params["type"] == "scene":
-            print("Patching scene")
+    if params["type"] == "scene":
+        print("Patching scene")
 
-            if params["patchType"] == "websites":
+        if params["patchType"] == "websites":
 
-                website_id = params["patchData"][0]
-                website_to_add = Website.objects.get(pk=website_id)
-                scenes_to_update = params["itemsToUpdate"]
+            website_id = params["patchData"][0]
+            website_to_add = Website.objects.get(pk=website_id)
+            scenes_to_update = params["itemsToUpdate"]
 
-                if params["addOrRemove"] == "add":
+            if params["addOrRemove"] == "add":
 
-                    for x in scenes_to_update:
-                        scene_to_update = Scene.objects.get(pk=x)
-                        scene_to_update.websites.add(website_to_add)
-                        print(
-                            f"Added Website '{website_to_add.name}' to scene '{scene_to_update.name}'"
-                        )
-
-                        if website_to_add.scene_tags.count() > 0:
-                            for tag in website_to_add.scene_tags.all():
-                                scene_to_update.scene_tags.add(tag)
-                                print(
-                                    f"Added Scene Tag '{tag.name}' to scene '{scene_to_update.name}'"
-                                )
-
-                        scene_to_update.save()
-                if params["addOrRemove"] == "remove":
-                    for x in scenes_to_update:
-                        scene_to_update = Scene.objects.get(pk=x)
-                        scene_to_update.websites.remove(website_to_add)
-                        print(
-                            f"Removed Website '{website_to_add.name}' from scene '{scene_to_update.name}'"
-                        )
-                        if website_to_add.scene_tags.count() > 0:
-                            for tag in website_to_add.scene_tags.all():
-                                if tag in scene_to_update.scene_tags.all():
-                                    scene_to_update.scene_tags.remove(tag)
-                                    print(
-                                        f"Removed Scene Tag '{tag.name}' from scene '{scene_to_update.name}'"
-                                    )
-                        scene_to_update.save()
-
-            elif params["patchType"] == "scene_tags":
-                scene_tag_id = params["patchData"][0]
-                scene_tag_to_add = SceneTag.objects.get(pk=scene_tag_id)
-                scenes_to_update = params["itemsToUpdate"]
-
-                if params["addOrRemove"] == "add":
-
-                    for x in scenes_to_update:
-                        scene_to_update = Scene.objects.get(pk=x)
-                        scene_to_update.scene_tags.add(scene_tag_to_add)
-                        scene_to_update.save()
-                        print(
-                            f"Added Scene Tag '{scene_tag_to_add.name}' to scene '{scene_to_update.name}'"
-                        )
-
-                if params["addOrRemove"] == "remove":
-                    for x in scenes_to_update:
-                        scene_to_update = Scene.objects.get(pk=x)
-                        scene_to_update.scene_tags.remove(scene_tag_to_add)
-                        scene_to_update.save()
-                        print(
-                            f"Removed Scene Tag '{scene_tag_to_add.name}' from scene '{scene_to_update.name}'"
-                        )
-            elif params["patchType"] == "actors":
-                actor_id = params["patchData"][0]
-                actor_to_add = Actor.objects.get(pk=actor_id)
-                scenes_to_update = params["itemsToUpdate"]
-
-                if params["addOrRemove"] == "add":
-
-                    for x in scenes_to_update:
-                        scene_to_update = Scene.objects.get(pk=x)
-                        scene_to_update.actors.add(actor_to_add)
-                        print(
-                            f"Added Actor '{actor_to_add.name}' to scene '{scene_to_update.name}'"
-                        )
-
-                        if actor_to_add.actor_tags.count() > 0:
-                            for actor_tag in actor_to_add.actor_tags.all():
-                                scene_to_update.scene_tags.add(
-                                    actor_tag.scene_tags.first()
-                                )
-                                print(
-                                    f"Added Scene Tag '{actor_tag.scene_tags.first().name}' to scene '{scene_to_update.name}'"
-                                )
-
-                        scene_to_update.save()
-
-                if params["addOrRemove"] == "remove":
-                    for x in scenes_to_update:
-                        scene_to_update = Scene.objects.get(pk=x)
-                        scene_to_update.actors.remove(actor_to_add)
-                        print(
-                            f"Removed Actor '{actor_to_add.name}' from scene '{scene_to_update.name}'"
-                        )
-
-                        if actor_to_add.actor_tags.count() > 0:
-                            for actor_tag in actor_to_add.actor_tags.all():
-                                if (
-                                    actor_tag.scene_tags.first()
-                                    in scene_to_update.scene_tags.all()
-                                ):
-                                    scene_to_update.scene_tags.remove(
-                                        actor_tag.scene_tags.first()
-                                    )
-                                    print(
-                                        f"Removed Scene Tag '{actor_tag.scene_tags.first().name}' to scene '{scene_to_update.name}'"
-                                    )
-                        scene_to_update.save()
-
-            elif params["patchType"] == "delete":
-                scenes_to_update = params["itemsToUpdate"]
-
-                if params["permDelete"]:
-                    print("permDelete true")
-                    for x in scenes_to_update:
-                        scene_to_update = Scene.objects.get(pk=x)
-                        permanently_delete_scene_and_remove_from_db(scene_to_update)
-                else:
-                    for x in scenes_to_update:
-                        scene_to_update = Scene.objects.get(pk=x)
-                        scene_to_update.delete()
-                        print(
-                            f"Removed scene '{scene_to_update.name}' from database"
-                        )
-
-            elif params["patchType"] == "playlists":
-                playlist_id = params["patchData"][0]
-                playlist_to_add = Playlist.objects.get(pk=playlist_id)
-                scenes_to_update = params["itemsToUpdate"]
-
-                if params["addOrRemove"] == "add":
-
-                    for x in scenes_to_update:
-                        scene_to_update = Scene.objects.get(pk=x)
-                        scene_to_update.playlists.add(playlist_to_add)
-                        print(
-                            f"Scene '{scene_to_update.name}' was added to playlist '{playlist_to_add.name}'"
-                        )
-                        scene_to_update.save()
-                if params["addOrRemove"] == "remove":
-                    for x in scenes_to_update:
-                        scene_to_update = Scene.objects.get(pk=x)
-                        scene_to_update.playlists.remove(playlist_to_add)
-                        print(
-                            f"Scene '{scene_to_update.name}' was removed to playlist '{playlist_to_add.name}'"
-                        )
-                        scene_to_update.save()
-
-            else:
-                scenes_to_update = params["itemsToUpdate"]
                 for x in scenes_to_update:
                     scene_to_update = Scene.objects.get(pk=x)
-                    patch_type = params["patchType"]
-                    patch_data = params["patchData"]
-                    setattr(scene_to_update, patch_type, patch_data)
-                    # scene_to_update[patch_type] = patch_data
-
+                    scene_to_update.websites.add(website_to_add)
                     print(
-                        f"Set scene's '{scene_to_update}' attribute '{patch_type}' to '{patch_data}'"
+                        f"Added Website '{website_to_add.name}' to scene '{scene_to_update.name}'"
+                    )
+
+                    if website_to_add.scene_tags.count() > 0:
+                        for tag in website_to_add.scene_tags.all():
+                            scene_to_update.scene_tags.add(tag)
+                            print(
+                                f"Added Scene Tag '{tag.name}' to scene '{scene_to_update.name}'"
+                            )
+
+                    scene_to_update.save()
+            if params["addOrRemove"] == "remove":
+                for x in scenes_to_update:
+                    scene_to_update = Scene.objects.get(pk=x)
+                    scene_to_update.websites.remove(website_to_add)
+                    print(
+                        f"Removed Website '{website_to_add.name}' from scene '{scene_to_update.name}'"
+                    )
+                    if website_to_add.scene_tags.count() > 0:
+                        for tag in website_to_add.scene_tags.all():
+                            if tag in scene_to_update.scene_tags.all():
+                                scene_to_update.scene_tags.remove(tag)
+                                print(
+                                    f"Removed Scene Tag '{tag.name}' from scene '{scene_to_update.name}'"
+                                )
+                    scene_to_update.save()
+
+        elif params["patchType"] == "scene_tags":
+            scene_tag_id = params["patchData"][0]
+            scene_tag_to_add = SceneTag.objects.get(pk=scene_tag_id)
+            scenes_to_update = params["itemsToUpdate"]
+
+            if params["addOrRemove"] == "add":
+
+                for x in scenes_to_update:
+                    scene_to_update = Scene.objects.get(pk=x)
+                    scene_to_update.scene_tags.add(scene_tag_to_add)
+                    scene_to_update.save()
+                    print(
+                        f"Added Scene Tag '{scene_tag_to_add.name}' to scene '{scene_to_update.name}'"
+                    )
+
+            if params["addOrRemove"] == "remove":
+                for x in scenes_to_update:
+                    scene_to_update = Scene.objects.get(pk=x)
+                    scene_to_update.scene_tags.remove(scene_tag_to_add)
+                    scene_to_update.save()
+                    print(
+                        f"Removed Scene Tag '{scene_tag_to_add.name}' from scene '{scene_to_update.name}'"
+                    )
+        elif params["patchType"] == "actors":
+            actor_id = params["patchData"][0]
+            actor_to_add = Actor.objects.get(pk=actor_id)
+            scenes_to_update = params["itemsToUpdate"]
+
+            if params["addOrRemove"] == "add":
+
+                for x in scenes_to_update:
+                    scene_to_update = Scene.objects.get(pk=x)
+                    scene_to_update.actors.add(actor_to_add)
+                    print(
+                        f"Added Actor '{actor_to_add.name}' to scene '{scene_to_update.name}'"
+                    )
+
+                    if actor_to_add.actor_tags.count() > 0:
+                        for actor_tag in actor_to_add.actor_tags.all():
+                            scene_to_update.scene_tags.add(
+                                actor_tag.scene_tags.first()
+                            )
+                            print(
+                                f"Added Scene Tag '{actor_tag.scene_tags.first().name}' to scene '{scene_to_update.name}'"
+                            )
+
+                    scene_to_update.save()
+
+            if params["addOrRemove"] == "remove":
+                for x in scenes_to_update:
+                    scene_to_update = Scene.objects.get(pk=x)
+                    scene_to_update.actors.remove(actor_to_add)
+                    print(
+                        f"Removed Actor '{actor_to_add.name}' from scene '{scene_to_update.name}'"
+                    )
+
+                    if actor_to_add.actor_tags.count() > 0:
+                        for actor_tag in actor_to_add.actor_tags.all():
+                            if (
+                                actor_tag.scene_tags.first()
+                                in scene_to_update.scene_tags.all()
+                            ):
+                                scene_to_update.scene_tags.remove(
+                                    actor_tag.scene_tags.first()
+                                )
+                                print(
+                                    f"Removed Scene Tag '{actor_tag.scene_tags.first().name}' to scene '{scene_to_update.name}'"
+                                )
+                    scene_to_update.save()
+
+        elif params["patchType"] == "delete":
+            scenes_to_update = params["itemsToUpdate"]
+
+            if params["permDelete"]:
+                print("permDelete true")
+                for x in scenes_to_update:
+                    scene_to_update = Scene.objects.get(pk=x)
+                    permanently_delete_scene_and_remove_from_db(scene_to_update)
+            else:
+                for x in scenes_to_update:
+                    scene_to_update = Scene.objects.get(pk=x)
+                    scene_to_update.delete()
+                    print(
+                        f"Removed scene '{scene_to_update.name}' from database"
+                    )
+
+        elif params["patchType"] == "playlists":
+            playlist_id = params["patchData"][0]
+            playlist_to_add = Playlist.objects.get(pk=playlist_id)
+            scenes_to_update = params["itemsToUpdate"]
+
+            if params["addOrRemove"] == "add":
+
+                for x in scenes_to_update:
+                    scene_to_update = Scene.objects.get(pk=x)
+                    scene_to_update.playlists.add(playlist_to_add)
+                    print(
+                        f"Scene '{scene_to_update.name}' was added to playlist '{playlist_to_add.name}'"
+                    )
+                    scene_to_update.save()
+            if params["addOrRemove"] == "remove":
+                for x in scenes_to_update:
+                    scene_to_update = Scene.objects.get(pk=x)
+                    scene_to_update.playlists.remove(playlist_to_add)
+                    print(
+                        f"Scene '{scene_to_update.name}' was removed to playlist '{playlist_to_add.name}'"
                     )
                     scene_to_update.save()
 
-        elif params["type"] == "actor":
-            if params["patchType"] == "actor_tags":
-                actor_tag_id = params["patchData"][0]
-                actor_tag_to_add = ActorTag.objects.get(pk=actor_tag_id)
-                actors_to_update = params["itemsToUpdate"]
+        else:
+            scenes_to_update = params["itemsToUpdate"]
+            for x in scenes_to_update:
+                scene_to_update = Scene.objects.get(pk=x)
+                patch_type = params["patchType"]
+                patch_data = params["patchData"]
+                setattr(scene_to_update, patch_type, patch_data)
+                # scene_to_update[patch_type] = patch_data
 
-                if params["addOrRemove"] == "add":
+                print(
+                    f"Set scene's '{scene_to_update}' attribute '{patch_type}' to '{patch_data}'"
+                )
+                scene_to_update.save()
 
-                    for x in actors_to_update:
-                        actor_to_update = Actor.objects.get(pk=x)
-                        actor_to_update.actor_tags.add(actor_tag_to_add)
-                        actor_to_update.save()
-                        print(
-                            f"Added Actor Tag '{actor_tag_to_add.name}' to actor {actor_to_update.name}"
-                        )
-                elif params["addOrRemove"] == "remove":
+    elif params["type"] == "actor":
+        if params["patchType"] == "actor_tags":
+            actor_tag_id = params["patchData"][0]
+            actor_tag_to_add = ActorTag.objects.get(pk=actor_tag_id)
+            actors_to_update = params["itemsToUpdate"]
 
-                    for x in actors_to_update:
-                        actor_to_update = Actor.objects.get(pk=x)
-                        actor_to_update.actor_tags.remove(actor_tag_to_add)
-                        actor_to_update.save()
-                        print(
-                            f"Removed Actor Tag '{actor_tag_to_add.name}' to actor {actor_to_update.name}"
-                        )
-            else:
-                actors_to_update = params["itemsToUpdate"]
+            if params["addOrRemove"] == "add":
+
                 for x in actors_to_update:
                     actor_to_update = Actor.objects.get(pk=x)
-                    patch_type = params["patchType"]
-                    patch_data = params["patchData"]
-                    setattr(actor_to_update, patch_type, patch_data)
-                    # scene_to_update[patch_type] = patch_data
-
-                    print(
-                        f"Set actors's '{actor_to_update}' attribute '{patch_type}' to '{patch_data}'"
-                    )
+                    actor_to_update.actor_tags.add(actor_tag_to_add)
                     actor_to_update.save()
+                    print(
+                        f"Added Actor Tag '{actor_tag_to_add.name}' to actor {actor_to_update.name}"
+                    )
+            elif params["addOrRemove"] == "remove":
 
-        return Response(status=200)
+                for x in actors_to_update:
+                    actor_to_update = Actor.objects.get(pk=x)
+                    actor_to_update.actor_tags.remove(actor_tag_to_add)
+                    actor_to_update.save()
+                    print(
+                        f"Removed Actor Tag '{actor_tag_to_add.name}' to actor {actor_to_update.name}"
+                    )
+        else:
+            actors_to_update = params["itemsToUpdate"]
+            for x in actors_to_update:
+                actor_to_update = Actor.objects.get(pk=x)
+                patch_type = params["patchType"]
+                patch_data = params["patchData"]
+                setattr(actor_to_update, patch_type, patch_data)
+                # scene_to_update[patch_type] = patch_data
+
+                print(
+                    f"Set actors's '{actor_to_update}' attribute '{patch_type}' to '{patch_data}'"
+                )
+                actor_to_update.save()
+
+    return Response(status=200)
 
 
 def clean_dir(type_of_model_to_clean):
@@ -1140,7 +1134,6 @@ def clean_dir(type_of_model_to_clean):
                 f"Dir name '{dir_in_path}' is not a database reference, skipping..."
             )
             index += 1
-            pass
 
 def sizeformat (b: int) -> str: # returns a human-readable filesize depending on the file's size
     if b < 1000:
@@ -1407,26 +1400,29 @@ def settings(request):
 
 @api_view(["GET"])
 def ffmpeg(request):
-    if request.method == "GET":
-        if "generateSampleVideo" in request.query_params:
-            if request.query_params["generateSampleVideo"]:
-                scene_id = request.query_params["sceneId"]
-                scene = Scene.objects.get(pk=scene_id)
-                if scene.duration is None:
-                    success_probe = ffmpeg_process.ffprobe_get_data_without_save(scene)
-                    if success_probe:
-                        success = ffmpeg_process.ffmpeg_create_sammple_video(scene)
-
-                        if success:
-                            return Response(status=200)
-                        else:
-                            return Response(status=500)
-
+    if request.method != "GET":
+        return
+    if (
+        "generateSampleVideo" in request.query_params
+        and request.query_params["generateSampleVideo"]
+    ):
+        scene_id = request.query_params["sceneId"]
+        scene = Scene.objects.get(pk=scene_id)
+        if scene.duration is None:
+            success_probe = ffmpeg_process.ffprobe_get_data_without_save(scene)
+            if success_probe:
                 success = ffmpeg_process.ffmpeg_create_sammple_video(scene)
+
                 if success:
                     return Response(status=200)
                 else:
                     return Response(status=500)
+
+        success = ffmpeg_process.ffmpeg_create_sammple_video(scene)
+        if success:
+            return Response(status=200)
+        else:
+            return Response(status=500)
 
 
 def add_comma_seperated_items_to_db(string_of_comma_seperated_items, type_of_item):
@@ -1519,10 +1515,7 @@ class AddItems(views.APIView):
 
 def play_scene_vlc(scene, random):
     file_path = os.path.normpath(scene.path_to_file)
-    if platform.system() == "Windows":
-        vlc_path = Config().vlc_path
-    else:
-        vlc_path = "vlc"
+    vlc_path = Config().vlc_path if platform.system() == "Windows" else "vlc"
     p = subprocess.Popen([vlc_path, file_path])
     scene.play_count += 1
     scene.date_last_played = datetime.datetime.now()
@@ -1623,8 +1616,7 @@ class PlayInVlc(views.APIView):
 
 def dorename(scene_id: int, force: bool):
     from utils import scenerenamer as renamer
-    result = renamer.rename(scene_id, force)
-    return result
+    return renamer.rename(scene_id, force)
 
 class renameScene(views.APIView):
     def get (self, request, format=None):

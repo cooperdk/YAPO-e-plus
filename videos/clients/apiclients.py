@@ -246,7 +246,7 @@ def tpdb(scene_id: int, force: bool):
                                 keyname = ""
                                 primary = 0
                                 sp = scene_performer.name
-                                if sp.lower() == perforiginal.lower():
+                                if sp.lower() == perforiginal.lower() or sp.lower().replace(".","") == perforiginal.lower():
                                     keyname = sp
                                     primary = 1
                                     print(f"  --> SM 1: YAPO performer name {scene_performer.name} is keyname")
@@ -255,10 +255,10 @@ def tpdb(scene_id: int, force: bool):
                                 if not keyname:
                                     sp = scene_performer.name
                                     perf = namecheck(perf)
-                                    if sp.lower() == perf.lower():
+                                    if sp.lower() == perf.lower() or or sp.lower().replace(".","") == perf.lower():
                                         keyname = scene_performer.name
                                         primary = 1
-                                        print(f"  --> SM 1: YAPO performer name {sp} matches checked TpDB name")
+                                        print(f"  --> SM 2: YAPO performer name {sp} matches a namefixed TpDB name {perf}")
                                         break
 
                             if not keyname:
@@ -271,6 +271,10 @@ def tpdb(scene_id: int, force: bool):
                                     for alias in akaroot:
 
                                         if not keyname and alias.name.lower() == perf.lower():
+                                            keyname = alias.name
+                                            primary = 3
+                                            break
+                                        if not keyname and alias.name.lower().replace(".","") == perf.lower():
                                             keyname = alias.name
                                             primary = 3
                                             break
@@ -292,6 +296,11 @@ def tpdb(scene_id: int, force: bool):
                                                     break
                                         else:
                                             alia = ""
+                            if keyname and primary == 3:
+                                oldkeyname = keyname
+                                keyname = Actor.objects.filter(actor_aliases__name=keyname)[0].name
+                                print(f"  --> SM 3: YAPO alias {oldkeyname} belongs to {keyname}, but TpDB uses the alias.")
+
 
                             # print("keyname " + keyname)
                             if keyname.strip() != "":

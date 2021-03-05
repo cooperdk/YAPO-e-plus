@@ -16,7 +16,6 @@ class ActorAlias(models.Model):
     name = models.CharField(max_length=50, unique=True)
     is_exempt_from_one_word_search = models.BooleanField(default=False)
     date_added = models.DateTimeField(auto_now_add=True)
-
     # actor = models.ForeignKey(Actor, on_delete=models.CASCADE)
 
     def natural_key(self):
