@@ -1623,12 +1623,18 @@ class renameScene(views.APIView):
         from utils import scenerenamer as renamer
         scene_id = request.query_params["sceneId"]
         force = request.query_params["force"]
+        if force.lower() == "true":
+            force=True
+        else:
+            force=False
 
         result = dorename(scene_id, force)
         if not result:
-            return Response(status=500)
+            return HttpResponse("There was an error renaming this scene. Please check the console or log.", status=500)
+        elif result == "notretitled":
+            return HttpResponse("This scene has not been through a re-titler which may cause issues with renaming. Please force the process.", status=403)
         else:
-            return Response(status=200)
+            return HttpResponse(f'Renamed the scene to "{result}" and stored the old file name.', status=200)
 
 def open_file_cross_platform(path):
     if platform.system() == "Windows":

@@ -350,15 +350,15 @@ angular.module('sceneDetail').component('sceneDetail', {
                 return $http.get('rename-scene/', {
                     params: {
                         sceneId: self.scene.id,
-                        force: true
+                        force: self.forceScan
 
                     }
                 }).then(function (response) {
                     // alert(angular.toJson(response))
-                    self.addAlert("Renamed " + self.scene.name + ".", 'success', '5000');
+                    self.addAlert(response.data, 'success', '5000');
                     self.getCurrentScene()
                 }, function errorCallback(response) {
-                    self.addAlert("An error occured, please check the console/logfile. ", 'warning', '5000');
+                    self.addAlert(response.data, 'warning', '10000');
                     console.log(angular.toJson(response))
                 });
 

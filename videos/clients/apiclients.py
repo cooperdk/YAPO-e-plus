@@ -300,9 +300,6 @@ def tpdb(scene_id: int, force: bool):
                                 oldkeyname = keyname
                                 keyname = Actor.objects.filter(actor_aliases__name=keyname)[0].name
                                 print(f"  --> SM 3: YAPO alias {oldkeyname} belongs to {keyname}, but TpDB uses the alias.")
-
-
-                            # print("keyname " + keyname)
                             if keyname.strip() != "":
                                 # actor_to_add = Actor.objects.get(pk=actor_id)
                                 print("----> CHECKING SCENE ACTORS")
@@ -317,25 +314,18 @@ def tpdb(scene_id: int, force: bool):
                                         print(f"  --> ACTOR ADDED TO SCENE: {keyname}")
                                     else:
                                         print("  --> ACTOR already in scene.")
-
-                            # print("keyname " + keyname)
                             if not keyname:
                                 perpn = performer['name']
                                 perpn = namecheck(perpn)
                                 secondary = 2
-                                # print ("perpn sec " + perpn + " sp lwr " + sp)
                                 keyname = perpn
                                 print(f"  --> SM 2: TpDB REPLACED {performer['name']} -> {keyname} is keyname")
-
-                                # print("keyname " + keyname)
                             if performer['parent']['name'] and not keyname:
                                 perpn = performer['parent']['name']
                                 perpn = namecheck(perpn)
-                                # print("perpn thd " + perpn + " sp lwr " + sp)
                                 keyname = perpn
                                 secondary = 3
                                 print(f"  --> SM 3: {keyname} is keyname")
-                            # print("keyname " + keyname + " - perf name " + perpn)
                             if Config().tpdb_actors and perpn and keyname and (primary == 0):
                                 # If an actor is found on TpDB, but doesn't exist in YAPO
                                 log.info(f"Auto-adding a new actor: {perpn}")
@@ -368,7 +358,7 @@ def tpdb(scene_id: int, force: bool):
                                         act.thumbnail = as_uri
 
                                 act.save()
-                                log.sinfo(f"  --> ACTOR CREATED AND ADDED TO SCENE: {act.name}")
+                                log.info(f"Actor created and connected to scene: {act.name}")
                                 # except:
                                     # log.error(f'Couldn\'t add {perpn} - possibly exists already even though she didn\'t turn up...')
                                     # break

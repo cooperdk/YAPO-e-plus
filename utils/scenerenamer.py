@@ -4,6 +4,7 @@ Default replace format could be:
     '{site} - {date} - {actor} - {title} ({codec}).{ext}'
 """
 import os
+import re
 import shutil
 from datetime import datetime
 from dateutil.parser import parse as dateparse
@@ -22,7 +23,9 @@ from videos.models import Actor, Scene, ActorAlias, SceneTag, Website
 
 
 def rename (scene_id: int, force: bool = False):
-    """Function to generate a .NFO file from scene metadata.
+    """
+    Function to rename a scene to to a default or site specific rename format.
+    It basically renames the file just as the title renamer does it.
 
     Args:
         scene_id (int): The table ID of a scene to scan
@@ -32,8 +35,12 @@ def rename (scene_id: int, force: bool = False):
         success: bool
     """
 
+    if all([Scene.objects.filter(pk=scene_id).first().orig_name is None, not force]): # checks if the scene was retitled
+        log.warn(f'RENAMER: The scene has not been re-titled (with fx the TpDB scanner), you must force this operation.')
+        return "notretitled"
+
     if not Scene.objects.filter(pk=scene_id): # checks if the scene exists
-        log.error(f'NFOGEN: The scene with ID {scene_id} does not exist!')
+        log.error(f'RENAMER: The scene with ID {scene_id} does not exist!')
         return False
 
     # This sorts out the original filename
@@ -46,7 +53,7 @@ def rename (scene_id: int, force: bool = False):
     justext = os.path.splitext(justfile)[1]
 
     if not os.path.exists(fpath):
-        log.info(f'Scene {scene_id}: Path {fpath} does not exist!')
+        log.info(f'RENAMER: Scene {scene_id}: Path {fpath} does not exist!')
         return False
 
     if len(str(scene.actors))>1:
@@ -108,20 +115,17 @@ def rename (scene_id: int, force: bool = False):
             mmmm = date2.strftime("%B")
             yy = date2.strftime("%y")
             yyyy = date2.strftime("%Y")
-
-
             date = date2.strftime("%Y-%m-%d")
 
         else:
-            log.info(f"REN: Scene ID {scene.id} - date mismatch ({date})")
+            log.warn(f"RENAMER: Scene ID {scene.id} - date mismatch ({date})")
             usedate = False
     else:
-        log.info(f"REN: Scene ID {scene.id} - date not found ({date}).")
+        log.info(f"RENAMER: Scene ID {scene.id} - date not found ({date}).")
         usedate = False
 
-
-    renameformat = scene.websites.all().first().filename_format # find out if the website has it's own rename format
-    if len(renameformat) <5:  #This will tell to get the default rename format
+    renameformat = scene.websites.all().first().filename_format  # find out if the website has it's own rename format
+    if len(renameformat) <5:  #T his will tell to get the default rename format
         renameformat = Config().renaming
         renamebase = "default format"
     else:
@@ -132,16 +136,25 @@ def rename (scene_id: int, force: bool = False):
     renameformat = renameformat.replace('<', '{').replace('>', '}')
     if not usedate:
         if any(['{dd}' in renameformat, '{mm}' in renameformat, '{mmmm}' in renameformat,
-                '{yy}' in renameformat, '{yyyy}' in renameformat]):
-            log.warn(f'REN: Scene {scene_id} - ERROR! Date unusable but required by the renaming format. Inserting placeholders.')
-            questiondate()
+                '{yy}' in renameformat, '{yyyy}' in renameformat, '{date}' in renameformat]):
+            log.warn(f'RENAMER: Scene {scene_id}: Date unusable but required by format. Trying to avoid dates.')
+            dd = ""
+            mm = ""
+            mmmm = ""
+            yy = ""
+            yyyy = ""
+            date = ""
 
     newname = eval(f"f'''{renameformat}'''")    # This replaces the strings specified by the user with their value.
                                                 # Triple quotes are required to allow quotes in the string.
     #print(f"Renaming by format:")
     #print(f"                    {renameformat_orig}")
     #print(f"                    {newname}")
-
+    print(newname + " -> ",end="")
+    newname = newname.replace("Unknown - ","").replace("-- - ", "").replace("// / ","").replace("- -- ","").replace("/ // ","")
+    for c in r'[]/\;,><&*:%=+@!#^()|?^':
+        newname = newname.replace(c, '')
+    print(newname)
     iteration = 1
     renamedok = False
     while not renamedok:
@@ -151,7 +164,6 @@ def rename (scene_id: int, force: bool = False):
         newfilename = os.path.join(justdir,workname+justext)
         print(f"Testing {newfilename}")
         if not os.path.exists(newfilename):
-
             renamedok = True
             newnfo = os.path.join(justdir,workname+".nfo")
             if os.path.exists(newnfo):
@@ -161,27 +173,20 @@ def rename (scene_id: int, force: bool = False):
         else:
             iteration += 1
     print(f'Filename {newfilename} not in use, renaming...')
-
     try:
         log.sinfo(f"REN: \n{fpath} >\n{newfilename}")
         os.rename(fpath,newfilename)
-
-    except:
-        log.error(f"REN: Failure renaming scene {scene_id} ({fpath})")
-
+        renamedname=workname+justext
+    except IOError as exc:
+        log.error(f"RENAMER: Failure renaming scene {scene_id} ({fpath}): {exc}")
+        return False
     if not scene.orig_path_to_file:
         scene.orig_path_to_file = fpath
     scene.path_to_file = newfilename
     scene.save(force_update=True)
-    return True
-### Helper functions
+    return renamedname
 
-def questiondate():
-    dd = "??"
-    mm = "??"
-    mmmm = "????"
-    yy = "??"
-    yyyy = "????"
+
 
 
 
