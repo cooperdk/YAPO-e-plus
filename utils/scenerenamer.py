@@ -152,8 +152,8 @@ def rename (scene_id: int, force: bool = False):
     #print(f"                    {newname}")
     print(newname + " -> ",end="")
     newname = newname.replace("Unknown - ","").replace("-- - ", "").replace("// / ","").replace("- -- ","").replace("/ // ","")
-    for c in r'[]/\;,><&*:%=+@!#^()|?^':
-        newname = newname.replace(c, '')
+    for c in r"'"[]/\;,><&*:%=+@!#^()|?^"'":
+        newname = newname.replace(c, "")
     print(newname)
     iteration = 1
     renamedok = False

@@ -501,11 +501,15 @@ def tpdb(scene_id: int, force: bool):
                 this_scene.release_id = bbcheck[0]
 
             if perflist: actors = perflist
-            else: actors = "Unknown"
-            if this_scene.actors.all().first(): actor = this_scene.actors.all().first().name
-            else: actor = "Unknown"
+            else: actors = ""
+            if this_scene.actors.all().first():
+                actors = ",".join(str(i.name) for i in this_scene.actors.all())
+            else:
+                actors = ""
+            if this_scene.actors.all().first():actor = this_scene.actors.all().first().name
+            else: actor = ""
             if this_scene.websites.all().first(): site = this_scene.websites.all().first().name
-            else: site = "Unknown"
+            else: site = ""
             res = aux.restest(this_scene.height)
             if release_date:
                 dd = release_date.strftime("%d")
@@ -513,8 +517,6 @@ def tpdb(scene_id: int, force: bool):
                 mmmm = release_date.strftime("%B")
                 yy = release_date.strftime("%y")
                 yyyy = release_date.strftime("%Y")
-
-
 
             if this_scene.websites.all().first():
                 renameformat = this_scene.websites.all().first().filename_format  # find out if the website has it's own rename format
@@ -535,6 +537,10 @@ def tpdb(scene_id: int, force: bool):
 
             newtitle = eval(f"f'''{renameformat}'''")
             log.sinfo(f'{newtitle}')
+
+            newtitle=newtitle.replace(" - - -","").replace("-- - ","").replace("// - ","")\
+                             .replace("- --","").replace("- //","").replace(" - -","").replace("- Unknown","")
+
 
             '''
             if (perflist and len(perflist) > 4) and newtitle and \

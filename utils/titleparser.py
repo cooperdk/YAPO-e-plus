@@ -599,7 +599,7 @@ def siteValues():
     searchSites[543] = ("Hot Crazy Mess", "Hot Crazy Mess", "https://hotcrazymess.com", "https://hotcrazymess.com/video/")
     searchSites[544] = ("NF Busty", "NF Busty", "https://nfbusty.com", "https://nfbusty.com/video/")
     searchSites[545] = ("That Sitcom Show", "That Sitcom Show", "https://thatsitcomshow.com", "https://thatsitcomshow.com/video/")
-    searchSites[546] = ("FuckedHard18", "FuckedHard18", "http://fuckedhard18.com", "http://fuckedhard18.com/membersarea/search.php?st=advanced&site[]=5&qall=")
+    searchSites[546] = ("Fucked Hard 18", "Fucked Hard 18", "http://fuckedhard18.com", "http://fuckedhard18.com/membersarea/search.php?st=advanced&site[]=5&qall=")
     searchSites[547] = ("MassageGirls18", "MassageGirls18", "http://massagegirls18.com", "http://massagegirls18.com/membersarea/search.php?st=advanced&site[]=4&qall=")
     searchSites[548] = ("BellaPass", "BellaPass", "https://www.bellapass.com", "https://bellapass.com/search.php?query=")
     searchSites[549] = ("Bryci", "Bryci", "https://www.bryci.com", "https://bryci.com/search.php?query=")
@@ -1110,6 +1110,7 @@ def getSearchSettings(mediaTitle: str):
         ('^fds ', 'FakeDrivingSchool '),
         ('^ff ', 'Facial Fest'),
         ('^fft ', 'FemaleFakeTaxi '),
+        ('^fh18 ','Fucked Hard 18 '),
         ('^fhd ', 'FantasyHD '),
         ('^fhl ', 'FakeHostel '),
         ('^fho ', 'FakehubOriginals '),

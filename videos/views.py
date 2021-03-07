@@ -336,12 +336,16 @@ def populate_tag(searchtag, tagtype, force) -> int:
         pass
     #print(response)
     if "tag" and "id" in str(response):
-
+        imgsave = None
         #get tag from main tag json
         yapoid = response["records"][0]["id"]
-        image = response["records"][0]["image"]
         desc = response["records"][0]["description"]
         found=1
+        if len(response["records"][0]["image"])>0:
+            imgsave = response["records"][0]["image"][0]["name"]
+            imgthumb = response["records"][0]["image"][0]["thumbnail"]
+        else:
+            found=4
     else:
         print("No primary tag name found, looking for aliases...")
 
@@ -365,21 +369,20 @@ def populate_tag(searchtag, tagtype, force) -> int:
 
             #get tag from alias json
             yapoid=image=response["records"][0]["tags_id"]["id"]
-            image=response["records"][0]["tags_id"]["image"]
             desc=response["records"][0]["tags_id"]["description"]
-            found=1
+            found = 1
+            if len(response["records"][0]["tags_id"]["image"])>0:
+                imgsave=response["records"][0]["tags_id"]["image"][0]["name"]
+                imgthumb=response["records"][0]["tags_id"]["image"][0]["thumbnail"]
+            else:
+                found=4
         else:
             return 0
     try:
-        if image and len(image)<5:
-            found=4
-        if image and len(image)>5:
-            img=json.loads(image)
-            #print("img: " + str(img))
-            imgsave=img[0]["name"]
-            imgthumb=img[0]["thumbnail"]
-            imgsave = imgsave.replace("\\\\", "").split("/")[1]
-            imgthumb = imgthumb.replace("\\\\", "").split("/")[1]
+
+        if imgsave:
+            #imgsave = imgsave.replace("\/", "/").split("/")[1]
+            #imgthumb = imgthumb.replace("\/", "/").split("/")[1]
             #log.sinfo(f"Downloading tag image {imgsave} with thumbnail...")
             suf=Path(imgsave).suffix
             folder = os.path.join(Config().site_media_path, 'tags', scf, str(tag.id))
@@ -388,12 +391,14 @@ def populate_tag(searchtag, tagtype, force) -> int:
             if not os.path.isdir(folder):
                 os.makedirs(folder)
 
-            aux.download_image("http://api.porn-organizer.org/photos/"+imgsave,fimg)
+            aux.download_image("http://api.porn-organizer.org/"+imgsave,fimg)
 
-            if aux.download_image("http://api.porn-organizer.org/thumbs/"+imgthumb,fthumb):
+            if aux.download_image("http://api.porn-organizer.org/"+imgthumb,fthumb):
                 relpath = os.path.relpath(fthumb, start="data")
                 asuri = urllib.request.pathname2url(relpath)
                 tag.thumbnail = asuri
+        else:
+            found = 4
     except Exception as e:
         log.warn(f'YAPOAPI: TAG: Error occured when getting image')
 
