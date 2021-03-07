@@ -28,16 +28,24 @@ log = Logger()
 
 
 def progress(count: int, total: int, suffix=''):
-    bar_len = 42
+    bar_len = 36
     filled_len = int(round(bar_len * count / float(total)))
 
-    percents = round(100.0 * count / float(total), 1)
+    percents = int(round(100 * count / float(total), 1))
     bar = '\u2588' * filled_len + '\u2591' * (bar_len - filled_len)
     #bar = '█' * filled_len + '░' * (bar_len - filled_len)
-    sys.stdout.write(f"\r{bar} [{percents}%] - {suffix}                    \r")
+    aaa=(f"\r{bar} ({percents}%) - {suffix}")
+    b=len(aaa)
+    c=79-b
+    print(aaa,end="")  # was sys.stdout.write
+    for _ in range(c):
+        print(" ",end="")
+        if count != total:
+            print("\r",end="")
 
 
 def progress_end():
+    print("\n",end="")
     sys.stdout.flush()
 
 def get_human_readable_size(num):

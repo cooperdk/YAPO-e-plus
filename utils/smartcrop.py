@@ -399,7 +399,7 @@ def main():
     options = parse_argument()
 
     image = Image.open(options.inputfile)
-    if image.mode != 'RGB' and image.mode != 'RGBA':
+    if image.mode not in ['RGB', 'RGBA']:
         sys.stderr.write("{1} convert from mode='{0}' to mode='RGB'\n".format(
             image.mode, options.inputfile))
         new_image = Image.new('RGB', image.size)

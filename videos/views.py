@@ -407,23 +407,32 @@ def populate_tag(searchtag, tagtype, force) -> int:
     if desc:
         tag.description = desc
 
-    if searchtag == "SceneTag":
+    if tagtype == "SceneTag":
         foundx=False
-        try:
-            extags = tag.aliases.split(",")
-            for x in response["records"]["aliases"]:
-                foundx=False
-                for extag in extags:
-                    if x[alias] == extag.strip():
-                        foundx=True
-                        break
-                    else:
-                        foundx=False
-                if not foundx:
-                    extag.append(x[alias])
-            tag.aliases = ",".join(extag)
-        except:
-            log.warn("TAGS: Error while enumerating tag aliases.")
+        print("Getting aliases...")
+        #try:
+        if len(tag.scene_tag_alias)>1:
+            extags = tag.scene_tag_alias.split(",")
+        else:
+            extags = []
+        for x in response["records"][0]["aliases"]:
+            foundx=False
+            for extag in extags:
+                if x["alias"] == extag.strip():
+                    foundx=True
+                    break
+                else:
+                    foundx=False
+            if not foundx:
+                extags.append(x["alias"])
+        tag.scene_tag_alias = ",".join(extags)
+        if len(extags)>0:
+            print(f'Added aliases: {",".join(extags)}')
+        else:
+            print("No aliases for this tag.")
+        #except:
+        #    log.warn("TAGS: Error while enumerating tag aliases.")
+    tag.modified_date = datetime.datetime.now()
     tag.save()
 
     if found==4:
@@ -1624,15 +1633,11 @@ def dorename(scene_id: int, force: bool):
     return renamer.rename(scene_id, force)
 
 class renameScene(views.APIView):
-    def get (self, request, format=None):
+    def get(self, request, format=None):
         from utils import scenerenamer as renamer
         scene_id = request.query_params["sceneId"]
         force = request.query_params["force"]
-        if force.lower() == "true":
-            force=True
-        else:
-            force=False
-
+        force = force.lower() == "true"
         result = dorename(scene_id, force)
         if not result:
             return HttpResponse("There was an error renaming this scene. Please check the console or log.", status=500)
