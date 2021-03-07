@@ -435,7 +435,7 @@ def populate_tag(searchtag, tagtype, force) -> int:
                 pass
         #try:
 
-        if len(tag.scene_tag_alias)>1:
+        if len(tag.scene_tag_alias)>0:
             extags = tag.scene_tag_alias.lower().split(",")
         else:
             extags = []
@@ -453,13 +453,14 @@ def populate_tag(searchtag, tagtype, force) -> int:
                 newaliases.append(x["alias"].lower())
         foundx=False
         if maintag:
-            for x in newaliases:
-                if x[0] == maintag:
+            for x in extags:
+                #print(f"{x.lower()} -> {maintag.lower()}")
+                if x.lower() == maintag.lower():
                     foundx=True
                     break
             if not foundx:
-                newaliases.append(maintag)
-                extags.append(maintag)
+                newaliases.append(maintag.lower())
+                extags.append(maintag.lower())
                 foundone=True
                 maintagfound=True
 
@@ -475,13 +476,13 @@ def populate_tag(searchtag, tagtype, force) -> int:
     if maintagfound:
         log.warn(f'TAGS API: WARNING! The main tag "{maintag}" was added to this tag as an alias.')
         if tagtype=="ActorTag":
-            exists=ActorTag.objects.filter(name=maintag)
+            exists=ActorTag.objects.filter(name__iexact=maintag)
             if len(exists)>0:
                 log.warn(f"TAGS API: {maintag}: This tag already exists, consider combining them.")
             else:
                 log.info(f"TAGS API: {maintag}: The main tag doesn't exist, consider renaming this tag.")
         elif tagtype=="SceneTag":
-            exists = SceneTag.objects.filter(name=maintag)
+            exists = SceneTag.objects.filter(name__iexact=maintag)
             if len(exists) > 0:
                 log.warn(f"TAGS API: {maintag}: This tag already exists, consider combining them.")
             else:
@@ -553,7 +554,8 @@ def populate_websites(force):
                         site.save()
                     except:
                         log.error(
-                            f'Attempting to rename {oldname} to {newname} resulted in an error. New name probably already exists!')
+                            f'Attempting to rename {oldname} to {newname} resulted in an error. New name probably '
+                            f'already exists!')
                         break
                     print("\n")
         nexturl = response['links']['next']
@@ -651,11 +653,14 @@ def tpdb_scan_actor(actor, force: bool):
                     save_path = os.path.join(Config().site_media_path, 'actor', str(actor.id), 'profile')
                     save_file_name = os.path.join(save_path, 'profile.jpg')
 
-                    if not force and ((actor.tpdb_id == pid) and (len(actor.description) > 125) and (os.path.isfile(save_file_name))):
+                    if not force and ((actor.tpdb_id == pid) and (len(actor.description) > 125) and (os.path.isfile(
+                            save_file_name))):
                         success = True
-                        log.sinfo(f'Your installation has good details about {actor.name}. You can force this operation.')
+                        log.sinfo(f'Your installation has good details about {actor.name}. You can force this '
+                                  f'operation.')
 
-                    elif force and ((actor.tpdb_id == pid) and (len(actor.description) > 125) and (os.path.isfile(save_file_name))):
+                    elif force and ((actor.tpdb_id == pid) and (len(actor.description) > 125) and (os.path.isfile(
+                            save_file_name))):
                         success = True
                         log.sinfo(f'It seems that there is no better information about {actor.name} on TpDB.')
                 return success
@@ -693,7 +698,8 @@ def scrape_all_actors(force):
                     scraper_freeones.search_freeones_with_force_flag(actor, True)
                     print("Finished Freeones search")
             else:
-                print(f"{actor.name} was already searched...                                                                        \r",end="")
+                print(f"{actor.name} was already searched...                                                          "
+                      f"   \r",end="")
         else:
             print("Searching TMDb...")
             scraper_tmdb.search_person_with_force_flag(actor, True)
@@ -708,7 +714,8 @@ def scrape_all_actors(force):
                 print("Searching Freeones")
                 scraper_freeones.search_freeones_with_force_flag(actor, True)
                 print("Finished Freeones search.")
-    print("\rDone scraping actors.                                                                                               ")
+    print("\rDone scraping actors.                                                                                  "
+          "       ")
     return Response(status=200)
 
 
@@ -894,7 +901,8 @@ def permanently_delete_scene_and_remove_from_db(scene):
             success_delete_file = True
         else:
             print(
-                f"Got OSError while trying to delete {scene.path_to_file} : Error number:{e.errno} Error Filename:{e.filename} Error:{e.strerror}"
+                f"Got OSError while trying to delete {scene.path_to_file} : Error number:{e.errno} Error Filename:"
+                f"{e.filename} Error:{e.strerror}"
             )
 
     media_path = os.path.relpath(
@@ -911,7 +919,8 @@ def permanently_delete_scene_and_remove_from_db(scene):
             success_delete_media_path = True
         else:
             print(
-                f"Got OSError while trying to delete {scene.path_to_file} : Error number:{e.errno} Error Filename:{e.filename} Error:{e.strerror}"
+                f"Got OSError while trying to delete {scene.path_to_file} : Error number:{e.errno} Error Filename:"
+                f"{e.filename} Error:{e.strerror}"
             )
 
     if success_delete_file and success_delete_media_path:
@@ -1023,7 +1032,8 @@ def tag_multiple_items(request):
                                 actor_tag.scene_tags.first()
                             )
                             print(
-                                f"Added Scene Tag '{actor_tag.scene_tags.first().name}' to scene '{scene_to_update.name}'"
+                                f"Added Scene Tag '{actor_tag.scene_tags.first().name}' to scene '"
+                                f"{scene_to_update.name}'"
                             )
 
                     scene_to_update.save()
@@ -1046,7 +1056,8 @@ def tag_multiple_items(request):
                                     actor_tag.scene_tags.first()
                                 )
                                 print(
-                                    f"Removed Scene Tag '{actor_tag.scene_tags.first().name}' to scene '{scene_to_update.name}'"
+                                    f"Removed Scene Tag '{actor_tag.scene_tags.first().name}' to scene '"
+                                    f"{scene_to_update.name}'"
                                 )
                     scene_to_update.save()
 
@@ -1277,14 +1288,6 @@ def settings(request):
 
                 return Response(status=200)
 
-        '''
-        if all(["pathToVlc" not in request.query_params, "enable_tpdb" not in request.query_params,
-                "tpdb_websitelogos" not in request.query_params, "tpdb_enable_autorename" not in request.query_params,
-                "tpdb_enable_addactors" not in request.query_params, "tpdb_enable_addphoto" not in request.query_params]):
-
-
-        '''
-
         if "tpdb_settings" in request.query_params:
 
             if "tpdb_enabled" in request.query_params:
@@ -1299,12 +1302,18 @@ def settings(request):
                     Config().tpdb_websites = 'false'
                     Config().tpdb_tags = 0
                 else:
-                    if "tpdb_websitelogos" in request.query_params: Config().tpdb_website_logos = request.query_params["tpdb_websitelogos"]
-                    if "tpdb_autorename" in request.query_params: Config().tpdb_autorename = request.query_params["tpdb_autorename"]
-                    if "tpdb_actors" in request.query_params: Config().tpdb_actors = request.query_params["tpdb_actors"]
-                    if "tpdb_photos" in request.query_params: Config().tpdb_photos = request.query_params["tpdb_photos"]
-                    if "tpdb_websites" in request.query_params: Config().tpdb_websites = request.query_params["tpdb_websites"]
-                    if "tpdb_tags" in request.query_params: Config().tpdb_tags = request.query_params["tpdb_tags"]
+                    if "tpdb_websitelogos" in request.query_params: Config().tpdb_website_logos = \
+                        request.query_params["tpdb_websitelogos"]
+                    if "tpdb_autorename" in request.query_params: Config().tpdb_autorename = \
+                        request.query_params["tpdb_autorename"]
+                    if "tpdb_actors" in request.query_params: Config().tpdb_actors = \
+                        request.query_params["tpdb_actors"]
+                    if "tpdb_photos" in request.query_params: Config().tpdb_photos = \
+                        request.query_params["tpdb_photos"]
+                    if "tpdb_websites" in request.query_params: Config().tpdb_websites = \
+                        request.query_params["tpdb_websites"]
+                    if "tpdb_tags" in request.query_params: Config().tpdb_tags = \
+                        request.query_params["tpdb_tags"]
                 Config().save()
                 return Response(status=200)
 
@@ -1375,7 +1384,8 @@ def settings(request):
                     log.sinfo(f'Scene {origscene.pk} has {amount} duplicate{nom}.')
                     for scene_2 in sceneinfo:
                         if origscene.path_to_file == scene_2.path_to_file and not (scene_1.pk == scene_2.pk):
-                            log.warn(f'Scene IDs {scene_1.pk} and {scene_2.pk} refer to the same file: {scene_1.path_to_file}')
+                            log.warn(f'Scene IDs {scene_1.pk} and {scene_2.pk} refer to the same file: '
+                                     f'{scene_1.path_to_file}')
                             break
                         if (not origscene.pk == scene_2.pk) or (not origscene.path_to_file == scene_2.path_to_file):
                             # if scene_2.path_to_file == scene_1.path_to_file:
@@ -1396,7 +1406,8 @@ def settings(request):
                     log.info(f"Deleted {total_deleted} files, saving {sizeformat(total_saved)}")
                 print('')
                 log.timer("Duplicate check", start, datetime.datetime.now())
-                return HttpResponse (f'Deleted {total_deleted} files, saving {sizeformat(total_saved)} in {timer(start,datetime.datetime.now())}.')
+                return HttpResponse (f'Deleted {total_deleted} files, saving {sizeformat(total_saved)} in '
+                                     f'{timer(start,datetime.datetime.now())}.')
                 #return Response(status=200)
 
         # populate_last_folder_name_in_virtual_folders()
@@ -1537,7 +1548,8 @@ class AddItems(views.APIView):
                     try:
                         if platform.system() == "Windows":
                             for test in Folder.objects.all():
-                                if temp.lower() in test.name.lower(): # Check f the new folder exists in the set of registered paths
+                                if temp.lower() in test.name.lower(): # Check if the new folder exists in the set of
+                                    # registered paths
                                     raise Exception(f'Folder already registered')
                         if request.query_params["createSampleVideo"] == "true":
                             videos.addScenes.get_files(folder_to_add_path_stripped, True)
@@ -1586,7 +1598,8 @@ def play_scene_vlc(scene, random):
     scene.play_count += 1
     scene.date_last_played = datetime.datetime.now()
     print(
-        f"Play count for scene '{scene.name}' is now '{scene.play_count}' and the date the scene was last played is '{scene.date_last_played}'"
+        f"Play count for scene '{scene.name}' is now '{scene.play_count}' and the date the scene was last played is "
+        f"'{scene.date_last_played}'"
     )
     scene.save()
 
@@ -1694,7 +1707,8 @@ class renameScene(views.APIView):
         if not result:
             return HttpResponse("There was an error renaming this scene. Please check the console or log.", status=500)
         elif result == "notretitled":
-            return HttpResponse("This scene has not been through a re-titler which may cause issues with renaming. Please force the process.", status=403)
+            return HttpResponse("This scene has not been through a re-titler which may cause issues with renaming. "
+                                "Please force the process.", status=403)
         else:
             return HttpResponse(f'Renamed the scene to "{result}" and stored the old file name.', status=200)
 
@@ -2022,68 +2036,14 @@ def display_video(request):
         if last_byte >= size:
             last_byte = size - 1
         length = last_byte - first_byte + 1
-        resp = StreamingHttpResponse(file_iterator(path, offset=first_byte, length=length), status=206, content_type=content_type)
+        resp = StreamingHttpResponse(file_iterator(path, offset=first_byte, length=length), status=206,
+                                     content_type=content_type)
         resp['Content-Length'] = str(length)
         resp['Content-Range'] = 'bytes %s-%s/%s' % (first_byte, last_byte, size)
     else:
-                 # When the video stream is not obtained, the entire file is returned in the generator mode to save memory.
+                 # When the video stream is not obtained, the entire file is returned in the generator mode to save
+                 # memory.
         resp = StreamingHttpResponse(FileWrapper(open(path, 'rb')), content_type=content_type)
         resp['Content-Length'] = str(size)
     resp['Accept-Ranges'] = 'bytes'
     return resp
-    #except requests.exceptions.ConnectionError
-    #    print("Error")
-    #    pass
-
-    '''
-        from django.http import StreamingHttpResponse
-        from wsgiref.util import FileWrapper
-        from datetime import timedelta
-        import mimetypes
-        
-        cont = 0
-     
-        def read_video(path):
-            
-            with open(path, 'rb') as f:
-                while True:
-                    data = f.read(10 * 1024)
-                    if data:
-                        yield data
-                        cont = 1
-                    else:
-                        break
-    
-        #dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-        #if x is None:
-            #return HttpResponse("No Video")
-        sceneid = x.path
-        sceneid = sceneid.split('/')[-1]
-        print (f"Requesting scene ID {sceneid}...\r", end="")
-        scene = Scene.objects.get(pk=sceneid)
-        pathname = scene.path_to_file
-        size = scene.size
-        
-        now = datetime.datetime.now()
-        if scene.date_last_played is not None:
-            then = scene.date_last_played
-        else:
-            then = datetime.datetime.now() - timedelta(hours = 12)
-        if now > then + timedelta(hours=3):
-            print (f"Playback: [{pathname}] ({size//1048576} MB)")#1048576 is 1024^2
-            scene.play_count+=1
-            scene.date_last_played=datetime.datetime.now()
-            scene.save()
-            print(f"Play count for scene {scene.id} is now {scene.play_count} and the last played date and time is updated.")
-        
-            response = StreamingHttpResponse(FileWrapper(open(pathname, 'rb'), 8192),
-                content_type=mimetypes.guess_type(pathname)[0]) #(open(pathname, 'rb')) #(read_video(pathname), status=206)
-            #response = StreamingHttpResponse(read_video(pathname)) #(open(pathname, 'rb')) #(read_video(pathname), status=206)
-            #response['Content-Length'] = size
-            #response['Content-Disposition'] = "attachment; filename=%s" % filename
-        #response["Content-Range"] = 'bytes 0-%s' % (size)
-        #response['Content-Disposition'] = f'attachement; filename="{pathname}"'
-    except:
-        print("Error")
-    return response
-'''

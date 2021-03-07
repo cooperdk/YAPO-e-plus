@@ -52,7 +52,6 @@ if __name__ == "__main__":
                 "convert-tags" in str(sys.argv), "mark-scenes" in str(sys.argv)]):
 
         print(f"Config: {Config().yapo_url}")
-        quit()
         execute_from_command_line([SCRIPT_ROOT, 'runserver', Config().yapo_url, '--noreload'])
     else:
         #if not "runserver" in str(sys.argv):
