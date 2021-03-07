@@ -462,6 +462,7 @@ def populate_tag(searchtag, tagtype, force) -> int:
                 extags.append(maintag)
                 foundone=True
                 maintagfound=True
+
         tag.scene_tag_alias = ",".join(extags)
         if len(extags)>0 and foundone:
             print(f'Added alias(es): {",".join(newaliases)}')
