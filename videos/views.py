@@ -298,6 +298,8 @@ def populate_tag(searchtag, tagtype, force) -> int:
 
     import videos.aux_functions as aux
     tag = None
+    maintag = None
+    maintagfound=False
     found = 0
     response = None
     if not aux.is_domain_reachable("https://api.porn-organizer.org/records/tags/"):
@@ -368,7 +370,9 @@ def populate_tag(searchtag, tagtype, force) -> int:
         if "tags_id" and "alias" in str(response):
 
             #get tag from alias json
-            yapoid=image=response["records"][0]["tags_id"]["id"]
+            maintag = response["records"][0]["tags_id"]["tag"]
+            print(f"Found a primary tag for this tag: {maintag}")
+            yapoid=response["records"][0]["tags_id"]["id"]
             desc=response["records"][0]["tags_id"]["description"]
             found = 1
             if len(response["records"][0]["tags_id"]["image"])>0:
@@ -407,24 +411,80 @@ def populate_tag(searchtag, tagtype, force) -> int:
     if desc:
         tag.description = desc
 
-    if searchtag == "SceneTag":
+    if tagtype == "SceneTag":
         foundx=False
-        try:
-            extags = tag.aliases.split(",")
-            for x in response["records"]["aliases"]:
-                foundx=False
-                for extag in extags:
-                    if x[alias] == extag.strip():
-                        foundx=True
-                        break
-                    else:
-                        foundx=False
-                if not foundx:
-                    extag.append(x[alias])
-            tag.aliases = ",".join(extag)
-        except:
-            log.warn("TAGS: Error while enumerating tag aliases.")
+        foundone=False
+        newaliases = []
+        if maintag:
+            print("Looking for aliases in the main tag for this tag alias...")
+            url = "https://api.porn-organizer.org/records/tags"
+            params = { 'filter': (f'tag,eq,{maintag.lower()}'),
+                       'join'  : 'taggroups',
+                       'join'  : 'aliases' }
+            headers = {
+                    'Content-Type': 'application/json',
+                    'Accept'      : 'application/json',
+                    'User-Agent'  : 'YAPO 0.7.6',
+            }
+            print("Downloading tag information... ", end="")
+            response = requests.request('GET', url, headers=headers, params=params)  # , params=params
+            print("\n")
+            try:
+                response = response.json()
+            except:
+                pass
+        #try:
+
+        if len(tag.scene_tag_alias)>1:
+            extags = tag.scene_tag_alias.lower().split(",")
+        else:
+            extags = []
+        for x in response["records"][0]["aliases"]:
+            foundx=False
+            for extag in extags:
+                if x["alias"] == extag.strip():
+                    foundx=True
+                    break
+                else:
+                    foundx=False
+            if not foundx:
+                extags.append(x["alias"].lower())
+                foundone=True
+                newaliases.append(x["alias"].lower())
+        foundx=False
+        if maintag:
+            for x in newaliases:
+                if x[0] == maintag:
+                    foundx=True
+                    break
+            if not foundx:
+                newaliases.append(maintag)
+                extags.append(maintag)
+                foundone=True
+                maintagfound=True
+        tag.scene_tag_alias = ",".join(extags)
+        if len(extags)>0 and foundone:
+            print(f'Added alias(es): {",".join(newaliases)}')
+        else:
+            print("No (new) aliases for this tag.")
+        #except:
+        #    log.warn("TAGS: Error while enumerating tag aliases.")
+    tag.modified_date = datetime.datetime.now()
     tag.save()
+    if maintagfound:
+        log.warn(f'TAGS API: WARNING! The main tag "{maintag}" was added to this tag as an alias.')
+        if tagtype=="ActorTag":
+            exists=ActorTag.objects.filter(name=maintag)
+            if len(exists)>0:
+                log.warn(f"TAGS API: {maintag}: This tag already exists, consider combining them.")
+            else:
+                log.info(f"TAGS API: {maintag}: The main tag doesn't exist, consider renaming this tag.")
+        elif tagtype=="SceneTag":
+            exists = SceneTag.objects.filter(name=maintag)
+            if len(exists) > 0:
+                log.warn(f"TAGS API: {maintag}: This tag already exists, consider combining them.")
+            else:
+                log.info(f"TAGS API: {maintag}: The main tag doesn't exist, consider renaming this tag.")
 
     if found==4:
         return 4
@@ -1624,15 +1684,11 @@ def dorename(scene_id: int, force: bool):
     return renamer.rename(scene_id, force)
 
 class renameScene(views.APIView):
-    def get (self, request, format=None):
+    def get(self, request, format=None):
         from utils import scenerenamer as renamer
         scene_id = request.query_params["sceneId"]
         force = request.query_params["force"]
-        if force.lower() == "true":
-            force=True
-        else:
-            force=False
-
+        force = force.lower() == "true"
         result = dorename(scene_id, force)
         if not result:
             return HttpResponse("There was an error renaming this scene. Please check the console or log.", status=500)

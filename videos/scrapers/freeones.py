@@ -66,7 +66,6 @@ def search_freeones(actor_to_search: object, alias: object, force: bool = False)
     if href_found:
 
         success = True
-        print("\r")
         aux.progress(1,27,f"Found {actor_to_search.name}, parsing...")
         #print("\nI found " + actor_to_search.name + ", so I am looking for information on her profile page.")
         actor_to_search.gender = 'F'
@@ -575,11 +574,11 @@ def search_freeones(actor_to_search: object, alias: object, force: bool = False)
         log.info(f"FO: {actor_to_search.name} was not found.")
 
     if success:
+        aux.progress(29,29,"Done.")
         aux.progress(29,29,f"{num} items added for {actor_to_search.name}.")
         aux.progress_end()
+        log.info(f"SCRAPER: FO: {num} items added to {actor_to_search.name}")
         print("")
-        log.info(f"Actor scraped: {actor_to_search.name}")
-
         return success
 
     return False
