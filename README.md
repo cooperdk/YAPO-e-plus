@@ -234,7 +234,7 @@ After the above command, you can add the parameter -v "":
 
 The directory on your computer must be quoted if there's a space in it. Windows directories should be typed with forward slashes instead of backslashes. I recommend that you configure the database, the data folder and the config folder as a volume on your host, and your media directories within the Docker container in a subdirectory named "clips", so for example (on Windows):
 
-docker run -i -t -p 8000 cooperdk/yapo-eplus -v "/database":/YAPO/database -v "/data":/YAPO/data -v "/config":/YAPO/config -v "/d/shared videos/porn/2020":/clips/2020
+docker run -i -t -p 8000 cooperdk/yapo-eplus -v "(host-yapo-dir)/database":/YAPO/database -v "(host-yapo-dir)/data":/YAPO/data -v "(host-yapo-dir)/config":/YAPO/config -v "/d/shared videos/porn/2020":/clips/2020
 
 Note that your D:/ drive becomes /d/ in Docker.
 
