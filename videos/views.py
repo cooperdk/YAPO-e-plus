@@ -395,9 +395,9 @@ def populate_tag(searchtag, tagtype, force) -> int:
             if not os.path.isdir(folder):
                 os.makedirs(folder)
 
-            aux.download_image("http://api.porn-organizer.org/"+imgsave,fimg)
+            aux.download_image("https://api.porn-organizer.org/"+imgsave,fimg)
 
-            if aux.download_image("http://api.porn-organizer.org/"+imgthumb,fthumb):
+            if aux.download_image("https://api.porn-organizer.org/"+imgthumb,fthumb):
                 relpath = os.path.relpath(fthumb, start="data")
                 asuri = urllib.request.pathname2url(relpath)
                 tag.thumbnail = asuri

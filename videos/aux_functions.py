@@ -577,7 +577,6 @@ def download_image(image_url, path):
         try:
             # timeout time to download an image
             timeout = 10
-
             response = urlopen(req, None, timeout)
             data = response.read()
             response.close()
