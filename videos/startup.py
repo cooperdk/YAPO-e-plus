@@ -205,7 +205,7 @@ def backupper (): # Generates a backup of the database
 
 
 def ffmpeg_check():
-    import dload
+    from utils import dload
     if platform.system() == "Windows":
         dir_to_check = os.path.join(Config().site_path, 'ffmpeg')
         ffmpeg = os.path.exists(os.path.abspath(os.path.join(dir_to_check, 'ffmpeg.exe')))
@@ -217,9 +217,13 @@ def ffmpeg_check():
             print(f"It will be placed at {dir_to_check}")
             input("Press enter to acknowledge... >")
             print("Getting https://porn-organizer.org/dl/ffmpeg-latest.zip...",end="")
-            try:
-                #print("Downloading... ",end="")
-                dload.save_unzip("https://porn-organizer.org/dl/ffmpeg-latest.zip", dir_to_check, True)
+            #try:
+            #   print("Downloading... ",end="")
+            if dload.save_unzip("https://porn-organizer.org/dl/ffmpeg-latest.zip", dir_to_check, True) == "":
+                print(f"An error may have occured, please download FFMPEG manually")
+                print(f"(preferably from the above link) and place it in {dir_to_check}")
+                input("YAPO will exit now. Press enter to acknowledge... >")
+                sys.exit()
                 #print("\nFFMpeg and supplement tools copied.", end="")
                 #print(os.path.abspath(os.path.join(dir_to_check, 'https://porn-organizer.org/dl/ffmpeg-latest', 'bin', 'ffmpeg.exe')))
                 #shutil.move(os.path.abspath(os.path.join(dir_to_check, 'ffmpeg-latest', 'ffmpeg.exe')), os.path.abspath(dir_to_check))
@@ -231,11 +235,11 @@ def ffmpeg_check():
                 #shutil.rmtree(os.path.abspath(os.path.join(dir_to_check, 'https://porn-organizer.org/dl/ffmpeg-latest')))
                 #print("\nDone.")
                 #input("Press enter to boot YAPO. >")
-            except:
-                print(f"An error may have occured, please download FFMPEG manually")
-                print(f"(preferably from the above link) and place it in {dir_to_check}")
-                input("YAPO will exit now. Press enter to acknowledge... >")
-                sys.exit()
+                #except:
+                #print(f"An error may have occured, please download FFMPEG manually")
+                #print(f"(preferably from the above link) and place it in {dir_to_check}")
+                #input("YAPO will exit now. Press enter to acknowledge... >")
+                #sys.exit()
 
 
 def startup_sequence():
