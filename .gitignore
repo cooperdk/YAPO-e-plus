@@ -336,3 +336,13 @@ fabric.properties
 !videos/media/actor/Unknown/*
 !videos/media/images/actor/Unknown/*
 !videos/media/images/blank.png
+/.idea/codeStyles/codeStyleConfig.xml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/other.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/codeStyles/Project.xml
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/snyk.project.settings.xml
+/.idea/vcs.xml
+/.idea/YAPO-e-plus.iml

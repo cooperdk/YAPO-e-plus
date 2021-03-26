@@ -26,8 +26,8 @@ def boot():
         print("No database\n===========")
         print(f"There is no database installed at: {os.path.join(dest, 'db.sqlite3')}\nGenerating a new database...\n\n")
         time.sleep(4)
-        a=call_command('makemigrations, interactive = False')
-        b=call_command('migrate, interactive = False')
+        a=call_command('makemigrations', interactive = False)
+        b=call_command('migrate', interactive = False)
         return
     else:
         '''
