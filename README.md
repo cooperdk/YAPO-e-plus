@@ -175,7 +175,7 @@ If you know what you're doing, this parameter will start a Python shell with the
 
 ---
 
-###Runtime issues and installation problems
+### Runtime issues and installation problems
 
 **If you get this error when you're done:**
     
@@ -197,7 +197,7 @@ Only if you really have difficulties, register an issue on Github. I will offer 
 or,  replace fake with fake-initial if you don't have a db.sqlite3 database file in your main YAPO e+ folder
    
  
-####You can secure a copy of your database with the command:
+#### You can secure a copy of your database with the command:
     
 `python manage.py dumpdata --indent=4 > database.json`
     
@@ -210,30 +210,43 @@ Once again, replace `python manage.py` with `yapo-maintenance` for the compiled 
 If you have any issues with this, I will fix your database for a small donation. There are sometimes problems due to Django's way of updating databases. Typically, it is due to primary keys in built-in tables.
 
 
+### Running YAPO in a Docker environment
 
-###Running YAPO in a Docker environment
+Note: I am looking for help in setting this up for ARM and for generally making it work as intended. I am getting somewhere, but the Docker image available may not be current, due to occasional issues.
 
-*Note: I am looking for help in setting this up for ARM and for generally making it work as intended. I am getting somewhere, but the Docker image available may not be current, due to occasional issues.*
+To do this, you will need a working Docker installation (on Windows, only Docker Desktop is supported, since I had no luck in connecting to my Docker Toolbox environment).
 
-- To do this, you will need a working [Docker installation](https://www.docker.com/get-started) (on Windows, only Docker Desktop is supported, since I had no luck in connecting to my Docker Toolbox environment).
+Get the release by doing:
 
-  Get the release by doing:
+`docker pull cooperdk/yapo-eplus`
 
-  `docker pull cooperdk/yapo-eplus`
+And run it with:
 
-  And run it with:
+`docker run -i -t -p 8000 cooperdk/yapo-eplus`
 
-  `docker run -i -t -p 8000 cooperdk/yapo-eplus`
+The -i argument is needed if YAPO needs to ask you a question, and the -t argument makes sure that you have TTY abilities for your session. The Docker image is defaulted to serve on port 8000, which is why it has to be opened with the -p argument. To change the port, you need to first setup YAPO in your container, and then edit the config/settings.yml file (which should now be where you've configured it on your host) and edit the "yapo_url" variable. DO NOT CHANGE THE SPACING in settings.yml as YAML is very particular about this. After that, you can run Docker with the port argument that you want.
 
-  The -i argument is needed if YAPO needs to ask you a question, and the -t argument makes sure that you have TTY abilities for your session. The Docker image is hardcoded to serve on port 8000, which is why it has to be opened with the -p argument.
+The database should be setup the first time you run the environment. After that you should be able to run it in headless, but a terminal output is still recommended while YAPO is in development, as much feedback is only given in the terminal at this point.
 
-  The database should be setup the first time you run the environment, and you can use the Docker CLI to mount your video folders as shared folders.
+#### Adding directories as volumes
 
-  Docker Desktop requires the May 2020 update of Windows 10 Home (build 2004), or any version of Windows 10 Professional. You cannot install Docker Desktop on an older release of Windows 10 Home.
+After the above command, you can add the parameter -v "":
+
+The directory on your computer must be quoted if there's a space in it. Windows directories should be typed with forward slashes instead of backslashes. I recommend that you configure the database, the data folder and the config folder as a volume on your host, and your media directories within the Docker container in a subdirectory named "clips", so for example (on Windows):
+
+`docker run -i -t -p 8000 cooperdk/yapo-eplus -v "(host-yapo-dir)/database":/YAPO/database -v "(host-yapo-dir)/data":/YAPO/data \-v "(host-yapo-dir)/config":/YAPO/config -v "/d/shared videos/porn/2020":/clips/2020`
+
+Note that your D:/ drive becomes /d/ in Docker.
+
+This might be easier to setup with a docker-compose file. I will provide one ASAP.
+
+Within YAPO, you then register the /clips/2020 directory as your clips directory (and so on, for each directory with clips).
+
+You can add as many volume arguments as you need.
   
   The docker image is built on a Debian system. Please read up on the above if you're not sure what I mean. If you need support for this, I offer my help for a donation.
 
-###Enjoy!
+### Enjoy!
 
 For visual help setting up your YAPO system, I am preparing guides and tips. You can find a (not necessarily current) "getting started" guide on the [releases page](https://github.com/cooperdk/YAPO-e-plus/releases).
 
