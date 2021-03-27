@@ -1695,16 +1695,16 @@ class PlayInVlc(views.APIView):
         return Response(status=200)
 
 def dorename(scene_id: int, force: bool):
-    from utils import scenerenamer as renamer
-    return renamer.rename(scene_id, force)
+    from utils.scenerenamer import rename
+    return rename(scene_id, force)
 
 class renameScene(views.APIView):
     def get(self, request, format=None):
-        from utils import scenerenamer as renamer
+        from utils.scenerenamer import rename
         scene_id = request.query_params["sceneId"]
         force = request.query_params["force"]
         force = force.lower() == "true"
-        result = dorename(scene_id, force)
+        result = rename(scene_id, force)
         if not result:
             return HttpResponse("There was an error renaming this scene. Please check the console or log.", status=500)
         elif result == "notretitled":

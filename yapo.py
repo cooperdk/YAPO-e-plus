@@ -6,6 +6,7 @@ import shutil
 from configuration import Config, Constants
 from utils import dbcheck
 from utils.printing import Logger
+from utils import scenerenamer
 log = Logger()
 
 #if os.path.exists(os.path.join(self.root_path,))
