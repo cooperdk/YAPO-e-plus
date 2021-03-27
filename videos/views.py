@@ -1546,6 +1546,11 @@ class AddItems(views.APIView):
                     temp = os.path.abspath(folder_to_add_path_stripped)
 
                     try:
+                        local_scene_folder = LocalSceneFolders(name=temp)
+                        local_scene_folder.save()
+                        log.info(
+                            f"Added folder {temp} to folder list..."
+                            )
                         if platform.system() == "Windows":
                             for test in Folder.objects.all():
                                 if temp.lower() in test.name.lower(): # Check if the new folder exists in the set of
@@ -1555,11 +1560,7 @@ class AddItems(views.APIView):
                             videos.addScenes.get_files(folder_to_add_path_stripped, True)
                         else:
                             videos.addScenes.get_files(folder_to_add_path_stripped, False)
-                        local_scene_folder = LocalSceneFolders(name=temp)
-                        local_scene_folder.save()
-                        log.info(
-                            f"Added folder {temp} to folder list..."
-                        )
+
                     except (django.db.IntegrityError, Exception) as e:
                         log.error(
                             f"{e} while trying to add {temp} to folder list"
