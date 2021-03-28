@@ -207,7 +207,7 @@ def addactor (current_scene, actor_to_add):
 
     if actor_to_add.actor_tags.count() > 0:
         for actor_tag in actor_to_add.actor_tags.all():
-            if not current_scene.scene_tags.filter(name=actor_tag.name):
+            if not current_scene.scene_tags.filter(name=actor_tag.name) and actor_tag.scene_tags.first():
                 current_scene.scene_tags.add(
                     actor_tag.scene_tags.first()
                 )
