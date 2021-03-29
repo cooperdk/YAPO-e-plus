@@ -566,7 +566,7 @@ def populate_websites(force):
 def tpdb_scan_actor(actor, force: bool):
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     import videos.aux_functions as aux
-    if not aux.is_domain_reachable("api.metadataapi.net/performers"):
+    if not aux.is_domain_reachable("https://api.metadataapi.net/performers"):
         return Response(status=500)
 
     photo = actor.thumbnail

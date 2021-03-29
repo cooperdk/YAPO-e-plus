@@ -628,7 +628,7 @@ def match_link_to_query(soup_links, text_to_find):
     ans = None
     for link in soup_links:
         try:
-            if link.get("href").replace('/', '').lower() == text_to_find.lower():
+            if link.get("href").replace('/feed','').replace('/', '').lower() == text_to_find.lower():
             #    print(link.get("href"))
                 ans = link.get("href")
                 break
