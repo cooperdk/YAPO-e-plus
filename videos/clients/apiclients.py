@@ -53,6 +53,17 @@ def tpdb(scene_id: int, force: bool):
     scene_name = this_scene.name
     searched = 0
 
+    if this_scene.tpdb_scanned:
+        searched = 1
+    if this_scene.tpdb_scanned_match:
+        searched = 2
+
+    if searched and not force:
+        if searched == 1: st = "not identified"
+        if searched == 2: st = "identified"
+        log.sinfo(f"Scene #{this_scene.id} was already scanned {st} by the TpDB scanner. To re-scan, use force.")
+        return 2  # Scene is searched already, exit
+
     bbcheck = bb_getinfo(scene_id, scene_name)
     if bbcheck:
         scene_name = f'{bbcheck[1]} - {bbcheck[3]} - {bbcheck [2]}'
@@ -86,12 +97,7 @@ def tpdb(scene_id: int, force: bool):
                 pass
 
 
-    if this_scene.tpdb_scanned_match:
-        searched = 2
 
-    if searched and not force:
-        log.sinfo(f"Scene #{this_scene.id} was already checked by the TpDB scanner. To re-scan, use force.")
-        return 2  # Scene is searched already, exit
 
     log.sinfo(f'Scanning for "{scene_name}" on TpDB...')
 
@@ -118,7 +124,7 @@ def tpdb(scene_id: int, force: bool):
             'Content-Type': 'application/json',
             'Accept': 'application/json',
             'User-Agent': 'YAPO 0.7.6',
-            'Authorization': Config().tpdb_apikey
+            'Authorization': 'Bearer ' + Config().tpdb_apikey
         }
 
         response = requests.request('GET', url, headers=headers, params=params, timeout=5)
@@ -161,7 +167,7 @@ def tpdb(scene_id: int, force: bool):
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
                 'User-Agent': 'YAPO 0.7.6',
-                'Authorization': Config().tpdb_apikey
+                'Authorization': 'Bearer ' + Config().tpdb_apikey
             }
             response = requests.request('GET', url, headers=headers, params=params, timeout=5)
             try:
@@ -471,7 +477,7 @@ def tpdb(scene_id: int, force: bool):
                                 added = True
 
                             if added:
-                                insert_actor_tag(actor, "TpDB: Info added")
+                                #insert_actor_tag(actor, "TpDB: Info added")
                                 actor.last_lookup = datetime.now()
                             actor.save()
 
@@ -604,10 +610,7 @@ def tpdb(scene_id: int, force: bool):
                 this_scene.tpdb_scanned = True
                 this_scene.tpdb_scanned_match = True
                 this_scene.tpdb_scanned_unsure = True
-            elif not success:
-                this_scene.tpdb_scanned = True
-                this_scene.tpdb_scanned_match = False
-                this_scene.tpdb_scanned_unsure = False
+
 
             # print("Tagged the scene with a TpDB tag.")
             if Config().debug=="true":
@@ -619,7 +622,11 @@ def tpdb(scene_id: int, force: bool):
             return 1
 
         else:
+            success = False
             log.sinfo(f"Scene {scene_id} was not found in TpDB.")
+            this_scene.tpdb_scanned = True
+            this_scene.tpdb_scanned_match = False
+            this_scene.tpdb_scanned_unsure = False
             this_scene.save(force_update=True)
             return 0
 

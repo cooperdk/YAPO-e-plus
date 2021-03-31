@@ -278,8 +278,9 @@ def tpdb_scanner(force):
 
     scenes = Scene.objects.all()
     for scene in scenes:
-        success = apiclients.tpdb(scene.id, force)
-        if not success: log.error('TPDB: SCAN: There was an error scanning scene ID {scene.id}.')
+        if not scene.tpdb_scanned or force:
+            success = apiclients.tpdb(scene.id, force)
+            #if not success: log.error(f'TPDB: SCAN: There was an error scanning scene ID {scene.id}.')
     return Response(status=200)
 
 def populate_tag(searchtag, tagtype, force) -> int:
@@ -501,66 +502,70 @@ def populate_websites(force):
     if not aux.is_domain_reachable("https://api.metadataapi.net"):
         return Response(status=500)
     log.sinfo(f"Traversing websites for logos...")
-    nexturl = 'https://api.metadataapi.net/sites?page=1'
-    while nexturl:
-        params = {'limit': 99999}
+
+    websites = Website.objects.all()
+    for site in websites:
+        url='https://api.metadataapi.net/sites'
+        sitename = site.name
+        params = {'q': sitename}
         headers = {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
             'User-Agent': 'YAPO 0.7.6',
-            'Authorization': Config().tpdb_apikey
+            'Authorization': 'Bearer ' + Config().tpdb_apikey
         }
-        print("Downloading site information... ", end="")
-        response = requests.request('GET', nexturl, headers=headers, params=params) #, params=params
-        print("\n")
+        #print("Searching site information... ", end="")
+        response = requests.request('GET', url, headers=headers, params=params) #, params=params
         try:
             response = response.json()
         except:
-            pass
-        print("\n")
-        websites = Website.objects.all()
-        for site in websites:
-            oldname = site.name
-            found = False
-            for tpdb in response['data']: #[0]:
-                found = False
-                tsid = tpdb['id']
-                tsn = tpdb['name']
-                tss = tpdb['short_name']
-                tsurl = tpdb['url']
-                tslogo = tpdb['logo']
-                if site.name == tsn:
-                    found = True
-                if (site.name != tsn) and (site.name.lower() == tsn.lower()):
-                    log.info(f'Renaming site "{site.name}" to "{tsn}" for consistency')
-                    site.name = tsn
-                    found = True
-                if (site.name.lower() == tss.lower()) and (site.name.lower() != tsn.lower()):
-                    log.info(f'Renaming site "{site.name}" to "{tsn}" because it is truncated')
-                    site.name = tsn
-                    found = True
-                if found:
-                    try:
-                        newname = site.name
-                        if tss.lower() not in site.website_alias.lower():
-                            if len(site.website_alias) > 1:
-                                site.website_alias += f",{tss.lower()}"
-                            else:
-                                site.website_alias = tss.lower()
-                        if not site.url:
-                            site.url = tsurl
-                        if not site.tpdb_id:
-                            site.tpdb_id = int(tsid)
-                        aux.save_website_logo(tslogo, site.name, force)
-                        site.save()
-                    except:
-                        log.error(
-                            f'Attempting to rename {oldname} to {newname} resulted in an error. New name probably '
-                            f'already exists!')
-                        break
-                    print("\n")
-        nexturl = response['links']['next']
-        print(f"Getting next JSON page ({nexturl})...")
+            return Response(status=503)
+        #print(response)
+        if response['data'] and len(response['data'])>0:
+            tpdb = response['data'][0]
+            if 'id' in tpdb:
+            
+                try:         
+                    found = False
+                    tsid = tpdb['id']
+                    tsn = tpdb['name']
+                    tss = tpdb['short_name']
+                    tsurl = tpdb['url']
+                    tslogo = tpdb['logo']
+                    if site.name == tsn:
+                        found = True
+                    if (site.name != tsn) and (site.name.lower() == tsn.lower()):
+                        log.info(f'Renaming site "{site.name}" to "{tsn}" for consistency')
+                        site.name = tsn
+                        found = True
+                    if (site.name.lower() == tss.lower()) and (site.name.lower() != tsn.lower()):
+                        log.info(f'Renaming site "{site.name}" to "{tsn}" because it is truncated')
+                        site.name = tsn
+                        found = True
+                    if found:
+                        try:
+                            newname = site.name
+                            if tss.lower() not in site.website_alias.lower():
+                                if len(site.website_alias) > 1:
+                                    site.website_alias += f",{tss.lower()}"
+                                else:
+                                    site.website_alias = tss.lower()
+                            if not site.url:
+                                site.url = tsurl
+                            if not site.tpdb_id:
+                                site.tpdb_id = int(tsid)
+                            aux.save_website_logo(tslogo, site.name, force)
+                            site.save()
+                        except:
+                            log.error(
+                                f'Attempting to rename {oldname} to {newname} resulted in an error. New name probably '
+                                f'already exists!')
+                            break
+                        print("\n")
+                except:
+                    log.info("This batch resulted in a failure.")
+
+
     return Response(status=200)
 
 
@@ -579,7 +584,7 @@ def tpdb_scan_actor(actor, force: bool):
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'User-Agent': 'YAPO 0.7.6',
-        'Authorization': Config().tpdb_apikey
+        'Authorization': 'Bearer ' + Config().tpdb_apikey
     }
     response = requests.request('GET', url, headers=headers, params=params)  # , params=params
     success = False

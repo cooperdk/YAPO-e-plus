@@ -83,25 +83,27 @@ def sysclear():
 
 def restest(height:int):
     if not isinstance(height, int):
-        return "???"
-    if height < 240:
+        return ""
+    if height <= 240:
         res = "240p"
-    if 240 < height <= 360:
+    elif 240 < height <= 360:
         res = "360p"
-    if 360 < height <= 480:
+    elif 360 < height <= 480:
         res = "480p"
-    if 480 < height <= 576:
+    elif 480 < height <= 576:
         res = "576p"
-    if 576 < height <= 720:
+    elif 576 < height <= 720:
         res = "720p"
-    if 720 < height <= 1080:
+    elif 720 < height <= 1080:
         res = "1080p"
-    if 1080 < height <= 1440:
+    elif 1080 < height <= 1440:
         res = "1440p"
-    if 1440 < height <= 2160:
+    elif 1440 < height <= 2160:
         res = "4K"
-    if 2160 < height <= 4320:
+    elif 2160 < height <= 4320:
         res = "8K"
+    else:
+        res = ""
     return res
 
 def send_piercings_to_actortag (actor):
@@ -314,7 +316,7 @@ def strip_bad_chars (name):
     return name
 
 
-def is_domain_reachable(host, timeout=5) -> bool:
+def is_domain_reachable(host, timeout=3) -> bool:
     """ This function checks to see if a host name has a DNS entry by checking
         for socket info. If the website gets a status code less than 500 in return,
         we know it's available. Otherwise, it will soft fail if less than 600 or hard fail anything else.
@@ -331,10 +333,7 @@ def is_domain_reachable(host, timeout=5) -> bool:
     elif response.status_code < 600:
         result =  True
         log.warn(f"{host} may be faulty (status code {response.status_code}).")
-    elif response.status_code < 900:
-        result = False
-        log.warn(f"{host} reported a response error {response.status_code}.")
-    else:
+
         result = False
         log.warn(f"{host} reported an error {response.status_code}.")
 
@@ -343,16 +342,19 @@ def is_domain_reachable(host, timeout=5) -> bool:
 
 def checkTpDB():
     try:
-        request = requests.get("http://api.metadataapi.net/scenes?parse=faye-reagan&limit=1", timeout = 3)
-        if request.status_code == 200:
-            result = True
-        else:
-            result = False
-            log.warn(f"api.metadataapi.net returns an unexpected reply code: {request.status_code}")
-
-    except (ConnectionError, ConnectionRefusedError, ConnectionAbortedError, ConnectionResetError) as e:
-        log.warn(f"Cannot connect to api.metadataapi.net: {e}")
+        response = requests.head("https://api.metadataapi.net", timeout = 5)
+    except Exception as e:
+        log.error(f"The Porn DB did not answer within 5 seconds. Try again later.")
         result = False
+        return result
+    if response.status_code < 500:
+        result =  True
+    elif response.status_code < 600:
+        result =  True
+        log.warn(f"{host} may be faulty (status code {response.status_code}).")
+    else:
+        result = False
+        log.warn(f"{host} reported an error {response.status_code}.")
     return result
 
 
@@ -361,7 +363,7 @@ def save_website_logo(image_link, website, force, *args):
 
     try:
         ws = None
-        print("Website scan, method 1...")
+        #print("Website scan, method 1...")
         ws = Website.objects.filter(name=website)
 
         if ws:
@@ -376,7 +378,7 @@ def save_website_logo(image_link, website, force, *args):
                 ws = Website.objects.get(name__iexact=website.replace(" ",""))
                 website = ws.name
         if not ws and Config().tpdb_websites:
-            print(f"Adding website: {website}")
+            log.sinfo(f"Adding website: {website}")
             hasarg = 0
             for arg in args:
                 hasarg += 1
@@ -390,25 +392,25 @@ def save_website_logo(image_link, website, force, *args):
             ws.website_alias = website.replace(" ","").lower()
             ws.date_added = datetime.datetime.now()
             ws.save()
-            log.info(f"Auto-added website: {ws.name}")
+            log.sinfo(f"Auto-added website: {ws.name}")
             ws = Website.objects.get(name=website)
             if hasarg == 1:
                 scene.websites.add(ws)
                 scene.save()
-                log.sinfo(f"A scene was added to {ws.name}: {scene.name}")
+                #log.sinfo(f"A scene was added to {ws.name}: {scene.name}")
         if not ws and not Config().tpdb_websites:
-                log.info(f"We could add the website {website}, but auto-adding is disabled.")
+                log.sinfo(f"We could add the website {website}, but auto-adding is disabled.")
     except:
         pass
 
 
     if image_link:
         if image_link.lower() == "null" or image_link == "":
-            print(f"No logo URL available for {website}.")
+            log.sinfo(f"No logo URL available for {website}.")
             success = False
             return
     else:
-        print(f"No logo URL available for {website}.")
+        log.sinfo(f"No logo URL available for {website}.")
         success = False
         return
 
@@ -425,11 +427,11 @@ def save_website_logo(image_link, website, force, *args):
     #print("Save path: " + save_path)
     if not os.path.exists(save_path):
         os.makedirs(save_path)
-        print(f"Created website directory: {save_path}")
+        log.sinfo(f"Created website directory: {save_path}")
     if os.path.splitext(image_link)[1]:
         ext = os.path.splitext(image_link)[1]
     else:
-        print("Error in logo filename!")
+        log.sinfo("Error in logo filename!")
         success = False
         return
 
@@ -440,11 +442,11 @@ def save_website_logo(image_link, website, force, *args):
 
         if download_image(image_link, save_file_name):
             ws = Website.objects.get(name=website)
-            print("OK")
+            #print("OK")
             rel_path = os.path.relpath(save_file_name, start="data")
             as_uri = urllib.request.pathname2url(rel_path)
             ws.thumbnail = as_uri
-            print(f"Saved {as_uri} to DB ({rel_path})")
+            log.sinfo(f"Saved {as_uri} to DB ({rel_path})")
             ws.modified_date = datetime.datetime.now()
             ws.save()
             success = True
@@ -469,6 +471,7 @@ def populate_actors():
             'Content-Type': 'application/json',
             'Accept': 'application/json',
             'User-Agent': 'YAPO 0.7.6',
+            'Authorization': 'Bearer ' + Config().tpdb_apikey
         }
         print(f"Contacting API for info about {actor.name}... ", end="")
         response = requests.request('GET', url, headers=headers, params=params)  # , params=params

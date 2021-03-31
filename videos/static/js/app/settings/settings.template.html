@@ -100,15 +100,7 @@
 
     </select>
 
-    <span ng-if="$ctrl.tpdb_enabled" style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>
 
-
-    <button style="color: #33ccff;" type="button" ng-click="$ctrl.TpDB()"" class="btn btn-default btn-sm"
-        uib-popover-html="'Save these settings'"
-        popover-trigger="mouseenter" popover-placement="right-top"
-
-    <span style="width:10%" class="glyphicon glyphicon-cog"></span> Save TpDB Settings
-    </button>
 
     <span ng-if="$ctrl.tpdb_enabled" style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>
 
@@ -122,13 +114,22 @@
 
     <span ng-if="$ctrl.tpdb_enabled" style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>
     <button type="button" ng-if="$ctrl.tpdb_enabled" ng-click="$ctrl.populate_websites()" class="btn btn-default btn-sm"
-        uib-popover-html="'Populates all websites with URLs and logos from TpDB.<br>Also checks website names against those used by TpDB and renames if necessary (this will make scans faster).<br>Force will redownload logos.'" popover-trigger="mouseenter" popover-placement="right-top"
+        uib-popover-html="'Runs a sub-process that populates all websites with URLs and logos from TpDB.<br>Also checks website names against those used by TpDB and renames if necessary (this will make scans faster).<br>Force will redownload logos.'" popover-trigger="mouseenter" popover-placement="right-top"
     <span class="glyphicon glyphicon-tag"></span> Populate websites
     </button>
     <input type="checkbox" ng-if="$ctrl.tpdb_enabled" ng-model="$ctrl.site_force"
            uib-popover-html="'Re-download all logos'"
            popover-trigger="mouseenter" popover-placement="top"> <label ng-if="$ctrl.tpdb_enabled">Re-get existing logos</label>
   <div class="divider"></div>
+  
+  
+    <button style="color: #33ccff;" type="button" ng-click="$ctrl.TpDB()"" class="btn btn-default btn-sm"
+        uib-popover-html="'Save these settings'"
+        popover-trigger="mouseenter" popover-placement="right-top"
+
+    <span style="width:10%" class="glyphicon glyphicon-cog"></span> Save TpDB Settings
+    </button>
+  
       </div>
     </div>
 

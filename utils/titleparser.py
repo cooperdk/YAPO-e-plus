@@ -29,8 +29,8 @@ def search(title):
     searchDate = searchSettings[3]
     # Debug
     #print(f"Parsed. Site: {fullsitename}\n             {searchTitle}\n",end="")
-    if searchDate:
-        print(f"Release date parsed: {searchDate}")
+    #if searchDate:
+        #print(f"Release date parsed: {searchDate}")
 
     return searchSiteID, fullsitename, searchTitle, searchDate
 
@@ -54,7 +54,7 @@ def getSearchSiteName(siteID):
 
 def siteValues():
 
-    searchSites = [None] * 903 # one higher than the array below
+    searchSites = [None] * 904 # one higher than the array below
 
     searchSites[0] = ("BlackedRaw", "BlackedRaw", "https://www.blackedraw.com", "https://www.blackedraw.com/api")
     searchSites[1] = ("Blacked", "Blacked", "https://www.blacked.com", "https://www.blacked.com/api")
@@ -392,7 +392,7 @@ def siteValues():
     searchSites[336] = ("Girlfriends.xxx", "Girlfriends.xxx", "https://www.sexyhub.com", "https://site-api.project1service.com")
     searchSites[337] = ("Lesbea", "Lesbea", "https://www.sexyhub.com", "https://site-api.project1service.com")
     searchSites[338] = ("Massage Rooms", "Massage Rooms", "https://www.sexyhub.com", "https://site-api.project1service.com")
-    searchSites[339] = ("MomXXX", "MomXXX", "https://www.sexyhub.com", "https://site-api.project1service.com")
+    searchSites[339] = ("Mom is Horny", "Mom is Horny", "https://www.bangbros.com", "https://bangbros.com/search/")
     searchSites[340] = ("FakeHub", "FakeHub", "https://www.fakehub.com", "https://site-api.project1service.com")
     searchSites[341] = ("Big Cock Bully", "Big Cock Bully", "https://tour.naughtyamerica.com", "https://i6p9q9r18e-3.algolianet.com/1/indexes/*/queries")
     searchSites[342] = ("VirtualRealPorn", "VirtualRealPorn", "https://virtualrealporn.com/", "https://virtualrealporn.com/vr-porn-video/")
@@ -953,9 +953,8 @@ def siteValues():
     searchSites[899] = ("Facial Cum Targets", "Facial Cum Targets", "https://www.facialcumtargets.com/", "https://www.facialcumtargets.com/")
     searchSites[900] = ("True Anal", "True Anal", "https://www.trueanal.com/", "https://www.trueanal.com/search/")
     searchSites[901] = ("Bang Trickery", "Bang Trickery", "https://www.bang.com/original/4800/bang-trickery", "https://www.bang.com/search?term=trickery+")
-    searchSites[902] = ("Pretty Dirty Teens", "Pretty Dirty Teens", "https://www.prettydirtyteens.com/",
-                        "https://www.prettydirtyteens.com/videos?q=")
-
+    searchSites[902] = ("Pretty Dirty Teens", "Pretty Dirty Teens", "https://www.prettydirtyteens.com/", "https://www.prettydirtyteens.com/videos?q=")
+    searchSites[903] = ("MomXXX", "MomXXX", "https://www.sexyhub.com", "https://site-api.project1service.com")
     return searchSites
 
 def getSearchSiteIDByFilter(searchFilter):
@@ -1016,7 +1015,7 @@ def getSearchSiteIDByFilter(searchFilter):
         except:
             pass
     # Debug
-    print(f'Search Filter: {searchFilterF}')
+    #print(f'Search Filter: {searchFilterF}')
     return # was None
 
 
@@ -1172,14 +1171,14 @@ def getSearchSettings(mediaTitle: str):
         ('^mgbf ', 'MyGirlfriendsBustyFriend '),
         ('^mgb ', 'MommyGotBoobs '),
         ('^mic ', 'MomsInControl '),
-        ('^mih ', 'MilfHunter '),
+        ('^mih ', 'Milfhunter '),
         ('^mj ', 'ManoJob '),
         ('^mlib ', 'MilfsLikeItBig '),
         ('^mlt ', 'MomsLickTeens '),
         ('^mmgs ', 'MommysGirl '),
         ('^mmts ', 'MomsTeachSex '),
         ('^mnm ', 'MyNaughtyMassage '),
-        ('^mom ', 'MomXXX '),
+        #('^mom ', 'MomXXX '),
         ('^mpov ', 'MisterPOV '),
         ('^mr ', 'MassageRooms '),
         ('^mrs ', 'MassageRooms '),
