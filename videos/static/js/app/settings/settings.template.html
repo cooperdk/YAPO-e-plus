@@ -49,16 +49,29 @@
     <input type="checkbox" ng-model="$ctrl.tpdb_enabled" ng-change="getdetails()"
         uib-popover-html="'Enable the TpDB (metadataapi.net) scanning functions'"
         popover-trigger="mouseenter" popover-placement="top"> Enable TpDB functionality
-
-    <span style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>
-
+		<div ng-if="$ctrl.tpdb_enabled" class="divider"></div>
+		<div class="row">
+<div class="col-lg-5">
+<br ng-if="$ctrl.tpdb_enabled" />
+        <label ng-if="$ctrl.tpdb_enabled">TpDB API Key</label><i ng-if="$ctrl.tpdb_enabled"> (get it <a target="_newtab" href="https://metadataapi.net/">here</a>)</i>
+    <input ng-if="$ctrl.tpdb_enabled" class="form-control" id="inputdefault" type="text"
+    ng-model="$ctrl.tpdb_apikey" popover-trigger="mouseenter" uib-popover-html="'Enter your API key here. If you don\'t have one, your access will be limited. You must register on TpDB and login to get your API key.'">
+</div>
+</div>
+	
+			<div ng-if="$ctrl.tpdb_enabled" class="divider"></div>
+<br ng-if="$ctrl.tpdb_enabled" />
     <input type="checkbox" ng-if="$ctrl.tpdb_enabled" ng-model="$ctrl.tpdb_autorename"
-    uib-popover-html="'Will automatically change scene names to the \'website - actor(s) - title\' naming convention. The actual filename will be untouched. A tag will be added to the scene (_tpdb-sure or _tpdb_unsure) depending on the quality of the result.'"
+    uib-popover-html="'Will automatically change scene names to the defined naming convention (see the \"file renaming\" tab). The actual filename will be untouched. A tag will be added to the scene  depending on the quality of the result.'"
            popover-trigger="mouseenter" popover-placement="top"> <label ng-if="$ctrl.tpdb_enabled">Automatically rename scenes</label>
-
+	<span ng-if="$ctrl.tpdb_enabled" style="margin-right: 10px; margin-left: 8px; border-left: 2px dotted #aaaaaa; transform: translate(-50%);"></span>
+    <input type="checkbox" ng-if="$ctrl.tpdb_enabled" ng-model="$ctrl.tpdb_filerename"
+    uib-popover-html="'Will also rename disk files to the defined naming convention(s) (see the \"file renaming\" tab).'"
+           popover-trigger="mouseenter" popover-placement="top"> <label ng-if="$ctrl.tpdb_enabled">Also rename the video files <i>(not yet functional)</i></label>	
             <div ng-if="$ctrl.tpdb_enabled" class="divider"></div>
           <label ng-if="$ctrl.tpdb_enabled">Enable registration of:</label>
-
+<div ng-if="$ctrl.tpdb_enabled" class="divider"></div>
+<br ng-if="$ctrl.tpdb_enabled" />
     <input type="checkbox" ng-if="$ctrl.tpdb_enabled" ng-model="$ctrl.tpdb_websites"
     uib-popover-html="'When YAPO discovers a new website on TpDB, then add it'"
            popover-trigger="mouseenter" popover-placement="top"> <label ng-if="$ctrl.tpdb_enabled">Websites</label>

@@ -32,6 +32,7 @@ class Config(metaclass=Singleton):
   timeprint_format: str
   configfile_path: str
   vlc_path: Optional[str]
+  auto_filerename: str
   current_setting_version: int
   sheet_width: int
   sheet_grid: str
@@ -42,6 +43,7 @@ class Config(metaclass=Singleton):
   tpdb_photos: str
   tpdb_websites: str
   tpdb_tags: int
+  tpdb_apikey: str
   debug: bool
 
 
@@ -72,9 +74,11 @@ class Config(metaclass=Singleton):
     self.tpdb_photos = Constants().tpdb_photos
     self.tpdb_websites = Constants().tpdb_websites
     self.tpdb_tags = Constants().tpdb_tags
+    self.tpdb_apikey = Constants().tpdb_apikey
     self.configfile_path = os.path.join(self.config_path, Constants().default_yaml_settings_filename)
     self.current_setting_version = 3
     self.debug = Constants().debug
+    self.auto_filerename = Constants().auto_filerename
     self.vlc_path = Constants().vlc_path if os.name == 'nt' else None
     self.last_all_scene_tag = None
 
@@ -121,6 +125,7 @@ class Config(metaclass=Singleton):
       self.site_media_path = settings_dict[__yaml_root_element__].get("site_media_path") or self.site_media_path
       self.unknown_person_image_path = settings_dict[__yaml_root_element__].get("unknown_person_image_path") or self.unknown_person_image_path
       self.vlc_path = settings_dict[__yaml_root_element__].get("vlc_path") or self.vlc_path
+      self.auto_filerename = settings_dict[__yaml_root_element__].get("auto_filerename") or self.auto_filerename
       self.current_setting_version = __string_to_nullable_int__(settings_dict[__yaml_root_element__].get("current_setting_version")) or self.current_setting_version
       self.sheet_width = __string_to_nullable_int__(settings_dict[__yaml_root_element__].get("sheet_width")) or self.sheet_width
       self.sheet_grid = settings_dict[__yaml_root_element__].get("sheet_grid") or self.sheet_grid
@@ -131,6 +136,7 @@ class Config(metaclass=Singleton):
       self.tpdb_photos = settings_dict[__yaml_root_element__].get("tpdb_photos") or self.tpdb_photos
       self.tpdb_websites = settings_dict[__yaml_root_element__].get("tpdb_websites") or self.tpdb_websites
       self.tpdb_tags = settings_dict[__yaml_root_element__].get("tpdb_tags") or self.tpdb_tags
+      self.tpdb_apikey = settings_dict[__yaml_root_element__].get("tpdb_apikey") or self.tpdb_apikey
       self.debug = settings_dict[__yaml_root_element__].get("debug") or self.debug
   def __settings_to_dict__(self):
     return {
@@ -146,6 +152,7 @@ class Config(metaclass=Singleton):
         "site_media_path": self.site_media_path,
         "unknown_person_image_path": self.unknown_person_image_path,
         "vlc_path": self.vlc_path,
+        "auto_filerename": self.auto_filerename,
         "current_setting_version": self.current_setting_version,
         "sheet_width": self.sheet_width,
         "sheet_grid": self.sheet_grid,
@@ -156,6 +163,7 @@ class Config(metaclass=Singleton):
         "tpdb_photos": self.tpdb_photos,
         "tpdb_websites": self.tpdb_websites,
         "tpdb_tags": self.tpdb_tags,
+        "tpdb_apikey": self.tpdb_apikey,
         "debug": self.debug
       }
     }
@@ -166,16 +174,8 @@ class Config(metaclass=Singleton):
 
   def get_old_settings_as_json(self):
     import json
-    # return f'{{"settings_version": 3, "vlc_path": "{os.path.normpath(self.vlc_path)}", "last_all_scene_tag": "{__nullable_time_to_string__(self.last_all_scene_tag)}"}}'
-    # the given vlc_path somehow leads to a json error, it thinks the ':' should be escaped? Unclear, because a colon should just work fine
-    #print (json.dumps(f'{{"settings_version": {self.current_setting_version}, "vlc_path": "{self.vlc_path}", "last_all_scene_tag": "{__nullable_time_to_string__(self.last_all_scene_tag)}", "tpdb_enabled": {self.tpdb_enabled}, "tpdb_website_logos": {self.tpdb_website_logos}, "tpdb_autorename": {self.tpdb_autorename}, "tpdb_add_actors": {self.tpdb_add_actors}, "tpdb_add_photo": {self.tpdb_add_photo}}}'))
-    #print('\n\n')
-    #print(f'JSON: {{"settings_version": {self.current_setting_version}, "vlc_path": "{self.vlc_path}", "last_all_scene_tag": "{__nullable_time_to_string__(self.last_all_scene_tag)}", "tpdb_enabled": {str(self.tpdb_enabled).lower()}, "tpdb_website_logos": {str(self.tpdb_website_logos).lower()}, "tpdb_autorename": {str(self.tpdb_autorename).lower()}, "tpdb_add_actors": {str(self.tpdb_add_actors).lower()}, "tpdb_add_photo": {str(self.tpdb_add_photo).lower()}}}')
 
-    #return f'{{"settings_version": {self.current_setting_version}, "vlc_path": "{self.vlc_path}", "last_all_scene_tag": "{__nullable_time_to_string__(self.last_all_scene_tag)}", "tpdb_enabled": {self.tpdb_enabled}, "tpdb_website_logos": {self.tpdb_website_logos}, "tpdb_autorename": {self.tpdb_autorename}, "tpdb_add_actors": {self.tpdb_add_actors}, "tpdb_add_photo": {self.tpdb_add_photo}}}'
-    #print (f'JSON: {{"settings_version": {self.current_setting_version}, "vlc_path": "{self.vlc_path}", "yapo_url": "{self.yapo_url}", "renaming": "{self.renaming}", "last_all_scene_tag": "{__nullable_time_to_string__(self.last_all_scene_tag)}", "tpdb_enabled": {str(self.tpdb_enabled).lower()}, "tpdb_website_logos": {str(self.tpdb_website_logos).lower()}, "tpdb_autorename": {str(self.tpdb_autorename).lower()}, "tpdb_actors": {str(self.tpdb_actors).lower()}, "tpdb_photos": {str(self.tpdb_photos).lower()}, "tpdb_websites": {str(self.tpdb_websites)}, "tpdb_tags": {self.tpdb_tags}}}')
-
-    return f'{{"settings_version": {self.current_setting_version}, "vlc_path": "{self.vlc_path}", "yapo_url": "{self.yapo_url}", "renaming": "{self.renaming}", "last_all_scene_tag": "{__nullable_time_to_string__(self.last_all_scene_tag)}", "tpdb_enabled": {str(self.tpdb_enabled).lower()}, "tpdb_website_logos": {str(self.tpdb_website_logos).lower()}, "tpdb_autorename": {str(self.tpdb_autorename).lower()}, "tpdb_actors": {str(self.tpdb_actors).lower()}, "tpdb_photos": {str(self.tpdb_photos).lower()}, "tpdb_websites": {str(self.tpdb_websites)}, "tpdb_tags": {self.tpdb_tags}}}'
+    return f'{{"settings_version": {self.current_setting_version}, "vlc_path": "{self.vlc_path}", "auto_filerename": "{self.auto_filerename}", "yapo_url": "{self.yapo_url}", "renaming": "{self.renaming}", "last_all_scene_tag": "{__nullable_time_to_string__(self.last_all_scene_tag)}", "tpdb_enabled": {str(self.tpdb_enabled).lower()}, "tpdb_website_logos": {str(self.tpdb_website_logos).lower()}, "tpdb_autorename": {str(self.tpdb_autorename).lower()}, "tpdb_actors": {str(self.tpdb_actors).lower()}, "tpdb_photos": {str(self.tpdb_photos).lower()}, "tpdb_websites": {str(self.tpdb_websites)}, "tpdb_apikey": "{str(self.tpdb_apikey)}", "tpdb_tags": {self.tpdb_tags}}}'
 
 
 def __nullable_time_to_string__(time: Optional[datetime]) -> str:

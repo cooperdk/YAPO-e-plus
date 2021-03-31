@@ -46,7 +46,7 @@ def tpdb(scene_id: int, force: bool):
     success = False
     found = 0
 
-    if not aux.is_domain_reachable("https://api.metadataapi.net/scenes") or not aux.checkTpDB():
+    if not aux.is_domain_reachable("https://api.metadataapi.net") or not aux.checkTpDB():
         return False
 
     this_scene = Scene.objects.get(pk=scene_id)
@@ -118,6 +118,7 @@ def tpdb(scene_id: int, force: bool):
             'Content-Type': 'application/json',
             'Accept': 'application/json',
             'User-Agent': 'YAPO 0.7.6',
+            'Authorization': Config().tpdb_apikey
         }
 
         response = requests.request('GET', url, headers=headers, params=params, timeout=5)
@@ -160,6 +161,7 @@ def tpdb(scene_id: int, force: bool):
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
                 'User-Agent': 'YAPO 0.7.6',
+                'Authorization': Config().tpdb_apikey
             }
             response = requests.request('GET', url, headers=headers, params=params, timeout=5)
             try:

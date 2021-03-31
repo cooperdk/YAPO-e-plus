@@ -9,6 +9,10 @@ from utils.printing import Logger
 from utils import scenerenamer
 log = Logger()
 
+if Config().tpdb_apikey == "":
+    Config().tpdb_apikey = ""
+    Config().save()
+
 #if os.path.exists(os.path.join(self.root_path,))
 sitemediaold = os.path.join(Config().site_path, Constants().site_media_subdir)
 if os.path.exists(sitemediaold): #)(Config().site_media_path):

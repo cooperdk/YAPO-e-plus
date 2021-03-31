@@ -50,9 +50,11 @@ angular.module('settings').component('settings', {
                             tpdb_enabled: false,
                             tpdb_website_logos: false,
                             tpdb_autorename: false,
+							auto_filerename: false,
                             tpdb_actors: false,
                             tpdb_photos: false,
                             tpdb_websites: false,
+							tpdb_apikey: "",
                             tpdb_tags: 0
                         }
                 }).then(function (response) {
@@ -64,11 +66,12 @@ angular.module('settings').component('settings', {
                     self.tpdb_enabled = response.data.tpdb_enabled;
                     self.tpdb_website_logos = response.data.tpdb_website_logos;
                     self.tpdb_autorename = response.data.tpdb_autorename;
+					self.auto_filerename = response.data.auto_filerename;
                     self.tpdb_actors = response.data.tpdb_actors;
                     self.tpdb_photos = response.data.tpdb_photos;
                     self.tpdb_websites = response.data.tpdb_websites;
                     self.tpdb_tags = response.data.tpdb_tags;
-
+					self.tpdb_apikey = response.data.tpdb_apikey;
                     // alert("Got response from server: " + self.pathToFolderToAdd);
                 }, function errorCallback(response) {
                     alert("Something went wrong!");
@@ -134,9 +137,11 @@ angular.module('settings').component('settings', {
                             tpdb_enabled: self.tpdb_enabled,
                             tpdb_websitelogos: self.tpdb_website_logos,
                             tpdb_autorename: self.tpdb_autorename,
+							auto_filerename: self.auto_filerename,
                             tpdb_actors: self.tpdb_actors,
                             tpdb_photos: self.tpdb_photos,
                             tpdb_websites: self.tpdb_websites,
+							tpdb_apikey: self.tpdb_apikey,
                             tpdb_tags: self.tpdb_tags
                         }
 
@@ -148,11 +153,13 @@ angular.module('settings').component('settings', {
                         self.tpdb_website_logos = response.data.tpdb_website_logos;
                         self.response = response.data.tpdb_autorename;
                         self.tpdb_autorename = response.data.tpdb_autorename;
+						self.auto_filerename = response.data.auto_filerename;
                         self.response = response.data.tpdb_actors;
                         self.tpdb_actors = response.data.tpdb_actors;
                         self.response = response.data.tpdb_photos;
                         self.tpdb_photos = response.data.tpdb_photos;
                         self.tpdb_websites = response.data.tpdb_websites;
+						self.tpdb_apikey = response.data.tpdb_apikey;
                         self.tpdb_tags = response.data.tpdb_tags;
                         //$window.location.reload(forceGet);
                         //alert("Got response from server: " + self.pathToFolderToAdd);

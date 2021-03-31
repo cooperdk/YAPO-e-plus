@@ -316,25 +316,27 @@ def strip_bad_chars (name):
 
 def is_domain_reachable(host, timeout=5) -> bool:
     """ This function checks to see if a host name has a DNS entry by checking
-        for socket info. If the website gets something in return,
-        we know it's available to DNS.
+        for socket info. If the website gets a status code less than 500 in return,
+        we know it's available. Otherwise, it will soft fail if less than 600 or hard fail anything else.
     """
     result = True
     try:
         response=requests.head(host, timeout=timeout)
-        #socket.gethostbyname(host)
-    except Exception as e: #socket.gaierror:
+    except Exception as e:
         log.error(f"{host} did not answer within {timeout} seconds. Try again later.")
         result = False
         return result
-    if response.status_code < 400:
+    if response.status_code < 500:
         result =  True
-    elif response.status_code < 500:
+    elif response.status_code < 600:
+        result =  True
+        log.warn(f"{host} may be faulty (status code {response.status_code}).")
+    elif response.status_code < 900:
         result = False
-        log.warn(f"{host} reported a response error {response.status_code}. Please report this to Team YAPO.")
+        log.warn(f"{host} reported a response error {response.status_code}.")
     else:
         result = False
-        log.warn(f"{host} reported a server error {response.status_code}.")
+        log.warn(f"{host} reported an error {response.status_code}.")
 
     return result
 

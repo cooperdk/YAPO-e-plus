@@ -33,6 +33,7 @@ class Constants(metaclass=Singleton):
         self.sheet_width = 1024
         self.sheet_grid = "4x4"
         self.vlc_path = "c:/program files/videolan/vlc/vlc.exe"
+        self.auto_filerename = 'false'
         self.tpdb_enabled = 'true'
         self.tpdb_website_logos = 'true'
         self.tpdb_autorename = 'false'
@@ -40,4 +41,6 @@ class Constants(metaclass=Singleton):
         self.tpdb_photos = 'false'
         self.tpdb_websites = 'false'
         self.tpdb_tags = 0
+        self.tpdb_apikey = ''
         self.debug = "false"
+        

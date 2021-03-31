@@ -498,7 +498,7 @@ def populate_websites(force):
     ### Force will re-download logos.
 
     import videos.aux_functions as aux
-    if not aux.is_domain_reachable("https://api.metadataapi.net/sites"):
+    if not aux.is_domain_reachable("https://api.metadataapi.net"):
         return Response(status=500)
     log.sinfo(f"Traversing websites for logos...")
     nexturl = 'https://api.metadataapi.net/sites?page=1'
@@ -508,6 +508,7 @@ def populate_websites(force):
             'Content-Type': 'application/json',
             'Accept': 'application/json',
             'User-Agent': 'YAPO 0.7.6',
+            'Authorization': Config().tpdb_apikey
         }
         print("Downloading site information... ", end="")
         response = requests.request('GET', nexturl, headers=headers, params=params) #, params=params
@@ -566,7 +567,7 @@ def populate_websites(force):
 def tpdb_scan_actor(actor, force: bool):
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     import videos.aux_functions as aux
-    if not aux.is_domain_reachable("https://api.metadataapi.net/performers"):
+    if not aux.is_domain_reachable("https://api.metadataapi.net"):
         return Response(status=500)
 
     photo = actor.thumbnail
@@ -578,6 +579,7 @@ def tpdb_scan_actor(actor, force: bool):
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'User-Agent': 'YAPO 0.7.6',
+        'Authorization': Config().tpdb_apikey
     }
     response = requests.request('GET', url, headers=headers, params=params)  # , params=params
     success = False
@@ -1235,10 +1237,12 @@ def settings(request):
             if request.query_params["pathToVlc"] == "":
 
                 serializer = SettingsSerializer(Config().get_old_settings_as_json())
-
+                #print(f'SER: {serializer}')
                 return Response(serializer.data)
 
-            else:
+        if "pathToVlc" in request.query_params:
+            
+            if request.query_params["pathToVlc"] != "":
 
                 new_path_to_vlc = os.path.abspath(request.query_params["pathToVlc"]).replace("\\","/")
                 log.info(f'VLC path set to {request.query_params["pathToVlc"]}')
@@ -1314,6 +1318,8 @@ def settings(request):
                         request.query_params["tpdb_websites"]
                     if "tpdb_tags" in request.query_params: Config().tpdb_tags = \
                         request.query_params["tpdb_tags"]
+                    if "tpdb_apikey" in request.query_params: Config().tpdb_apikey = \
+                        request.query_params["tpdb_apikey"]
                 Config().save()
                 return Response(status=200)
 
