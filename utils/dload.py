@@ -28,7 +28,7 @@ def save(url, path="", overwrite=False):
         #namespace = sys._getframe(1).f_globals  # caller's globals
         #c_path = os.path.dirname(namespace['__file__'])
         fn = os.path.basename(urlparse(url).path)
-        fn = fn if fn else f"dload{rand_fn()}"
+        fn = fn or f"dload{rand_fn()}"
         path = path if path.strip() else c_path+os.path.sep+fn
         if not overwrite and os.path.isfile(path):
             return path

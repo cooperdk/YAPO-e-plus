@@ -85,121 +85,119 @@ def restest(height:int):
     if not isinstance(height, int):
         return ""
     if height <= 240:
-        res = "240p"
+        return "240p"
     elif 240 < height <= 360:
-        res = "360p"
+        return "360p"
     elif 360 < height <= 480:
-        res = "480p"
+        return "480p"
     elif 480 < height <= 576:
-        res = "576p"
+        return "576p"
     elif 576 < height <= 720:
-        res = "720p"
+        return "720p"
     elif 720 < height <= 1080:
-        res = "1080p"
+        return "1080p"
     elif 1080 < height <= 1440:
-        res = "1440p"
+        return "1440p"
     elif 1440 < height <= 2160:
-        res = "4K"
+        return "4K"
     elif 2160 < height <= 4320:
-        res = "8K"
+        return "8K"
     else:
-        res = ""
-    return res
+        return ""
 
-def send_piercings_to_actortag (actor):
-    cnt = 0
+def send_piercings_to_actortag(actor):
     piercings = actor.piercings
-    if piercings:
-        if ("navel" or "belly button" or "bellybutton") in piercings.lower():
-            insert_actor_tag(actor, "Pierced navel")
-            cnt += 1
-        if "clit" in piercings.lower():
-            insert_actor_tag(actor, "Pierced clitoris")
-            cnt += 1
-        if ("nipples" or "nipple rings") in piercings.lower():
-            insert_actor_tag(actor, "Pierced nipples")
-            cnt += 1
-        elif "nipple" in piercings.lower():
-            insert_actor_tag(actor, "Pierced single nipple")
-            cnt += 1
-        if "septum" in piercings.lower():
-            insert_actor_tag(actor, "Pierced septum")
-            cnt += 1
-        if "nose" in piercings.lower():
-            insert_actor_tag(actor, "Pierced nose")
-            cnt += 1
-        if "nostril" in piercings.lower():
-            insert_actor_tag(actor, "Pierced nostril")
-            cnt += 1
-        if "tongue" in piercings.lower():
-            insert_actor_tag(actor, "Pierced tongue")
-            cnt += 1
-        if "tragus" in piercings.lower():
-            insert_actor_tag(actor, "Pierced tragus")
-            cnt += 1
-        if "helix" in piercings.lower():
-            insert_actor_tag(actor, "Pierced helix")
-            cnt += 1
-        if ("earlobe" or "ear lobe") in piercings.lower():
-            insert_actor_tag(actor, "Pierced ear lobe")
-            cnt += 1
-        if "lower lip" in piercings.lower():
-            insert_actor_tag(actor, "Pierced lower lip")
-            cnt += 1
-        if "upper lip" in piercings.lower():
-            insert_actor_tag(actor, "Pierced upper lip")
-            cnt += 1
-        if "monroe" in piercings.lower():
-            insert_actor_tag(actor, "Pierced Monroe")
-            cnt += 1
-        if ("dermal" or "surface") in piercings.lower():
-            insert_actor_tag(actor, "Pierced dermal")
-            cnt += 1
-        if "wrists" in piercings.lower():
-            insert_actor_tag(actor, "Pierced wrists")
-            cnt += 1
-        elif "wrist" in piercings.lower():
-            insert_actor_tag(actor, "Pierced single wrist")
-            cnt += 1
-        if "hips" in piercings.lower():
-            insert_actor_tag(actor, "Pierced hip dermals")
-            cnt += 1
-        elif "hip" in piercings.lower():
-            insert_actor_tag(actor, "Pierced single hip dermal")
-            cnt += 1
-        if "labia" in piercings.lower():
-            insert_actor_tag(actor, "Pierced labia")
-            cnt += 1
-        if "back dimples" in piercings.lower():
-            insert_actor_tag(actor, "Pierced back dimples")
-            cnt += 1
-        if ("right brow" or "right eyebrow") in piercings.lower():
-            insert_actor_tag(actor, "Pierced right eyebrow")
-            cnt += 1
-        elif ("left brow" or "left eyebrow") in piercings.lower():
-            insert_actor_tag(actor, "Pierced left eyebrow")
-            cnt += 1
-        elif "brow" in piercings.lower():
-            insert_actor_tag(actor, "Pierced eyebrow")
-            cnt += 1
-        if "ears" in piercings.lower():
-            insert_actor_tag(actor, "Pierced ears")
-            cnt += 1
-        elif "left ear" in piercings.lower():
-            insert_actor_tag(actor, "Pierced left ear")
-            cnt += 1
-        elif "right ear" in piercings.lower():
-            insert_actor_tag(actor, "Pierced right ear")
-            cnt += 1
-        if "chest" in piercings.lower():
-            insert_actor_tag(actor, "Pierced dermal on chest")
-            cnt += 1
-        if any([piercings.lower() == "n/a", piercings.lower() == "none", piercings.lower() == "no piercings", piercings.lower() == "no"]):
-            insert_actor_tag(actor, "No piercings")
-            cnt += 1
-        return cnt
-    else:
+    if not piercings:
         return 0
+    cnt = 0
+    if ("navel" or "belly button" or "bellybutton") in piercings.lower():
+        insert_actor_tag(actor, "Pierced navel")
+        cnt += 1
+    if "clit" in piercings.lower():
+        insert_actor_tag(actor, "Pierced clitoris")
+        cnt += 1
+    if ("nipples" or "nipple rings") in piercings.lower():
+        insert_actor_tag(actor, "Pierced nipples")
+        cnt += 1
+    elif "nipple" in piercings.lower():
+        insert_actor_tag(actor, "Pierced single nipple")
+        cnt += 1
+    if "septum" in piercings.lower():
+        insert_actor_tag(actor, "Pierced septum")
+        cnt += 1
+    if "nose" in piercings.lower():
+        insert_actor_tag(actor, "Pierced nose")
+        cnt += 1
+    if "nostril" in piercings.lower():
+        insert_actor_tag(actor, "Pierced nostril")
+        cnt += 1
+    if "tongue" in piercings.lower():
+        insert_actor_tag(actor, "Pierced tongue")
+        cnt += 1
+    if "tragus" in piercings.lower():
+        insert_actor_tag(actor, "Pierced tragus")
+        cnt += 1
+    if "helix" in piercings.lower():
+        insert_actor_tag(actor, "Pierced helix")
+        cnt += 1
+    if ("earlobe" or "ear lobe") in piercings.lower():
+        insert_actor_tag(actor, "Pierced ear lobe")
+        cnt += 1
+    if "lower lip" in piercings.lower():
+        insert_actor_tag(actor, "Pierced lower lip")
+        cnt += 1
+    if "upper lip" in piercings.lower():
+        insert_actor_tag(actor, "Pierced upper lip")
+        cnt += 1
+    if "monroe" in piercings.lower():
+        insert_actor_tag(actor, "Pierced Monroe")
+        cnt += 1
+    if ("dermal" or "surface") in piercings.lower():
+        insert_actor_tag(actor, "Pierced dermal")
+        cnt += 1
+    if "wrists" in piercings.lower():
+        insert_actor_tag(actor, "Pierced wrists")
+        cnt += 1
+    elif "wrist" in piercings.lower():
+        insert_actor_tag(actor, "Pierced single wrist")
+        cnt += 1
+    if "hips" in piercings.lower():
+        insert_actor_tag(actor, "Pierced hip dermals")
+        cnt += 1
+    elif "hip" in piercings.lower():
+        insert_actor_tag(actor, "Pierced single hip dermal")
+        cnt += 1
+    if "labia" in piercings.lower():
+        insert_actor_tag(actor, "Pierced labia")
+        cnt += 1
+    if "back dimples" in piercings.lower():
+        insert_actor_tag(actor, "Pierced back dimples")
+        cnt += 1
+    if ("right brow" or "right eyebrow") in piercings.lower():
+        insert_actor_tag(actor, "Pierced right eyebrow")
+        cnt += 1
+    elif ("left brow" or "left eyebrow") in piercings.lower():
+        insert_actor_tag(actor, "Pierced left eyebrow")
+        cnt += 1
+    elif "brow" in piercings.lower():
+        insert_actor_tag(actor, "Pierced eyebrow")
+        cnt += 1
+    if "ears" in piercings.lower():
+        insert_actor_tag(actor, "Pierced ears")
+        cnt += 1
+    elif "left ear" in piercings.lower():
+        insert_actor_tag(actor, "Pierced left ear")
+        cnt += 1
+    elif "right ear" in piercings.lower():
+        insert_actor_tag(actor, "Pierced right ear")
+        cnt += 1
+    if "chest" in piercings.lower():
+        insert_actor_tag(actor, "Pierced dermal on chest")
+        cnt += 1
+    if any([piercings.lower() == "n/a", piercings.lower() == "none", piercings.lower() == "no piercings", piercings.lower() == "no"]):
+        insert_actor_tag(actor, "No piercings")
+        cnt += 1
+    return cnt
 
 def addactor (current_scene, actor_to_add):
 

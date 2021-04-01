@@ -284,6 +284,7 @@ def tpdb_scanner(force):
     return Response(status=200)
 
 def populate_tag(searchtag, tagtype, force) -> int:
+    # sourcery skip: remove-redundant-if, remove-unnecessary-else, swap-if-else-branches
     """
     Function to scan a scene using the YAPO Tags API (api.porn-organizer.org/records/tags).
     Populates a single scene or actor tag with description and images from the YAPO API.
@@ -504,8 +505,8 @@ def populate_websites(force):
     log.sinfo(f"Traversing websites for logos...")
 
     websites = Website.objects.all()
+    url='https://api.metadataapi.net/sites'
     for site in websites:
-        url='https://api.metadataapi.net/sites'
         sitename = site.name
         params = {'q': sitename}
         headers = {
@@ -524,7 +525,7 @@ def populate_websites(force):
         if response['data'] and len(response['data'])>0:
             tpdb = response['data'][0]
             if 'id' in tpdb:
-            
+
                 try:         
                     found = False
                     tsid = tpdb['id']

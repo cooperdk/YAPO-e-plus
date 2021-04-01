@@ -28,7 +28,6 @@ def boot():
         time.sleep(4)
         a=call_command('makemigrations', interactive = False)
         b=call_command('migrate', interactive = False)
-        return
     else:
         '''
         This needs to be modified to actually check for pending migrations.
@@ -43,4 +42,4 @@ def boot():
         #    log.info(f'DBCHK: Database needs an upgrade, migration commencing.')
         a=call_command('makemigrations', interactive = False)
         a=call_command('migrate', interactive = False)
-        return
+    return
