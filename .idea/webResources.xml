@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebResourcesPaths">
+    <contentEntries>
+      <entry url="file://$PROJECT_DIR$">
+        <entryData>
+          <resourceRoots>
+            <path value="file://$PROJECT_DIR$/data" />
+            <path value="file://$PROJECT_DIR$/data/media" />
+            <path value="file://$PROJECT_DIR$/data/media/actor" />
+            <path value="file://$PROJECT_DIR$/data/media/images" />
+            <path value="file://$PROJECT_DIR$/data/media/logos" />
+            <path value="file://$PROJECT_DIR$/data/media/scenes" />
+            <path value="file://$PROJECT_DIR$/data/media/tags" />
+            <path value="file://$PROJECT_DIR$/data/media/websites" />
+            <path value="file://$PROJECT_DIR$/videos/static" />
+            <path value="file://$PROJECT_DIR$/videos/static/css" />
+            <path value="file://$PROJECT_DIR$/videos/static/django_extensions" />
+            <path value="file://$PROJECT_DIR$/videos/static/fonts" />
+            <path value="file://$PROJECT_DIR$/videos/static/js" />
+            <path value="file://$PROJECT_DIR$/videos/static/mptt" />
+            <path value="file://$PROJECT_DIR$/videos/static/partials" />
+            <path value="file://$PROJECT_DIR$/videos/static/providers" />
+            <path value="file://$PROJECT_DIR$/videos/static/rest_framework" />
+          </resourceRoots>
+        </entryData>
+      </entry>
+    </contentEntries>
+  </component>
+</project>

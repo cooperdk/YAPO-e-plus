@@ -1,6 +1,11 @@
 # YAPO e+
 ## Yet Another Porn Organizer (extended plus)
 
+#### ATTENTION!
+Development takes place in develop, which is much more rich in features than this (master) build. Please 
+consider checking out/downloading from 
+develop, as it is usually stable enough for usage.
+
 #### *The YAPO website is coming soon!*
 
 *If you don't want to mess with Python and all the dependencies, there is an installer (Windows 10 64-bit) located here: https://github.com/cooperdk/YAPO-e-plus/releases. It may not include newer commits, please check the changelog and you can manually update the YAPO code after installation.*
