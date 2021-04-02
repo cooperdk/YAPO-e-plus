@@ -26,8 +26,7 @@ Requirements: FFMPEG, VLC (for out-of-browser playback, if you prefer that) and 
 
 If something is not working, it is generally enough to make sure all dependencies are installed. Please consult step 3 and 4 under "Installation and upgrade instructions"  below.
 
-##### Discuss and share on Discord: https://discord.gg/zdm7Mdg
-
+##### Discuss and share on Discord: https://discord.gg/T6ybX4vs8u
 ---------------
 
 #### NEW FEATURES:
