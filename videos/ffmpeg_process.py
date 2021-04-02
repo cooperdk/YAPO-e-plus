@@ -75,7 +75,7 @@ def execute_subprocess(command_call, type_of_bin,):
 
     # print(a[0])
 
-    ans = dict()
+    ans = {}
     if p.returncode == 0:
         ans["success"] = True
         if type_of_bin == "ffprobe":

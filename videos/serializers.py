@@ -37,7 +37,7 @@ class PathWithIds(serializers.CharField):
             value:
         """
         x = json.loads(value)
-        # print (x)
+        print ("SERIALIZER: " + str(x))
         return x
 
 
@@ -376,12 +376,12 @@ class SceneListSerializer(serializers.ModelSerializer):
             "scene_tags",
             "websites",
             "thumbnail",
-            "folders_in_tree",
             "is_runner_up",
             "rating",
             "path_to_file",
             "hash",
             "release_date",
+            "folders_in_tree",
         ]
 
         # fields = ['id', 'name']
@@ -433,10 +433,10 @@ class SceneSerializer(serializers.ModelSerializer):
             "codec_name",
             "framerate",
             "description",
-            "folders_in_tree",
             "date_last_played",
             "orig_name",
             "orig_path_to_file",
+            "folders_in_tree",
         ]
 
 

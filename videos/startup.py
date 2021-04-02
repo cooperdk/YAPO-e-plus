@@ -7,7 +7,7 @@ import platform
 import webbrowser
 from videos.models import Scene, Actor, ActorTag, SceneTag, Folder
 from django.db.models import Count
-import videos.aux_functions as aux
+from videos import aux_functions as aux
 from configuration import Config
 from utils import Constants
 from colorama import init
@@ -96,12 +96,16 @@ def getsizeall () -> str: # Retrieves the total amount of bytes of registered sc
     else:
         return "no space"
 
-def dupes() -> int:
+
+def report_dupes() -> int:
     dupes = Scene.objects.values('hash').annotate(name_count=Count('hash')).exclude(name_count=1)
     if not any([len(dupes)==0, len(dupes)==1]):
-        log.info(f'There are {len(dupes)} duplicate scenes in your collection. Use the duplicate checker to clean them out.')
+        log.info(f'There are {len(dupes)} duplicate scenes in your collection.\nUse the duplicate checker in settings '
+                 f'to remove any redundant copies.\n')
     elif len(dupes)==1:
-        log.info(f'There is one duplicate scene in your collection. Use the duplicate checker to clean them out.')
+        log.info(f'There is one duplicate scene in your collection.\nUse the duplicate checker in settings to delete'
+                 f'the redundant copy/copies.\n')
+
 
 def sizeformat (b: int) -> str: # returns a human-readable filesize depending on the file's size
     if b < 1000:
@@ -131,8 +135,8 @@ def configcheck ():
     if not path.isfile(settings):
         log.info("No config file found, so one has been generated.\n")
         Config().save()
-    else:
-        print(f"Configuration loaded from {settings}\n")
+
+
 
 def vercheck(): # Check the local version against Github
     from distutils.version import LooseVersion
@@ -171,6 +175,7 @@ def vercheck(): # Check the local version against Github
 
         log.info(verprint)
 
+
 def stats (): # Prints statistics about videos and metadata
     size = getsizeall()
     row = Actor.objects.raw(
@@ -193,9 +198,9 @@ def stats (): # Prints statistics about videos and metadata
     )  # cursor.fetchone()
     if row[0].total is not None:
         sctag = str(row[0].total)
-    # TODO assign that all values got read correctly and have a valid value!
-    print(f"Scenes: {sce} ({size} on disk). Scene tags available: {sctag}")
-    print(f"Actors: {act} Actor tags available: {acttag}.\n")
+    print(f"Scenes: {sce} occupying {size} on disk. {sctag} scene tags available.")
+    print(f"Actors: {act} - there are {acttag} actor tags available.\n")
+
 
 def backupper (): # Generates a backup of the database
     src = Config().database_path
@@ -245,7 +250,6 @@ def ffmpeg_check():
 def startup_sequence():
 
     banner()
-
     configcheck()
     vercheck()
     print("")
@@ -256,20 +260,20 @@ def startup_sequence():
     cpu = aux.getCPU()
     cpucnt = aux.getCPUCount()
     global videoProcessing
+    vpr = "enabled" if {Config().videoprocessing} else "disabled"
     print(f"\nYou have {aux.get_human_readable_size(mem)} available. CPU speed is {cpu} GHz and you have {cpucnt} cores available.")
-    print(f"Video processing configuration is {Config().videoprocessing}.\n")
+    print(f"Video processing is {vpr}.\n")
     if ((mem >> 30) >= 2 or cpu > 1.2) and Config().videoprocessing != True:
         Config().videoprocessing = True
-        log.sinfo("Video processing enabled, you have the computer to handle it.")
+        log.sinfo("Video processing is now enabled, you have the computer to handle it.")
         print("\n")
     elif ((mem >> 30) < 2 or cpu < 1.2) and Config().videoprocessing != False:
         Config().videoprocessing = False
-        log.sinfo("Video processing disabled, your computer specification is too low.")
+        log.sinfo("Video processing is now disabled, your computer specification is too low.")
         print("\n")
     ffmpeg_check()
-    dupes()
+    report_dupes()
     #aux.populate_actors()
-
 
     if "no-browser" not in str(sys.argv):
         site = Config().yapo_url

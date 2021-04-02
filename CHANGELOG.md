@@ -2,6 +2,25 @@
 
 (WIN) = Windows exclusive, (LIN) = Linux exclusive
 
+## (0.7.6.6)
+
+*This update requires migrations, which is now fully automatic.*
+
+### Changes
+
+* The Folders view has been disabled for now. I am having trouble getting mptt to function in Django 2+. If anyone 
+  can assist, please let me know.
+* Optimization and fixes for the Freeones scraper and TpDB scanner. The latter has been running for two days 
+  straight in a test with real data.
+* All outside connections are now done to SSL servers. 
+* The Docker compose file (inside the docker directory) should be functional, recommended to ease mounting video 
+  volumes
+  
+### New
+
+* The TpDB scanner now supports (and expects) an API key. To get a key, visit [The Porn DB](https://metadataapi.net/).
+  To enter it, just visit the Settings > TpDB scanner page.
+
 ## (0.7.6.55)
 
 ### Changes

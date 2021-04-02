@@ -145,8 +145,9 @@ def search_in_get_queryset(original_queryset, request):
         and request.query_params["recursive"] == "true"
     ):
         print("Recursive is TRUE!!!!")
-        print(request.query_params["folders_in_tree"])
-        folder = Folder.objects.get(pk=int(request.query_params["folders_in_tree"]))
+        fit = request.query_params["folders_in_tree"]
+        if not isinstance(fit, int): fit=0
+        folder = Folder.objects.get(pk=fit)
         qs_list = get_scenes_in_folder_recursive(folder, qs_list)
         print(qs_list)
         term_is_not_null = True

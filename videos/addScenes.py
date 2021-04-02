@@ -69,14 +69,16 @@ def create_scene(scene_path, make_sample_video):
     current_scene.path_to_file = scene_path
     path_to_dir, filename = os.path.split(scene_path)
     current_scene.name = os.path.splitext(filename)[0]
-    # TODO: Insert website abbreviation function call here
+    # TODO: check
     current_scene.path_to_dir = path_to_dir
     sheet_width = Config().sheet_width
     sheet_grid = Config().sheet_grid
     if sheet_width > 2048:
         sheet_width = 2048
+        Config().sheet_width = 2048
     if sheet_width < 800:
         sheet_width = 800
+        Config().sheet_width = 800
 #    print(
 #        "Scene Name: %s\nPath to Dir: %s\nPath to File: %s"
 #        % (current_scene.name, current_scene.path_to_dir, current_scene.path_to_file)
@@ -418,17 +420,6 @@ def recursive_function(parent, folder):
             # siblings = folder.get_siblings()
             # for sibling in siblings:
             #     recursive_function(sibling)
-
-
-def write_actors_to_file():
-    actors = Actor.objects.all()
-    actors_string = ",".join(actor.name for actor in actors)
-
-    file = open("actors.txt", "w")
-
-    file.write(actors_string)
-
-    file.close()
 
 
 def populate_last_folder_name_in_virtual_folders():
