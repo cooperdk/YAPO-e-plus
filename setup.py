@@ -22,7 +22,7 @@ setup(
     package_data={'data'},
     scripts=['yapo.py', 'manage.py', 'yapo-maintenance.py'],
     python_requires='>=3.7',
-    install_requires=['asgiref>=3.2.10', 'beautifulsoup4>=4.9.2', 'colorama>=0.4.3', 'dj_static', 'django==3.1.6',
+    install_requires=['asgiref>=3.2.10', 'beautifulsoup4>=4.9.2', 'colorama>=0.4.3', 'dj_static', 'django==3.1.9',
                       'django-autocomplete-light==3.5.1', 'django-extensions==3.0.9', 'django-mptt==0.11.0',
                       'djangorestframework==3.12.1', 'dload>=0.6', 'html5lib>=1.1', 'jinja2>=2.11.2',
                       'numpy>=1.19.2', 'parsedatetime>=2.6', 'pillow>=7.2.0', 'pillow-pil>=0.1.dev0',
