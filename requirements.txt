@@ -1,6 +1,6 @@
 beautifulsoup4>=4.9.2
 colorama>=0.4.3
-Django==3.1.6
+Django==3.1.10
 waitress==1.4.4
 django-autocomplete-light==3.5.1
 django-extensions==3.0.9
