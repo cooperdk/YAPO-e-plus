@@ -15,9 +15,8 @@ class SettingsSerializer(serializers.Serializer):
         Args:
             value:
         """
-        x = json.loads(value)
         #print ("SERIALIZER: " + str(x))
-        return x
+        return json.loads(value)
 
 
 class LocalSceneFoldersSerializer(serializers.ModelSerializer):

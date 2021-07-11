@@ -1,6 +1,8 @@
 <uib-alert ng-repeat="alert in $ctrl.alerts" class="enter" type="{{ alert.type }}" close="$ctrl.closeAlert($index)"
            dismiss-on-timeout="{{ alert.timeout }}">{{ alert.msg }}
-</uib-alert><!--
+</uib-alert>
+
+<!--
         <div class="col-md-2">
 
 
@@ -24,7 +26,7 @@
 <pagination page-type="'Actor'"></pagination>
 
 
-<div class="col-md-10" id="big-scroll-item" infinite-scroll="$ctrl.pageChange()" infinite-scroll-distance="3"
+<div class="col-md-10" id="big-scroll-item"
      ng-if="!$ctrl.gridView">
 
     <ul class="actors">
@@ -100,8 +102,7 @@
 
 </div>
 
-<div class="col-md-12" id="big-scroll-item" infinite-scroll="$ctrl.pageChange()" infinite-scroll-distance="3"
-     ng-if="$ctrl.gridView">
+<div class="col-md-12" id="big-scroll-item" ng-if="$ctrl.gridView">
     <div class="row-fluid" id="actor-list-grid">
         <div class="col-md-2" ng-repeat="actor in $ctrl.actors">
             <a href="/#!/actor/{{ actor.id }}">

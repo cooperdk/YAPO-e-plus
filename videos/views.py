@@ -474,7 +474,7 @@ def populate_tag(searchtag, tagtype, force) -> int:
             print("No (new) aliases for this tag.")
         #except:
         #    log.warn("TAGS: Error while enumerating tag aliases.")
-    tag.modified_date = datetime.datetime.now()
+    tag.modified_date = datetime.now()
     tag.save()
     if maintagfound:
         log.warn(f'TAGS API: WARNING! The main tag "{maintag}" was added to this tag as an alias.')
@@ -503,11 +503,22 @@ def populate_websites(force):
     import videos.aux_functions as aux
     if not aux.is_domain_reachable("https://api.metadataapi.net"):
         return Response(status=500)
-    log.sinfo(f"Traversing websites for logos...")
 
-    websites = Website.objects.all()
+    if not force:
+        websites = Website.objects.all().filter(thumbnail__isnull=True).order_by('name')
+    else:
+        websites = Website.objects.all().order_by('name')
+
+    numweb = str(len(websites))
+    log.sinfo(f"Traversing {numweb} websites for logos...")
+
+    nn = 0
     url='https://api.metadataapi.net/sites'
     for site in websites:
+        nn += 1
+
+        print(f'                 {nn}/{numweb}: {site.name}')
+
         sitename = site.name
         params = {'q': sitename}
         headers = {
@@ -536,14 +547,19 @@ def populate_websites(force):
                     tslogo = tpdb['logo']
                     if site.name == tsn:
                         found = True
-                    if (site.name != tsn) and (site.name.lower() == tsn.lower()):
-                        log.info(f'Renaming site "{site.name}" to "{tsn}" for consistency')
-                        site.name = tsn
-                        found = True
-                    if (site.name.lower() == tss.lower()) and (site.name.lower() != tsn.lower()):
-                        log.info(f'Renaming site "{site.name}" to "{tsn}" because it is truncated')
-                        site.name = tsn
-                        found = True
+
+
+                    if (site.name != tsn):
+                        if (site.name.lower() == tsn.lower() or site.name.lower().replace(" ",
+                                          "") == tsn.lower().replace(" ", "")):
+                            log.info(f'Renaming site "{site.name}" to "{tsn}" for consistency')
+                            site.name = tsn
+                            found = True
+                        elif (site.name.lower().replace(" ", "") == tss.lower()) and (site.name.lower().replace(" ",
+                                                                           "")  != tsn.lower()):
+                            log.info(f'Renaming site "{site.name}" to "{tsn}" because it is truncated')
+                            site.name = tsn
+                            found = True
                     if found:
                         try:
                             newname = site.name
@@ -552,9 +568,9 @@ def populate_websites(force):
                                     site.website_alias += f",{tss.lower()}"
                                 else:
                                     site.website_alias = tss.lower()
-                            if not site.url:
+                            if not site.url  or force:
                                 site.url = tsurl
-                            if not site.tpdb_id:
+                            if not site.tpdb_id or force:
                                 site.tpdb_id = int(tsid)
                             aux.save_website_logo(tslogo, site.name, force)
                             site.save()
@@ -563,9 +579,14 @@ def populate_websites(force):
                                 f'Attempting to rename {oldname} to {newname} resulted in an error. New name probably '
                                 f'already exists!')
                             break
-                        print("\n")
+                        #print("\n")
+
                 except:
-                    log.info("This batch resulted in a failure.")
+                    log.info("This website resulted in a failure.")
+        else:
+            log.sinfo(f"{site.name} doesn't seem to exist on TpDB. Maybe ask them to add it?")
+
+
 
 
     return Response(status=200)
@@ -654,8 +675,8 @@ def tpdb_scan_actor(actor, force: bool):
                     changed = True
                     success = True
                 if success:
-                    actor.last_lookup = datetime.datetime.now()
-                    actor.modified_date = datetime.datetime.now()
+                    actor.last_lookup = datetime.now()
+                    actor.modified_date = datetime.now()
                     actor.save()
                     log.sinfo(f'Information about {actor.name} was successfully gathered from TpDB: {photo}.')
                 else:
@@ -1351,7 +1372,7 @@ def settings(request):
 
         if "scrapAllActors" in request.query_params:
             if request.query_params["scrapAllActors"] == "True":
-                start = datetime.datetime.now()
+                start = datetime.now()
                 if request.query_params["force"] == "true":
                     force = True
                 else:
@@ -1381,7 +1402,7 @@ def settings(request):
         if "checkDupes" in request.query_params:
             if request.query_params["checkDupes"] == "True":
                 print("Checking database for duplicates by hash...")
-                start = datetime.datetime.now()
+                start = datetime.now()
                 total_saved = 0
                 total_deleted = 0
                 anumber = 0
@@ -1418,9 +1439,9 @@ def settings(request):
                     # print(f"Deleted {total_deleted} files, saving {sizeformat(total_saved)}")
                     log.info(f"Deleted {total_deleted} files, saving {sizeformat(total_saved)}")
                 print('')
-                log.timer("Duplicate check", start, datetime.datetime.now())
+                log.timer("Duplicate check", start, datetime.now())
                 return HttpResponse (f'Deleted {total_deleted} files, saving {sizeformat(total_saved)} in '
-                                     f'{timer(start,datetime.datetime.now())}.')
+                                     f'{timer(start,datetime.now())}.')
                 #return Response(status=200)
 
         # populate_last_folder_name_in_virtual_folders()
@@ -1432,7 +1453,7 @@ def settings(request):
 
         if "cleanDatabase" in request.query_params:
             if request.query_params["cleanDatabase"]:
-                start = datetime.datetime.now()
+                start = datetime.now()
                 scenes = Scene.objects.all()
                 count = scenes.count()
                 counter = 1
@@ -1468,12 +1489,12 @@ def settings(request):
 
                 print("Cleaning website dirs that are no longer in database...")
                 clean_dir("websites")
-                log.timer("Database Cleanup", start, datetime.datetime.now())
-                return HttpResponse (f'Performed database cleanup in {timer(start,datetime.datetime.now())}.')
+                log.timer("Database Cleanup", start, datetime.now())
+                return HttpResponse (f'Performed database cleanup in {timer(start,datetime.now())}.')
 
 
         if "folderToScan" in request.query_params:
-            start = datetime.datetime.now()
+            start = datetime.now()
             if request.query_params["folderToScan"] != "":
                 local_folder = LocalSceneFolders.objects.get(
                     id=int(request.query_params["folderToScan"])
@@ -1483,9 +1504,9 @@ def settings(request):
                 all_folders = LocalSceneFolders.objects.all()
                 for folder in all_folders:
                     videos.addScenes.get_files(folder.name, False)
-            log.timer("Folder scan", start, datetime.datetime.now())
+            log.timer("Folder scan", start, datetime.now())
             #print("\nDone.")
-            return HttpResponse (f'Completed folder scan in {timer(start,datetime.datetime.now())}.')
+            return HttpResponse (f'Completed folder scan in {timer(start,datetime.now())}.')
 
 
 @api_view(["GET"])
@@ -1610,7 +1631,7 @@ def play_scene_vlc(scene, random):
     vlc_path = Config().vlc_path if platform.system() == "Windows" else "vlc"
     p = subprocess.Popen([vlc_path, file_path])
     scene.play_count += 1
-    scene.date_last_played = datetime.datetime.now()
+    scene.date_last_played = datetime.now()
     print(
         f"Play count for scene '{scene.name}' is now '{scene.play_count}' and the date the scene was last played is "
         f"'{scene.date_last_played}'"
@@ -1985,7 +2006,6 @@ class ActorViewSet(viewsets.ModelViewSet):
         # queryset = Actor.objects.all().order_by('?')
 
         queryset = Actor.objects.all()
-
         # **{term: term}
         res_qs = search_in_get_queryset(queryset, self.request)
         return res_qs
@@ -2017,7 +2037,7 @@ def file_iterator(file_name, chunk_size=8192, offset=0, length=None):
             yield data
 
 @api_view(["GET", "POST"])
-def display_video(request):
+def display_video(request: object) -> object:
 
     sceneid = request.path
     sceneid = sceneid.split('/')[-1]
@@ -2025,15 +2045,15 @@ def display_video(request):
     pathname = scene.path_to_file
     path = pathname
     size = os.path.getsize(path)
-    now = datetime.datetime.now()
+    now = datetime.now()
     if scene.date_last_played is not None:
         then = scene.date_last_played
     else:
-        then = datetime.datetime.now() - timedelta(hours = 12)
+        then = datetime.now() - timedelta(hours = 12)
     if now > then + timedelta(hours=2):
         log.sinfo(f"Playback: [{pathname}] ({size//1048576} MB)")#1048576 is 1024^2
         scene.play_count+=1
-        scene.date_last_played=datetime.datetime.now()
+        scene.date_last_played=datetime.now()
         scene.save()
         log.sinfo(f"Playback count {scene.play_count} for scene ID {scene.id}. Last played date/time updated.")
 

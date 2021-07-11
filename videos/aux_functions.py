@@ -356,7 +356,16 @@ def checkTpDB():
     return result
 
 
-def save_website_logo(image_link, website, force, *args):
+def save_website_logo(image_link: str, website: str, force: bool, *args: tuple):
+    """
+    :param image_link: The URL to download
+    :param website: The website to attach the image to
+    :param force: Re-get an image
+    :param args: 1-x scenes that should be connected to that website
+    :return: bool
+    """
+
+
     website = website.strip()
 
     try:
@@ -404,11 +413,11 @@ def save_website_logo(image_link, website, force, *args):
 
     if image_link:
         if image_link.lower() == "null" or image_link == "":
-            log.sinfo(f"No logo URL available for {website}.")
+            log.sinfo(f"No logo available for {website}.")
             success = False
             return
     else:
-        log.sinfo(f"No logo URL available for {website}.")
+        log.sinfo(f"No logo available for {website}.")
         success = False
         return
 
