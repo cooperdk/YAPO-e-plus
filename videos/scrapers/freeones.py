@@ -512,8 +512,8 @@ def search_freeones(actor_to_search: object, alias: object, force: bool = False)
             aux.progress(23,29,"Piercings")
 
             if not actor_to_search.extra_text:
-                x = dom.xpath( \
-                    "//div[@data-test='section-additional-info']//div//div//p/text()")
+                extra_text = ""
+                x = dom.xpath("//div[@data-test='section-additional-info']//div//div//p/text()")
                 if len(x)>0 and x is not None:
                     extra_text = x[0]
                 aux.progress(24,29,"Additional info")
