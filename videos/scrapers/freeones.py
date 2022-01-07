@@ -511,60 +511,62 @@ def search_freeones(actor_to_search: object, alias: object, force: bool = False)
                 num += 1
             aux.progress(23,29,"Piercings")
 
-            if not actor_to_search.extra_text:
-                extra_text = ""
-                x = dom.xpath("//div[@data-test='section-additional-info']//div//div//p/text()")
-                if len(x)>0 and x is not None:
-                    extra_text = x[0]
-                aux.progress(24,29,"Additional info")
-                if not actor_to_search.extra_text == "Unknown" and len(extra_text) > 5 \
-                and actor_to_search.extra_text != None:
-                    actor_to_search.extra_text = extra_text.strip()
+        if not actor_to_search.extra_text:
+            extra_text = ""
+            x = dom.xpath("//div[@data-test='section-additional-info']//div//div//p/text()")
+            if len(x)>0 and x is not None:
+                extra_text = x[0]
+            aux.progress(24,29,"Additional info")
+            if not actor_to_search.extra_text == "Unknown" and len(extra_text) > 5 \
+            and actor_to_search.extra_text != None:
+                actor_to_search.extra_text = extra_text.strip()
+                num += 1
+            else:
+                actor_to_search.extra_text = None
+
+        try:
+            if actor_to_search.ethnicity is not None or actor_to_search.ethnicity is not "":
+                if ("asian" in ethnicity.lower() and not "caucasian" in ethnicity.lower()) and not actor_to_search.actor_tags.filter(name="Asian"):
+                    insert_actor_tag(actor_to_search, "Asian")
                     num += 1
-                else:
-                    actor_to_search.extra_text = None
+                elif "caucasian" in ethnicity.lower() and not actor_to_search.actor_tags.filter(name="Caucasian"):
+                    insert_actor_tag(actor_to_search, "Caucasian")
+                    num += 1
+                elif "black" in ethnicity.lower() and not actor_to_search.actor_tags.filter(name="Black"):
+                    insert_actor_tag(actor_to_search, "Black")
+                    num += 1
+                elif "latin" in ethnicity.lower() and not actor_to_search.actor_tags.filter(name="Latin"):
+                    insert_actor_tag(actor_to_search, "Latin")
+                    num += 1
+                elif "caucasian" in ethnicity.lower() and not actor_to_search.actor_tags.filter(name="Caucasian"):
+                    insert_actor_tag(actor_to_search, "Caucasian")
+                    num += 1
+                elif "middle eastern" in ethnicity.lower() and not actor_to_search.actor_tags.filter(name="Middle Eastern"):
+                    insert_actor_tag(actor_to_search, "Middle Eastern")
+                    num += 1
+                elif "arabic" in ethnicity.lower() and not actor_to_search.actor_tags.filter(name="Arabic"):
+                    insert_actor_tag(actor_to_search, "Arabic")
+                    num += 1
+                elif "inuit" in ethnicity.lower() and not actor_to_search.actor_tags.filter(name="Inuit"):
+                    insert_actor_tag(actor_to_search, "Inuit")
+                    num += 1
+                elif "native american" in ethnicity.lower() and not actor_to_search.actor_tags.filter(name="Native American"):
+                    insert_actor_tag(actor_to_search, "Native American")
+                    num += 1
+
+            aux.progress(26,29,"Ethnicity")
+        except:
+            pass
+
+        result = aux.send_piercings_to_actortag(actor_to_search)
+        num += result
+        aux.progress(27,29,"Sending piercings to tags")
+        #    sendallpiercings() #    use this whenever you want to update all piercings in db
 
 
-            try:
-                if actor_to_search.ethnicity is not None:
-                    if "black" in ethnicity.lower() and not actor_to_search.actor_tags.filter(name="Black"):
-                        insert_actor_tag(actor_to_search, "Black")
-                        num += 1
-                    elif "asian" in ethnicity.lower() and not actor_to_search.actor_tags.filter(name="Asian"):
-                        insert_actor_tag(actor_to_search, "Asian")
-                        num += 1
-                    elif "latin" in ethnicity.lower() and not actor_to_search.actor_tags.filter(name="Latin"):
-                        insert_actor_tag(actor_to_search, "Latin")
-                        num += 1
-                    elif "caucasian" in ethnicity.lower() and not actor_to_search.actor_tags.filter(name="Caucasian"):
-                        insert_actor_tag(actor_to_search, "Caucasian")
-                        num += 1
-                    elif "middle eastern" in ethnicity.lower() and not actor_to_search.actor_tags.filter(name="Middle Eastern"):
-                        insert_actor_tag(actor_to_search, "Middle Eastern")
-                        num += 1
-                    elif "arabic" in ethnicity.lower() and not actor_to_search.actor_tags.filter(name="Arabic"):
-                        insert_actor_tag(actor_to_search, "Arabic")
-                        num += 1
-                    elif "inuit" in ethnicity.lower() and not actor_to_search.actor_tags.filter(name="Inuit"):
-                        insert_actor_tag(actor_to_search, "Inuit")
-                        num += 1
-                    elif "native american" in ethnicity.lower() and not actor_to_search.actor_tags.filter(name="Native American"):
-                        insert_actor_tag(actor_to_search, "Native American")
-                        num += 1
-
-                aux.progress(26,29,"Ethnicity")
-            except:
-                pass
-
-            result = aux.send_piercings_to_actortag(actor_to_search)
-            num += result
-            aux.progress(27,29,"Sending piercings to tags")
-            #    sendallpiercings() #    use this whenever you want to update all piercings in db
-
-
-            actor_to_search.last_lookup = datetime.datetime.now()
-            actor_to_search.save()
-            aux.progress(28,29,"Saving to database")
+        actor_to_search.last_lookup = datetime.datetime.now()
+        actor_to_search.save()
+        aux.progress(28,29,"Saving to database")
 
     else:
         actor_to_search.last_lookup = datetime.datetime.now()

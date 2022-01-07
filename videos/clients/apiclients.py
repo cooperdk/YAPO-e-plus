@@ -525,7 +525,8 @@ def tpdb(scene_id: int, force: bool):
                 mmmm = release_date.strftime("%B")
                 yy = release_date.strftime("%y")
                 yyyy = release_date.strftime("%Y")
-
+            renameformat = ""
+            renamebase = ""
             if this_scene.websites.all().first():
                 renameformat = this_scene.websites.all().first().filename_format  # find out if the website has it's own rename format
             if len(renameformat) < 5:  # This will tell to get the default rename format
