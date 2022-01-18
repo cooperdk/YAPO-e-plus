@@ -139,7 +139,7 @@ If you know what you're doing, this parameter will start a Python shell with the
 
 1. **Install all Python dependencies by executing:**
 
-    ```pip install -R requirements.txt```
+    ```pip install -r requirements.txt```
    
     from the main YAPO e+ folder. This installs Django and all of the other required libraries in their minimum required versions.
 
