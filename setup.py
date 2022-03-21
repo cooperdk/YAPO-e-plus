@@ -30,5 +30,5 @@ setup(
                       'pywin32>=228; platform_system == "Windows"',
                       'pywin32-ctypes>=0.2.0; platform_system == "Windows"', 'python-dateutil>=2.8.1',
                       'pyyaml>=5.3.1', 'requests>=2.24.0', 'selenium>=3.141.0', 'static-ranges', 'texttable>=1.6.3',
-                      'tmdbsimple==2.6.6', 'waitress==1.4.4', 'webencodings>=0.5.1', 'zipp>=3.2.0'],
+                      'tmdbsimple==2.6.6', 'waitress==2.1.1', 'webencodings>=0.5.1', 'zipp>=3.2.0'],
     )
